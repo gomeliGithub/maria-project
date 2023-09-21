@@ -5,7 +5,7 @@ import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import ms from 'ms';
 
-import { AppService } from 'src/common/app.service';
+import { AppService } from 'src/app.service';
 import { JwtControlService } from 'src/services/sign/jwt-control.service';
 
 import { Admin, Member } from 'src/models/client.model';
