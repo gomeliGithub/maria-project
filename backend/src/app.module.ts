@@ -8,14 +8,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { SignModule } from './modules/sign.module';
+import { ClientModule } from './modules/client.module';
 
-import { JWT } from 'models/sign.model';
-import { Admin, Member } from 'models/client.model';
+import { JWT } from 'src/models/sign.model';
+import { Admin, Member } from 'src/models/client.model';
 
 @Module({
     imports: [
         ConfigModule.forRoot({
-            envFilePath: [ '../config/app/.env.development', '../config/app/.env.production' ],
+            envFilePath: [ 'config/.env.development', 'config/.env.production' ],
             isGlobal: true
         }),
         SequelizeModule.forRootAsync({
@@ -48,7 +49,8 @@ import { Admin, Member } from 'models/client.model';
                 }
             }
         }), 
-        SignModule
+        SignModule,
+        ClientModule
     ],
     controllers: [AppController],
     providers: [AppService],

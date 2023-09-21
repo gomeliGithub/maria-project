@@ -1,11 +1,10 @@
 import sequelize from 'sequelize';
-import { Column, Model, Table, DataType, AutoIncrement, PrimaryKey, AllowNull, Default, CreatedAt } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, PrimaryKey, AllowNull, Default, CreatedAt } from 'sequelize-typescript';
 
 @Table({
     timestamps: false
 })
 export class Admin extends Model {
-    @AutoIncrement
     @PrimaryKey
     @AllowNull(false)
     @Column({ 
@@ -37,7 +36,6 @@ export class Admin extends Model {
     timestamps: false
 })
 export class Member extends Model {
-    @AutoIncrement
     @PrimaryKey
     @AllowNull(false)
     @Column({ 

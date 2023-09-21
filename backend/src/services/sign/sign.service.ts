@@ -8,7 +8,7 @@ import ms from 'ms';
 import { AppService } from 'src/app.service';
 import { JwtControlService } from 'src/services/sign/jwt-control.service';
 
-import { Admin, Member } from 'models/client.model';
+import { Admin, Member } from 'src/models/client.model';
 
 import { generate__secure_fgp } from './sign.generateKeys';
 
