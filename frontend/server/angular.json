@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "server": {
+    "frontendserver": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/server",
+            "outputPath": "dist/frontendserver/browser",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -60,10 +60,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "server:build:production"
+              "browserTarget": "frontendserver:build:production"
             },
             "development": {
-              "browserTarget": "server:build:development"
+              "browserTarget": "frontendserver:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -71,27 +71,27 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "server:build"
+            "browserTarget": "frontendserver:build"
           }
         },
         "serve-ssr": {
           "builder": "@nguniversal/builders:ssr-dev-server",
           "options": {
-            "browserTarget": "server:build",
-            "serverTarget": "server:server"
+            "browserTarget": "frontendserver:build",
+            "serverTarget": "frontendserver:server"
           },
           "configurations": {
             "production": {
-              "browserTarget": "server:build:production",
-              "serverTarget": "server:server:production"
+              "browserTarget": "frontendserver:build:production",
+              "serverTarget": "frontendserver:server:production"
             }
           }
         },
         "prerender": {
           "builder": "@nguniversal/builders:prerender",
           "options": {
-            "browserTarget": "server:build:production",
-            "serverTarget": "server:server:production",
+            "browserTarget": "frontendserver:build:production",
+            "serverTarget": "frontendserver:server:production",
             "routes": ["/"]
           },
           "configurations": {

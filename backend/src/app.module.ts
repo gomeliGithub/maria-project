@@ -4,15 +4,6 @@ import { JwtModule, JwtSecretRequestType } from '@nestjs/jwt';
 import { Algorithm } from 'jsonwebtoken';
 import { ConfigModule } from '@nestjs/config';
 
-
-
-import { join } from 'path';
-import { AngularUniversalModule } from '@nestjs/ng-universal';
-
-import { AppServerModule } from '../../frontend/server/src/app/app.server.module';
-
-
-
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -24,10 +15,6 @@ import { Admin, Member } from './models/client.model';
 
 @Module({
     imports: [
-        AngularUniversalModule.forRoot({
-            bootstrap: AppServerModule,
-            viewsPath: join(process.cwd(), 'dist/frontend/server/src/app') // join(process.cwd(), 'dist/{APP_NAME}/browser')
-        }),
         ConfigModule.forRoot({
             envFilePath: [ 'config/.env.development', 'config/.env.production' ],
             isGlobal: true

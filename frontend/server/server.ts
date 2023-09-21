@@ -1,3 +1,3 @@
 import 'zone.js/dist/zone-node';
-import '../../backend/src/main';
+import './src/server/main';
 export * from './src/main.server';
