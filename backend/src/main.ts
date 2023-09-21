@@ -1,17 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 
-/////////////////////////////////////////////////////////
-/*
-import 'zone.js/node';
-import { APP_BASE_HREF } from '@angular/common';
-import { ngExpressEngine } from '@nguniversal/express-engine';
-import { existsSync } from 'fs';
-import { join } from 'path';
-
-import { AppServerModule } from './src/main.server';
-*/
-/////////////////////////////////////////////////////////
-
 import cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
