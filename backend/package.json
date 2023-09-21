@@ -24,6 +24,7 @@
         "@nestjs/config": "^3.1.1",
         "@nestjs/core": "^9.0.0",
         "@nestjs/jwt": "^10.1.1",
+        "@nestjs/ng-universal": "^8.0.0",
         "@nestjs/platform-express": "^9.0.0",
         "@nestjs/sequelize": "^10.0.0",
         "bcrypt": "^5.1.1",
