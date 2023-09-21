@@ -1,1 +1,0 @@
-2023/09/21 21:53:50 [error] 3008#14536: *6 CreateFile() "g:\Installed_Programs\nginx\nginx-1.25.2/html/nofile.gif" failed (2: The system cannot find the file specified), client: 127.0.0.1, server: localhost, request: "GET /nofile.gif HTTP/1.1", host: "localhost", referrer: "http://localhost/page_sds.html"

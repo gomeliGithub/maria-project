@@ -7,7 +7,7 @@ import { SignService } from 'src/services/sign/sign.service';
 import { SignGuard } from 'src/guards/sign/sign.guard';
 import { JwtControlService } from 'src/services/sign/jwt-control.service';
 
-import { AppService } from 'src/app.service';
+import { AppService } from 'src/common/app.service';
 import { ClientService } from 'src/services/client/client.service';
 
 import { JWT } from 'src/models/sign.model';

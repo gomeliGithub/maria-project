@@ -7,8 +7,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { SignModule } from './modules/sign.module';
-import { ClientModule } from './modules/client.module';
+import { SignModule } from '../modules/sign.module';
+import { ClientModule } from '../modules/client.module';
 
 import { JWT } from 'src/models/sign.model';
 import { Admin, Member } from 'src/models/client.model';
