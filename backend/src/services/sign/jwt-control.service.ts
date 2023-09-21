@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 
 import * as crypto from 'crypto';
 
-import { JWT } from 'src/models/sign.model';
+import { JWT } from '../../models/sign.model';
 
 import { IClient, IRequest } from 'types/global';
 

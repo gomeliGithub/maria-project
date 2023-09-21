@@ -19,14 +19,14 @@ import { AppService } from './app.service';
 import { SignModule } from './modules/sign.module';
 import { ClientModule } from './modules/client.module';
 
-import { JWT } from 'src/models/sign.model';
-import { Admin, Member } from 'src/models/client.model';
+import { JWT } from './models/sign.model';
+import { Admin, Member } from './models/client.model';
 
 @Module({
     imports: [
         AngularUniversalModule.forRoot({
             bootstrap: AppServerModule,
-            viewsPath: '../../../frontend/server/dist/server' // join(process.cwd(), 'dist/{APP_NAME}/browser')
+            viewsPath: join(process.cwd(), 'dist/frontend/server/src/app') // join(process.cwd(), 'dist/{APP_NAME}/browser')
         }),
         ConfigModule.forRoot({
             envFilePath: [ 'config/.env.development', 'config/.env.production' ],

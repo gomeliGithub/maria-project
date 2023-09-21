@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
 
-import { generateCookieSecret, generateJWT_SecretCode } from 'src/services/sign/sign.generateKeys';
+import { generateCookieSecret, generateJWT_SecretCode } from './services/sign/sign.generateKeys';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);

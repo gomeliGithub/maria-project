@@ -5,10 +5,10 @@ import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import ms from 'ms';
 
-import { AppService } from 'src/app.service';
-import { JwtControlService } from 'src/services/sign/jwt-control.service';
+import { AppService } from '../../app.service';
+import { JwtControlService } from '../../services/sign/jwt-control.service';
 
-import { Admin, Member } from 'src/models/client.model';
+import { Admin, Member } from '../../models/client.model';
 
 import { generate__secure_fgp } from './sign.generateKeys';
 

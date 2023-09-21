@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Post, Put, Req, Res, Redirect } from '@nestjs/common';
 import { Response } from 'express';
 
-import { SignService } from 'src/services/sign/sign.service';
+import { SignService } from '../../services/sign/sign.service';
 
 import { IClient, IRequest, IRequestBody } from 'types/global';
 import { IClientAccessData } from 'types/sign';

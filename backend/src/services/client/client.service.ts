@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
-import { Admin, Member } from 'src/models/client.model';
+import { Admin, Member } from '../../models/client.model';
 
 import sequelize from 'sequelize';
 

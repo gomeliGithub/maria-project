@@ -1,7 +1,7 @@
 import { BadRequestException, CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { SignService } from 'src/services/sign/sign.service';
+import { SignService } from '../../services/sign/sign.service';
 
 import { IRequest, IRequestBody } from 'types/global';
 

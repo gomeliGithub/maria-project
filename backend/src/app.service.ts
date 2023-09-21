@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 
 import ms from 'ms';
 
-import { ClientService } from 'src/services/client/client.service';
+import { ClientService } from './services/client/client.service';
 
-import { Admin, Member } from 'src/models/client.model';
+import { Admin, Member } from './models/client.model';
 
 import { ICookieSerializeOptions, IRequest } from 'types/global';
 import { IClientGetOptions } from 'types/options';
