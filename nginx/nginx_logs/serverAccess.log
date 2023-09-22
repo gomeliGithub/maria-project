@@ -1,0 +1,2 @@
+127.0.0.1 - - [22/Sep/2023:22:01:45 +0300] "GET /styles.css HTTP/1.1" 200 415 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" "-" "0.000" "624"
+127.0.0.1 - - [22/Sep/2023:22:08:40 +0300] "GET /styles.css HTTP/1.1" 200 415 "http://localhost/home" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" "-" "0.000" "628"

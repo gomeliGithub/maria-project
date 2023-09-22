@@ -5,8 +5,9 @@ import { Meta, Title } from '@angular/platform-browser';
     providedIn: 'root'
 })
 export class AppService {
-    constructor(
-        private meta: Meta, private platformTitle: Title
+    constructor (
+        private readonly meta: Meta, 
+        private readonly platformTitle: Title
     ) { }
 
     public setMetaTag (property: string, content: string): void {

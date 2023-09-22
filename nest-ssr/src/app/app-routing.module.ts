@@ -5,7 +5,8 @@ import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
 
 const routes: Routes = [
-    { path: '', component: HomeComponent, title: 'Home' },
+    { path: 'home', component: HomeComponent, title: 'Home' },
+    { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'gallery', component: GalleryComponent, title: 'Gallery' }
 ];
 
