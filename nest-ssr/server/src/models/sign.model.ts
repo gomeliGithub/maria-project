@@ -3,7 +3,7 @@ import { Column, Model, Table, DataType } from 'sequelize-typescript';
 @Table({
     timestamps: false
 })
-export class JWT_tokens extends Model {
+export class JWT_token extends Model {
     @Column({ 
         type: DataType.STRING,
         primaryKey: true,

@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 
 import * as crypto from 'crypto';
 
-import { JWT } from '../../models/sign.model';
+import { JWT_token } from '../../models/sign.model';
 
 import { IClient, IRequest } from 'types/global';
 
@@ -13,8 +13,8 @@ export class JwtControlService {
     constructor (
         private readonly jwtService: JwtService,
 
-        @InjectModel(JWT) 
-        private readonly JWT_revokedTokenModel: typeof JWT
+        @InjectModel(JWT_token) 
+        private readonly JWT_tokenModel: typeof JWT_token
     ) { }
 
     public extractTokenFromHeader (request: IRequest): string | undefined {
@@ -51,7 +51,7 @@ export class JwtControlService {
         if (!(await this.checkRevokedTokenIs(token))) {
             const tokenHash: string = (crypto.createHmac("SHA256", token)).digest('hex');
 
-            await this.JWT_revokedTokenModel.create({
+            await this.JWT_tokenModel.create({
                 token_hash: tokenHash,
                 revokation_date: new Date()
             })
@@ -66,10 +66,10 @@ export class JwtControlService {
         } else return true;
     }
 
-    public async checkRevokedTokenIs (token: string): Promise<JWT> {
+    public async checkRevokedTokenIs (token: string): Promise<JWT_token> {
         const tokenHash: string = (crypto.createHmac("SHA256", token)).digest('hex');
 
-        const revokedToken = await this.JWT_revokedTokenModel.findOne({ where: { token_hash: tokenHash }});
+        const revokedToken = await this.JWT_tokenModel.findOne({ where: { token_hash: tokenHash }});
 
         return revokedToken;
     }

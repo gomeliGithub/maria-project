@@ -16,7 +16,7 @@ import { AppService } from './app.service';
 import { SignModule } from './modules/sign.module';
 import { ClientModule } from './modules/client.module';
 
-import { JWT } from './models/sign.model';
+import { JWT_token } from './models/sign.model';
 import { Admin, Member } from './models/client.model';
 
 @Module({
@@ -38,7 +38,7 @@ import { Admin, Member } from './models/client.model';
                 username: process.env.DB_USERNAME,
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
-                models: [ JWT, Admin, Member ],
+                models: [ JWT_token, Admin, Member ],
                 autoLoadModels: true,
                 synchronize: true
             })

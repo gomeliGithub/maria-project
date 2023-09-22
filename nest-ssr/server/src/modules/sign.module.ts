@@ -10,11 +10,11 @@ import { JwtControlService } from '../services/sign/jwt-control.service';
 import { AppService } from '../app.service';
 import { ClientService } from '../services/client/client.service';
 
-import { JWT } from '../models/sign.model';
+import { JWT_token } from '../models/sign.model';
 import { Admin, Member } from '../models/client.model';
 
 @Module({
-    imports: [ SequelizeModule.forFeature([ JWT, Admin, Member ]) ],
+    imports: [ SequelizeModule.forFeature([ JWT_token, Admin, Member ]) ],
     providers: [ SignService, JwtControlService, AppService, ClientService, {
         provide: APP_GUARD,
         useClass: SignGuard,
