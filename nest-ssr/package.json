@@ -35,7 +35,7 @@
         "@nestjs/ng-universal": "^8.0.0",
         "@nestjs/platform-express": "^10.2.6",
         "@nestjs/sequelize": "^10.0.0",
-        "@nguniversal/express-engine": "^16.2.0",
+        "@nguniversal/express-engine": "^15.2.1",
         "aws-sdk": "^2.1462.0",
         "bcrypt": "^5.1.1",
         "class-transformer": "^0.5.1",
