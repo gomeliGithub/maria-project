@@ -6,7 +6,7 @@ import { AppService } from './app.service';
 
 import { IRequest, IRequestBody } from 'types/global';
 
-@Controller('/api/main')
+@Controller('/main')
 export class AppController {
     constructor(private readonly appService: AppService) { }
 

@@ -6,7 +6,7 @@ import { SignService } from '../../services/sign/sign.service';
 import { IClient, IRequest, IRequestBody } from 'types/global';
 import { IClientAccessData } from 'types/sign';
 
-@Controller('/api/sign')
+@Controller('/sign')
 export class SignController {
     constructor(
         private readonly signService: SignService

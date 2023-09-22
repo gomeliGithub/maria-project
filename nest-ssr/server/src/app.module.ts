@@ -1,8 +1,14 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
+import mysql2 from 'mysql2';
 import { JwtModule, JwtSecretRequestType } from '@nestjs/jwt';
 import { Algorithm } from 'jsonwebtoken';
 import { ConfigModule } from '@nestjs/config';
+
+import { join } from 'path';
+
+import { AngularUniversalModule } from '@nestjs/ng-universal';
+import { AppServerModule } from '../../src/main.server';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -15,13 +21,18 @@ import { Admin, Member } from './models/client.model';
 
 @Module({
     imports: [
+        AngularUniversalModule.forRoot({
+            bootstrap: AppServerModule,
+            viewsPath: join(process.cwd(), 'dist/nest-ssr/browser')
+        }),
         ConfigModule.forRoot({
-            envFilePath: [ 'config/.env.development', 'config/.env.production' ],
+            envFilePath: [ 'server/config/.env.development', 'server/config/.env.production' ],
             isGlobal: true
         }),
         SequelizeModule.forRootAsync({
             useFactory: () => ({
                 dialect: 'mysql',
+                dialectModule: mysql2,
                 host: process.env.DB_HOST,
                 port: parseInt(process.env.DB_PORT as string, 10),
                 username: process.env.DB_USERNAME,
@@ -29,7 +40,7 @@ import { Admin, Member } from './models/client.model';
                 database: process.env.DB_NAME,
                 models: [ JWT, Admin, Member ],
                 autoLoadModels: true,
-                synchronize: true,
+                synchronize: true
             })
         }),
         JwtModule.register({

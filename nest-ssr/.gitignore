@@ -1,6 +1,15 @@
-# compiled output
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# Compiled output
 /dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
 /node_modules
+npm-debug.log
+yarn-error.log
 
 # Logs
 logs
@@ -19,7 +28,7 @@ lerna-debug.log*
 /.nyc_output
 
 # IDEs and editors
-/.idea
+.idea/
 .project
 .classpath
 .c9/
@@ -27,12 +36,26 @@ lerna-debug.log*
 .settings/
 *.sublime-workspace
 
-# IDE - VSCode
+# Visual Studio Code
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+
+# System files
+.DS_Store
+Thumbs.db
 
 # Config
 /config
