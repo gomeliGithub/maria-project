@@ -9,7 +9,7 @@
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
-        "noImplicitOverride": true,
+        "noImplicitOverride": false,
         "noPropertyAccessFromIndexSignature": false,
         "strictNullChecks": false,
         "noImplicitAny": false,

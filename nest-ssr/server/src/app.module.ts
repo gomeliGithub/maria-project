@@ -15,6 +15,7 @@ import { AppService } from './app.service';
 
 import { SignModule } from './modules/sign.module';
 import { ClientModule } from './modules/client.module';
+import { ImageControlModule } from './modules/image-control.module';
 
 import { JWT_token } from './models/sign.model';
 import { Admin, Member } from './models/client.model';
@@ -61,7 +62,8 @@ import { Admin, Member } from './models/client.model';
             }
         }), 
         SignModule,
-        ClientModule
+        ClientModule,
+        ImageControlModule
     ],
     controllers: [AppController],
     providers: [AppService],

@@ -1,5 +1,7 @@
 import sequelize from 'sequelize';
-import { Column, Model, Table, DataType, PrimaryKey, AllowNull, Default, CreatedAt } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, PrimaryKey, AllowNull, Default, CreatedAt, HasMany } from 'sequelize-typescript';
+
+import { СompressedImage } from './image-control.model';
 
 @Table({
     timestamps: false
@@ -30,6 +32,9 @@ export class Admin extends Model {
         type: DataType.DATE
     })
     creationDate: Date;
+
+    @HasMany(() => СompressedImage)
+    compressedImages: СompressedImage[];
 }
 
 @Table({
@@ -61,4 +66,7 @@ export class Member extends Model {
         type: DataType.DATE
     })
     creationDate: Date;
+
+    @HasMany(() => СompressedImage)
+    compressedImages: СompressedImage[];
 }
