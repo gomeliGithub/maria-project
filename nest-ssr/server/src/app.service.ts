@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
 import ms from 'ms';
+import sharp from 'sharp';
 
 import { ClientService } from './services/client/client.service';
+import { ImageControlService } from './services/image-control/image-control.service';
 
 import { Admin, Member } from './models/client.model';
 
@@ -12,7 +14,8 @@ import { IClientGetOptions } from 'types/options';
 @Injectable()
 export class AppService {
     constructor (
-        private readonly clientService: ClientService
+        private readonly clientService: ClientService,
+        private readonly imageControlService: ImageControlService
     ) { }
 
     public cookieSerializeOptions: ICookieSerializeOptions = {
@@ -32,5 +35,9 @@ export class AppService {
 
     public registerClientLastLoginTime (request: IRequest, login: string): Promise<void> {
         return this.clientService.registerClientLastLoginTime(request, login);
+    }
+
+    public async compressImage (inputImagePath: string, outputDirPath: string, options: sharp.SharpOptions): Promise<boolean> {
+        return this.imageControlService.compressImage(inputImagePath, outputDirPath, options);
     }
 }

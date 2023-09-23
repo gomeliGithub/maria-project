@@ -44,6 +44,7 @@
         "class-validator": "^0.14.0",
         "cookie-parser": "^1.4.6",
         "express": "^4.15.2",
+        "file-type": "^18.5.0",
         "hammerjs": "^2.0.8",
         "jquery": "^3.7.1",
         "mock-aws-s3": "^4.0.2",
