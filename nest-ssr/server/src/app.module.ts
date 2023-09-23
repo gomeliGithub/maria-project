@@ -19,6 +19,7 @@ import { ImageControlModule } from './modules/image-control.module';
 
 import { JWT_token } from './models/sign.model';
 import { Admin, Member } from './models/client.model';
+import { СompressedImage } from './models/image-control.model';
 
 @Module({
     imports: [
@@ -39,7 +40,7 @@ import { Admin, Member } from './models/client.model';
                 username: process.env.DB_USERNAME,
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
-                models: [ JWT_token, Admin, Member ],
+                models: [ JWT_token, Admin, Member, СompressedImage ],
                 autoLoadModels: true,
                 synchronize: true
             })

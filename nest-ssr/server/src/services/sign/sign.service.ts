@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 
@@ -90,30 +90,35 @@ export class SignService {
     public async signOut (request: IRequest): Promise<void> {
         const token = this.jwtControlService.extractTokenFromHeader(request);
 
-        if (!token || token === "") throw new UnauthorizedException();
+        if ( !token || token === "" ) throw new UnauthorizedException();
 
         return this.jwtControlService.addRevokedToken(token);
     }
 
-    public async getActiveClient (request: IRequest, options: IGetActiveClientOptions): Promise<string | IClient> {
+    public async getActiveClient (request: IRequest, options?: { includeFields?: string, allowedIncludedFields?: string[] }): Promise<string>
+    public async getActiveClient (request: IRequest, options?: { includeFields?: string[], allowedIncludedFields?: string[] }): Promise<IClient>
+    public async getActiveClient (request: IRequest, options?: IGetActiveClientOptions): Promise<string | IClient> {
         const token: string = this.jwtControlService.extractTokenFromHeader(request);
 
-        if (!token || token === "") return null;
+        if ( !token || token === " ") return null;
         
         const validatedClient: IClient = await this.jwtControlService.tokenValidate(request, token, false);
-
-        if (!options.includedFields) options.includedFields = options.allowedIncludedFields; 
         
-        if (validatedClient) {
-            if (typeof options.includedFields === 'string') return validatedClient[options.includedFields];
+        if ( validatedClient ) {
+            if ( !options ) options = {};
 
-            if (Array.isArray(options.includedFields)) {
-                Object.keys(validatedClient).forEach(field => {
-                    !options.includedFields.includes(field) ? delete validatedClient[field] : null;
-                });
+            if ( options.includedFields ) {
+                if ( typeof options.includedFields === 'string' ) return validatedClient[options.includedFields];
+                else if ( Array.isArray(options.includedFields) ) {
+                    if ( options.allowedIncludedFields && options.includedFields.some(field => !options.allowedIncludedFields.includes(field)) ) throw new BadRequestException();
 
-                return validatedClient;
-            }
+                    Object.keys(validatedClient).forEach(field => {
+                        !options.includedFields.includes(field) ? delete validatedClient[field] : null;
+                    });
+
+                    return validatedClient;
+                }
+            } else return validatedClient;
         }
     }
 

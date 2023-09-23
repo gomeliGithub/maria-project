@@ -28,10 +28,11 @@ export class Admin extends Model {
 
     @Default(sequelize.literal('CURRENT_TIMESTAMP'))
     @CreatedAt
+    @AllowNull(false)
     @Column({ 
         type: DataType.DATE
     })
-    creationDate: Date;
+    signUpDate: Date;
 
     @HasMany(() => СompressedImage)
     compressedImages: СompressedImage[];
@@ -65,7 +66,7 @@ export class Member extends Model {
     @Column({ 
         type: DataType.DATE
     })
-    creationDate: Date;
+    signUpDate: Date;
 
     @HasMany(() => СompressedImage)
     compressedImages: СompressedImage[];

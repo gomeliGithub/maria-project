@@ -8,3 +8,8 @@ export interface IClientGetOptions {
     rawResult?: boolean;
     clientType?: 'admin' | 'member';
 }
+
+export interface IDownloadOriginalImageOptions {
+    imagePath?: string;
+    compressedImageName?: string;
+}

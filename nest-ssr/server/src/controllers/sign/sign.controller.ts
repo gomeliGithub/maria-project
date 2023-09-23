@@ -35,6 +35,6 @@ export class SignController {
             || Array.isArray(requestBody.sign.includedFields) && !requestBody.sign.includedFields.every(includedField => allowedIncludedFields.includes(includedField))
         ) throw new BadRequestException();
 
-        return this.signService.getActiveClient(request, { includedFields: requestBody.sign.includedFields, allowedIncludedFields });
+        return this.signService.getActiveClient(request, { includeFields: requestBody.sign.includedFields, allowedIncludedFields });
     }
 }
