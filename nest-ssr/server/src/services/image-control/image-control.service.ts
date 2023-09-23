@@ -8,17 +8,23 @@ import path from 'path';
 import sharp from 'sharp';
 import { fileTypeFromFile } from 'file-type';
 
+import { AppService } from '../../app.service';
+
 import { Admin, Member } from '../../models/client.model';
 import { СompressedImage } from '../../models/image-control.model';
+
+import { IRequest } from 'types/global';
 
 @Injectable()
 export class ImageControlService {
     constructor (
+        private readonly appService: AppService,
+        
         @InjectModel(СompressedImage) 
         private readonly compressedImageModel: typeof СompressedImage
     ) { }
 
-    public async compressImage (inputImagePath: string, outputDirPath: string, options?: sharp.SharpOptions): Promise<boolean> {
+    public async compressImage (request: IRequest, inputImagePath: string, outputDirPath: string, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
         const supportedImageTypes: string[] = [ 'jpg', 'png', 'webp', 'avif', 'gif', 'svg', 'tiff' ];
 
         const { ext } = await fileTypeFromFile(inputImagePath);
@@ -54,7 +60,7 @@ export class ImageControlService {
                 originalImageDirPath: inputImageDirPath
             });
 
-            const client: Admin | Member = null;
+            const client: Admin | Member = await this.appService.getClients(request, activeClientLogin);
 
             await client.$add('compressedImages', newCompressedImage);
 

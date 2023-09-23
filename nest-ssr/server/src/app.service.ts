@@ -35,7 +35,10 @@ export class AppService {
 
     public clientOriginalImagesDir: string = path.join(this.__dirname, 'originalImages');
 
-    public getClients (request: IRequest, loginList: string | string[], options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[]> {
+    public async getClients (request: IRequest, loginList: string, options?: IClientGetOptions): Promise<Admin | Member>
+    public async getClients (request: IRequest, loginList: string[], options?: IClientGetOptions): Promise<Admin[] | Member[]>
+    public async getClients (request: IRequest, loginList: string | string[], options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[]>
+    public async getClients (request: IRequest, loginList: string | string[], options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[]> {
         return this.clientService.get(request, loginList, options);
     }
 
@@ -53,7 +56,7 @@ export class AppService {
         return this.signService.getActiveClient(request, options);
     }
 
-    public async compressImage (inputImagePath: string, outputDirPath: string, options?: sharp.SharpOptions): Promise<boolean> {
-        return this.imageControlService.compressImage(inputImagePath, outputDirPath, options);
+    public async compressImage (request: IRequest, inputImagePath: string, outputDirPath: string, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
+        return this.imageControlService.compressImage(request, inputImagePath, outputDirPath, activeClientLogin, options);
     }
 }

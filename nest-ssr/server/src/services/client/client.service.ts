@@ -97,7 +97,7 @@ export class ClientService {
         request.on('end', () => writeStream.end());
 
         writeStream.on('close', async () => {
-            const compressResult: boolean = await this.appService.compressImage(newOriginalImagePath, path.join(this.appService.__dirname, 'src/assets'));
+            const compressResult: boolean = await this.appService.compressImage(request, newOriginalImagePath, path.join(this.appService.__dirname, 'assets'), activeClientLogin);
 
             if (!compressResult) throw new InternalServerErrorException();
         });
