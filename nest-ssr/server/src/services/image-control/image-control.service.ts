@@ -15,12 +15,12 @@ export class ImageControlService {
 
         const { ext } = await fileTypeFromFile(inputImagePath);
 
-        if (!supportedImageTypes.includes(ext)) return false;
+        if ( !supportedImageTypes.includes(ext) ) return false;
 
         if ( !options ) options = {
             create: {
-                width: 48,
-                height: 48,
+                width: 300,
+                height: 300,
                 channels: 4,
                 background: { r: 255, g: 0, b: 0, alpha: 0.5 }
             }
@@ -36,7 +36,7 @@ export class ImageControlService {
             await fsPromises.rename(outputTempFilePath, outputFilePath);
 
             return true;
-        } catch (error: any) {
+        } catch ( error: any ) {
             console.error(error);
 
             return false;
