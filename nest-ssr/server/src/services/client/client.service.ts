@@ -2,7 +2,9 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { InjectModel } from '@nestjs/sequelize';
 
 import fs from 'fs';
+import fsPromises from 'fs/promises';
 import path from 'path';
+import querystring from 'querystring';
 
 import { Response } from 'express';
 
@@ -97,7 +99,7 @@ export class ClientService {
         request.on('end', () => writeStream.end());
 
         writeStream.on('close', async () => {
-            const compressResult: boolean = await this.appService.compressImage(request, newOriginalImagePath, path.join(this.appService.__dirname, 'assets'), activeClientLogin);
+            const compressResult: boolean = await this.appService.compressImage(request, newOriginalImagePath, path.join(this.appService.clientCompressedImagesDir), activeClientLogin);
 
             if (!compressResult) throw new InternalServerErrorException();
         });
@@ -123,6 +125,24 @@ export class ClientService {
             else throw new BadRequestException();
 
             return;
+        }
+    }
+
+    public async getCompressedImage (params: string[], response: Response): Promise<void> {
+        const fullImageName: string = querystring.unescape(params[0]);
+        const imageNameOnly: string = querystring.unescape(params[1]);
+        const imageExtName: string = querystring.unescape(params[2]);
+
+        const imagePath: string = path.join(this.appService.clientCompressedImagesDir, fullImageName);
+
+        try {
+            await fsPromises.access(imagePath, fsPromises.constants.F_OK);
+
+            response.sendFile(imagePath);
+        } catch (error) {
+            console.error(error);
+
+            throw new BadRequestException();
         }
     }
 }

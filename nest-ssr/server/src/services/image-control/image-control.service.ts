@@ -43,7 +43,7 @@ export class ImageControlService {
         const inputImageDirPath: string = path.dirname(inputImagePath);
         const inputImageName: string = path.basename(inputImagePath);
 
-        const outputImageName: string = path.basename(inputImagePath, path.extname(inputImagePath)) + '.' + ext;
+        const outputImageName: string = `${path.basename(inputImagePath, path.extname(inputImagePath))}_thumb.${ext}`;
         const outputImagePath: string = path.join(outputDirPath, outputImageName);
         const outputTempFilePath: string = this.getTempFileName(outputImagePath);
 

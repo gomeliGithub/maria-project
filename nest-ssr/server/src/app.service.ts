@@ -34,6 +34,7 @@ export class AppService {
     }
 
     public clientOriginalImagesDir: string = path.join(this.__dirname, 'originalImages');
+    public clientCompressedImagesDir: string = path.join(this.__dirname, 'images_thumb');
 
     public async getClients (request: IRequest, loginList: string, options?: IClientGetOptions): Promise<Admin | Member>
     public async getClients (request: IRequest, loginList: string[], options?: IClientGetOptions): Promise<Admin[] | Member[]>
