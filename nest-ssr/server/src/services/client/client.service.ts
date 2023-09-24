@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
+import sequelize from 'sequelize';
+
 import fs from 'fs';
 import fsPromises from 'fs/promises';
 import path from 'path';
@@ -12,8 +14,6 @@ import { AppService } from '../../app.service';
 
 import { Admin, Member } from '../../models/client.model';
 import { СompressedImage } from '../../models/image-control.model';
-
-import sequelize from 'sequelize';
 
 import { IRequest } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions } from 'types/options';
