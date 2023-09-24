@@ -2,7 +2,7 @@
     "extends": "./tsconfig.app.json",
     "compilerOptions": {
         "outDir": "./out-tsc/app-server",
-        "module": "commonjs",
+        "module": "ES2022",
         "types": ["node"],
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true

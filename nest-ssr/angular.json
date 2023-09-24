@@ -41,7 +41,7 @@
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "500kb",
+                                    "maximumWarning": "800kb",
                                     "maximumError": "1mb"
                                 },
                                 {
@@ -138,7 +138,12 @@
                             "@nestjs/websockets",
                             "@nestjs/websockets/socket-module",
                             "cache-manager",
-                            "bcrypt"
+                            "bcrypt",
+                            "sharp",
+                            "@nestjs/common",
+                            "@nestjs/core",
+                            "sequelize-typescript",
+                            "sequelize"
                         ]
                     },
                     "configurations": {
