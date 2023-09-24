@@ -12,8 +12,6 @@ async function bootstrap() {
     process.env.JWT_SECRETCODE = generateJWT_SecretCode();
     process.env.COOKIE_SECRET = generateCookieSecret();
 
-    app.setGlobalPrefix('/api');
-
     app.enableCors({
         origin: process.env.CORS_ORIGIN, 
         methods: [ 'GET', 'PUT', 'POST', 'DELETE' ], 
@@ -21,6 +19,8 @@ async function bootstrap() {
     });
 
     app.use(cookieParser(process.env.COOKIE_SECRET));
+
+    app.setGlobalPrefix('/api');
 
     await app.listen(process.env['PORT'] || 4000);
 }
