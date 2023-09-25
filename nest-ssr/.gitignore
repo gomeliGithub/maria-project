@@ -57,6 +57,11 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Images
+*.jpg
+*.jpeg
+*.png
+
 # Config
 /config
 .env.*
