@@ -14,7 +14,7 @@ export class AppController {
         console.log(requestBody);
         console.log(params.pageName);
 
-        const page = await fsPromises.readFile('../frontend/nginx/home.html', { encoding: 'utf8' });
+        const page = await fsPromises.readFile('../nginx/home.html', { encoding: 'utf8' });
 
         return page;
     }
