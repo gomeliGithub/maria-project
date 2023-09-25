@@ -9,6 +9,8 @@ import { generateCookieSecret, generateJWT_SecretCode } from './services/sign/si
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
+    const port: number = parseInt(process.env.PORT, 10) ?? 4000;
+
     process.env.JWT_SECRETCODE = generateJWT_SecretCode();
     process.env.COOKIE_SECRET = generateCookieSecret();
 
@@ -22,7 +24,7 @@ async function bootstrap() {
 
     app.setGlobalPrefix('/api');
 
-    await app.listen(process.env.PORT && 4000);
+    await app.listen(port);
 }
 
 declare const __non_webpack_require__: NodeRequire;

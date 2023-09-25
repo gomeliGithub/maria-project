@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { LazyModuleLoader } from '@nestjs/core';
 import { InjectModel } from '@nestjs/sequelize';
 
 import { Buffer } from 'node:buffer';
@@ -8,16 +9,20 @@ import path from 'path';
 import sharp from 'sharp';
 import { fileTypeFromFile } from 'file-type';
 
-import { AppService } from '../../app.service';
+import { CommonModule } from '../../modules/common.module';
 
-import { Admin, Member } from '../../models/client.model';
-import { СompressedImage } from '../../models/image-control.model';
+import { AppService } from '../../app.service';
+import { CommonService } from '../common/common.service';
+
+import { Admin, Member, СompressedImage } from '../../models/client.model';
 
 import { IRequest } from 'types/global';
 
 @Injectable()
 export class ImageControlService {
     constructor (
+        private lazyModuleLoader: LazyModuleLoader,
+
         private readonly appService: AppService,
         
         @InjectModel(СompressedImage) 
@@ -60,7 +65,10 @@ export class ImageControlService {
                 originalImageDirPath: inputImageDirPath
             });
 
-            const client: Admin | Member = await this.appService.getClients(request, activeClientLogin);
+            const commonModuleRef = await this.lazyModuleLoader.load(() => CommonModule);
+            const commonServiceRef = commonModuleRef.get(CommonService);
+
+            const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin);
 
             await client.$add('compressedImages', newCompressedImage);
 

@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { SequelizeModule } from '@nestjs/sequelize';
 
+import { AppService } from '../app.service';
+
 import { SignController } from '../controllers/sign/sign.controller';
 import { SignService } from '../services/sign/sign.service';
 import { SignGuard } from '../guards/sign/sign.guard';
@@ -12,7 +14,7 @@ import { Admin, Member } from '../models/client.model';
 
 @Module({
     imports: [ SequelizeModule.forFeature([ JWT_token, Admin, Member ]) ],
-    providers: [ SignService, JwtControlService, {
+    providers: [ AppService, SignService, JwtControlService, {
         provide: APP_GUARD,
         useClass: SignGuard,
     }],

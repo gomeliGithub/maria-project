@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { LazyModuleLoader } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 
 import { Response } from 'express';
@@ -6,7 +7,10 @@ import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import ms from 'ms';
 
+import { CommonModule } from '../../modules/common.module';
+
 import { AppService } from '../../app.service';
+import { CommonService } from '../common/common.service';
 import { JwtControlService } from '../../services/sign/jwt-control.service';
 
 import { Admin, Member } from '../../models/client.model';
@@ -20,6 +24,8 @@ import { IGetActiveClientOptions } from 'types/options';
 @Injectable()
 export class SignService {
     constructor (
+        private lazyModuleLoader: LazyModuleLoader,
+        
         private readonly appService: AppService,
         private readonly jwtService: JwtService,
         private readonly jwtControlService: JwtControlService
@@ -27,6 +33,9 @@ export class SignService {
 
     public async validateClient (request: IRequest, requiredClientTypes: string[]): Promise<boolean> {
         const token = this.jwtControlService.extractTokenFromHeader(request); 
+
+        const commonModuleRef = await this.lazyModuleLoader.load(() => CommonModule);
+        const commonServiceRef = commonModuleRef.get(CommonService);
 
         if (request.url === "/api/sign/in") {
             const requestBody: IRequestBody = request.body;
@@ -36,7 +45,7 @@ export class SignService {
 
             await this._signDataValidate(request, clientLogin, clientPassword);
 
-            await this.appService.registerClientLastActivityTime(request, clientLogin);
+            await commonServiceRef.registerClientLastActivityTime(request, clientLogin);
 
             return true;
         } else {
@@ -46,7 +55,7 @@ export class SignService {
 
             const clientType: string = validatedClient.type;
 
-            await this.appService.registerClientLastActivityTime(request, validatedClient.login);
+            await commonServiceRef.registerClientLastActivityTime(request, validatedClient.login);
 
             return requiredClientTypes.some(requiredClientType => requiredClientType === clientType);
         }
@@ -54,8 +63,11 @@ export class SignService {
 
     public async signIn (request: IRequest, clientAuthData: IClientSignData, response: Response): Promise<IClientAccessData> {
         const clientLogin: string = clientAuthData.login; 
+
+        const commonModuleRef = await this.lazyModuleLoader.load(() => CommonModule);
+        const commonServiceRef = commonModuleRef.get(CommonService);
         
-        const client: Admin | Member = await this.appService.getClients(request, clientLogin, {
+        const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, {
             includeFields: [ 'login', 'fullName' ],
             rawResult: true
         }) as Admin | Member;
@@ -77,7 +89,7 @@ export class SignService {
 
         payload.__secure_fgpHash = __secure_fgpHash;
 
-        await this.appService.registerClientLastLoginTime(request, clientLogin);
+        await commonServiceRef.registerClientLastLoginTime(request, clientLogin);
 
         response.cookie('__secure_fgp', __secure_fgp, this.appService.cookieSerializeOptions);
 
@@ -124,7 +136,10 @@ export class SignService {
     }
 
     private async _signDataValidate (request: IRequest, clientLogin: string, clientPassword: string): Promise<void> {
-        const client: Admin | Member = await this.appService.getClients(request, clientLogin, {
+        const commonModuleRef = await this.lazyModuleLoader.load(() => CommonModule);
+        const commonServiceRef = commonModuleRef.get(CommonService);
+
+        const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, {
             includeFields: [ 'password' ],
             rawResult: true
         }) as Admin | Member;

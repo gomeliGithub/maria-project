@@ -18,8 +18,8 @@ import { ClientModule } from './modules/client.module';
 import { ImageControlModule } from './modules/image-control.module';
 
 import { JWT_token } from './models/sign.model';
-import { Admin, Member } from './models/client.model';
-import { СompressedImage } from './models/image-control.model';
+import { Admin, Member, СompressedImage } from './models/client.model';
+import { CommonModule } from './modules/common.module';
 
 @Module({
     imports: [
@@ -36,7 +36,7 @@ import { СompressedImage } from './models/image-control.model';
                 dialect: 'mysql',
                 dialectModule: mysql2,
                 host: process.env.DB_HOST,
-                port: parseInt(process.env.DB_PORT as string, 10),
+                port: parseInt(process.env.DB_PORT, 10),
                 username: process.env.DB_USERNAME,
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
@@ -57,14 +57,15 @@ import { СompressedImage } from './models/image-control.model';
             },
             secretOrKeyProvider: (requestType: JwtSecretRequestType) => {
                 switch (requestType) {
-                    case JwtSecretRequestType.SIGN: return process.env.JWT_SECRETCODE as string;
-                    case JwtSecretRequestType.VERIFY: return process.env.JWT_SECRETCODE as string;
+                    case JwtSecretRequestType.SIGN: return process.env.JWT_SECRETCODE;
+                    case JwtSecretRequestType.VERIFY: return process.env.JWT_SECRETCODE;
                 }
             }
         }), 
         SignModule,
         ClientModule,
-        ImageControlModule
+        ImageControlModule,
+        CommonModule
     ],
     controllers: [AppController],
     providers: [AppService],

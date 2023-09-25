@@ -1,10 +1,9 @@
-import { Column, Model, Table, DataType, AutoIncrement, PrimaryKey, AllowNull } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, PrimaryKey, AllowNull } from 'sequelize-typescript';
 
 @Table({
     timestamps: false
 })
 export class JWT_token extends Model {
-    @AutoIncrement
     @PrimaryKey
     @AllowNull(false)
     @Column({ 

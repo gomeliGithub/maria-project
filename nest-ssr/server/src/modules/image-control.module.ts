@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 
+import { AppService } from '../app.service';
+
 import { ImageControlService } from '../services/image-control/image-control.service';
 
-import { СompressedImage } from '../models/image-control.model';
+import { СompressedImage } from '../models/client.model';
 
 @Module({
     imports: [ SequelizeModule.forFeature([ СompressedImage ]) ],
-    providers: [ImageControlService],
+    providers: [ AppService, ImageControlService ],
     // controllers: [ImageControlController],
     exports: [ImageControlService]
 })
