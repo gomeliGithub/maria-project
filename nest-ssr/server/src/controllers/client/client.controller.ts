@@ -1,6 +1,4 @@
-import { BadRequestException, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
-
-import { Response } from 'express';
+import { BadRequestException, Controller, Get, Param, Post, Req } from '@nestjs/common';
 
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
@@ -21,8 +19,8 @@ export class ClientController {
         return this.clientService.uploadImage(request, imageName);
     }
 
-    @Get('/^\/image\/(([a-zA-Z\d]+)_thumb\.(jpg|jpeg|gif|png))$/')
-    async getCompressedImage (@Param() params: string[], @Res({ passthrough: true }) response: Response): Promise<void> {
-        return this.clientService.getCompressedImage(params, response);
+    @Get('/getCompressedImagesList/:imagesType')
+    async getCompressedImagesList (@Param('imagesType') imagesType: string): Promise<string[]> {
+        return this.clientService.getCompressedImagesList(imagesType.substring(1));
     }
 }

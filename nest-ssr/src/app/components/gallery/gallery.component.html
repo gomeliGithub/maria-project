@@ -1,3 +1,5 @@
-<div>
-    <span class="text-success fw-bold">{{title}} WORKING!!!!!!!!!</span>
+<div class="p-3" id="galleryContainer">
+    <div class="h-50 w-25" id="commonImages">
+        <img *ngFor="let imagePath of compressedImagesList | async" src="/assets/images_thumbnail/main/{{imagePath}}" class="img-thumbnail">
+    </div>
 </div>

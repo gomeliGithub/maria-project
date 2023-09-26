@@ -7,7 +7,6 @@ import sequelize from 'sequelize';
 import fs from 'fs';
 import fsPromises from 'fs/promises';
 import path from 'path';
-import querystring from 'querystring';
 
 import { Response } from 'express';
 
@@ -35,6 +34,8 @@ export class ClientService {
         @InjectModel(СompressedImage)
         private readonly compressedImageModel: typeof СompressedImage
     ) { }
+
+    public compressedImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
 
     public async get (request: IRequest, loginList: string, options?: IClientGetOptions): Promise<Admin | Member>
     public async get (request: IRequest, loginList: string[], options?: IClientGetOptions): Promise<Admin[] | Member[]>
@@ -136,21 +137,13 @@ export class ClientService {
         }
     }
 
-    public async getCompressedImage (params: string[], response: Response): Promise<void> {
-        const fullImageName: string = querystring.unescape(params[0]);
-        const imageNameOnly: string = querystring.unescape(params[1]);
-        const imageExtName: string = querystring.unescape(params[2]);
+    public async getCompressedImagesList (imagesType: string): Promise<string[]> {
+        const compressedImagesDirPaths: string[] = [ 'main' ];
 
-        const imagePath: string = path.join(this.appService.clientCompressedImagesDir, fullImageName);
+        if ( !compressedImagesDirPaths.includes(imagesType) ) throw new BadRequestException();
 
-        try {
-            await fsPromises.access(imagePath, fsPromises.constants.F_OK);
+        const imagesList: string[] = await fsPromises.readdir(path.join(this.compressedImagesDirPath, imagesType));
 
-            response.sendFile(imagePath);
-        } catch (error) {
-            console.error(error);
-
-            throw new BadRequestException();
-        }
+        return imagesList;
     }
 }

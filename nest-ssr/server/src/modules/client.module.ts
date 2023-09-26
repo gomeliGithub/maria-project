@@ -4,13 +4,14 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { AppService } from '../app.service';
 
 import { ClientService } from '../services/client/client.service';
+import { ClientController } from '../controllers/client/client.controller';
 
 import { Admin, Member, СompressedImage } from '../models/client.model';
 
 @Module({
     imports: [ SequelizeModule.forFeature([ Admin, Member, СompressedImage ]) ],
     providers: [ AppService, ClientService ],
-    // controllers: [ClientController],
+    controllers: [ClientController],
     exports: [ClientService]
 })
 export class ClientModule {}

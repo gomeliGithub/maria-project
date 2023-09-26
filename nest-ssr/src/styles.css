@@ -8,13 +8,11 @@ body {
     width: 100%;
 }
 
-/*
 .bg-image {
-    background-image: url('assets/TestBackground.png');
+    background-image: url('assets/TestBackground.jpg');
     position: relative;
-    overflow: hidden;
+    overflow: auto;
     background-repeat: no-repeat;
     background-size: cover;
     background-position: 50%;
 }
-*/
