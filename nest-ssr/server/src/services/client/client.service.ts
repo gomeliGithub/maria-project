@@ -50,12 +50,12 @@ export class ClientService {
 
         let clients: Admin | Member | Admin[] | Member[] = null;
 
-        if (options && options.includeFields) findOptions.attributes = options.includeFields;
-        if (options && options.hasOwnProperty('rawResult')) findOptions.raw = options.rawResult;
+        if ( options && options.includeFields ) findOptions.attributes = options.includeFields;
+        if ( options && options.hasOwnProperty('rawResult') ) findOptions.raw = options.rawResult;
 
-        if (options && !options.clientType) {
+        if (options && !options.clientType ) {
             try {
-                if (!Array.isArray(loginList)) {
+                if (!Array.isArray(loginList) ) {
                     clients = await Promise.any([
                         this.adminModel.findOne(findOptions),
                         this.memberModel.findOne(findOptions)
@@ -71,8 +71,8 @@ export class ClientService {
             }
         }
 
-        if (!(clients instanceof Admin) || (Array.isArray(clients) && !clients.every(client => client instanceof Admin))) {
-            if (!Array.isArray(clients)) {
+        if (!(clients instanceof Admin) || (Array.isArray(clients) && !clients.every(client => client instanceof Admin)) ) {
+            if ( !Array.isArray(clients) ) {
 
             } else {
 
@@ -110,7 +110,7 @@ export class ClientService {
         writeStream.on('close', async () => {
             const compressResult: boolean = await commonServiceRef.compressImage(request, newOriginalImagePath, path.join(this.appService.clientCompressedImagesDir), activeClientLogin);
 
-            if (!compressResult) throw new InternalServerErrorException();
+            if ( !compressResult ) throw new InternalServerErrorException();
         });
 
         request.on('error', error => {
