@@ -14,10 +14,21 @@ export class SignController {
         private readonly signService: SignService
     ) { }
 
+    @Post('/up')
+    @ClientTypes('admin', 'member')
+    async signUp (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
+        if ( !requestBody.sign || !requestBody.sign.clientSignData || !requestBody.sign.clientSignData.login || !requestBody.sign.clientSignData.password 
+            || typeof requestBody.sign.clientSignData.login !== 'string' || typeof requestBody.sign.clientSignData.password !== 'string'
+            || ( requestBody.sign.clientSignData.email && typeof requestBody.sign.clientSignData.email !== 'string' )
+        ) throw new BadRequestException();
+
+        return this.signService.signUp(request, requestBody.sign.clientSignData);
+    }
+
     @Post('/in')
     @ClientTypes('admin', 'member')
     async signIn (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<IClientAccessData> {
-        if (!requestBody.sign || !requestBody.sign.clientSignData || !requestBody.sign.clientSignData.login || !requestBody.sign.clientSignData.password ||
+        if ( !requestBody.sign || !requestBody.sign.clientSignData || !requestBody.sign.clientSignData.login || !requestBody.sign.clientSignData.password ||
             typeof requestBody.sign.clientSignData.login !== 'string' || typeof requestBody.sign.clientSignData.password !== 'string'
         ) throw new BadRequestException();
 
@@ -36,7 +47,7 @@ export class SignController {
     async getActiveClient (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string | IClient> {
         const allowedIncludedFields: string[] = [ 'login', 'locale', 'fullName' ];
 
-        if ((!requestBody.sign || !requestBody.sign.includedFields || !Array.isArray(requestBody.sign.includedFields))
+        if ( (!requestBody.sign || !requestBody.sign.includedFields || !Array.isArray(requestBody.sign.includedFields) )
             || Array.isArray(requestBody.sign.includedFields) && !requestBody.sign.includedFields.every(includedField => allowedIncludedFields.includes(includedField))
         ) throw new BadRequestException();
 

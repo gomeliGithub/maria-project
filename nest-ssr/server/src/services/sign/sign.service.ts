@@ -63,8 +63,29 @@ export class SignService {
         }
     }
 
-    public async signIn (request: IRequest, clientAuthData: IClientSignData, response: Response): Promise<IClientAccessData> {
-        const clientLogin: string = clientAuthData.login; 
+    public async signUp (request: IRequest, clientSignData: IClientSignData): Promise<void> {
+        const clientLogin: string = clientSignData.login;
+        const clientPassword: string = clientSignData.password;
+        const clientFullName: string = clientSignData.fullName;
+        const clientEmail: string = clientSignData.email;
+
+        const loginPattern: RegExp = /^[a-zA-Z](.[a-zA-Z0-9_-]*)$/;
+        const emailPattern: RegExp = /^[^\s()<>@,;:\/]+@\w[\w\.-]+\.[a-z]{2,}$/i;
+
+        if ( !loginPattern.test(clientLogin) || clientPassword.length < 4 || clientFullName.length < 5 || !emailPattern.test(clientEmail) ) throw new BadRequestException();
+
+        const clientPasswordHash: string = await bcrypt.hash(clientPassword, process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS);
+
+        await this.memberModel.create({
+            login: clientLogin,
+            password: clientPasswordHash,
+            fullName: clientFullName,
+            email: clientEmail
+        });
+    }
+
+    public async signIn (request: IRequest, clientSignData: IClientSignData, response: Response): Promise<IClientAccessData> {
+        const clientLogin: string = clientSignData.login;
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
@@ -81,7 +102,7 @@ export class SignService {
         const payload: IClient = {
             login: client.login,
             type: clientType,
-            locale: process.env.CLIENT_DEFAULT_LOCALE,
+            // locale: process.env.CLIENT_DEFAULT_LOCALE,
             fullName: client.fullName,
             __secure_fgpHash: ""
         }

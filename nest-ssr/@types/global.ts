@@ -33,7 +33,7 @@ export interface IRequestBody {
 export interface IClient {
     login: string;
     type: 'admin' | 'member';
-    locale: string;
+    // locale: string;
     fullName: string;
     __secure_fgpHash?: string;
     iat?: number;

@@ -1,6 +1,8 @@
 export interface IClientSignData {
     login: string;
     password: string;
+    fullName?: string;
+    email?: string;
 }
 
 export interface IClientAccessData {

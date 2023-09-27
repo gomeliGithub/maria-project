@@ -1,25 +1,33 @@
 <div class="d-flex flex-column" id="controls">
     <div class="p-3" id="images">
         <div id="listContainer">
-            <table class="table table-borderless table-hover">
+            <table *ngIf="fullCompressedImagesList | async; else noContentBlock" class="table table-borderless table-hover">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Оригинального имя</th>
+                        <th scope="col">Оригинальное имя</th>
                         <th scope="col">Размер оригинального изображения</th>
                         <th scope="col">Загружен</th>
-                        <th scope="col">Активность</th>
+                        <th scope="col">Отображён на главной</th>
+                        <th scope="col">Отображён на галерее</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
+                    <tr *ngFor="let compressedImage of fullCompressedImagesList | async; let i = index">
+                        <th scope="row">{{i}}</th>
+                        <td>{{compressedImage.originalImageName}}</td>
+                        <td>{{compressedImage.originalImageSize}}</td>
+                        <td>{{compressedImage.uploadDate}}</td>
+                        <td>{{compressedImage.displayedOnHomePage}}</td>
+                        <td>{{compressedImage.displayedOnGalleryPage}}</td>
                     </tr>
                 </tbody>
             </table>
+            <ng-template #noContentBlock>  
+                <div class="noContentBlock text-center text-danger fs-4 p-4">
+                    <span class="fw-bold">Загруженных изображений пока нет</span>
+                </div>
+            </ng-template>
         </div>
         <div id="uploadImageContainer">
             <div class="input-group">

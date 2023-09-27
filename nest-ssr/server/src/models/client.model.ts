@@ -24,6 +24,12 @@ export class Admin extends Model {
     })
     fullName: string;
 
+    @AllowNull(true)
+    @Column({ 
+        type: DataType.STRING
+    })
+    email: string;
+
     @Default(sequelize.literal('CURRENT_TIMESTAMP'))
     @CreatedAt
     @AllowNull(false)
@@ -70,6 +76,12 @@ export class Member extends Model {
         type: DataType.STRING
     })
     fullName: string;
+
+    @AllowNull(true)
+    @Column({ 
+        type: DataType.STRING
+    })
+    email: string;
 
     @Default(sequelize.literal('CURRENT_TIMESTAMP'))
     @CreatedAt

@@ -5,6 +5,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
+import { AdminPanelModule } from './modules/admin-panel.module';
+
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
 
@@ -17,7 +19,8 @@ import { GalleryComponent } from './components/gallery/gallery.component';
     imports: [
         BrowserModule.withServerTransition({ appId: 'serverApp' }),
         HttpClientModule,
-        AppRoutingModule
+        AppRoutingModule,
+        AdminPanelModule
     ],
     providers: [],
     bootstrap: [AppComponent]

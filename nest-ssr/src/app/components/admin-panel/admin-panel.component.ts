@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { AppService } from '../../app.service';
@@ -18,7 +18,7 @@ export class AdminPanelComponent implements OnInit {
     ) { }
 
     ngOnInit (): void {
-        if ( this.appService.checkIsPlatformBrowser() ) this.getFullCompressedImagesList().subscribe(imagesList => console.log(imagesList));
+        // if ( this.appService.checkIsPlatformBrowser() ) this.getFullCompressedImagesList().subscribe(imagesList => console.log(imagesList));
     }
 
     private _imageFile: File;

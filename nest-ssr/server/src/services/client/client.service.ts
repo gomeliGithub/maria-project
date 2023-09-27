@@ -96,7 +96,10 @@ export class ClientService {
 
         const activeClientLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
 
-        const newOriginalImagePath: string = path.join(this.appService.clientOriginalImagesDir, activeClientLogin, imageName);
+        const currentClientOriginalImagesDir: string = path.join(this.appService.clientOriginalImagesDir, activeClientLogin);
+        const newOriginalImagePath: string = path.join(currentClientOriginalImagesDir, imageName);
+
+        await fsPromises.mkdir(currentClientOriginalImagesDir);
 
         const writeStream: fs.WriteStream = fs.createWriteStream(newOriginalImagePath);
 

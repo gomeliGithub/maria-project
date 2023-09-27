@@ -20,7 +20,7 @@ export class SignGuard implements CanActivate {
 
         if (!requestBody) throw new BadRequestException();
 
-        if (request.url === "/api/sign/getActive" || request.url === "/api/sign/out" || request.url.includes('main') || request.url.includes('/admin-panel')) return true;
+        if (request.url === "/api/sign/getActive" || request.url === "/api/sign/up"  || request.url === "/api/sign/out" || request.url.includes('main') || request.url.includes('/admin-panel')) return true;
         else {
             if (request.url !== "/api/sign/in") {
                 if (!request.cookies['__secure_fgp']) throw new UnauthorizedException();
