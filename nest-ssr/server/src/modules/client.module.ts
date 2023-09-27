@@ -9,7 +9,7 @@ import { ClientController } from '../controllers/client/client.controller';
 import { Admin, Member, СompressedImage } from '../models/client.model';
 
 @Module({
-    imports: [ SequelizeModule.forFeature([ Admin, Member, СompressedImage ]) ],
+    imports: [ SequelizeModule.forFeature([ Admin, Member, СompressedImage ])],
     providers: [ AppService, ClientService ],
     controllers: [ClientController],
     exports: [ClientService]

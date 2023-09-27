@@ -1,4 +1,4 @@
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 
@@ -15,6 +15,10 @@ export class AppService {
 
     public checkIsPlatformBrowser (): boolean {
         return isPlatformBrowser(this.platformId);
+    }
+
+    public checkIsPlatformServer (): boolean {
+        return isPlatformServer(this.platformId);
     }
 
     public setMetaTag (property: string, content: string): void {

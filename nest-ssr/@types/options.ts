@@ -13,3 +13,8 @@ export interface IDownloadOriginalImageOptions {
     imagePath?: string;
     compressedImageName?: string;
 }
+
+export interface IСompressedImageGetOptions {
+    includeFields?: string[];
+    includeCount?: boolean;
+}

@@ -1,0 +1,31 @@
+<div class="d-flex flex-column" id="controls">
+    <div class="p-3" id="images">
+        <div id="listContainer">
+            <table class="table table-borderless table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Оригинального имя</th>
+                        <th scope="col">Размер оригинального изображения</th>
+                        <th scope="col">Загружен</th>
+                        <th scope="col">Активность</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="uploadImageContainer">
+            <div class="input-group">
+                <input type="file" class="form-control" id="inputGroupUploadImage" aria-describedby="uploadImageButton" aria-label="Upload" (change)="fileChange($event)">
+                <button class="btn btn-outline-secondary" type="button" id="uploadImageButton" (click)="uploadImage()">Загрузить новое изображение</button>
+            </div>
+        </div>
+    </div>
+</div>

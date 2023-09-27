@@ -3,6 +3,8 @@ import { Response } from 'express';
 
 import { SignService } from '../../services/sign/sign.service';
 
+import { ClientTypes } from '../../decorators/client.types.decorator';
+
 import { IClient, IRequest, IRequestBody } from 'types/global';
 import { IClientAccessData } from 'types/sign';
 
@@ -13,6 +15,7 @@ export class SignController {
     ) { }
 
     @Post('/in')
+    @ClientTypes('admin', 'member')
     async signIn (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<IClientAccessData> {
         if (!requestBody.sign || !requestBody.sign.clientSignData || !requestBody.sign.clientSignData.login || !requestBody.sign.clientSignData.password ||
             typeof requestBody.sign.clientSignData.login !== 'string' || typeof requestBody.sign.clientSignData.password !== 'string'
@@ -22,12 +25,14 @@ export class SignController {
     }
 
     @Put('/out')
+    @ClientTypes('admin', 'member')
     @Redirect('/', 301)
     async signOut (@Req() request: IRequest): Promise<void> {
         return this.signService.signOut(request);
     }
 
     @Put('/getActive')
+    @ClientTypes('admin', 'member')
     async getActiveClient (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string | IClient> {
         const allowedIncludedFields: string[] = [ 'login', 'locale', 'fullName' ];
 

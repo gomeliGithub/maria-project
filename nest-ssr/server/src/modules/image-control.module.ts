@@ -5,10 +5,10 @@ import { AppService } from '../app.service';
 
 import { ImageControlService } from '../services/image-control/image-control.service';
 
-import { СompressedImage } from '../models/client.model';
+import { Admin, Member, СompressedImage } from '../models/client.model';
 
 @Module({
-    imports: [ SequelizeModule.forFeature([ СompressedImage ]) ],
+    imports: [ SequelizeModule.forFeature([ Admin, Member, СompressedImage ]) ],
     providers: [ AppService, ImageControlService ],
     // controllers: [ImageControlController],
     exports: [ImageControlService]

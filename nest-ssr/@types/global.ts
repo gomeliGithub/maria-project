@@ -1,5 +1,7 @@
 import { Request } from "express";
 
+import { СompressedImage } from "server/src/models/client.model";
+
 import { IClientSignData } from "./sign";
 
 export interface ICookieSerializeOptions {
@@ -24,7 +26,6 @@ export interface IRequestBody {
         clientSignData?: IClientSignData;
         includedFields?: string | string[];
     }
-
     clientLogins?: string | string[];
     newLocale?: string;
 }
@@ -37,4 +38,22 @@ export interface IClient {
     __secure_fgpHash?: string;
     iat?: number;
     exp?: number;
+}
+
+export interface ICompressedImage {
+    originalImageName: string;
+    originalImageSize: number;
+    uploadDate: Date;
+    displayedOnHomePage: boolean;
+    displayedOnGalleryPage: boolean;
+}
+
+export interface IFullCompressedImageData {
+    imagesList: ICompressedImage[];
+    count: number;
+}
+
+export interface IСompressedImageGetResult {
+    rows: СompressedImage[];
+    count?: number;
 }

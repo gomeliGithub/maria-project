@@ -16,10 +16,11 @@ import { AppService } from './app.service';
 import { SignModule } from './modules/sign.module';
 import { ClientModule } from './modules/client.module';
 import { ImageControlModule } from './modules/image-control.module';
+import { AdminPanelModule } from './modules/admin-panel.module';
+import { CommonModule } from './modules/common.module';
 
 import { JWT_token } from './models/sign.model';
 import { Admin, Member, СompressedImage } from './models/client.model';
-import { CommonModule } from './modules/common.module';
 
 @Module({
     imports: [
@@ -65,6 +66,7 @@ import { CommonModule } from './modules/common.module';
         SignModule,
         ClientModule,
         ImageControlModule,
+        AdminPanelModule,
         CommonModule
     ],
     controllers: [AppController],

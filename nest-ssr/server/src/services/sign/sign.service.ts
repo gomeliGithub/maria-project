@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { LazyModuleLoader } from '@nestjs/core';
+import { InjectModel } from '@nestjs/sequelize';
 import { JwtService } from '@nestjs/jwt';
 
 import { Response } from 'express';
@@ -24,18 +24,20 @@ import { IGetActiveClientOptions } from 'types/options';
 @Injectable()
 export class SignService {
     constructor (
-        private lazyModuleLoader: LazyModuleLoader,
-        
         private readonly appService: AppService,
         private readonly jwtService: JwtService,
-        private readonly jwtControlService: JwtControlService
+        private readonly jwtControlService: JwtControlService,
+
+        @InjectModel(Admin) 
+        private readonly adminModel: typeof Admin,
+        @InjectModel(Member) 
+        private readonly memberModel: typeof Member
     ) { }
 
     public async validateClient (request: IRequest, requiredClientTypes: string[]): Promise<boolean> {
         const token = this.jwtControlService.extractTokenFromHeader(request); 
 
-        const commonModuleRef = await this.lazyModuleLoader.load(() => CommonModule);
-        const commonServiceRef = commonModuleRef.get(CommonService);
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         if (request.url === "/api/sign/in") {
             const requestBody: IRequestBody = request.body;
@@ -64,8 +66,7 @@ export class SignService {
     public async signIn (request: IRequest, clientAuthData: IClientSignData, response: Response): Promise<IClientAccessData> {
         const clientLogin: string = clientAuthData.login; 
 
-        const commonModuleRef = await this.lazyModuleLoader.load(() => CommonModule);
-        const commonServiceRef = commonModuleRef.get(CommonService);
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
         const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, {
             includeFields: [ 'login', 'fullName' ],
@@ -116,6 +117,15 @@ export class SignService {
         if ( !token || token === " ") return null;
         
         const validatedClient: IClient = await this.jwtControlService.tokenValidate(request, token, false);
+
+        try {
+            await Promise.any([
+                this.adminModel.findOne({ where: { login: validatedClient.login }, raw: false }),
+                this.memberModel.findOne({ where: { login: validatedClient.login }, raw: false })
+            ]);
+        } catch {
+            throw new UnauthorizedException();
+        }
         
         if ( validatedClient ) {
             if ( !options ) options = {};
@@ -136,8 +146,7 @@ export class SignService {
     }
 
     private async _signDataValidate (request: IRequest, clientLogin: string, clientPassword: string): Promise<void> {
-        const commonModuleRef = await this.lazyModuleLoader.load(() => CommonModule);
-        const commonServiceRef = commonModuleRef.get(CommonService);
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, {
             includeFields: [ 'password' ],

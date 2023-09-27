@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { LazyModuleLoader } from '@nestjs/core';
 import { InjectModel } from '@nestjs/sequelize';
 
 import sequelize from 'sequelize';
@@ -23,8 +22,6 @@ import { IClientGetOptions, IDownloadOriginalImageOptions } from 'types/options'
 @Injectable()
 export class ClientService {
     constructor (
-        private lazyModuleLoader: LazyModuleLoader,
-        
         private readonly appService: AppService,
         
         @InjectModel(Admin)
@@ -85,18 +82,17 @@ export class ClientService {
     public async registerClientLastActivityTime (request: IRequest, login: string): Promise<void> {
         const client: Admin | Member = await this.get(request, login) as Admin | Member;
 
-        await client.update({ lastActiveAt: sequelize.literal('CURRENT_TIMESTAMP') });
+        await client.update({ lastActiveDate: sequelize.literal('CURRENT_TIMESTAMP') });
     }
 
     public async registerClientLastLoginTime (request: IRequest, login: string): Promise<void> {
         const client: Admin | Member = await this.get(request, login) as Admin | Member;
 
-        await client.update({ lastLoginAt: sequelize.literal('CURRENT_TIMESTAMP') });
+        await client.update({ lastSignInDate: sequelize.literal('CURRENT_TIMESTAMP') });
     }
 
     public async uploadImage (request: IRequest, imageName: string): Promise<void> {
-        const commonModuleRef = await this.lazyModuleLoader.load(() => CommonModule);
-        const commonServiceRef = commonModuleRef.get(CommonService);
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const activeClientLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
 
@@ -107,14 +103,24 @@ export class ClientService {
         request.on('data', chunk => writeStream.write(chunk));
         request.on('end', () => writeStream.end());
 
+        writeStream.on('error', async error => {
+            console.error(error);
+
+            await fsPromises.unlink(newOriginalImagePath);
+
+            throw new InternalServerErrorException();
+        });
+
         writeStream.on('close', async () => {
             const compressResult: boolean = await commonServiceRef.compressImage(request, newOriginalImagePath, path.join(this.appService.clientCompressedImagesDir), activeClientLogin);
 
             if ( !compressResult ) throw new InternalServerErrorException();
         });
 
-        request.on('error', error => {
+        request.on('error', async error => {
             console.error(error);
+
+            await fsPromises.unlink(newOriginalImagePath);
 
             throw new InternalServerErrorException();
         });

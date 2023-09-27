@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LazyModuleLoader } from '@nestjs/core';
 import { InjectModel } from '@nestjs/sequelize';
+import { AssociationGetOptions } from 'sequelize-typescript';
 
 import { Buffer } from 'node:buffer';
 import fsPromises from 'fs/promises';
@@ -16,7 +17,8 @@ import { CommonService } from '../common/common.service';
 
 import { Admin, Member, СompressedImage } from '../../models/client.model';
 
-import { IRequest } from 'types/global';
+import { IRequest, IСompressedImageGetResult } from 'types/global';
+import { IСompressedImageGetOptions } from 'types/options';
 
 @Injectable()
 export class ImageControlService {
@@ -24,10 +26,26 @@ export class ImageControlService {
         private lazyModuleLoader: LazyModuleLoader,
 
         private readonly appService: AppService,
-        
+
         @InjectModel(СompressedImage) 
         private readonly compressedImageModel: typeof СompressedImage
     ) { }
+
+    public async get (client: Admin | Member, clientType: 'admin' | 'member', options?: IСompressedImageGetOptions): Promise<IСompressedImageGetResult> {
+        const findOptions: AssociationGetOptions = { raw: true }
+
+        if ( options && options.includeFields ) findOptions.attributes = options.includeFields;
+
+        let compressedImages: СompressedImage[] = null;
+
+        if ( clientType === 'admin' ) compressedImages = await (client as Admin).$get('compressedImages', findOptions);
+        else if ( clientType === 'member' ) compressedImages = await (client as Member).$get('compressedImages', findOptions);
+
+        if ( options ) {
+            if ( options.includeCount ) return { rows: compressedImages, count: await client.$count('compressedImages') };
+            else return { rows: compressedImages };
+        }
+    }
 
     public async compressImage (request: IRequest, inputImagePath: string, outputDirPath: string, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
         const supportedImageTypes: string[] = [ 'jpg', 'png', 'webp', 'avif', 'gif', 'svg', 'tiff' ];

@@ -1,5 +1,5 @@
 <div class="bg-image d-flex flex-column align-items-center h-100" #bgImage>
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+    <nav class="navbar navbar-expand-lg navbar-light w-100" style="background-color: #e3f2fd;">
         <div class="container-fluid">
             <a class="navbar-brand" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                 <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
@@ -37,7 +37,9 @@
             </div>
         </div>
     </nav>
-    <router-outlet></router-outlet>
+    <div class="w-100">
+        <router-outlet></router-outlet>
+    </div>
     <footer class="footer mt-auto w-100 py-2 bg-secondary text-center"> <!-- footer w-100 py-2 position-absolute bottom-0 start-50 translate-middle-x bg-secondary text-center -->
         <div class="container">
             <section class="mb-3">

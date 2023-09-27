@@ -32,6 +32,18 @@ export class Admin extends Model {
     })
     signUpDate: Date;
 
+    @AllowNull(true)
+    @Column({ 
+        type: DataType.DATE
+    })
+    lastSignInDate: Date;
+
+    @AllowNull(true)
+    @Column({ 
+        type: DataType.DATE
+    })
+    lastActiveDate: Date;
+
     @HasMany(() => СompressedImage)
     compressedImages: СompressedImage[];
 }
@@ -65,6 +77,18 @@ export class Member extends Model {
         type: DataType.DATE
     })
     signUpDate: Date;
+
+    @AllowNull(true)
+    @Column({ 
+        type: DataType.DATE
+    })
+    lastSignInDate: Date;
+
+    @AllowNull(true)
+    @Column({ 
+        type: DataType.DATE
+    })
+    lastActiveDate: Date;
 
     @HasMany(() => СompressedImage)
     compressedImages: СompressedImage[];
@@ -106,13 +130,19 @@ export class СompressedImage extends Model {
     })
     originalImageDirPath: string;
 
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.INTEGER
+    })
+    originalImageSize: number;
+
     @Default(sequelize.literal('CURRENT_TIMESTAMP'))
     @CreatedAt
     @AllowNull(false)
     @Column({ 
         type: DataType.DATE
     })
-    creationDate: Date;
+    uploadDate: Date;
 
     @DeletedAt
     @AllowNull(true)
@@ -120,6 +150,20 @@ export class СompressedImage extends Model {
         type: DataType.DATE
     })
     deletionDate: Date;
+
+    @Default(false)
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.BOOLEAN
+    })
+    displayedOnHomePage: boolean;
+
+    @Default(false)
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.BOOLEAN
+    })
+    displayedOnGalleryPage: boolean;
 
     @ForeignKey(() => Admin)
     @AllowNull(true)
