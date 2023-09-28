@@ -25,16 +25,18 @@ export class ClientService {
         clientPassword: string;
         clientFullName: string;
         clientEmail?: string;
-    }>): void {
-        this._getBcrypt_hash_saltrounds().subscribe(async bcrypt_hash_saltrounds => {
+    }>, signOp: 'up' | 'in'): void {
+        if ( signOp === 'up') this._getBcrypt_hash_saltrounds().subscribe(async bcrypt_hash_saltrounds => {
             const { clientLogin, clientPassword, clientFullName, clientEmail } = signFormValue;
 
             const clientPasswordHash: string = await bcryptjs.hash(clientPassword, parseInt(bcrypt_hash_saltrounds, 10));
 
-            console.log(clientLogin);
-            console.log(clientPasswordHash);
-            console.log(clientFullName);
-            console.log(clientEmail);
+            this.http.post('/api/sign/up', { 
+                clientLogin,
+                clientPassword: clientPasswordHash,
+                clientFullName,
+                clientEmail
+            }, { withCredentials: true });
         });
     }
 

@@ -23,7 +23,7 @@ export class ClientComponent implements OnInit {
             'clientFullName': new FormControl("", [ Validators.required, this.clientFullNameValidator ]),
         };
 
-        this.signOp = this.activateRoute.snapshot.paramMap.get('op') as string;
+        this.signOp = this.activateRoute.snapshot.paramMap.get('op') as 'up' | 'in';
 
         if (this.signOp === 'up') formControls['clientEmail'] = new FormControl("", Validators.email);
 
@@ -37,7 +37,7 @@ export class ClientComponent implements OnInit {
         clientEmail?: FormControl<string>;
     }>;
 
-    public signOp: string;
+    public signOp: 'up' | 'in';
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {}
@@ -64,6 +64,6 @@ export class ClientComponent implements OnInit {
     }
 
     public sign (event: SubmitEvent): void {
-        return this.clientService.sign(this.signForm.value);
+        return this.clientService.sign(this.signForm.value, this.signOp);
     }
 }
