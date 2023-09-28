@@ -46,10 +46,10 @@ export class ClientService {
 
                 this.http.post('/api/sign/up', { 
                     sign: { clientData }
-                }, { withCredentials: true }).subscribe(() => this.appService.reloadComponent(false, 'signIn'));
+                }, { withCredentials: true }).subscribe(() => this.appService.reloadComponent(false, '/signIn'));
             } else this.http.put('/api/sign/in', { 
                 sign: { clientData }
-            });
+            }).subscribe(() => this.appService.reloadComponent(false, ''));
         });
     }
 
