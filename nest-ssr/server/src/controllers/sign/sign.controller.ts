@@ -1,6 +1,8 @@
 import { BadRequestException, Body, Controller, Get, Post, Put, Req, Res } from '@nestjs/common';
 import { Response } from 'express';
 
+import { ClientTypes } from '../../decorators/client.types.decorator';
+
 import { SignService } from '../../services/sign/sign.service';
 
 import { IClient, IRequest, IRequestBody } from 'types/global';
@@ -23,6 +25,7 @@ export class SignController {
     }
 
     @Put('/in')
+    @ClientTypes('admin', 'member')
     async signIn (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<IClientAccessData> {
         if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password ||
             typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
