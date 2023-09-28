@@ -23,7 +23,7 @@ export interface IRequestBody {
     clientType?: 'admin' | 'member';
     clientLogin?: string;
     sign?: {
-        clientSignData?: IClientSignData;
+        clientData?: IClientSignData;
     }
     clientLogins?: string | string[];
     newLocale?: string;

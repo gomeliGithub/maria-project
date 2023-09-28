@@ -15,22 +15,22 @@ export class SignController {
     @Post('/up')
     @Redirect('/in', 301)
     async signUp (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
-        if ( !requestBody.sign || !requestBody.sign.clientSignData || !requestBody.sign.clientSignData.login || !requestBody.sign.clientSignData.password 
-            || typeof requestBody.sign.clientSignData.login !== 'string' || typeof requestBody.sign.clientSignData.password !== 'string'
-            || ( requestBody.sign.clientSignData.email && typeof requestBody.sign.clientSignData.email !== 'string' )
+        if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password 
+            || typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
+            || ( requestBody.sign.clientData.email && typeof requestBody.sign.clientData.email !== 'string' )
         ) throw new BadRequestException();
 
-        return this.signService.signUp(request, requestBody.sign.clientSignData);
+        return this.signService.signUp(request, requestBody.sign.clientData);
     }
 
     @Post('/in')
     @Redirect('/', 301)
     async signIn (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<IClientAccessData> {
-        if ( !requestBody.sign || !requestBody.sign.clientSignData || !requestBody.sign.clientSignData.login || !requestBody.sign.clientSignData.password ||
-            typeof requestBody.sign.clientSignData.login !== 'string' || typeof requestBody.sign.clientSignData.password !== 'string'
+        if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password ||
+            typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
         ) throw new BadRequestException();
 
-        return this.signService.signIn(request, requestBody.sign.clientSignData, response);
+        return this.signService.signIn(request, requestBody.sign.clientData, response);
     }
 
     @Put('/out')

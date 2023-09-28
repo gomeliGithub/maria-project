@@ -44,8 +44,8 @@ export class SignService {
         if ( request.url === '/api/sign/in' ) {
             const requestBody: IRequestBody = request.body;
 
-            const clientLogin: string = requestBody.sign.clientSignData.login;
-            const clientPassword: string = requestBody.sign.clientSignData.password;
+            const clientLogin: string = requestBody.sign.clientData.login;
+            const clientPassword: string = requestBody.sign.clientData.password;
 
             await this.jwtControlService.saveToken(token);
             await this._signDataValidate(request, clientLogin, clientPassword);
@@ -63,11 +63,11 @@ export class SignService {
         }
     }
 
-    public async signUp (request: IRequest, clientSignData: IClientSignData): Promise<void> {
-        const clientLogin: string = clientSignData.login;
-        const clientPassword: string = clientSignData.password;
-        const clientFullName: string = clientSignData.fullName;
-        const clientEmail: string = clientSignData.email;
+    public async signUp (request: IRequest, clientData: IClientSignData): Promise<void> {
+        const clientLogin: string = clientData.login;
+        const clientPassword: string = clientData.password;
+        const clientFullName: string = clientData.fullName;
+        const clientEmail: string = clientData.email;
 
         const loginPattern: RegExp = /^[a-zA-Z](.[a-zA-Z0-9_-]*)$/;
         const emailPattern: RegExp = /^[^\s()<>@,;:\/]+@\w[\w\.-]+\.[a-z]{2,}$/i;

@@ -32,10 +32,14 @@ export class ClientService {
             const clientPasswordHash: string = await bcryptjs.hash(clientPassword, parseInt(bcrypt_hash_saltrounds, 10));
 
             this.http.post('/api/sign/up', { 
-                clientLogin,
-                clientPassword: clientPasswordHash,
-                clientFullName,
-                clientEmail
+                sign: { 
+                    clientData: {
+                        login: clientLogin,
+                        password: clientPasswordHash,
+                        fullName: clientFullName,
+                        email: clientEmail
+                    }
+                }
             }, { withCredentials: true }).subscribe();
         });
     }
