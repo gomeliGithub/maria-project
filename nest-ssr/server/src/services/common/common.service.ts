@@ -43,6 +43,7 @@ export class CommonService {
         return clientServiceRef.registerClientLastLoginTime(request, login);
     }
 
+    public async getActiveClient (request: IRequest): Promise<IClient>
     public async getActiveClient (request: IRequest, options?: { includeFields?: string, allowedIncludedFields?: string[] }): Promise<string>
     public async getActiveClient (request: IRequest, options?: { includeFields?: string[], allowedIncludedFields?: string[] }): Promise<IClient>
     public async getActiveClient (request: IRequest, options?: IGetActiveClientOptions): Promise<string | IClient> {

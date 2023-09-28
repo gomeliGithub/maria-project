@@ -18,16 +18,14 @@ export class SignGuard implements CanActivate {
         const request: IRequest = context.switchToHttp().getRequest<IRequest>();
         const requestBody: IRequestBody = request.body; 
 
-        if (!requestBody) throw new BadRequestException();
+        if ( !requestBody ) throw new BadRequestException();
 
         if (request.url === "/api/sign/getActive" || request.url === "/api/sign/up"  || request.url === "/api/sign/out" || request.url.includes('main') || request.url.includes('/admin-panel')) return true;
         else {
-            if (request.url !== "/api/sign/in") {
-                if (!request.cookies['__secure_fgp']) throw new UnauthorizedException();
+            if ( request.url !== "/api/sign/in" ) {
+                if ( !request.cookies['__secure_fgp'] ) throw new UnauthorizedException();
             
-                if (!clientTypes) {
-                    return true;
-                }
+                if ( !clientTypes ) return true;
             }
 
             return this.signService.validateClient(request, clientTypes);

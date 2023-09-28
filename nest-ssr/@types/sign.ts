@@ -7,7 +7,7 @@ export interface IClientSignData {
 
 export interface IClientAccessData {
     access_token: string;
-    locale: string;
+    // locale: string;
     expiresTime: number;
 }
 

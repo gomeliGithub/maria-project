@@ -18,58 +18,63 @@ export class JwtControlService {
     ) { }
 
     public extractTokenFromHeader (request: IRequest): string | undefined {
-        const [type, token] = request.headers.authorization?.split(' ') ?? [];
+        const [ type, token ] = request.headers.authorization?.split(' ') ?? [];
 
-        if (request.url !== "/api/auth/signIn" && request.url !== "/api/auth/getActiveClient" && request.url !== "/api/auth/logout") if (!token) {
-            throw new UnauthorizedException();
-        }
+        if ( request.url !== "/api/auth/signIn" && request.url !== "/api/auth/getActiveClient" && request.url !== "/api/auth/logout" && !token ) throw new UnauthorizedException();
         
         return type === 'Bearer' ? token : undefined;
     }
 
-    public async tokenValidate (request: IRequest, token: string, throwError = true): Promise<IClient | null> {
+    public async tokenValidate (request: IRequest, token: string): Promise<IClient> {
         let validatedClient: IClient = null;
 
         try {
             validatedClient = await this.jwtService.verifyAsync<IClient>(token);
         } catch {
-            if (throwError) throw new UnauthorizedException();
-            else return null;
+            throw new UnauthorizedException();
         }
 
         const client__secure_fgpHash: string = (crypto.createHmac("SHA256", request.cookies['__secure_fgp'])).digest('hex');
 
-        if (client__secure_fgpHash !== validatedClient.__secure_fgpHash || !(await this.validateRevokedToken(token))) {
-            if (throwError) throw new UnauthorizedException();
-            else return null;
+        if ( client__secure_fgpHash !== validatedClient.__secure_fgpHash || !(await this.validateRevokedToken(token)) ) {
+            throw new UnauthorizedException();
         }
 
         return validatedClient;
     }
 
     public async addRevokedToken (token: string): Promise<void> {
-        if (!(await this.checkRevokedTokenIs(token))) {
-            const tokenHash: string = (crypto.createHmac("SHA256", token)).digest('hex');
+        const revokedToken: JWT_token = await this.checkRevokedTokenIs(token);
 
-            await this.JWT_tokenModel.create({
-                token_hash: tokenHash,
-                revokation_date: new Date()
-            })
+        if ( !revokedToken ) {
+            await revokedToken.update({ revokation_date: new Date(), revoked: true });
         }
+    }
+
+    public async saveToken (token: string): Promise<void> {
+        const token_hash: string = (crypto.createHmac("SHA256", token)).digest('hex');
+
+        const expires_date = new Date(Date.now() + parseInt(process.env.JWT_EXPIRESIN_TIME, 10));
+
+        await this.JWT_tokenModel.create({
+            token_hash,
+            expires_date,
+            revokation_date: expires_date
+        });
     }
 
     public async validateRevokedToken (token: string): Promise<boolean> {
         const revokedToken = await this.checkRevokedTokenIs(token);
 
-        if (revokedToken) {
-            if (new Date() > revokedToken.revokation_date) return false;
+        if ( revokedToken ) {
+            if ( new Date() > revokedToken.revokation_date ) return false;
         } else return true;
     }
 
     public async checkRevokedTokenIs (token: string): Promise<JWT_token> {
-        const tokenHash: string = (crypto.createHmac("SHA256", token)).digest('hex');
+        const token_hash: string = (crypto.createHmac("SHA256", token)).digest('hex');
 
-        const revokedToken = await this.JWT_tokenModel.findOne({ where: { token_hash: tokenHash }});
+        const revokedToken: JWT_token = await this.JWT_tokenModel.findOne({ where: { token_hash, revoked: true }});
 
         return revokedToken;
     }

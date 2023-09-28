@@ -25,6 +25,7 @@ import { IGetActiveClientOptions } from 'types/options';
 export class SignService {
     constructor (
         private readonly appService: AppService,
+        private readonly commonService: CommonService,
         private readonly jwtService: JwtService,
         private readonly jwtControlService: JwtControlService,
 
@@ -39,22 +40,22 @@ export class SignService {
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        if (request.url === "/api/sign/in") {
+        if ( (request.url === '/api/sign/up' || request.url === '/api/sign/in') && ( token && token !== '' ) ) this.jwtControlService.addRevokedToken(token);
+
+        if ( request.url === '/api/sign/in' ) {
             const requestBody: IRequestBody = request.body;
 
             const clientLogin: string = requestBody.sign.clientSignData.login;
             const clientPassword: string = requestBody.sign.clientSignData.password;
 
+            await this.jwtControlService.saveToken(token);
             await this._signDataValidate(request, clientLogin, clientPassword);
 
             await commonServiceRef.registerClientLastActivityTime(request, clientLogin);
 
             return true;
         } else {
-            if (!requiredClientTypes) return true;
-
             const validatedClient: IClient = await this.jwtControlService.tokenValidate(request, token);
-
             const clientType: string = validatedClient.type;
 
             await commonServiceRef.registerClientLastActivityTime(request, validatedClient.login);
@@ -74,6 +75,15 @@ export class SignService {
 
         if ( !loginPattern.test(clientLogin) || clientPassword.length < 4 || clientFullName.length < 5 || !emailPattern.test(clientEmail) ) throw new BadRequestException();
 
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+        const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, {
+            includeFields: [ 'login', 'fullName' ],
+            rawResult: true
+        }) as Admin | Member;
+
+        if ( client ) throw new UnauthorizedException();
+        
         const clientPasswordHash: string = await bcrypt.hash(clientPassword, process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS);
 
         await this.memberModel.create({
@@ -94,10 +104,12 @@ export class SignService {
             rawResult: true
         }) as Admin | Member;
 
+        if ( !client ) throw new UnauthorizedException();
+
         let clientType: 'admin' | 'member' = null;
 
-        if (client instanceof Admin) clientType = 'admin';
-        if (client instanceof Member) clientType = 'member';
+        if ( client instanceof Admin ) clientType = 'admin';
+        if ( client instanceof Member ) clientType = 'member';
         
         const payload: IClient = {
             login: client.login,
@@ -117,53 +129,49 @@ export class SignService {
 
         return {
             access_token: this.jwtService.sign(payload),
-            locale: process.env.CLIENT_DEFAULT_LOCALE,
+            // locale: process.env.CLIENT_DEFAULT_LOCALE,
             expiresTime: ms(process.env.JWT_EXPIRES_TIME)
         }
     }
 
     public async signOut (request: IRequest): Promise<void> {
-        const token = this.jwtControlService.extractTokenFromHeader(request);
+        const token: string = this.jwtControlService.extractTokenFromHeader(request);
 
-        if ( !token || token === "" ) throw new UnauthorizedException();
+        if ( !token || token === '' ) throw new UnauthorizedException();
 
         return this.jwtControlService.addRevokedToken(token);
     }
 
+    public async getActiveClient (request: IRequest): Promise<IClient>
     public async getActiveClient (request: IRequest, options?: { includeFields?: string, allowedIncludedFields?: string[] }): Promise<string>
     public async getActiveClient (request: IRequest, options?: { includeFields?: string[], allowedIncludedFields?: string[] }): Promise<IClient>
     public async getActiveClient (request: IRequest, options?: IGetActiveClientOptions): Promise<string | IClient> {
         const token: string = this.jwtControlService.extractTokenFromHeader(request);
 
-        if ( !token || token === " ") return null;
+        if ( !token || token === '') return null;
         
-        const validatedClient: IClient = await this.jwtControlService.tokenValidate(request, token, false);
+        const validatedClient: IClient = await this.jwtControlService.tokenValidate(request, token);
 
         try {
-            await Promise.any([
-                this.adminModel.findOne({ where: { login: validatedClient.login }, raw: false }),
-                this.memberModel.findOne({ where: { login: validatedClient.login }, raw: false })
-            ]);
+            await this.commonService.getClients(request, validatedClient.login, { rawResult: false });
         } catch {
             throw new UnauthorizedException();
         }
-        
-        if ( validatedClient ) {
-            if ( !options ) options = {};
+            
+        if ( !options ) options = {};
 
-            if ( options.includedFields ) {
-                if ( typeof options.includedFields === 'string' ) return validatedClient[options.includedFields];
-                else if ( Array.isArray(options.includedFields) ) {
-                    if ( options.allowedIncludedFields && options.includedFields.some(field => !options.allowedIncludedFields.includes(field)) ) throw new BadRequestException();
+        if ( options.includedFields ) {
+            if ( typeof options.includedFields === 'string' ) return validatedClient[options.includedFields];
+            else if ( Array.isArray(options.includedFields) ) {
+                if ( options.allowedIncludedFields && options.includedFields.some(field => !options.allowedIncludedFields.includes(field)) ) throw new BadRequestException();
 
-                    Object.keys(validatedClient).forEach(field => {
-                        !options.includedFields.includes(field) ? delete validatedClient[field] : null;
-                    });
-
-                    return validatedClient;
-                }
-            } else return validatedClient;
+                Object.keys(validatedClient).forEach(field => {
+                    !options.includedFields.includes(field) ? delete validatedClient[field] : null;
+                });
+            }
         }
+
+        return validatedClient;
     }
 
     private async _signDataValidate (request: IRequest, clientLogin: string, clientPassword: string): Promise<void> {
@@ -174,7 +182,7 @@ export class SignService {
             rawResult: true
         }) as Admin | Member;
 
-        if (!client) throw new UnauthorizedException();
+        if ( !client ) throw new UnauthorizedException();
 
         const passwordValid: boolean = await bcrypt.compare(clientPassword, client.password);
 

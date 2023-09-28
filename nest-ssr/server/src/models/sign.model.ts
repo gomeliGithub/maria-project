@@ -1,4 +1,5 @@
-import { Column, Model, Table, DataType, PrimaryKey, AllowNull } from 'sequelize-typescript';
+import sequelize from 'sequelize';
+import { Column, Model, Table, DataType, PrimaryKey, AllowNull, Default } from 'sequelize-typescript';
 
 @Table({
     timestamps: false
@@ -11,6 +12,7 @@ export class JWT_token extends Model {
     })
     token_hash: string;
 
+    @Default(sequelize.literal('CURRENT_TIMESTAMP'))
     @AllowNull(false)
     @Column({ 
         type: DataType.DATE
@@ -28,4 +30,11 @@ export class JWT_token extends Model {
         type: DataType.DATE
     })
     revokation_date: Date;
+
+    @Default(false)
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.BOOLEAN
+    })
+    revoked: boolean;
 }

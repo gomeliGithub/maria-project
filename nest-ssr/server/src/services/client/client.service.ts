@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
-import sequelize from 'sequelize';
+import sequelize, { NonNullFindOptions } from 'sequelize';
 
 import fs from 'fs';
 import fsPromises from 'fs/promises';
@@ -38,7 +38,7 @@ export class ClientService {
     public async get (request: IRequest, loginList: string[], options?: IClientGetOptions): Promise<Admin[] | Member[]>
     public async get (request: IRequest, loginList: string | string[], options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[]>
     public async get (request: IRequest, loginList: string | string[], options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[]> {
-        const findOptions = {
+        const findOptions: NonNullFindOptions = {
             raw: false, 
             where: { login: loginList },
             attributes: null,
@@ -50,9 +50,9 @@ export class ClientService {
         if ( options && options.includeFields ) findOptions.attributes = options.includeFields;
         if ( options && options.hasOwnProperty('rawResult') ) findOptions.raw = options.rawResult;
 
-        if (options && !options.clientType ) {
+        if ( options && !options.clientType ) {
             try {
-                if (!Array.isArray(loginList) ) {
+                if ( !Array.isArray(loginList) ) {
                     clients = await Promise.any([
                         this.adminModel.findOne(findOptions),
                         this.memberModel.findOne(findOptions)
@@ -68,7 +68,7 @@ export class ClientService {
             }
         }
 
-        if (!(clients instanceof Admin) || (Array.isArray(clients) && !clients.every(client => client instanceof Admin)) ) {
+        if ( !(clients instanceof Admin) || (Array.isArray(clients) && !clients.every(client => client instanceof Admin)) ) {
             if ( !Array.isArray(clients) ) {
 
             } else {
