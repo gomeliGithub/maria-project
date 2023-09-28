@@ -54,7 +54,12 @@ export class SignService {
             const validatedClient: IClient = await this.jwtControlService.tokenValidate(request, token);
             const clientType: string = validatedClient.type;
 
-            await commonServiceRef.registerClientLastActivityTime(request, validatedClient.login);
+            const client: Admin | Member = await commonServiceRef.getClients(request, validatedClient.login, {
+                includeFields: [ 'login', 'fullName' ],
+                rawResult: true
+            }) as Admin | Member;
+
+            await commonServiceRef.registerClientLastActivityTime(client);
 
             return requiredClientTypes.some(requiredClientType => requiredClientType === clientType);
         }
@@ -118,8 +123,8 @@ export class SignService {
 
         payload.__secure_fgpHash = __secure_fgpHash;
 
-        await commonServiceRef.registerClientLastLoginTime(request, clientLogin);
-        await commonServiceRef.registerClientLastActivityTime(request, clientLogin);
+        await commonServiceRef.registerClientLastLoginTime(client);
+        await commonServiceRef.registerClientLastActivityTime(client);
 
         response.cookie('__secure_fgp', __secure_fgp, this.appService.cookieSerializeOptions);
 

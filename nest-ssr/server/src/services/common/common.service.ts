@@ -31,16 +31,16 @@ export class CommonService {
         return clientServiceRef.get(request, loginList, options);
     }
 
-    public async registerClientLastActivityTime (request: IRequest, login: string): Promise<void> {
+    public async registerClientLastActivityTime (client: Admin | Member): Promise<void> {
         const clientServiceRef = await this.appService.getServiceRef(ClientModule, ClientService);
 
-        return clientServiceRef.registerClientLastActivityTime(request, login);
+        return clientServiceRef.registerClientLastActivityTime(client);
     }
 
-    public async registerClientLastLoginTime (request: IRequest, login: string): Promise<void> {
+    public async registerClientLastLoginTime (client: Admin | Member): Promise<void> {
         const clientServiceRef = await this.appService.getServiceRef(ClientModule, ClientService);
 
-        return clientServiceRef.registerClientLastLoginTime(request, login);
+        return clientServiceRef.registerClientLastLoginTime(client);
     }
 
     public async getActiveClient (request: IRequest): Promise<IClient>

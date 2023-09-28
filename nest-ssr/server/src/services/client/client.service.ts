@@ -79,15 +79,11 @@ export class ClientService {
         return clients;
     }
 
-    public async registerClientLastActivityTime (request: IRequest, login: string): Promise<void> {
-        const client: Admin | Member = await this.get(request, login) as Admin | Member;
-
+    public async registerClientLastActivityTime (client: Admin | Member): Promise<void> {
         await client.update({ lastActiveDate: sequelize.literal('CURRENT_TIMESTAMP') });
     }
 
-    public async registerClientLastLoginTime (request: IRequest, login: string): Promise<void> {
-        const client: Admin | Member = await this.get(request, login) as Admin | Member;
-
+    public async registerClientLastLoginTime (client: Admin | Member): Promise<void> {
         await client.update({ lastSignInDate: sequelize.literal('CURRENT_TIMESTAMP') });
     }
 
