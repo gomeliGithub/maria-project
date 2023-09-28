@@ -8,6 +8,7 @@ import * as bcryptjs from 'bcryptjs';
 import { AppService } from '../../app.service';
 
 import { IClientBrowser } from 'types/global';
+import { IClientSignData } from 'types/sign';
 
 @Injectable({
     providedIn: 'root'
@@ -29,21 +30,26 @@ export class ClientService {
         clientFullName: string;
         clientEmail?: string;
     }>, signOp: 'up' | 'in'): void {
-        if ( signOp === 'up') this._getBcrypt_hash_saltrounds().subscribe(async bcrypt_hash_saltrounds => {
+        this._getBcrypt_hash_saltrounds().subscribe(async bcrypt_hash_saltrounds => {
             const { clientLogin, clientPassword, clientFullName, clientEmail } = signFormValue;
 
             const clientPasswordHash: string = await bcryptjs.hash(clientPassword, parseInt(bcrypt_hash_saltrounds, 10));
 
-            this.http.post('/api/sign/up', { 
-                sign: { 
-                    clientData: {
-                        login: clientLogin,
-                        password: clientPasswordHash,
-                        fullName: clientFullName,
-                        email: clientEmail
-                    }
-                }
-            }, { withCredentials: true }).subscribe(() => this.appService.reloadComponent(false, 'signIn'));
+            const clientData: IClientSignData = {
+                login: clientLogin,
+                password: clientPasswordHash
+            }
+
+            if ( signOp === 'up') {
+                clientData.fullName = clientFullName;
+                clientData.email = clientEmail;
+
+                this.http.post('/api/sign/up', { 
+                    sign: { clientData }
+                }, { withCredentials: true }).subscribe(() => this.appService.reloadComponent(false, 'signIn'));
+            } else this.http.put('/api/sign/in', { 
+                sign: { clientData }
+            });
         });
     }
 

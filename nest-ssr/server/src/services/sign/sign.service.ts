@@ -39,7 +39,7 @@ export class SignService {
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        if ( (request.url === '/api/sign/up' || request.url === '/api/sign/in') && ( token && token !== '' ) ) this.jwtControlService.addRevokedToken(token);
+        if ( (request.url === '/api/sign/up' || request.url === '/api/sign/in') && ( token && token !== '' ) ) await this.jwtControlService.saveToken(token);
 
         if ( request.url === '/api/sign/in' ) {
             const requestBody: IRequestBody = request.body;
@@ -47,10 +47,7 @@ export class SignService {
             const clientLogin: string = requestBody.sign.clientData.login;
             const clientPassword: string = requestBody.sign.clientData.password;
 
-            await this.jwtControlService.saveToken(token);
             await this._signDataValidate(request, clientLogin, clientPassword);
-
-            await commonServiceRef.registerClientLastActivityTime(request, clientLogin);
 
             return true;
         } else {
@@ -104,8 +101,6 @@ export class SignService {
             rawResult: true
         }) as Admin | Member;
 
-        if ( !client ) throw new UnauthorizedException();
-
         let clientType: 'admin' | 'member' = null;
 
         if ( client instanceof Admin ) clientType = 'admin';
@@ -124,6 +119,7 @@ export class SignService {
         payload.__secure_fgpHash = __secure_fgpHash;
 
         await commonServiceRef.registerClientLastLoginTime(request, clientLogin);
+        await commonServiceRef.registerClientLastActivityTime(request, clientLogin);
 
         response.cookie('__secure_fgp', __secure_fgp, this.appService.cookieSerializeOptions);
 
@@ -189,7 +185,7 @@ export class SignService {
 
         const passwordValid: boolean = await bcrypt.compare(clientPassword, client.password);
 
-        if (!passwordValid) throw new UnauthorizedException();
+        if ( !passwordValid ) throw new UnauthorizedException();
     }
 
     public async getBcryptHashSaltrounds (): Promise<string> {
