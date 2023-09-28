@@ -36,7 +36,7 @@ export class ClientService {
                 clientPassword: clientPasswordHash,
                 clientFullName,
                 clientEmail
-            }, { withCredentials: true });
+            }, { withCredentials: true }).subscribe();
         });
     }
 
