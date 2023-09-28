@@ -12,14 +12,14 @@ export class ClientComponent {
         private readonly activateRoute: ActivatedRoute
     ) {
         const formControls = {
-            'clientLogin': new FormControl("Имя вашего аккаунта", [ Validators.required, this.clientLoginValidator ]),
-            'clientPassword': new FormControl("Ваш пароль", [ Validators.required, this.clientPasswordValidator ]),
-            'clientFullName': new FormControl("Ваше собственное ФИО", [ Validators.required, this.clientFullNameValidator ]),
+            'clientLogin': new FormControl("", [ Validators.required, this.clientLoginValidator ]),
+            'clientPassword': new FormControl("", [ Validators.required, this.clientPasswordValidator ]),
+            'clientFullName': new FormControl("", [ Validators.required, this.clientFullNameValidator ]),
         };
 
         this.signOp = this.activateRoute.snapshot.paramMap.get('op') as string;
 
-        if (this.signOp === 'up') formControls['clientEmail'] = new FormControl("Ваша электронная почта", Validators.email);
+        if (this.signOp === 'up') formControls['clientEmail'] = new FormControl("", Validators.email);
 
         this.signForm = new FormGroup(formControls);
     }

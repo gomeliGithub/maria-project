@@ -1,28 +1,28 @@
 <form [formGroup]="signForm" novalidate>
     <div class="form-group mb-3">
         <label for="inputLogin" class="form-label">Логин</label>
-        <input type="text" class="form-control" id="inputLogin" formControlName="clientLogin">
+        <input type="text" class="form-control" id="inputLogin" placeholder="Имя вашего аккаунта" formControlName="clientLogin">
         <div class="alert alert-danger" *ngIf="signForm.controls['clientLogin'].invalid && signForm.controls['clientLogin'].touched">
             Не указан логин
         </div>
     </div>
     <div class="form-group mb-3">
         <label for="inputPassword" class="form-label">Пароль</label>
-        <input type="password" class="form-control" id="inputPassword" formControlName="clientPassword">
+        <input type="password" class="form-control" id="inputPassword" placeholder="Ваш пароль" formControlName="clientPassword">
         <div class="alert alert-danger" *ngIf="signForm.controls['clientPassword'].invalid && signForm.controls['clientPassword'].touched">
             Не указан пароль
         </div>
     </div>
     <div class="form-group mb-3">
         <label for="inputFullName" class="form-label">ФИО</label>
-        <input type="text" class="form-control" id="inputFullName" formControlName="clientFullName">
+        <input type="text" class="form-control" id="inputFullName" placeholder="Ваше собственное ФИО" formControlName="clientFullName">
         <div class="alert alert-danger" *ngIf="signForm.controls['clientFullName'].invalid && signForm.controls['clientFullName'].touched">
             Не указано ФИО
         </div>
     </div>
     <div *ngIf="signOp === 'up'" class="form-group mb-3">
         <label for="inputEmail" class="form-label">Email</label>
-        <input type="email" class="form-control" id="inputEmail" formControlName="clientEmail">
+        <input type="email" class="form-control" id="inputEmail" placeholder="Ваша электронная почта" formControlName="clientEmail">
     </div>
     <div class="form-group">
         <button class="btn btn-primary" [disabled]="signForm.invalid">
