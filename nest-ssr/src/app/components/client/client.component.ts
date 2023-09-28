@@ -19,13 +19,15 @@ export class ClientComponent implements OnInit {
     ) {
         const formControls = {
             'clientLogin': new FormControl("", [ Validators.required, this.clientLoginValidator ]),
-            'clientPassword': new FormControl("", [ Validators.required, this.clientPasswordValidator ]),
-            'clientFullName': new FormControl("", [ Validators.required, this.clientFullNameValidator ]),
+            'clientPassword': new FormControl("", [ Validators.required, this.clientPasswordValidator ])
         };
 
         this.signOp = this.activateRoute.snapshot.paramMap.get('op') as 'up' | 'in';
 
-        if (this.signOp === 'up') formControls['clientEmail'] = new FormControl("", Validators.email);
+        if (this.signOp === 'up') {
+            formControls['clientFullName'] = new FormControl("", [ Validators.required, this.clientFullNameValidator ]),
+            formControls['clientEmail'] = new FormControl("", Validators.email);
+        }
 
         this.signForm = new FormGroup(formControls);
     }
@@ -33,7 +35,7 @@ export class ClientComponent implements OnInit {
     public signForm: FormGroup<{
         clientLogin: FormControl<string>;
         clientPassword: FormControl<string>;
-        clientFullName: FormControl<string>;
+        clientFullName?: FormControl<string>;
         clientEmail?: FormControl<string>;
     }>;
 
