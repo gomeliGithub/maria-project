@@ -23,7 +23,7 @@ export class SignGuard implements CanActivate {
         if ( request.url.includes('main') || request.url.includes('/admin-panel') ) return true;
         else {
             if ( !clientTypes ) return true;
-            if ( !request.cookies['__secure_fgp'] ) throw new UnauthorizedException();
+            if ( request.url !== '/api/sign/in' && !request.cookies['__secure_fgp'] ) throw new UnauthorizedException();
 
             return this.signService.validateClient(request, clientTypes);
         }
