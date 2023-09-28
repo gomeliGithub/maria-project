@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
+import { CommonModule } from '../../modules/common.module';
+
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 
@@ -12,18 +14,19 @@ import { IFullCompressedImageData, IRequest } from 'types/global';
 export class AdminPanelService {
     constructor (
         private readonly appService: AppService,
-        private readonly commonService: CommonService,
 
         @InjectModel(СompressedImage)
         private readonly compressedImageModel: typeof СompressedImage
     ) { }
 
     public async getFullCompressedImagesList (request: IRequest): Promise<IFullCompressedImageData> {
-        const activeAdminLogin: string = await this.commonService.getActiveClient(request, { includeFields: 'login' });
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        
+        const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
 
-        const client: Admin = await this.commonService.getClients(request, activeAdminLogin, { rawResult: false });
+        const client: Admin = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false });
 
-        const { rows, count } = await this.commonService.getCompressedImages(client, 'admin', { 
+        const { rows, count } = await commonServiceRef.getCompressedImages(client, 'admin', { 
             includeFields: [ 'originalImageName', 'originalImageSize', 'uploadDate', 'displayedOnHomePage', 'displayedOnGalleryPage' ],
             includeCount: true
         });

@@ -11,10 +11,10 @@ export class ClientComponent {
     constructor (
         private readonly activateRoute: ActivatedRoute
     ) {
-        this.signOp = this.activateRoute.snapshot.paramMap.get('op') as string;
+        this.signOp = this.activateRoute.snapshot.url; // this.activateRoute.snapshot.paramMap.get('op') as string;
     }
 
-    public signOp: string;
+    public signOp;
 
     public signForm: FormGroup = new FormGroup({
         "clientLogin": new FormControl("Имя вашего аккаунта", [ Validators.required, this.clientLoginValidator ]),
