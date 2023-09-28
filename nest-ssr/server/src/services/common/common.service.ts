@@ -46,6 +46,7 @@ export class CommonService {
     public async getActiveClient (request: IRequest): Promise<IClient>
     public async getActiveClient (request: IRequest, options?: { includeFields?: string, allowedIncludedFields?: string[] }): Promise<string>
     public async getActiveClient (request: IRequest, options?: { includeFields?: string[], allowedIncludedFields?: string[] }): Promise<IClient>
+    public async getActiveClient (request: IRequest, options?: { includeFields?: string | string[], allowedIncludedFields?: string[] }): Promise<string | IClient>
     public async getActiveClient (request: IRequest, options?: IGetActiveClientOptions): Promise<string | IClient> {
         const signServiceRef = await this.appService.getServiceRef(SignModule, SignService);
 

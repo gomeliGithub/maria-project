@@ -22,6 +22,6 @@ export class GalleryComponent implements OnInit {
     }
 
     private _getCompressedImagesList (): Observable<string[]> {
-        return this.http.get('/api/client/getCompressedImagesList/:main').pipe<string[]>(imagesList => this.compressedImagesList = imagesList as Observable<string[]>);
+        return this.http.get('/api/client/getCompressedImagesList/:main', { withCredentials: true }).pipe<string[]>(imagesList => this.compressedImagesList = imagesList as Observable<string[]>);
     }
 }

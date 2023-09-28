@@ -20,27 +20,44 @@
                             Галерея
                         </a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Dropdown link
+                    <li class="nav-item">
+                        <a class="nav-link" routerLink="/adminPanel" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                            Панель администратора
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Аккаунт
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" routerLink="/signUp" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                                    Создать
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                                    Войти
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
-                <span class="navbar-text">
-                    Navbar text with an inline element
-                </span>
+                <div class="navbar-text fw-bold" [attr.activeClient]="activeClient">
+                    <span *ngIf="activeClientLogin; else noActiveClientBlock" class="">
+                        {{activeClientLogin}} - {{activeClientFullName}}
+                    </span>
+                    <ng-template #noActiveClientBlock>  
+                        <span class="text-warning">Гость</span>
+                    </ng-template>
+                </div>
             </div>
         </div>
     </nav>
-    <div class="w-100">
+    <div class="h-100 w-100">
         <router-outlet></router-outlet>
     </div>
-    <footer class="footer mt-auto w-100 py-2 bg-secondary text-center"> <!-- footer w-100 py-2 position-absolute bottom-0 start-50 translate-middle-x bg-secondary text-center -->
+    <footer class="footer mt-auto w-100 py-2 bg-secondary text-center">
         <div class="container">
             <section class="mb-3">
                 <a class="btn btn-primary btn-floating m-3" style="background-color: #55acee" href="#!" role="button">

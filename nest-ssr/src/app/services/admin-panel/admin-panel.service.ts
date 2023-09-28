@@ -13,7 +13,7 @@ export class AdminPanelService {
     ) { }
 
     public getFullCompressedImagesList (): Observable<ICompressedImage[]> {
-        return this.http.get('/api/admin-panel/getFullCompressedImagesList').pipe(map(imagesList => imagesList)) as Observable<ICompressedImage[]>;
+        return this.http.get('/api/admin-panel/getFullCompressedImagesList', { withCredentials: true }).pipe(map(imagesList => imagesList)) as Observable<ICompressedImage[]>;
     }
 
     public uploadImage (imageFile: File): void {

@@ -1,32 +1,41 @@
-<form [formGroup]="signForm" novalidate>
-    <div class="form-group form-floating mb-3">
-        <input type="text" class="form-control" id="inputLogin" placeholder="Имя вашего аккаунта" formControlName="clientLogin">
-        <label for="inputLogin" class="form-label">Логин</label>
-        <div class="alert alert-danger" *ngIf="signForm.controls['clientLogin'].invalid && signForm.controls['clientLogin'].touched">
-            Не указан логин
+<div class="d-flex flex-row justify-content-center align-items-center h-100" id="signFormContainer" (submit)="sign($event)">
+    <form [formGroup]="signForm" class="p-3 w-50 border border-light border-3 rounded" novalidate>
+        <div class="form-group form-floating mb-3">
+            <input type="text" class="form-control" id="inputLogin" placeholder="Имя вашего аккаунта" formControlName="clientLogin">
+            <label for="inputLogin" class="form-label">Логин</label>
+            <div class="alert alert-danger" *ngIf="signForm.controls['clientLogin'].invalid && signForm.controls['clientLogin'].touched">
+                Не указан логин
+            </div>
         </div>
-    </div>
-    <div class="form-group form-floating mb-3">
-        <input type="password" class="form-control" id="inputPassword" placeholder="Ваш пароль" formControlName="clientPassword">
-        <label for="inputPassword" class="form-label">Пароль</label>
-        <div class="alert alert-danger" *ngIf="signForm.controls['clientPassword'].invalid && signForm.controls['clientPassword'].touched">
-            Не указан пароль
+        <div class="form-group form-floating mb-3">
+            <input type="password" class="form-control" id="inputPassword" placeholder="Ваш пароль" formControlName="clientPassword">
+            <label for="inputPassword" class="form-label">Пароль</label>
+            <div class="alert alert-danger" *ngIf="signForm.controls['clientPassword'].invalid && signForm.controls['clientPassword'].touched">
+                Не указан пароль
+            </div>
         </div>
-    </div>
-    <div class="form-group form-floating mb-3">
-        <input type="text" class="form-control" id="inputFullName" placeholder="Ваше собственное ФИО" formControlName="clientFullName">
-        <label for="inputFullName" class="form-label">ФИО</label>
-        <div class="alert alert-danger" *ngIf="signForm.controls['clientFullName'].invalid && signForm.controls['clientFullName'].touched">
-            Не указано ФИО
+        <div class="form-group form-floating mb-3">
+            <input type="text" class="form-control" id="inputFullName" placeholder="Ваше собственное ФИО" formControlName="clientFullName">
+            <label for="inputFullName" class="form-label">ФИО</label>
+            <div class="alert alert-danger" *ngIf="signForm.controls['clientFullName'].invalid && signForm.controls['clientFullName'].touched">
+                Не указано ФИО
+            </div>
         </div>
-    </div>
-    <div *ngIf="signOp === 'up'" class="form-group form-floating mb-3">
-        <input type="email" class="form-control" id="inputEmail" placeholder="Ваша электронная почта" formControlName="clientEmail">
-        <label for="inputEmail" class="form-label">Email</label>
-    </div>
-    <div class="form-group">
-        <button class="btn btn-primary" [disabled]="signForm.invalid">
-            Зарегистрироваться
-        </button>
-    </div>
-</form>
+        <div *ngIf="signOp === 'up'" class="form-group form-floating mb-3">
+            <input type="email" class="form-control" id="inputEmail" placeholder="Ваша электронная почта" formControlName="clientEmail">
+            <label for="inputEmail" class="form-label">Email</label>
+        </div>
+        <div class="form-group text-center">
+            <button class="btn btn-primary" [disabled]="signForm.invalid">
+                <span *ngIf="signOp === 'up'; else signInBlock">
+                    Зарегистрироваться
+                </span>
+                <ng-template #signInBlock>  
+                    (<a class="nav-link" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                        Войти
+                    </a>)
+                </ng-template>
+            </button>
+        </div>
+    </form>
+</div>

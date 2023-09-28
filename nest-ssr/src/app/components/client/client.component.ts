@@ -52,4 +52,8 @@ export class ClientComponent {
 
         return null;
     }
+
+    public sign (event: SubmitEvent): void {
+        console.log(this.signForm.value);
+    }
 }

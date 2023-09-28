@@ -20,7 +20,7 @@ export class JwtControlService {
     public extractTokenFromHeader (request: IRequest): string | undefined {
         const [ type, token ] = request.headers.authorization?.split(' ') ?? [];
 
-        if ( request.url !== "/api/auth/signIn" && request.url !== "/api/auth/getActiveClient" && request.url !== "/api/auth/logout" && !token ) throw new UnauthorizedException();
+        if ( request.url !== "/api/sign/sign/up" && request.url !== "/api/sign/sign/in" && request.url !== "/api/sign/getActiveClient" && request.url !== "/api/sign/sign/out" && !token ) throw new UnauthorizedException();
         
         return type === 'Bearer' ? token : undefined;
     }
