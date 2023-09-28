@@ -20,7 +20,7 @@
             Не указано ФИО
         </div>
     </div>
-    <div class="form-group mb-3">
+    <div *ngIf="signOp === 'up'" class="form-group mb-3">
         <label for="inputEmail" class="form-label">Email</label>
         <input type="email" class="form-control" id="inputEmail" formControlName="clientEmail">
     </div>
@@ -29,5 +29,4 @@
             Зарегистрироваться
         </button>
     </div>
-    {{signOp}}
 </form>

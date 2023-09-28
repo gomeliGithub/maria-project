@@ -11,17 +11,27 @@ export class ClientComponent {
     constructor (
         private readonly activateRoute: ActivatedRoute
     ) {
-        this.signOp = this.activateRoute.snapshot.url; // this.activateRoute.snapshot.paramMap.get('op') as string;
+        const formControls = {
+            'clientLogin': new FormControl("Имя вашего аккаунта", [ Validators.required, this.clientLoginValidator ]),
+            'clientPassword': new FormControl("Ваш пароль", [ Validators.required, this.clientPasswordValidator ]),
+            'clientFullName': new FormControl("Ваше собственное ФИО", [ Validators.required, this.clientFullNameValidator ]),
+        };
+
+        this.signOp = this.activateRoute.snapshot.paramMap.get('op') as string;
+
+        if (this.signOp === 'up') formControls['clientEmail'] = new FormControl("Ваша электронная почта", Validators.email);
+
+        this.signForm = new FormGroup(formControls);
     }
 
-    public signOp;
+    public signForm: FormGroup<{
+        clientLogin: FormControl<string>;
+        clientPassword: FormControl<string>;
+        clientFullName: FormControl<string>;
+        clientEmail?: FormControl<string>;
+    }>;
 
-    public signForm: FormGroup = new FormGroup({
-        "clientLogin": new FormControl("Имя вашего аккаунта", [ Validators.required, this.clientLoginValidator ]),
-        "clientPassword": new FormControl("Ваш пароль", [ Validators.required, this.clientPasswordValidator ]),
-        "clientFullName": new FormControl("Ваше собственное ФИО", [ Validators.required, this.clientFullNameValidator ]),
-        "clientEmail": new FormControl("Ваша электронная почта", Validators.email)
-    });
+    public signOp: string;
 
     public clientLoginValidator (control: FormControl<'string'>): { [ s: string ]: boolean } | null {
         const loginPattern: RegExp = /^[a-zA-Z](.[a-zA-Z0-9_-]*)$/;
