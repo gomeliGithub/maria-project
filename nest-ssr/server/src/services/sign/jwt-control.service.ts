@@ -48,7 +48,7 @@ export class JwtControlService {
 
         if ( !revokedToken ) {
             await revokedToken.update({ revokation_date: new Date(), revoked: true });
-        }
+        } else throw new UnauthorizedException();
     }
 
     public async saveToken (token: string): Promise<void> {
