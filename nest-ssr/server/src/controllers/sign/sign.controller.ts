@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Put, Req, Res, Redirect } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Put, Req, Res } from '@nestjs/common';
 import { Response } from 'express';
 
 import { SignService } from '../../services/sign/sign.service';
@@ -13,7 +13,6 @@ export class SignController {
     ) { }
 
     @Post('/up')
-    @Redirect('/in', 301)
     async signUp (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
         if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password 
             || typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
@@ -24,7 +23,6 @@ export class SignController {
     }
 
     @Post('/in')
-    @Redirect('/', 301)
     async signIn (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<IClientAccessData> {
         if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password ||
             typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
@@ -34,7 +32,6 @@ export class SignController {
     }
 
     @Put('/out')
-    @Redirect('/', 301)
     async signOut (@Req() request: IRequest): Promise<void> {
         return this.signService.signOut(request);
     }

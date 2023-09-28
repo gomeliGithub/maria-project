@@ -32,12 +32,12 @@ export class AppService {
         this.platformTitle.setTitle(title);
     }
 
-    public reloadComponent (self: boolean, urlToNavigateTo?: string){
-        const url= self ? this.router.url : urlToNavigateTo;
+    public reloadComponent (self: boolean, urlToNavigateTo?: string) {
+        const url: string = self ? this.router.url : urlToNavigateTo;
 
-        this.router.navigateByUrl('/',{skipLocationChange:true}).then(()=>{
-            this.router.navigate([`/${url}`]).then(()=>{
-                console.log(`After navigation I am on:${this.router.url}`)
+        this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+            this.router.navigate([`/${url}`]).then(() => {
+                console.log(`After navigation I am on: ${ this.router.url }`);
             })
         })
     }

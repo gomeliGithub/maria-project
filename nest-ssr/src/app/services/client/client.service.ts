@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 
 import * as bcryptjs from 'bcryptjs';
 
+import { AppService } from '../../app.service';
+
 import { IClientBrowser } from 'types/global';
 
 @Injectable({
@@ -12,7 +14,8 @@ import { IClientBrowser } from 'types/global';
 })
 export class ClientService {
     constructor (
-        private readonly http: HttpClient
+        private readonly http: HttpClient,
+        private readonly appService: AppService,
     ) { }
 
     public getActiveClient (): Observable<IClientBrowser> {
@@ -40,7 +43,7 @@ export class ClientService {
                         email: clientEmail
                     }
                 }
-            }, { withCredentials: true }).subscribe();
+            }, { withCredentials: true }).subscribe(() => this.appService.reloadComponent(false, 'signIn'));
         });
     }
 
