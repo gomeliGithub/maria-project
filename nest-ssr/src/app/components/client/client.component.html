@@ -24,18 +24,22 @@
         <div *ngIf="signOp === 'up'" class="form-group form-floating mb-3">
             <input type="email" class="form-control" id="inputEmail" placeholder="Ваша электронная почта" formControlName="clientEmail">
             <label for="inputEmail" class="form-label">Email</label>
+            <div class="alert alert-danger" *ngIf="signForm.controls['clientEmail'].invalid && signForm.controls['clientEmail'].touched">
+                Не указан email
+            </div>
         </div>
         <div class="form-group text-center">
             <button class="btn btn-primary" [disabled]="signForm.invalid">
-                <span *ngIf="signOp === 'up'; else signInBlock">
-                    Зарегистрироваться
-                </span>
-                <ng-template #signInBlock>  
-                    (<a class="nav-link" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                {{signOp === 'up' ? 'Зарегистрироваться': 'Войти'}} 
+            </button>
+            <div class="mt-2">
+                <span *ngIf="signOp === 'up'" class="fw-bold text-light">
+                    Уже есть аккаунт?   
+                    (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover link-light" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                         Войти
                     </a>)
-                </ng-template>
-            </button>
+                </span>
+            </div>
         </div>
     </form>
 </div>

@@ -1,15 +1,21 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+
+import { AppService } from '../../app.service';
+import { ClientService } from '../../services/client/client.service';
 
 @Component({
     selector: 'app-client',
     templateUrl: './client.component.html',
     styleUrls: ['./client.component.css']
 })
-export class ClientComponent {
+export class ClientComponent implements OnInit {
     constructor (
-        private readonly activateRoute: ActivatedRoute
+        private readonly router: Router,
+        private readonly activateRoute: ActivatedRoute,
+        private readonly appService: AppService,
+        private readonly clientService: ClientService
     ) {
         const formControls = {
             'clientLogin': new FormControl("", [ Validators.required, this.clientLoginValidator ]),
@@ -33,6 +39,10 @@ export class ClientComponent {
 
     public signOp: string;
 
+    ngOnInit (): void {
+        if ( this.appService.checkIsPlatformBrowser() ) {}
+    }
+
     public clientLoginValidator (control: FormControl<'string'>): { [ s: string ]: boolean } | null {
         const loginPattern: RegExp = /^[a-zA-Z](.[a-zA-Z0-9_-]*)$/;
 
@@ -53,7 +63,7 @@ export class ClientComponent {
         return null;
     }
 
-    public sign (event: SubmitEvent): void {
-        console.log(this.signForm.value);
+    public sign (event: SubmitEvent): Promise<void> {
+        return this.clientService.sign(this.signForm.value);
     }
 }

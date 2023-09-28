@@ -72,7 +72,8 @@ export class SignService {
         const loginPattern: RegExp = /^[a-zA-Z](.[a-zA-Z0-9_-]*)$/;
         const emailPattern: RegExp = /^[^\s()<>@,;:\/]+@\w[\w\.-]+\.[a-z]{2,}$/i;
 
-        if ( !loginPattern.test(clientLogin) || clientPassword.length < 4 || clientFullName.length < 5 || !emailPattern.test(clientEmail) ) throw new BadRequestException();
+        // clientPassword.length < 4 
+        if ( !loginPattern.test(clientLogin) || clientFullName.length < 5 || !emailPattern.test(clientEmail) ) throw new BadRequestException();
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
@@ -83,11 +84,11 @@ export class SignService {
 
         if ( client ) throw new UnauthorizedException();
         
-        const clientPasswordHash: string = await bcrypt.hash(clientPassword, process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS);
+        // const clientPasswordHash: string = await bcrypt.hash(clientPassword, process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS);
 
         await this.memberModel.create({
             login: clientLogin,
-            password: clientPasswordHash,
+            password: clientPassword,
             fullName: clientFullName,
             email: clientEmail
         });
@@ -189,5 +190,9 @@ export class SignService {
         const passwordValid: boolean = await bcrypt.compare(clientPassword, client.password);
 
         if (!passwordValid) throw new UnauthorizedException();
+    }
+
+    public async getBcryptHashSaltrounds (): Promise<string> {
+        return process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS;
     }
 }

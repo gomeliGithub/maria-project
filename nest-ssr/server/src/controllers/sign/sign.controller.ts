@@ -45,4 +45,9 @@ export class SignController {
 
         return this.signService.getActiveClient(request, { includeFields: includedFields });
     }
+
+    @Get('/getBcryptHashSaltrounds')
+    async getBcryptHashSaltrounds (): Promise<string | IClient> {
+        return this.signService.getBcryptHashSaltrounds();
+    }
 }
