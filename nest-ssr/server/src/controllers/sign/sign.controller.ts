@@ -22,7 +22,7 @@ export class SignController {
         return this.signService.signUp(request, requestBody.sign.clientData);
     }
 
-    @Post('/in')
+    @Put('/in')
     async signIn (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<IClientAccessData> {
         if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password ||
             typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
