@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { LazyModuleLoader } from '@nestjs/core';
 import { InjectModel } from '@nestjs/sequelize';
 import { AssociationGetOptions } from 'sequelize-typescript';
 
@@ -23,8 +22,6 @@ import { IСompressedImageGetOptions } from 'types/options';
 @Injectable()
 export class ImageControlService {
     constructor (
-        private lazyModuleLoader: LazyModuleLoader,
-
         private readonly appService: AppService,
 
         @InjectModel(СompressedImage) 
@@ -83,8 +80,7 @@ export class ImageControlService {
                 originalImageDirPath: inputImageDirPath
             });
 
-            const commonModuleRef = await this.lazyModuleLoader.load(() => CommonModule);
-            const commonServiceRef = commonModuleRef.get(CommonService);
+            const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
             const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin);
 

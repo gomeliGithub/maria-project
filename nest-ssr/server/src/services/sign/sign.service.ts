@@ -25,7 +25,6 @@ import { IGetActiveClientOptions } from 'types/options';
 export class SignService {
     constructor (
         private readonly appService: AppService,
-        private readonly commonService: CommonService,
         private readonly jwtService: JwtService,
         private readonly jwtControlService: JwtControlService,
 
@@ -152,8 +151,10 @@ export class SignService {
         
         const validatedClient: IClient = await this.jwtControlService.tokenValidate(request, token);
 
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
         try {
-            await this.commonService.getClients(request, validatedClient.login, { rawResult: false });
+            await commonServiceRef.getClients(request, validatedClient.login, { rawResult: false });
         } catch {
             throw new UnauthorizedException();
         }
