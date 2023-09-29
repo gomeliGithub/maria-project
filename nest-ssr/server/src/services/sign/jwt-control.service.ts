@@ -26,19 +26,19 @@ export class JwtControlService {
         return type === 'Bearer' ? token : undefined;
     }
 
-    public async tokenValidate (request: IRequest, token: string): Promise<IClient> {
+    public async tokenValidate (request: IRequest, token: string, throwError = true): Promise<IClient> {
         let validatedClient: IClient = null;
 
         try {
             validatedClient = await this.jwtService.verifyAsync<IClient>(token);
         } catch {
-            throw new UnauthorizedException();
+            if ( throwError ) throw new UnauthorizedException();
         }
 
         const client__secure_fgpHash: string = (crypto.createHmac("SHA256", request.cookies['__secure_fgp'])).digest('hex');
 
         if ( client__secure_fgpHash !== validatedClient.__secure_fgpHash || !(await this.validateRevokedToken(token)) ) {
-            throw new UnauthorizedException();
+            if ( throwError ) throw new UnauthorizedException();
         }
 
         return validatedClient;
