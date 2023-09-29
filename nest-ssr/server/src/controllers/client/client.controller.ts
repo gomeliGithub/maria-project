@@ -19,7 +19,7 @@ export class ClientController {
     async uploadImage (@Req() request: IRequest, @Param('imageName') imageName: string): Promise<void> {
         if ( !imageName || imageName === '' ) throw new BadRequestException();
 
-        return this.clientService.uploadImage(request, imageName);
+        return this.clientService.uploadImage(request, imageName.substring(1));
     }
 
     @Get('/getCompressedImagesList/:imagesType')

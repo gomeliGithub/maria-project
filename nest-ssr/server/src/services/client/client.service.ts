@@ -107,7 +107,7 @@ export class ClientService {
             await fsPromises.mkdir(currentClientOriginalImagesDir);
         }
 
-        console.log("SSSSSSSSSSSSSSSSSS");
+        console.log(newOriginalImagePath);
 
         const writeStream: fs.WriteStream = fs.createWriteStream(newOriginalImagePath);
 
