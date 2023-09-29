@@ -56,6 +56,8 @@ export class SignService {
 
             const client: Admin | Member = await commonServiceRef.getClients(request, validatedClient.login, { rawResult: false }) as Admin | Member;
 
+            if ( !client ) throw new UnauthorizedException();
+
             await commonServiceRef.registerClientLastActivityTime(client);
 
             return requiredClientTypes.some(requiredClientType => requiredClientType === clientType);
@@ -162,7 +164,7 @@ export class SignService {
         } catch { }
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
-        
+
         if ( validatedClient ) await commonServiceRef.getClients(request, validatedClient.login, { rawResult: false });
             
         if ( !options ) options = {};
