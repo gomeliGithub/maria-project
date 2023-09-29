@@ -11,7 +11,7 @@ export class AppController {
     constructor () { }
 
     @Get('/checkAccess')
-    @ClientTypes('admin')
+    @ClientTypes('admin', 'member')
     async checkAccess (): Promise<boolean> {
         return true;
     }
