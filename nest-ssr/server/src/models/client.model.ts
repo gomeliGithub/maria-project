@@ -22,6 +22,12 @@ export class Admin extends Model {
     @Column({ 
         type: DataType.STRING
     })
+    type: string;
+
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.STRING
+    })
     fullName: string;
 
     @AllowNull(true)
@@ -70,6 +76,12 @@ export class Member extends Model {
         type: DataType.STRING
     })
     password: string;
+
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.STRING
+    })
+    type: string;
 
     @AllowNull(false)
     @Column({ 

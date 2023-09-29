@@ -62,7 +62,7 @@ export class SignService {
         }
     }
 
-    public async signUp (request: IRequest, clientData: IClientSignData): Promise<void> {
+    public async signUp (request: IRequest, clientData: IClientSignData, newAdmin = false): Promise<void> {
         const clientLogin: string = clientData.login;
         const clientPassword: string = clientData.password;
         const clientFullName: string = clientData.fullName;
@@ -89,7 +89,8 @@ export class SignService {
             login: clientLogin,
             password: clientPassword,
             fullName: clientFullName,
-            email: clientEmail
+            email: clientEmail,
+            type: newAdmin ? 'admin' : 'member'
         });
     }
 
@@ -99,18 +100,13 @@ export class SignService {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
         const clientInstance: Admin | Member = await commonServiceRef.getClients(request, clientLogin, {
-            includeFields: [ 'login', 'fullName' ],
+            includeFields: [ 'login', 'fullName', 'type' ],
             rawResult: true
         }) as Admin | Member;
 
-        let clientType: 'admin' | 'member' = null;
-
-        if ( clientInstance instanceof Admin ) clientType = 'admin';
-        if ( clientInstance instanceof Member ) clientType = 'member';
-        
         const payload: IClient = {
             login: clientInstance.login,
-            type: clientType,
+            type: clientInstance.type as 'admin' | 'member',
             // locale: process.env.CLIENT_DEFAULT_LOCALE,
             fullName: clientInstance.fullName,
             __secure_fgpHash: ""
