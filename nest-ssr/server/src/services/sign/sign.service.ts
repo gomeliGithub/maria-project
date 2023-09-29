@@ -158,16 +158,12 @@ export class SignService {
         let validatedClient: IClient = null;
         
         try {
-            validatedClient = await this.jwtControlService.tokenValidate(request, token, false);
+            validatedClient = await this.jwtControlService.tokenValidate(request, token);
         } catch { }
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
-
-        try {
-            await commonServiceRef.getClients(request, validatedClient.login, { rawResult: false });
-        } catch {
-            throw new UnauthorizedException();
-        }
+        
+        if ( validatedClient ) await commonServiceRef.getClients(request, validatedClient.login, { rawResult: false });
             
         if ( !options ) options = {};
 
