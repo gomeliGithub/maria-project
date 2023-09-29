@@ -85,12 +85,19 @@ export class SignService {
         
         // const clientPasswordHash: string = await bcrypt.hash(clientPassword, process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS);
 
-        await this.memberModel.create({
+        if ( isNewAdmin ) await this.adminModel.create({
             login: clientLogin,
             password: clientPassword,
             fullName: clientFullName,
             email: clientEmail,
-            type: isNewAdmin ? 'admin' : 'member'
+            type: 'admin'
+        });
+        else await this.memberModel.create({
+            login: clientLogin,
+            password: clientPassword,
+            fullName: clientFullName,
+            email: clientEmail,
+            type: 'member'
         });
     }
 
