@@ -2,11 +2,19 @@ import { Body, Controller, Get, Param, Req } from '@nestjs/common';
 
 import * as fsPromises from 'fs/promises';
 
+import { ClientTypes } from './decorators/client.types.decorator';
+
 import { IRequest, IRequestBody } from 'types/global';
 
 @Controller('/main')
 export class AppController {
-    constructor() { }
+    constructor () { }
+
+    @Get('/checkAccess')
+    @ClientTypes('admin')
+    async checkAccess (): Promise<boolean> {
+        return true;
+    }
 
     @Get('/getMainPage/:pageName')
     async getMainPage (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Param() params: any): Promise<string> {
