@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { AppService } from '../../app.service';
 import { AdminPanelService } from '../../services/admin-panel/admin-panel.service';
 
-import { ICompressedImage } from 'types/global';
+import { ICompressedImage, IFullCompressedImageData } from 'types/global';
 
 @Component({
     selector: 'app-admin-panel',
@@ -20,13 +20,15 @@ export class AdminPanelComponent implements OnInit {
     private _imageFile: File;
 
     
-    public getFullCompressedImagesListResult: Observable<ICompressedImage[]>;
+    public getFullCompressedImagesDataResult: Observable<IFullCompressedImageData>;
 
     public fullCompressedImagesList: ICompressedImage[];
+    public fullCompressedImagesListCount: number;
 
     ngOnInit (): void {
-        if ( this.appService.checkIsPlatformBrowser() ) this.adminPanelService.getFullCompressedImagesList().pipe<ICompressedImage[]>(imagesList => this.getFullCompressedImagesListResult = imagesList as Observable<ICompressedImage[]>).subscribe(imagesList => {
-            this.fullCompressedImagesList = imagesList;
+        if ( this.appService.checkIsPlatformBrowser() ) this.adminPanelService.getFullCompressedImagesData().pipe<IFullCompressedImageData>(imagesList => this.getFullCompressedImagesDataResult = imagesList as Observable<IFullCompressedImageData>).subscribe(imagesList => {
+            this.fullCompressedImagesList = imagesList.imagesList;
+            this.fullCompressedImagesListCount = imagesList.count;
         });
     }
 

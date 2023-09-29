@@ -4,7 +4,7 @@ import { Observable, map } from 'rxjs';
 
 import { AppService } from '../../app.service';
 
-import { ICompressedImage } from 'types/global';
+import { ICompressedImage, IFullCompressedImageData } from 'types/global';
 
 @Injectable({
     providedIn: 'root'
@@ -16,7 +16,7 @@ export class AdminPanelService {
         private readonly appService: AppService
     ) { }
 
-    public getFullCompressedImagesList (): Observable<ICompressedImage[]> {
+    public getFullCompressedImagesData (): Observable<IFullCompressedImageData> {
         const headers: HttpHeaders = this.appService.createRequestHeaders();
 
         return this.http.get('/api/admin-panel/getFullCompressedImagesList', { headers, withCredentials: true }).pipe(map(imagesList => imagesList)) as Observable<ICompressedImage[]>;
