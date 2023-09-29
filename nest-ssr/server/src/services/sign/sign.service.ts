@@ -166,7 +166,11 @@ export class SignService {
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        if ( validatedClient ) await commonServiceRef.getClients(request, validatedClient.login, { rawResult: false });
+        if ( validatedClient ) {
+            const client: Admin | Member = await commonServiceRef.getClients(request, validatedClient.login, { rawResult: false });
+
+            if ( !client ) throw new UnauthorizedException();
+        }
             
         if ( !options ) options = {};
 
