@@ -17,11 +17,18 @@ export class AdminPanelComponent implements OnInit {
         private readonly adminPanelService: AdminPanelService
     ) { }
 
-    ngOnInit (): void {
-        // if ( this.appService.checkIsPlatformBrowser() ) this.getFullCompressedImagesList().subscribe(imagesList => console.log(imagesList));
-    }
-
     private _imageFile: File;
+
+    
+    public getFullCompressedImagesListResult: Observable<ICompressedImage[]>;
+
+    public fullCompressedImagesList: ICompressedImage[];
+
+    ngOnInit (): void {
+        if ( this.appService.checkIsPlatformBrowser() ) this.adminPanelService.getFullCompressedImagesList().pipe<ICompressedImage[]>(imagesList => this.getFullCompressedImagesListResult = imagesList as Observable<ICompressedImage[]>).subscribe(imagesList => {
+            this.fullCompressedImagesList = imagesList;
+        });
+    }
 
     public fileChange (event: any): void {
         const fileList: FileList = event.target.files;
@@ -31,12 +38,6 @@ export class AdminPanelComponent implements OnInit {
         }
 
         this._imageFile = fileList[0];
-    }
-
-    public fullCompressedImagesList: Observable<ICompressedImage[]>;
-
-    public getFullCompressedImagesList (): Observable<ICompressedImage[]> {
-        return this.adminPanelService.getFullCompressedImagesList().pipe<ICompressedImage[]>(imagesList => this.fullCompressedImagesList = imagesList as Observable<ICompressedImage[]>);
     }
 
     public uploadImage (): void {
