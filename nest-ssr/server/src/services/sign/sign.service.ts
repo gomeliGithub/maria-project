@@ -160,7 +160,9 @@ export class SignService {
 
         let validatedClient: IClient = null;
         
-        validatedClient = await this.jwtControlService.tokenValidate(request, token);
+        try {
+            validatedClient = await this.jwtControlService.tokenValidate(request, token);
+        } catch { }
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
@@ -172,7 +174,7 @@ export class SignService {
             
         if ( !options ) options = {};
 
-        if ( options.includeFields ) {
+        if ( validatedClient && options.includeFields ) {
             if ( typeof options.includeFields === 'string' ) return validatedClient[options.includeFields];
             else if ( Array.isArray(options.includeFields) ) {
                 if ( options.allowedIncludedFields && options.includeFields.some(field => !options.allowedIncludedFields.includes(field)) ) throw new BadRequestException();
