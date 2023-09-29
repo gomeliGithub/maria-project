@@ -107,12 +107,17 @@ export class ClientService {
             await fsPromises.mkdir(currentClientOriginalImagesDir);
         }
 
-        console.log(newOriginalImagePath);
-
         const writeStream: fs.WriteStream = fs.createWriteStream(newOriginalImagePath);
 
-        request.on('data', chunk => writeStream.write(chunk));
-        request.on('end', () => writeStream.end());
+        request.on('data', chunk => {
+            console.log(chunk.length, ' is downloaded');
+        });
+
+        request.on('end', () => {
+            console.log("Resource has been downloaded");
+
+            writeStream.end()
+        });
 
         writeStream.on('error', async error => {
             console.error(error);
@@ -123,6 +128,8 @@ export class ClientService {
         });
 
         writeStream.on('close', async () => {
+            console.log("File has been written");
+
             const compressResult: boolean = await commonServiceRef.compressImage(request, newOriginalImagePath, path.join(this.appService.clientCompressedImagesDir), activeClientLogin);
 
             if ( !compressResult ) throw new InternalServerErrorException();
