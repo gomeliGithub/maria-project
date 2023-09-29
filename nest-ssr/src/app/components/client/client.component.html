@@ -33,12 +33,20 @@
                 {{signOp === 'up' ? 'Зарегистрироваться': 'Войти'}} 
             </button>
             <div class="mt-2">
-                <span *ngIf="signOp === 'up'" class="fw-bold text-light">
+                <span *ngIf="signOp === 'up'; else signInSpan" class="fw-bold text-light">
                     Уже есть аккаунт?   
                     (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover link-light" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                         Войти
                     </a>)
                 </span>
+                <ng-template #signInSpan>  
+                    <span class="fw-bold text-light">
+                        Ещё нет аккаунта?   
+                        (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover link-light" routerLink="/signUp" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                            Создать
+                        </a>)
+                    </span>
+                </ng-template>
             </div>
         </div>
     </form>
