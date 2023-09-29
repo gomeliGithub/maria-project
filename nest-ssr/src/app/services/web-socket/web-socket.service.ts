@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { IWSMessage } from 'types/global';
+import { IWSMessage } from 'types/web-socket';
 
 @Injectable({
     providedIn: 'root'
@@ -42,7 +42,7 @@ export class WebSocketService {
                     this._changeProgressBar(message.percentUploaded, true);
 
                     setTimeout(() => this._changeProgressBar(0), 2000);
-                } else if ( message.text === 'FINISH' ) { // console.log(message.percentUploaded);
+                } else if ( message.text === 'FINISH' ) { console.log(message.percentUploaded);
                     this._changeProgressBar(message.percentUploaded);
 
                     this._clearUploadImageData(uploadImageInput);
@@ -54,7 +54,7 @@ export class WebSocketService {
 
                         responseMessageElement.textContent = "Файл успешно загружен.";
                     }, 1000);
-                } else if ( message.text === 'SUCCESS' ) { // console.log(message.percentUploaded);
+                } else if ( message.text === 'SUCCESS' ) { console.log(message.percentUploaded);
                     this._changeProgressBar(message.percentUploaded);
 
                     this.sendImage(this._slicedImageData, this._currentChunkNumber += 1);
