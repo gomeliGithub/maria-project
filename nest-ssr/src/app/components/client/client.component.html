@@ -1,4 +1,4 @@
-<div class="d-flex flex-row justify-content-center align-items-center h-100" id="signFormContainer" (submit)="sign($event)">
+<div class="d-flex flex-row justify-content-center align-items-center h-100" id="signFormContainer" (submit)="sign()">
     <form [formGroup]="signForm" class="p-3 w-50 border border-light border-3 rounded" novalidate>
         <div class="form-group form-floating mb-3">
             <input type="text" class="form-control" id="inputLogin" placeholder="Имя вашего аккаунта" formControlName="clientLogin">

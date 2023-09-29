@@ -65,7 +65,7 @@ export class ClientComponent implements OnInit {
         return null;
     }
 
-    public sign (event: SubmitEvent): void {
+    public sign (): void {
         return this.clientService.sign(this.signForm.value, this.signOp);
     }
 }
