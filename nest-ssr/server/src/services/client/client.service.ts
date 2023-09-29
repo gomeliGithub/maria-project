@@ -108,15 +108,15 @@ export class ClientService {
         const newOriginalImagePath: string = path.join(currentClientOriginalImagesDir, imageMeta.name);
 
         try {
-            await fsPromises.access(currentClientOriginalImagesDir, fsPromises.constants.F_OK)
-        } catch {
-            await fsPromises.mkdir(currentClientOriginalImagesDir);
-        }
-
-        try {
             await fsPromises.access(this.appService.clientOriginalImagesDir, fsPromises.constants.F_OK)
         } catch {
             await fsPromises.mkdir(this.appService.clientOriginalImagesDir);
+        }
+
+        try {
+            await fsPromises.access(currentClientOriginalImagesDir, fsPromises.constants.F_OK);
+        } catch {
+            await fsPromises.mkdir(currentClientOriginalImagesDir);
         }
         
         return this.webSocketService.uploadImage(requestBody, activeClientLogin, imageMeta, currentClientOriginalImagesDir, newOriginalImagePath);
