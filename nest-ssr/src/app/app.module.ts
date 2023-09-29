@@ -12,6 +12,9 @@ import { ClientModule } from './modules/client.module';
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
 
+import { AppService } from './app.service';
+import { SseService } from './services/sse/sse.service';
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -27,7 +30,7 @@ import { GalleryComponent } from './components/gallery/gallery.component';
         AdminPanelModule,
         ClientModule
     ],
-    providers: [],
+    providers: [ AppService, SseService ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

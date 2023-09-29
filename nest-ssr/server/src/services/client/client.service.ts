@@ -1,9 +1,8 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
 import sequelize, { NonNullFindOptions } from 'sequelize';
 
-import fs from 'fs';
 import fsPromises from 'fs/promises';
 import path from 'path';
 
@@ -13,16 +12,19 @@ import { CommonModule } from '../../modules/common.module';
 
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
+import { WebSocketService } from '../web-socket/web-socket.service';
 
 import { Admin, Member, СompressedImage } from '../../models/client.model';
 
-import { IRequest } from 'types/global';
+import { IRequest, IRequestBody } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions } from 'types/options';
+import { IImageMeta } from 'types/web-socket';
 
 @Injectable()
 export class ClientService {
     constructor (
         private readonly appService: AppService,
+        private readonly webSocketService: WebSocketService,
         
         @InjectModel(Admin)
         private readonly adminModel: typeof Admin,
@@ -87,61 +89,25 @@ export class ClientService {
         await client.update({ lastSignInDate: sequelize.literal('CURRENT_TIMESTAMP') });
     }
 
-    public async uploadImage (request: IRequest, imageName: string): Promise<void> {
+    public async uploadImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const activeClientLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
 
+        let imageMeta: IImageMeta = null;
+
+        try {
+            imageMeta = JSON.parse(requestBody.client.uploadImageMeta);
+        } catch {
+            await this.appService.logLineAsync(`[${ process.env.SERVER_PORT }] UploadImage - not valid imageMeta`);
+    
+            throw new BadRequestException();
+        }
+
         const currentClientOriginalImagesDir: string = path.join(this.appService.clientOriginalImagesDir, activeClientLogin);
-        const newOriginalImagePath: string = path.join(currentClientOriginalImagesDir, imageName);
-
-        try {
-            await fsPromises.access(this.appService.clientOriginalImagesDir, fsPromises.constants.F_OK)
-        } catch {
-            await fsPromises.mkdir(this.appService.clientOriginalImagesDir);
-        }
-
-        try {
-            await fsPromises.access(currentClientOriginalImagesDir, fsPromises.constants.F_OK)
-        } catch {
-            await fsPromises.mkdir(currentClientOriginalImagesDir);
-        }
-
-        const writeStream: fs.WriteStream = fs.createWriteStream(newOriginalImagePath);
-
-        request.on('data', chunk => {
-            console.log(chunk.length, ' is downloaded');
-        });
-
-        request.on('end', () => {
-            console.log("Resource has been downloaded");
-
-            writeStream.end()
-        });
-
-        writeStream.on('error', async error => {
-            console.error(error);
-
-            await fsPromises.unlink(newOriginalImagePath);
-
-            throw new InternalServerErrorException();
-        });
-
-        writeStream.on('close', async () => {
-            console.log("File has been written");
-
-            const compressResult: boolean = await commonServiceRef.compressImage(request, newOriginalImagePath, path.join(this.appService.clientCompressedImagesDir), activeClientLogin);
-
-            if ( !compressResult ) throw new InternalServerErrorException();
-        });
-
-        request.on('error', async error => {
-            console.error(error);
-
-            await fsPromises.unlink(newOriginalImagePath);
-
-            throw new InternalServerErrorException();
-        });
+        const newOriginalImagePath: string = path.join(currentClientOriginalImagesDir, imageMeta.name);
+        
+        return this.webSocketService.uploadImage(requestBody, activeClientLogin, imageMeta, currentClientOriginalImagesDir, newOriginalImagePath);
     }
 
     public async downloadOriginalImage (response: Response, options: IDownloadOriginalImageOptions): Promise<void> {

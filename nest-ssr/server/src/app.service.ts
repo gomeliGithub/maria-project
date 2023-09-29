@@ -2,7 +2,9 @@ import { DynamicModule, Injectable, Type } from '@nestjs/common';
 import { LazyModuleLoader } from '@nestjs/core';
 
 import { fileURLToPath } from 'url';
+import * as fs from 'fs';
 import path, { dirname, join } from 'path';
+import { EOL } from 'os';
 
 import ms from 'ms';
 
@@ -31,6 +33,8 @@ export class AppService {
     public __filename: string = fileURLToPath(import.meta.url);
     public __dirname: string = dirname(__filename);
 
+    public logFilePath: string = join(this.__dirname, '_server.log');
+
     public cookieSerializeOptions: ICookieSerializeOptions = {
         httpOnly: true,
         maxAge: ms(process.env.COOKIE_MAXAGE_TIME as string),
@@ -52,5 +56,35 @@ export class AppService {
         const serviceRef: AdminPanelService | ClientService | CommonService | ImageControlService | SignService | JwtControlService = moduleRef.get(service);
 
         return serviceRef;
+    }
+
+    public logLineAsync (logLine: string) {
+        return new Promise<void>( (resolve, reject) => {
+            const logDT = new Date();
+
+            const time: string = logDT.toLocaleDateString() + " " + logDT.toLocaleTimeString();
+            const fullLogLine: string = time + " " + logLine;
+        
+            console.log(fullLogLine);
+        
+            fs.open(this.logFilePath, 'a+', (err, logFd) => {
+                if ( err ) 
+                    reject(err);
+                else    
+                    fs.write(logFd, fullLogLine + EOL, (err) => {
+                        if ( err )
+                            reject(err); 
+                        else    
+                            fs.close(logFd, (err) =>{
+                                if (err)
+                                    reject(err);
+                                else    
+                                    resolve();
+                            });
+                    });
+        
+            });
+                
+        });
     }
 }

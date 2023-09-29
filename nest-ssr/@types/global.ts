@@ -24,7 +24,11 @@ export interface IRequestBody {
     clientLogin?: string;
     sign?: {
         clientData?: IClientSignData;
-    }
+    },
+    client?: {
+        uploadImageMeta: string;
+        _id: number;
+    },
     clientLogins?: string | string[];
     newLocale?: string;
 }
