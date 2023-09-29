@@ -15,7 +15,7 @@ export class AdminPanelGuard implements CanActivate {
 }*/
 
 import { inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ActivatedRouteSnapshot, CanActivateFn, RouterStateSnapshot } from '@angular/router';
 
 import { Observable, map } from 'rxjs';
@@ -30,7 +30,9 @@ export const ClientGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state:
 
     const appService: AppService = inject(AppService);
 
-    return http.get('/api/main/checkAccess').pipe(checkAccessResult => checkAccessResult as Observable<boolean>).pipe(map(checkAccessResult => {
+    const headers: HttpHeaders = appService.createRequestHeaders();
+
+    return http.get('/api/main/checkAccess', { headers, withCredentials: true }).pipe(checkAccessResult => checkAccessResult as Observable<boolean>).pipe(map(checkAccessResult => {
         if ( checkAccessResult ) return true;
         else {
             appService.reloadComponent(false, '');
