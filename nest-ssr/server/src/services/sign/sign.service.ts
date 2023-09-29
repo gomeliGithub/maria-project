@@ -62,7 +62,7 @@ export class SignService {
         }
     }
 
-    public async signUp (request: IRequest, clientData: IClientSignData, newAdmin = false): Promise<void> {
+    public async signUp (request: IRequest, clientData: IClientSignData, isNewAdmin = false): Promise<void> {
         const clientLogin: string = clientData.login;
         const clientPassword: string = clientData.password;
         const clientFullName: string = clientData.fullName;
@@ -90,7 +90,7 @@ export class SignService {
             password: clientPassword,
             fullName: clientFullName,
             email: clientEmail,
-            type: newAdmin ? 'admin' : 'member'
+            type: isNewAdmin ? 'admin' : 'member'
         });
     }
 
