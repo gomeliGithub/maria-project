@@ -154,8 +154,12 @@ export class SignService {
         const token: string = this.jwtControlService.extractTokenFromHeader(request);
 
         if ( !token || token === '') return null;
+
+        let validatedClient: IClient = null;
         
-        const validatedClient: IClient = await this.jwtControlService.tokenValidate(request, token);
+        try {
+            validatedClient = await this.jwtControlService.tokenValidate(request, token);
+        } catch { }
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
