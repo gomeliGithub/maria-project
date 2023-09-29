@@ -67,7 +67,7 @@ export class WebSocketService {
                 currentClient.uploadedSize += fileData.length;
 
                 currentClient.activeWriteStream.write(fileData, async () => {
-                    const message = this.createMessage('uploadFile', 'SUCCESS', { uploadedSize: currentClient.uploadedSize, imageMetaSize: currentClient.imageMetaSize });
+                    const message = this.createMessage('uploadImage', 'SUCCESS', { uploadedSize: currentClient.uploadedSize, imageMetaSize: currentClient.imageMetaSize });
 
                     await this.appService.logLineAsync(`[${this.webSocketServerPort}] WebSocketClientId --- ${webSocketClientId}, login --- ${currentClient.login}. Chunk ${currentClient.currentChunkNumber} writed, size --> ${fileData.length}, allUploadedSize --> ${currentClient.uploadedSize}`);
 
