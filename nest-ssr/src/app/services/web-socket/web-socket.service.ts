@@ -33,7 +33,7 @@ export class WebSocketService {
         this._connection.onmessage = (event: MessageEvent<IWSMessage>) => {
             const message: IWSMessage = JSON.parse(event.data as unknown as string);
             
-            // console.log(`Клиентом получено сообщение от сервера: ${message.event} ----- ${message.text}`);
+            console.log(`Клиентом получено сообщение от сервера: ${message.event} ----- ${message.text}`);
 
             if ( message.event === 'uploadImage' ) {
                 if ( message.text === 'ERROR' ) {
