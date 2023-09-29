@@ -14,6 +14,12 @@ export class AdminPanelController {
         private readonly adminPanelService: AdminPanelService
     ) { }
 
+    @Get('/checkAccess')
+    @ClientTypes('admin')
+    async checkAccess (): Promise<boolean> {
+        return true;
+    }
+
     @Get('/getFullCompressedImagesList')
     @ClientTypes('admin', 'member')
     async getFullCompressedImagesList (@Req() request: IRequest): Promise<IFullCompressedImageData> {
