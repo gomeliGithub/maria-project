@@ -96,6 +96,7 @@ export class WebSocketService {
 
     public setIntervalStart (newImagePath: string) {
         let timer: number = 0;
+        
         setInterval(() => {
             timer++;
         
