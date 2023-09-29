@@ -95,7 +95,19 @@ export class ClientService {
         const currentClientOriginalImagesDir: string = path.join(this.appService.clientOriginalImagesDir, activeClientLogin);
         const newOriginalImagePath: string = path.join(currentClientOriginalImagesDir, imageName);
 
-        await fsPromises.mkdir(currentClientOriginalImagesDir);
+        try {
+            await fsPromises.access(this.appService.clientOriginalImagesDir, fsPromises.constants.F_OK)
+        } catch {
+            await fsPromises.mkdir(this.appService.clientOriginalImagesDir);
+        }
+
+        try {
+            await fsPromises.access(currentClientOriginalImagesDir, fsPromises.constants.F_OK)
+        } catch {
+            await fsPromises.mkdir(currentClientOriginalImagesDir);
+        }
+
+        console.log("SSSSSSSSSSSSSSSSSS");
 
         const writeStream: fs.WriteStream = fs.createWriteStream(newOriginalImagePath);
 
