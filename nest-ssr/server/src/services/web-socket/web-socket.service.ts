@@ -18,7 +18,7 @@ export class WebSocketService {
 
     public webSocketServerPort: number = parseInt(process.env.WEBSOCKETSERVER_PORT, 10);
 
-    public webSocketClients: IWebSocketClient[];
+    public webSocketClients: IWebSocketClient[] = [];
 
     public init () {
         const socketServer = new WebSocketServer({ port: this.webSocketServerPort }); 
@@ -96,7 +96,7 @@ export class WebSocketService {
 
     public setIntervalStart (newImagePath: string) {
         let timer: number = 0;
-        
+
         setInterval(() => {
             timer++;
         

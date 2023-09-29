@@ -149,7 +149,8 @@
                             "@nestjs/common",
                             "@nestjs/core",
                             "sequelize-typescript",
-                            "sequelize"
+                            "sequelize",
+                            "ws"
                         ]
                     },
                     "configurations": {

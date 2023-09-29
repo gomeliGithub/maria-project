@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
@@ -57,11 +57,15 @@ export class AdminPanelComponent implements OnInit {
         }); 
     
         const newClientId: number = Math.random();
-            
+
+        const headers: HttpHeaders = this.appService.createRequestHeaders();
+  
         this.http.post('/api/client/uploadImage', {
-            _id: newClientId, 
-            uploadImageMeta: imageMetaJson
-        }, { responseType: 'text', withCredentials: true }).subscribe({
+            client: {
+                _id: newClientId, 
+                uploadImageMeta: imageMetaJson
+            }
+        }, { headers, responseType: 'text', withCredentials: true }).subscribe({
             next: result => {
                 switch (result) {
                     case 'START': { this.adminPanelService.uploadImage(this._imageFile, this.uploadImageInputElementRef.nativeElement, newClientId); break; }
