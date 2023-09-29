@@ -30,7 +30,7 @@ export const ClientGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state:
 
     const appService: AppService = inject(AppService);
 
-    return http.get('/api/admin-panel/checkAccess').pipe(checkAccessResult => checkAccessResult as Observable<boolean>).pipe(map(checkAccessResult => {
+    return http.get('/api/main/checkAccess').pipe(checkAccessResult => checkAccessResult as Observable<boolean>).pipe(map(checkAccessResult => {
         if ( checkAccessResult ) return true;
         else {
             appService.reloadComponent(false, '');
