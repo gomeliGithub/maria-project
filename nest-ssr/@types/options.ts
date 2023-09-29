@@ -1,5 +1,5 @@
 export interface IGetActiveClientOptions {
-    includedFields?: string | string[];
+    includeFields?: string | string[];
     allowedIncludedFields?: string[];
 }
 

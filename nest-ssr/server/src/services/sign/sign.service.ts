@@ -170,13 +170,13 @@ export class SignService {
             
         if ( !options ) options = {};
 
-        if ( options.includedFields ) {
-            if ( typeof options.includedFields === 'string' ) return validatedClient[options.includedFields];
-            else if ( Array.isArray(options.includedFields) ) {
-                if ( options.allowedIncludedFields && options.includedFields.some(field => !options.allowedIncludedFields.includes(field)) ) throw new BadRequestException();
+        if ( options.includeFields ) {
+            if ( typeof options.includeFields === 'string' ) return validatedClient[options.includeFields];
+            else if ( Array.isArray(options.includeFields) ) {
+                if ( options.allowedIncludedFields && options.includeFields.some(field => !options.allowedIncludedFields.includes(field)) ) throw new BadRequestException();
 
                 Object.keys(validatedClient).forEach(field => {
-                    !options.includedFields.includes(field) ? delete validatedClient[field] : null;
+                    !options.includeFields.includes(field) ? delete validatedClient[field] : null;
                 });
             }
         }
