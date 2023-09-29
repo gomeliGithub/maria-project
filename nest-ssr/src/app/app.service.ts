@@ -1,4 +1,5 @@
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { HttpHeaders } from '@angular/common/http';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
@@ -40,5 +41,13 @@ export class AppService {
                 console.log(`After navigation I am on: ${ this.router.url }`);
             })
         })
+    }
+
+    public createRequestHeaders (): HttpHeaders {
+        const token: string | null = localStorage.getItem('access_token');
+
+        const headers = new HttpHeaders().set('Authorization', token ? `Bearer ${token}` : "");
+
+        return headers;
     }
 }

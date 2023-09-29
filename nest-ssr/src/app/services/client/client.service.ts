@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
@@ -8,7 +8,7 @@ import * as bcryptjs from 'bcryptjs';
 import { AppService } from '../../app.service';
 
 import { IClientBrowser } from 'types/global';
-import { IClientSignData } from 'types/sign';
+import { IClientAccessData, IClientSignData } from 'types/sign';
 
 @Injectable({
     providedIn: 'root'
@@ -20,7 +20,9 @@ export class ClientService {
     ) { }
 
     public getActiveClient (): Observable<IClientBrowser> {
-        return this.http.get('/api/sign/getActiveClient', { withCredentials: true }
+        const headers: HttpHeaders = this.appService.createRequestHeaders();
+
+        return this.http.get('/api/sign/getActiveClient', { headers, withCredentials: true }
         ).pipe(activeClient => activeClient as Observable<IClientBrowser>);
     }
 
@@ -33,11 +35,11 @@ export class ClientService {
         this._getBcrypt_hash_saltrounds().subscribe(async bcrypt_hash_saltrounds => {
             const { clientLogin, clientPassword, clientFullName, clientEmail } = signFormValue;
 
-            const clientPasswordHash: string = await bcryptjs.hash(clientPassword, parseInt(bcrypt_hash_saltrounds, 10));
+            // const clientPasswordHash: string = await bcryptjs.hash(clientPassword, parseInt(bcrypt_hash_saltrounds, 10));
 
             const clientData: IClientSignData = {
                 login: clientLogin,
-                password: clientPasswordHash
+                password: signOp === 'up' ? await bcryptjs.hash(clientPassword, parseInt(bcrypt_hash_saltrounds, 10)) : clientPassword
             }
 
             if ( signOp === 'up') {
@@ -49,7 +51,11 @@ export class ClientService {
                 }, { withCredentials: true }).subscribe(() => this.appService.reloadComponent(false, '/signIn'));
             } else this.http.put('/api/sign/in', { 
                 sign: { clientData }
-            }).subscribe(() => this.appService.reloadComponent(false, ''));
+            }, { withCredentials: true }).pipe(accessData => accessData as Observable<IClientAccessData>).subscribe(accessData => {
+                localStorage.setItem('access_token', accessData.access_token);
+
+                this.appService.reloadComponent(false, '');
+            });
         });
     }
 

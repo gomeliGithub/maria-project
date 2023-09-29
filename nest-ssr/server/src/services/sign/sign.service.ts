@@ -39,8 +39,6 @@ export class SignService {
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        if ( (request.url === '/api/sign/up' || request.url === '/api/sign/in') && ( token && token !== '' ) ) await this.jwtControlService.saveToken(token);
-
         if ( request.url === '/api/sign/in' ) {
             const requestBody: IRequestBody = request.body;
 
@@ -49,15 +47,14 @@ export class SignService {
 
             await this._signDataValidate(request, clientLogin, clientPassword);
 
+            if ( token ) await this.jwtControlService.addRevokedToken(token);
+
             return true;
         } else {
             const validatedClient: IClient = await this.jwtControlService.tokenValidate(request, token);
             const clientType: string = validatedClient.type;
 
-            const client: Admin | Member = await commonServiceRef.getClients(request, validatedClient.login, {
-                includeFields: [ 'login', 'fullName' ],
-                rawResult: true
-            }) as Admin | Member;
+            const client: Admin | Member = await commonServiceRef.getClients(request, validatedClient.login, { rawResult: false }) as Admin | Member;
 
             await commonServiceRef.registerClientLastActivityTime(client);
 
@@ -101,21 +98,21 @@ export class SignService {
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
-        const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, {
+        const clientInstance: Admin | Member = await commonServiceRef.getClients(request, clientLogin, {
             includeFields: [ 'login', 'fullName' ],
             rawResult: true
         }) as Admin | Member;
 
         let clientType: 'admin' | 'member' = null;
 
-        if ( client instanceof Admin ) clientType = 'admin';
-        if ( client instanceof Member ) clientType = 'member';
+        if ( clientInstance instanceof Admin ) clientType = 'admin';
+        if ( clientInstance instanceof Member ) clientType = 'member';
         
         const payload: IClient = {
-            login: client.login,
+            login: clientInstance.login,
             type: clientType,
             // locale: process.env.CLIENT_DEFAULT_LOCALE,
-            fullName: client.fullName,
+            fullName: clientInstance.fullName,
             __secure_fgpHash: ""
         }
 
@@ -123,15 +120,21 @@ export class SignService {
 
         payload.__secure_fgpHash = __secure_fgpHash;
 
+        const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, { rawResult: false }) as Admin | Member;
+
         await commonServiceRef.registerClientLastLoginTime(client);
         await commonServiceRef.registerClientLastActivityTime(client);
+
+        const access_token: string = this.jwtService.sign(payload);
+
+        await this.jwtControlService.saveToken(access_token);
 
         response.cookie('__secure_fgp', __secure_fgp, this.appService.cookieSerializeOptions);
 
         return {
-            access_token: this.jwtService.sign(payload),
+            access_token,
             // locale: process.env.CLIENT_DEFAULT_LOCALE,
-            expiresTime: ms(process.env.JWT_EXPIRES_TIME)
+            expiresTime: ms(process.env.JWT_EXPIRESIN_TIME)
         }
     }
 
@@ -188,7 +191,13 @@ export class SignService {
 
         if ( !client ) throw new UnauthorizedException();
 
-        const passwordValid: boolean = await bcrypt.compare(clientPassword, client.password);
+        const passwordValid: boolean = await bcrypt.compare(clientPassword, client.password); 
+        
+        
+        console.log(clientPassword); 
+        console.log(client.password);
+        console.log(await bcrypt.compare(clientPassword, client.password));
+
 
         if ( !passwordValid ) throw new UnauthorizedException();
     }

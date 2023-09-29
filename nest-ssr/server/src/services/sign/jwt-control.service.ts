@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/sequelize';
 
 import * as crypto from 'crypto';
+import ms from 'ms';
 
 import { JWT_token } from '../../models/sign.model';
 
@@ -54,7 +55,7 @@ export class JwtControlService {
     public async saveToken (token: string): Promise<void> {
         const token_hash: string = (crypto.createHmac("SHA256", token)).digest('hex');
 
-        const expires_date = new Date(Date.now() + parseInt(process.env.JWT_EXPIRESIN_TIME, 10));
+        const expires_date = new Date(Date.now() + ms(process.env.JWT_EXPIRESIN_TIME));
 
         await this.JWT_tokenModel.create({
             token_hash,
