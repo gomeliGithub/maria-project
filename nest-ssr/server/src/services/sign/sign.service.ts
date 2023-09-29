@@ -58,8 +58,6 @@ export class SignService {
 
             if ( !client ) throw new UnauthorizedException();
 
-            await commonServiceRef.registerClientLastActivityTime(client);
-
             return requiredClientTypes.some(requiredClientType => requiredClientType === clientType);
         }
     }
