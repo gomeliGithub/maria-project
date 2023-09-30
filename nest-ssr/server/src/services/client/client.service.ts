@@ -130,6 +130,11 @@ export class ClientService {
         }
     
         if ( activeUploadsClientNumber > 3 ) return 'PENDING';
+
+        const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin, { rawResult: false });
+        const compressedImage: СompressedImage[] = (await commonServiceRef.getCompressedImages(client, client.dataValues.type)).rows;
+
+        if ( compressedImage ) return 'FILEEXISTS';
     
         try {
             await fsPromises.access(newOriginalImagePath, fsPromises.constants.F_OK);
@@ -181,7 +186,7 @@ export class ClientService {
 
                 currentClient.connection.send(JSON.stringify(errorMessage));
             } else currentClient.connection.send(JSON.stringify(successMessage));
-            
+
             currentClient.connection.terminate();
             currentClient.connection = null;
     
