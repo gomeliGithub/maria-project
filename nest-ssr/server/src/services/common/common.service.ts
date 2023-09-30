@@ -15,12 +15,15 @@ import { Admin, Member } from '../../models/client.model';
 
 import { IClient, IRequest, IСompressedImageGetResult } from 'types/global';
 import { IClientGetOptions, IGetActiveClientOptions, IСompressedImageGetOptions } from 'types/options';
+import { IWebSocketClient } from 'types/web-socket';
 
 @Injectable()
 export class CommonService {
     constructor (
         private readonly appService: AppService
     ) { }
+
+    public webSocketClients: IWebSocketClient[] = [];
 
     public async getClients (request: IRequest, loginList: string, options?: IClientGetOptions): Promise<Admin | Member>
     public async getClients (request: IRequest, loginList: string[], options?: IClientGetOptions): Promise<Admin[] | Member[]>

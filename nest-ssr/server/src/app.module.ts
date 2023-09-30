@@ -19,6 +19,8 @@ import { ImageControlModule } from './modules/image-control.module';
 import { AdminPanelModule } from './modules/admin-panel.module';
 import { CommonModule } from './modules/common.module';
 
+import { WebSocketService } from './services/web-socket/web-socket.service';
+
 import { JWT_token } from './models/sign.model';
 import { Admin, Member, СompressedImage } from './models/client.model';
 
@@ -70,7 +72,7 @@ import { Admin, Member, СompressedImage } from './models/client.model';
         CommonModule
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [ AppService, WebSocketService ],
     exports: [AppService]
 })
 export class AppModule {}

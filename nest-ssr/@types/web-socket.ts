@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { WebSocket} from 'ws';
+import { WebSocket } from 'ws';
 
 export interface IWebSocketClient {
     _id: number, 
