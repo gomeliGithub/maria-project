@@ -1,4 +1,4 @@
-import { ComponentRef, ElementRef, ViewContainerRef } from "@angular/core";
+import { ComponentRef, ViewContainerRef } from "@angular/core";
 
 import { ModalComponent } from "src/app/components/modal/modal.component";
 
@@ -39,5 +39,4 @@ export interface IModalCreateOptions {
 export interface IModalRef {
     modalViewRef: ViewContainerRef;
     modalComponentRef: ComponentRef<ModalComponent>;
-    progressElementElementRef: ElementRef<HTMLDivElement>;
 }

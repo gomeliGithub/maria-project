@@ -37,7 +37,7 @@ export class WebSocketService {
                 type: 'progressBar'
             });
 
-            this._progressElement = modalRef.modalViewRef.element.nativeElement as HTMLDivElement;
+            this._progressElement = document.getElementById('progressBar') as HTMLDivElement;
 
             this.sendImage(slicedImageData, 0);
         };

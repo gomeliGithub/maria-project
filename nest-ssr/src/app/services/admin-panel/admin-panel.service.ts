@@ -40,7 +40,7 @@ export class AdminPanelService {
             for (let i = 0; i <= fileData.byteLength; i += 100000) {
                 slicedImageData.push(fileData.slice(i, i + 100000));
             } 
-            debugger;
+            
             this.webSocketService.on(this._socketServerHost, uploadImageInput, slicedImageData, newClientId, modalRef);
         }
 
