@@ -70,7 +70,7 @@ export class ImageControlService {
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin);
+        const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin, { rawResult: false });
 
         let newCompressedImage: СompressedImage = null;
 
