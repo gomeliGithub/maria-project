@@ -36,6 +36,8 @@ export class WebSocketService {
             confirmButton: false
         });
 
+        this._modal.onDestroy(() => this._connection.close());
+
         this._keepAliveTimer = setInterval(() => {
             this.send('KEEP_ME_ALIVE');
         }, 5000);

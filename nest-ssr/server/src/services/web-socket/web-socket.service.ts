@@ -7,6 +7,8 @@ import { AppService } from '../../app.service';
 import { ClientService } from '../client/client.service';
 import { CommonService } from '../common/common.service';
 
+import { Admin, Member } from '../../models/client.model';
+
 import { IWebSocketClient } from 'types/web-socket';
 
 @Injectable()
@@ -84,6 +86,10 @@ export class WebSocketService {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         if (currentClient.uploadedSize !== currentClient.imageMetaSize) {
+            // const compressedImage = await commonServiceRef.getCompressedImages();
+
+            // await commonServiceRef.removeUncompleteImages();
+            
             commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter(client => client._id !== currentClient._id);
         }
     }

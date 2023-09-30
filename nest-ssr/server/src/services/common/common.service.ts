@@ -11,7 +11,7 @@ import { ClientService } from '../../services/client/client.service';
 import { SignService } from '../../services/sign/sign.service';
 import { ImageControlService } from '../../services/image-control/image-control.service';
 
-import { Admin, Member } from '../../models/client.model';
+import { Admin, Member, СompressedImage } from '../../models/client.model';
 
 import { IClient, IRequest, IСompressedImageGetResult } from 'types/global';
 import { IClientGetOptions, ICreateImageDirsOptions, IGetActiveClientOptions, IСompressedImageGetOptions } from 'types/options';
@@ -60,6 +60,12 @@ export class CommonService {
         const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
 
         return imageControlServiceRef.createImageDirs(options);
+    }
+
+    public async removeUncompleteImages (originalImagePath: string, compressedImagePath: string, compressedImage: СompressedImage, client: Admin | Member) {
+        const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
+
+        return imageControlServiceRef.removeUncompleteImages(originalImagePath, compressedImagePath, compressedImage, client);
     }
 
     public async compressImage (request: IRequest, inputImagePath: string, outputDirPath: string, originalImageSize: number, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
