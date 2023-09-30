@@ -49,7 +49,7 @@ export class WebSocketService {
         this._connection.onmessage = (event: MessageEvent<IWSMessage>) => {
             const message: IWSMessage = JSON.parse(event.data as unknown as string);
             
-            console.log(`Клиентом получено сообщение от сервера: ${message.event} ----- ${message.text}`);
+            // console.log(`Клиентом получено сообщение от сервера: ${message.event} ----- ${message.text}`);
 
             if ( message.event === 'uploadImage' ) {
                 if ( message.text === 'ERROR' ) {
@@ -58,7 +58,7 @@ export class WebSocketService {
                     this.modalService.changeProgressBar(this._progressElement, message.percentUploaded, true);
 
                     setTimeout(() => this.modalService.changeProgressBar(this._progressElement, 0), 2000);
-                } else if ( message.text === 'FINISH' ) { console.log(message.percentUploaded);
+                } else if ( message.text === 'FINISH' ) { // console.log(message.percentUploaded);
                     this.modalService.changeProgressBar(this._progressElement, message.percentUploaded);
 
                     this._clearUploadImageData(uploadImageInput);
@@ -74,7 +74,7 @@ export class WebSocketService {
                             responseMessageElement.textContent = "Файл успешно загружен.";
                         });
                     }, 1000);
-                } else if ( message.text === 'SUCCESS' ) { console.log(message.percentUploaded);
+                } else if ( message.text === 'SUCCESS' ) { // console.log(message.percentUploaded);
                     this.modalService.changeProgressBar(this._progressElement, message.percentUploaded);
 
                     this.sendImage(this._slicedImageData, this._currentChunkNumber += 1);
