@@ -1,4 +1,6 @@
-import { Injectable } from '@angular/core';
+import { ComponentRef, Injectable } from '@angular/core';
+
+import { ModalComponent } from '../../components/modal/modal.component';
 
 import { AppService } from '../../app.service';
 import { ModalService } from '../modal/modal.service';
@@ -22,12 +24,13 @@ export class WebSocketService {
     private _currentChunkNumber: number;
     private _slicedImageData: ArrayBuffer[];
 
+    private _modal: ComponentRef<ModalComponent>;
     private _progressElement: HTMLDivElement;
 
     public on (host: string, uploadImageInput: HTMLInputElement, slicedImageData: ArrayBuffer[], newClientId: number, modalRef: IModalRef): void {
         this._connection = new WebSocket(host + `/:${newClientId}`);
 
-        this.appService.createModalInstance(modalRef.modalViewRef, {
+        this._modal = this.appService.createModalInstance(modalRef.modalViewRef, {
             title: this.appService.getTranslations('PROGRESSBAR.TITLE'),
             type: 'progressBar'
         });
@@ -63,6 +66,8 @@ export class WebSocketService {
                         this.modalService.changeProgressBar(this._progressElement, 0);
 
                         const responseMessageElement: HTMLSpanElement = document.getElementById('responseMessage') as HTMLSpanElement;
+
+                        this._modal.destroy();
 
                         responseMessageElement.textContent = "Файл успешно загружен.";
                     }, 1000);
