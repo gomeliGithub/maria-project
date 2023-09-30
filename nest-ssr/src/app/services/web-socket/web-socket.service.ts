@@ -68,6 +68,7 @@ export class WebSocketService {
 
                         const responseMessageElement: HTMLSpanElement = document.getElementById('responseMessage') as HTMLSpanElement;
 
+                        this._modal.instance.hideModal();
                         this._modal.destroy();
 
                         responseMessageElement.textContent = "Файл успешно загружен.";

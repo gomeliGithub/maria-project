@@ -31,13 +31,13 @@ export class ModalComponent {
         modal.show();
     }
 
-    destroyModal (): void {
+    public destroyModal (): void {
         const modal = document.getElementById('modal');
 
         if ( modal ) modal.remove();
     }
 
-    async hideModal (): Promise<void> {
+    public async hideModal (): Promise<void> {
         const bootstrap = await import('bootstrap');
 
         const modal = bootstrap.Modal.getInstance('#modal');
