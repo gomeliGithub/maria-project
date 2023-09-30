@@ -31,8 +31,8 @@
         </div>
         <div id="uploadImageContainer">
             <div class="input-group">
-                <input type="file" class="form-control" id="inputGroupUploadImage" aria-describedby="uploadImageButton" aria-label="Upload" (change)="fileChange($event)" #uploadImageInput [disabled]="!fileSelected">
-                <button class="btn btn-outline-secondary" type="button" id="uploadImageButton" (click)="uploadImage()">Загрузить новое изображение</button>
+                <input type="file" class="form-control" id="inputGroupUploadImage" aria-describedby="uploadImageButton" aria-label="Upload" (change)="fileChange($event)" #uploadImageInput>
+                <button class="btn btn-outline-secondary" type="button" id="uploadImageButton" (click)="uploadImage()" [disabled]="!fileSelected">Загрузить новое изображение</button>
             </div>
         </div>
     </div>
