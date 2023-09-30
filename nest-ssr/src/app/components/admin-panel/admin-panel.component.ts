@@ -29,7 +29,8 @@ export class AdminPanelComponent implements OnInit {
     private readonly modalViewRef: ViewContainerRef;
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
-    @ViewChild('uploadImageInput', { static: false }) private uploadImageInputElementRef: ElementRef<HTMLInputElement>;
+    @ViewChild('uploadImageInput', { static: false }) private readonly uploadImageInputElementRef: ElementRef<HTMLInputElement>;
+    @ViewChild('progressElement', { static: false }) private readonly progressElementElementRef: ElementRef<HTMLDivElement>;
 
     private _imageFile: File;
     
@@ -70,7 +71,8 @@ export class AdminPanelComponent implements OnInit {
 
         const modalRef: IModalRef = {
             modalViewRef: this.modalViewRef,
-            modalComponentRef: this.modalComponentRef
+            modalComponentRef: this.modalComponentRef,
+            progressElementElementRef: this.progressElementElementRef
         }
     
         const newClientId: number = Math.random();

@@ -27,8 +27,6 @@ export class WebSocketService {
     public on (host: string, uploadImageInput: HTMLInputElement, slicedImageData: ArrayBuffer[], newClientId: number, modalRef: IModalRef): void {
         this._connection = new WebSocket(host + `/:${newClientId}`);
 
-        this._progressElement = modalRef.modalViewRef.element.nativeElement as HTMLDivElement;
-
         this._keepAliveTimer = setInterval(() => {
             this.send('KEEP_ME_ALIVE');
         }, 5000);
@@ -38,6 +36,8 @@ export class WebSocketService {
                 title: this.appService.getTranslations('PROGRESSBAR.TITLE'),
                 type: 'progressBar'
             });
+
+            this._progressElement = modalRef.modalViewRef.element.nativeElement as HTMLDivElement;
 
             this.sendImage(slicedImageData, 0);
         };
