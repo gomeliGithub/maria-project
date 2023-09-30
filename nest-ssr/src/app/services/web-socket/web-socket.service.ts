@@ -27,16 +27,16 @@ export class WebSocketService {
     public on (host: string, uploadImageInput: HTMLInputElement, slicedImageData: ArrayBuffer[], newClientId: number, modalRef: IModalRef): void {
         this._connection = new WebSocket(host + `/:${newClientId}`);
 
+        this.appService.createModalInstance(modalRef.modalViewRef, {
+            title: this.appService.getTranslations('PROGRESSBAR.TITLE'),
+            type: 'progressBar'
+        });
+
         this._keepAliveTimer = setInterval(() => {
             this.send('KEEP_ME_ALIVE');
         }, 5000);
 
         this._connection.onopen = () => {
-            this.appService.createModalInstance(modalRef.modalViewRef, {
-                title: this.appService.getTranslations('PROGRESSBAR.TITLE'),
-                type: 'progressBar'
-            });
-
             this._progressElement = document.getElementById('progressBar') as HTMLDivElement;
 
             this.sendImage(slicedImageData, 0);
