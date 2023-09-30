@@ -174,9 +174,6 @@ export class ClientService {
     
             await this.appService.logLineAsync(`[${ process.env.WEBSOCKETSERVER_PORT }] WebSocketClientId --- ${webSocketClientId}, login --- ${currentClient.login}. All chunks writed, overall size --> ${currentClient.uploadedSize}. Image ${imageMeta.name} uploaded`);
 
-
-
-
             const compressResult: boolean = await commonServiceRef.compressImage(request, newOriginalImagePath, compressedImagesDirClientPath, imageMeta.size, activeClientLogin);
 
             if ( !compressResult ) {
@@ -184,11 +181,7 @@ export class ClientService {
 
                 currentClient.connection.send(JSON.stringify(errorMessage));
             } else currentClient.connection.send(JSON.stringify(successMessage));
-    
-
-
-
-
+            
             currentClient.connection.terminate();
             currentClient.connection = null;
     
