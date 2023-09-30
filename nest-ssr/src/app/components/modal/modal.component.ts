@@ -1,16 +1,12 @@
 import { Component, Input } from '@angular/core';
 
-import { AppService } from '../../app.service';
-
 @Component({
     selector: 'app-modal',
     templateUrl: './modal.component.html',
     styleUrls: ['./modal.component.css']
 })
 export class ModalComponent {
-    constructor (
-        private readonly appService: AppService
-    ) { }
+    constructor () { }
 
     @Input() title: string;
     @Input() type: string;
