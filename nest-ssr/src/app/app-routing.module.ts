@@ -9,10 +9,10 @@ import { ClientComponent } from './components/client/client.component';
 import { ClientGuard } from './guards/client/client.guard';
 
 const routes: Routes = [
-    { path: 'home', component: HomeComponent, title: 'Home' },
+    { path: 'home', component: HomeComponent},
     { path: '', redirectTo: '/home', pathMatch: 'full' },
-    { path: 'gallery', component: GalleryComponent, title: 'Gallery' },
-    { path: 'adminPanel', component: AdminPanelComponent, title: 'Admin Panel', canActivate: [ClientGuard] },
+    { path: 'gallery', component: GalleryComponent },
+    { path: 'adminPanel', component: AdminPanelComponent, canActivate: [ClientGuard] },
     { path: 'sign/:op', component: ClientComponent },
     { path: 'signUp', redirectTo: '/sign/up', pathMatch: 'full' },
     { path: 'signIn', redirectTo: '/sign/in', pathMatch: 'full' },

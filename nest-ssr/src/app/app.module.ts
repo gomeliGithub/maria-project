@@ -1,7 +1,10 @@
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -11,25 +14,45 @@ import { ClientModule } from './modules/client.module';
 
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
+import { ModalComponent } from './components/modal/modal.component';
+
+import { MissingTranslationService } from './missingTranslationService';
 
 import { AppService } from './app.service';
+
+import { environment } from '../environments/environment';
 
 @NgModule({
     declarations: [
         AppComponent,
         HomeComponent,
-        GalleryComponent
+        GalleryComponent,
+        ModalComponent
     ],
     imports: [
         BrowserModule.withServerTransition({ appId: 'serverApp' }),
         HttpClientModule,
         FormsModule,
         ReactiveFormsModule,
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory,
+                deps: [HttpClient],
+            },
+            missingTranslationHandler: { provide: MissingTranslationHandler, useClass: MissingTranslationService },
+            defaultLanguage: environment.defaultLocale,
+            useDefaultLang: true
+        }),
         AppRoutingModule,
         AdminPanelModule,
         ClientModule
     ],
-    providers: [ AppService ],
+    providers: [AppService],
     bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+export function HttpLoaderFactory (http: HttpClient): TranslateLoader {
+    return new TranslateHttpLoader(http, '/assets/locale/', '.json');
+}

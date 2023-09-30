@@ -1,0 +1,35 @@
+{
+    "NAVBARBRANDTITLE": "DOT",
+	"PAGETITLES": {
+		"HOME": "Home",
+		"GALLERY": "Gallery",
+		"ADMINPANEL": "Admin panel",
+		"SIGNUP": "Sign up",
+		"SIGNIN": "Sign in"
+	},
+    "CLIENTMENU": {
+        "LOGINTEXT": "Log In",
+        "LOGOUTTEXT": "Log Out",
+        "NONLOGINTEXT": "You are not logged in"
+    },
+    "LOGINFORM": {
+		"TITLE": "Sign In",
+        "LOGINLABELTEXT": "Login",
+		"PASSWORDLABELTEXT": "Password",
+		"NOLOGINTEXT": "Login not specified",
+		"NOPASSWORDTEXT": "Password not specified",
+		"CONFIRMBUTTONCAPTIONTEXT": "Sign In"
+	},
+    "SUCCESSMODALTITLE": "Success",
+    "ERRORMODALTITLE": "Error",
+    "DEFAULTERRORMESSAGE": "Something went wrong.",
+    "CLIENTAUTHERRORMESSAGE": "No such client exists, or the password is incorrect.",
+    "TRYAGAINMESSAGE": "Try again.",
+    "CONFIRMBUTTONCAPTIONTEXT": "Close",
+    "CLIENTSUCCESSMESSAGES": {
+		"CHANGELOCALE": "Language changed successfully."
+	},
+    "PROGRESSBAR": {
+		"TITLE": "Upload image..."
+	}
+}

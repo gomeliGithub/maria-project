@@ -1,8 +1,14 @@
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { ComponentRef, Inject, Injectable, PLATFORM_ID, ViewContainerRef } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+
+import { Observable, map } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
+
+import { ModalComponent } from './components/modal/modal.component';
+import { IModalCreateOptions } from 'types/options';
 
 @Injectable({
     providedIn: 'root'
@@ -13,7 +19,8 @@ export class AppService {
         
         private readonly meta: Meta, 
         private readonly platformTitle: Title,
-        private readonly router: Router
+        private readonly router: Router,
+        private readonly translateService: TranslateService
     ) { }
 
     public checkIsPlatformBrowser (): boolean {
@@ -49,5 +56,56 @@ export class AppService {
         const headers = new HttpHeaders().set('Authorization', token ? `Bearer ${token}` : "");
 
         return headers;
+    }
+
+    public createModalInstance (viewRef: ViewContainerRef, createOptions: IModalCreateOptions): ComponentRef<ModalComponent> {
+        viewRef.clear();
+
+        const modalWindowComponent = viewRef.createComponent(ModalComponent);
+
+        modalWindowComponent.instance.title = createOptions.title;
+        modalWindowComponent.instance.type = createOptions.type;
+        modalWindowComponent.instance.body = createOptions.body;
+
+        modalWindowComponent.instance.closeButton = createOptions.closeButton ? createOptions.closeButton : false;
+        modalWindowComponent.instance.closeButtonCaption = createOptions.closeButtonCaption ? createOptions.closeButtonCaption : undefined;
+
+        modalWindowComponent.instance.confirmButtonCaption = createOptions.confirmButtonCaption;
+
+        modalWindowComponent.instance.closeButtonListener = createOptions.closeButtonListener ? createOptions.closeButtonListener : undefined;
+        modalWindowComponent.instance.confirmButtonListener = createOptions.confirmButtonListener ? createOptions.confirmButtonListener : undefined;
+
+        return modalWindowComponent;
+    }
+
+    public createSuccessModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): void {
+        const createOptions: IModalCreateOptions = {
+            title: this.translateService.instant('SUCCESSMODALTITLE'),
+            type: "successModal",
+            body: `${bodyText}`,
+            closeButton: false,
+            confirmButtonCaption: this.translateService.instant('CONFIRMBUTTONCAPTIONTEXT')
+        }
+            
+        componentRef = this.createModalInstance(viewRef, createOptions);
+    }
+
+    public createErrorModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): void {
+        const mWCreateOptions: IModalCreateOptions = {
+            title: this.translateService.instant('ERRORMODALTITLE'),
+            type: "errorModal",
+            body: `${bodyText} ${this.translateService.instant('TRYAGAINMESSAGE')}`,
+            closeButton: false,
+            confirmButtonCaption: this.translateService.instant('CONFIRMBUTTONCAPTIONTEXT')
+        }
+            
+        componentRef = this.createModalInstance(viewRef, mWCreateOptions);
+    }
+
+    public getTranslations<asyncParameter extends boolean = false> (keys: string, async?: asyncParameter): asyncParameter extends true ? Observable<string> : string;
+    public getTranslations<asyncParameter extends boolean = false> (keys: string[], async?: asyncParameter): asyncParameter extends true ? Observable<string[]> : string[];
+    public getTranslations(keys: string | string[], async = false): Observable<string | string[]> | string | string[] {
+        if (async) return this.translateService.get(keys).pipe(map(translations => typeof translations === 'object' ? Object.entries(translations).map(keyValueArr => keyValueArr[1]) : translations)) as Observable<string | string[]>;
+        else return this.translateService.instant(keys);
     }
 }

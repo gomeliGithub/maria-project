@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 
+import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
 
 import { AppService } from './app.service';
 import { ClientService } from './services/client/client.service';
+
+import { environment } from '../environments/environment';
 
 import { IClientBrowser } from 'types/global';
 
@@ -15,7 +18,8 @@ import { IClientBrowser } from 'types/global';
 export class AppComponent implements OnInit {
     constructor (
         private readonly appService: AppService,
-        private readonly clientService: ClientService
+        private readonly clientService: ClientService,
+        private readonly translateService: TranslateService
     ) { }
 
     title = 'nest-ssr';
@@ -27,6 +31,8 @@ export class AppComponent implements OnInit {
     activeClientFullName: string;
 
     ngOnInit (): void {
+        this.translateService.use(environment.defaultLocale);
+
         if ( this.appService.checkIsPlatformBrowser() ) this.clientService.getActiveClient().pipe(activeClient => this.activeClient = activeClient).subscribe(activeClient => {
             this.activeClientLogin = activeClient ? activeClient.login : null;
             this.activeClientFullName = activeClient ? activeClient.fullName : null;

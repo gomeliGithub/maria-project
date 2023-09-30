@@ -42,7 +42,9 @@ export class ClientComponent implements OnInit {
     public signOp: 'up' | 'in';
 
     ngOnInit (): void {
-        if ( this.appService.checkIsPlatformBrowser() ) {}
+        if ( this.appService.checkIsPlatformBrowser() ) {
+            this.appService.getTranslations(`PAGETITLES.${this.signOp === 'up' ? 'SIGNUP' : 'SIGNIN'}`, true).subscribe(translation => this.appService.setTitle(translation));
+        }
     }
 
     public clientLoginValidator (control: FormControl<'string'>): { [ s: string ]: boolean } | null {

@@ -1,0 +1,35 @@
+{
+  	"NAVBARBRANDTITLE": "ДОТ",
+	"PAGETITLES": {
+		"HOME": "Главная",
+		"GALLERY": "Галерея",
+		"ADMINPANEL": "Панель администратора",
+		"SIGNUP": "Регистрация",
+		"SIGNIN": "Вход"
+	},
+  	"CLIENTMENU": {
+    	"LOGINTEXT": "Войти",
+    	"LOGOUTTEXT": "Выйти",
+		"NONLOGINTEXT": "Вы не вошли в систему"
+	},
+	"LOGINFORM": {
+		"TITLE": "Вход в систему",
+		"LOGINLABELTEXT": "Логин",
+		"PASSWORDLABELTEXT": "Пароль",
+		"NOLOGINTEXT": "Не указан логин",
+		"NOPASSWORDTEXT": "Не указан пароль",
+		"CONFIRMBUTTONCAPTIONTEXT": "Войти"
+	},
+	"SUCCESSMODALTITLE": "Успешно",
+	"ERRORMODALTITLE": "Ошибка",
+	"DEFAULTERRORMESSAGE": "Что-то пошло не так.",
+	"CLIENTAUTHERRORMESSAGE": "Не существует такого клиента, либо неверный пароль.",
+	"TRYAGAINMESSAGE": "Попробуйте ещё раз.",
+	"CONFIRMBUTTONCAPTIONTEXT": "Закрыть",
+	"CLIENTSUCCESSMESSAGES": {
+		"CHANGELOCALE": "Язык успешно изменен"
+	},
+	"PROGRESSBAR": {
+		"TITLE": "Загрузка изображения..."
+	}
+}

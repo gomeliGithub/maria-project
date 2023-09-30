@@ -18,7 +18,11 @@ export class GalleryComponent implements OnInit {
     public compressedImagesList: Observable<string[]>;
 
     ngOnInit (): void {
-        if ( this.appService.checkIsPlatformBrowser() ) this._getCompressedImagesList();
+        if ( this.appService.checkIsPlatformBrowser() ) {
+            this.appService.getTranslations('PAGETITLES.GALLERY', true).subscribe(translation => this.appService.setTitle(translation));
+
+            this._getCompressedImagesList();
+        }
     }
 
     private _getCompressedImagesList (): Observable<string[]> {

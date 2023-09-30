@@ -1,12 +1,19 @@
 import { Injectable } from '@angular/core';
 
+import { AppService } from '../../app.service';
+import { ModalService } from '../modal/modal.service';
+
+import { IModalRef } from 'types/options';
 import { IWSMessage } from 'types/web-socket';
 
 @Injectable({
     providedIn: 'root'
 })
 export class WebSocketService {
-    constructor () { }
+    constructor (
+        private readonly appService: AppService,
+        private readonly modalService: ModalService
+    ) { }
 
     private _connection: WebSocket | null;
 
@@ -17,15 +24,20 @@ export class WebSocketService {
 
     private _progressElement: HTMLDivElement;
 
-    public on (host: string, uploadImageInput: HTMLInputElement, slicedImageData: ArrayBuffer[], newClientId: number): void {
+    public on (host: string, uploadImageInput: HTMLInputElement, slicedImageData: ArrayBuffer[], newClientId: number, modalRef: IModalRef): void {
         this._connection = new WebSocket(host + `/:${newClientId}`);
+
+        this._progressElement = modalRef.modalViewRef.element.nativeElement as HTMLDivElement;
 
         this._keepAliveTimer = setInterval(() => {
             this.send('KEEP_ME_ALIVE');
         }, 5000);
 
         this._connection.onopen = () => {
-            this._progressElement = document.getElementById('progressBar') as HTMLDivElement;
+            this.appService.createModalInstance(modalRef.modalViewRef, {
+                title: this.appService.getTranslations('PROGRESSBAR.TITLE'),
+                type: 'progressBar'
+            });
 
             this.sendImage(slicedImageData, 0);
         };
@@ -39,23 +51,23 @@ export class WebSocketService {
                 if ( message.text === 'ERROR' ) {
                     this._clearUploadImageData(uploadImageInput);
 
-                    this._changeProgressBar(message.percentUploaded, true);
+                    this.modalService.changeProgressBar(this._progressElement, message.percentUploaded, true);
 
-                    setTimeout(() => this._changeProgressBar(0), 2000);
+                    setTimeout(() => this.modalService.changeProgressBar(this._progressElement, 0), 2000);
                 } else if ( message.text === 'FINISH' ) { console.log(message.percentUploaded);
-                    this._changeProgressBar(message.percentUploaded);
+                    this.modalService.changeProgressBar(this._progressElement, message.percentUploaded);
 
                     this._clearUploadImageData(uploadImageInput);
 
                     setTimeout(() => {
-                        this._changeProgressBar(0);
+                        this.modalService.changeProgressBar(this._progressElement, 0);
 
                         const responseMessageElement: HTMLSpanElement = document.getElementById('responseMessage') as HTMLSpanElement;
 
                         responseMessageElement.textContent = "Файл успешно загружен.";
                     }, 1000);
                 } else if ( message.text === 'SUCCESS' ) { console.log(message.percentUploaded);
-                    this._changeProgressBar(message.percentUploaded);
+                    this.modalService.changeProgressBar(this._progressElement, message.percentUploaded);
 
                     this.sendImage(this._slicedImageData, this._currentChunkNumber += 1);
                 }
@@ -85,20 +97,6 @@ export class WebSocketService {
         this._currentChunkNumber = chunkNumber;
 
         this.send(slicedImageData[chunkNumber]);
-    }
-
-    private _changeProgressBar (percentUploaded: number, error = false): void {
-        this._progressElement.setAttribute('aria-valuenow', percentUploaded.toString());
-
-        const progressBarElement: HTMLDivElement = this._progressElement.children[0] as HTMLDivElement;
-
-        progressBarElement.style.width = `${percentUploaded}%`;
-        progressBarElement.textContent = `${percentUploaded}%`;
-
-        if ( error ) {
-            progressBarElement.classList.add('bg-danger');
-            progressBarElement.textContent = "Произошла ошибка при загрузке файла на сервер";
-        }
     }
 
     private _clearUploadImageData (uploadImageInput: HTMLInputElement) {

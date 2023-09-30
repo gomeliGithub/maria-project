@@ -1,12 +1,15 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ComponentRef, ElementRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
+
+import { ModalComponent } from '../modal/modal.component';
 
 import { AppService } from '../../app.service';
 import { AdminPanelService } from '../../services/admin-panel/admin-panel.service';
 
 import { ICompressedImage, IFullCompressedImageData } from 'types/global';
+import { IModalRef } from 'types/options';
 
 @Component({
     selector: 'app-admin-panel',
@@ -21,6 +24,11 @@ export class AdminPanelComponent implements OnInit {
         private readonly adminPanelService: AdminPanelService
     ) { }
 
+    @ViewChild(ModalComponent) modalWindowComponent: ModalComponent
+    @ViewChild('appModal', { read: ViewContainerRef, static: false })
+    private readonly modalViewRef: ViewContainerRef;
+    private readonly modalComponentRef: ComponentRef<ModalComponent>;
+
     @ViewChild('uploadImageInput', { static: false }) private uploadImageInputElementRef: ElementRef<HTMLInputElement>;
 
     private _imageFile: File;
@@ -33,10 +41,14 @@ export class AdminPanelComponent implements OnInit {
     public responseMessage: string;
 
     ngOnInit (): void {
-        if ( this.appService.checkIsPlatformBrowser() ) this.adminPanelService.getFullCompressedImagesData().pipe<IFullCompressedImageData>(imagesList => this.getFullCompressedImagesDataResult = imagesList as Observable<IFullCompressedImageData>).subscribe(imagesList => {
-            this.fullCompressedImagesList = imagesList.imagesList;
-            this.fullCompressedImagesListCount = imagesList.count;
-        });
+        if ( this.appService.checkIsPlatformBrowser() ) {
+            this.appService.getTranslations('PAGETITLES.ADMINPANEL', true).subscribe(translation => this.appService.setTitle(translation));
+
+            this.adminPanelService.getFullCompressedImagesData().pipe<IFullCompressedImageData>(imagesList => this.getFullCompressedImagesDataResult = imagesList as Observable<IFullCompressedImageData>).subscribe(imagesList => {
+                this.fullCompressedImagesList = imagesList.imagesList;
+                this.fullCompressedImagesListCount = imagesList.count;
+            });
+        }
     }
 
     public fileChange (event: any): void {
@@ -55,6 +67,11 @@ export class AdminPanelComponent implements OnInit {
             size         : this._imageFile.size,
             type         : this._imageFile.type
         }); 
+
+        const modalRef: IModalRef = {
+            modalViewRef: this.modalViewRef,
+            modalComponentRef: this.modalComponentRef
+        }
     
         const newClientId: number = Math.random();
 
@@ -68,7 +85,7 @@ export class AdminPanelComponent implements OnInit {
         }, { headers, responseType: 'text', withCredentials: true }).subscribe({
             next: result => {
                 switch (result) {
-                    case 'START': { this.adminPanelService.uploadImage(this._imageFile, this.uploadImageInputElementRef.nativeElement, newClientId); break; }
+                    case 'START': { this.adminPanelService.uploadImage(this._imageFile, this.uploadImageInputElementRef.nativeElement, newClientId, modalRef); break; }
                     case 'PENDING': { this.responseMessage = "Сервер занят. Повторите попытку позже."; break; }
                     case 'FILEEXISTS': { this.responseMessage = "Файл с таким именем уже загружен."; break; }
                     case 'MAXCOUNT': { this.responseMessage = "Загружено максимальное количество файлов."; break; }
