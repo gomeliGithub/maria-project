@@ -21,8 +21,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button *ngIf="closeButton === true" type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="destroyModal()">{{closeButtonCaption}}</button>
-                <button *ngIf="confirmButton === false" type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="destroyModal()">{{confirmButtonCaption}}</button>
+                <button *ngIf="closeButton" type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="destroyModal()">{{closeButtonCaption}}</button>
+                <button *ngIf="confirmButton" type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="destroyModal()">{{confirmButtonCaption}}</button>
             </div>
         </div>
     </div>
