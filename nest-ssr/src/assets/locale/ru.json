@@ -20,12 +20,16 @@
 		"NOPASSWORDTEXT": "Не указан пароль",
 		"CONFIRMBUTTONCAPTIONTEXT": "Войти"
 	},
-	"SUCCESSMODALTITLE": "Успешно",
-	"ERRORMODALTITLE": "Ошибка",
-	"DEFAULTERRORMESSAGE": "Что-то пошло не так.",
+	"MODAL": {
+		"SUCCESSTITLE": "Успешно",
+		"ERRORTITLE": "Ошибка",
+		"DEFAULTERRORMESSAGE": "Что-то пошло не так.",
+		"BUTTONS": {
+			"CONFIRMCAPTIONTEXT": "Закрыть"
+		},
+		"TRYAGAINMESSAGE": "Попробуйте ещё раз."
+	},
 	"CLIENTAUTHERRORMESSAGE": "Не существует такого клиента, либо неверный пароль.",
-	"TRYAGAINMESSAGE": "Попробуйте ещё раз.",
-	"CONFIRMBUTTONCAPTIONTEXT": "Закрыть",
 	"CLIENTSUCCESSMESSAGES": {
 		"CHANGELOCALE": "Язык успешно изменен"
 	},

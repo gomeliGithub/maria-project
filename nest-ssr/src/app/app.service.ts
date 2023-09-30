@@ -81,11 +81,11 @@ export class AppService {
 
     public createSuccessModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): void {
         const createOptions: IModalCreateOptions = {
-            title: this.translateService.instant('SUCCESSMODALTITLE'),
+            title: this.getTranslations('MODAL.SUCCESSTITLE'),
             type: "successModal",
             body: `${bodyText}`,
             closeButton: false,
-            confirmButtonCaption: this.translateService.instant('CONFIRMBUTTONCAPTIONTEXT')
+            confirmButtonCaption: this.getTranslations('MODAL.BUTTONS.CONFIRMCAPTIONTEXT')
         }
             
         componentRef = this.createModalInstance(viewRef, createOptions);
@@ -93,11 +93,11 @@ export class AppService {
 
     public createErrorModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): void {
         const mWCreateOptions: IModalCreateOptions = {
-            title: this.translateService.instant('ERRORMODALTITLE'),
+            title: this.getTranslations('MODAL.ERRORTITLE'),
             type: "errorModal",
-            body: `${bodyText} ${this.translateService.instant('TRYAGAINMESSAGE')}`,
+            body: `${bodyText} ${this.getTranslations('MODAL.TRYAGAINMESSAGE')}`,
             closeButton: false,
-            confirmButtonCaption: this.translateService.instant('CONFIRMBUTTONCAPTIONTEXT')
+            confirmButtonCaption: this.getTranslations('MODAL.BUTTONS.CONFIRMCAPTIONTEXT')
         }
             
         componentRef = this.createModalInstance(viewRef, mWCreateOptions);
