@@ -1,5 +1,6 @@
 {
   	"NAVBARBRANDTITLE": "ДОТ",
+	"DEFAULTERRORMESSAGE": "Что-то пошло не так. Попробуйте ещё раз",
 	"PAGETITLES": {
 		"HOME": "Главная",
 		"GALLERY": "Галерея",
@@ -24,13 +25,18 @@
 		"SUCCESSTITLE": "Успешно",
 		"WARNINGTITLE": "Внимание",
 		"ERRORTITLE": "Ошибка",
-		"DEFAULTERRORMESSAGE": "Что-то пошло не так.",
 		"BUTTONS": {
 			"CONFIRMCAPTIONTEXT": "Закрыть"
-		},
-		"TRYAGAINMESSAGE": "Попробуйте ещё раз."
+		}
 	},
-	"CLIENTAUTHERRORMESSAGE": "Не существует такого клиента, либо неверный пароль.",
+	"UPLOADIMAGERESPONSES": {
+		"PENDING": "Сервер занят. Повторите попытку позже",
+		"FILEEXISTS": "Файл с таким именем уже загружен",
+		"MAXCOUNT": "Загружено максимальное количество файлов",
+		"MAXSIZE": "Максимальный размер файла - 100 МБ",
+		"MAXNAMELENGTH": "Имя файла должно содержать как минимум 4 символа"
+	},
+	"CLIENTAUTHERRORMESSAGE": "Не существует такого клиента, либо неверный пароль",
 	"CLIENTSUCCESSMESSAGES": {
 		"CHANGELOCALE": "Язык успешно изменен"
 	},

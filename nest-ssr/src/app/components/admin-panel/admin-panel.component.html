@@ -34,9 +34,6 @@
                 <input type="file" class="form-control" id="inputGroupUploadImage" aria-describedby="uploadImageButton" aria-label="Upload" (change)="fileChange($event)" #uploadImageInput [disabled]="!fileSelected">
                 <button class="btn btn-outline-secondary" type="button" id="uploadImageButton" (click)="uploadImage()">Загрузить новое изображение</button>
             </div>
-            <div class="text-center">
-                <span class="text-danger fw-bold" id="responseMessage">{{responseMessage}}</span>
-            </div>
         </div>
     </div>
 </div>

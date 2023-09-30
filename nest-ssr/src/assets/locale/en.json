@@ -27,12 +27,18 @@
 		"DEFAULTERRORMESSAGE": "Something went wrong.",
 		"BUTTONS": {
 			"CONFIRMCAPTIONTEXT": "Close"
-		},
-		"TRYAGAINMESSAGE": "Try again."
+		}
 	},
-    "CLIENTAUTHERRORMESSAGE": "No such client exists, or the password is incorrect.",
+	"UPLOADIMAGERESPONSES": {
+		"PENDING": "The server is busy. Please try again later",
+		"FILEEXISTS": "A file with the same name has already been uploaded",
+		"MAXCOUNT": "Maximum number of files uploaded",
+		"MAXSIZE": "Maximum file size - 100 MB",
+		"MAXNAMELENGTH": "The file name must contain at least 4 characters"
+	},
+    "CLIENTAUTHERRORMESSAGE": "No such client exists, or the password is incorrect",
     "CLIENTSUCCESSMESSAGES": {
-		"CHANGELOCALE": "Language changed successfully."
+		"CHANGELOCALE": "Language changed successfully"
 	},
     "PROGRESSBAR": {
 		"TITLE": "Upload image..."

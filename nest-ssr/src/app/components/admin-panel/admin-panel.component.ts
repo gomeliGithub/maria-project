@@ -39,8 +39,6 @@ export class AdminPanelComponent implements OnInit {
     public fullCompressedImagesList: ICompressedImage[];
     public fullCompressedImagesListCount: number;
 
-    public responseMessage: string;
-
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
             this.appService.getTranslations('PAGETITLES.ADMINPANEL', true).subscribe(translation => this.appService.setTitle(translation));
@@ -89,14 +87,14 @@ export class AdminPanelComponent implements OnInit {
                 next: result => {
                     switch (result) {
                         case 'START': { this.adminPanelService.uploadImage(this._imageFile, this.uploadImageInputElementRef.nativeElement, newClientId, modalRef); break; }
-                        case 'PENDING': { this.responseMessage = "Сервер занят. Повторите попытку позже."; break; }
-                        case 'FILEEXISTS': { this.responseMessage = "Файл с таким именем уже загружен."; break; }
-                        case 'MAXCOUNT': { this.responseMessage = "Загружено максимальное количество файлов."; break; }
-                        case 'MAXSIZE': { this.responseMessage = "Максимальный размер файла - 100 МБ."; break; }
-                        case 'MAXNAMELENGTH': { this.responseMessage = "Имя файла должно содержать как минимум 4 символа."; break; }
+                        case 'PENDING': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
+                        case 'FILEEXISTS': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
+                        case 'MAXCOUNT': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
+                        case 'MAXSIZE': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
+                        case 'MAXNAMELENGTH': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
                     }
                 },
-                error: () => this.responseMessage = "Что-то пошло не так. Попробуйте ещё раз."
+                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
         } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
     }

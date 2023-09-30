@@ -82,7 +82,7 @@ export class AppService {
     public createSuccessModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): void {
         const createOptions: IModalCreateOptions = {
             title: this.getTranslations('MODAL.SUCCESSTITLE'),
-            type: "successModal",
+            type: 'successModal',
             body: `${bodyText}`,
             closeButton: false,
             confirmButtonCaption: this.getTranslations('MODAL.BUTTONS.CONFIRMCAPTIONTEXT')
@@ -94,7 +94,7 @@ export class AppService {
     public createWarningModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): void {
         const createOptions: IModalCreateOptions = {
             title: this.getTranslations('MODAL.WARNINGTITLE'),
-            type: "warningModal",
+            type: 'warningModal',
             body: `${bodyText}`,
             closeButton: false,
             confirmButtonCaption: this.getTranslations('MODAL.BUTTONS.CONFIRMCAPTIONTEXT')
@@ -106,8 +106,8 @@ export class AppService {
     public createErrorModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText?: string): void {
         const mWCreateOptions: IModalCreateOptions = {
             title: this.getTranslations('MODAL.ERRORTITLE'),
-            type: "errorModal",
-            body: `${ bodyText ? bodyText : this.getTranslations('MODAL.DEFAULTERRORMESSAGE') } ${this.getTranslations('MODAL.TRYAGAINMESSAGE')}`,
+            type: 'errorModal',
+            body: `${ bodyText ? bodyText : this.getTranslations('DEFAULTERRORMESSAGE') }`,
             closeButton: false,
             confirmButtonCaption: this.getTranslations('MODAL.BUTTONS.CONFIRMCAPTIONTEXT')
         }
