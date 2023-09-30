@@ -55,9 +55,15 @@ export class WebSocketService {
                 if ( message.text === 'ERROR' ) {
                     this._clearUploadImageData(uploadImageInput);
 
-                    this.modalService.changeProgressBar(this._progressElement, message.percentUploaded, true);
+                    setTimeout(() => {
+                        this.modalService.changeProgressBar(this._progressElement, 0)
 
-                    setTimeout(() => this.modalService.changeProgressBar(this._progressElement, 0), 2000);
+                        this._modal.instance.hideModal().then(() => {
+                            this._modal.destroy();
+
+                            this.appService.createErrorModal(modalRef.modalViewRef, modalRef.modalComponentRef);
+                        });
+                    }, 2000);
                 } else if ( message.text === 'FINISH' ) { // console.log(message.percentUploaded);
                     this.modalService.changeProgressBar(this._progressElement, message.percentUploaded);
 

@@ -32,6 +32,7 @@ export class AdminPanelComponent implements OnInit {
     @ViewChild('uploadImageInput', { static: false }) private readonly uploadImageInputElementRef: ElementRef<HTMLInputElement>;
 
     private _imageFile: File;
+    public fileSelected: boolean;
     
     public getFullCompressedImagesDataResult: Observable<IFullCompressedImageData>;
 
@@ -54,46 +55,49 @@ export class AdminPanelComponent implements OnInit {
     public fileChange (event: any): void {
         const fileList: FileList = event.target.files;
 
-        if (fileList.length < 1) {
+        if ( fileList.length < 1 ) {
             return;
         }
 
         this._imageFile = fileList[0];
+        this.fileSelected = true;
     }
 
     public uploadImage (): void {
         const imageMetaJson: string = JSON.stringify({
-            name         : this._imageFile.name,
-            size         : this._imageFile.size,
-            type         : this._imageFile.type
+            name         : this._imageFile ? this._imageFile.name : null,
+            size         : this._imageFile ? this._imageFile.size : null,
+            type         : this._imageFile ? this._imageFile.type : null
         }); 
 
-        const modalRef: IModalRef = {
-            modalViewRef: this.modalViewRef,
-            modalComponentRef: this.modalComponentRef
-        }
-    
-        const newClientId: number = Math.random();
-
-        const headers: HttpHeaders = this.appService.createRequestHeaders();
-  
-        this.http.post('/api/client/uploadImage', {
-            client: {
-                _id: newClientId, 
-                uploadImageMeta: imageMetaJson
+        if ( this._imageFile ) {
+            const modalRef: IModalRef = {
+                modalViewRef: this.modalViewRef,
+                modalComponentRef: this.modalComponentRef
             }
-        }, { headers, responseType: 'text', withCredentials: true }).subscribe({
-            next: result => {
-                switch (result) {
-                    case 'START': { this.adminPanelService.uploadImage(this._imageFile, this.uploadImageInputElementRef.nativeElement, newClientId, modalRef); break; }
-                    case 'PENDING': { this.responseMessage = "Сервер занят. Повторите попытку позже."; break; }
-                    case 'FILEEXISTS': { this.responseMessage = "Файл с таким именем уже загружен."; break; }
-                    case 'MAXCOUNT': { this.responseMessage = "Загружено максимальное количество файлов."; break; }
-                    case 'MAXSIZE': { this.responseMessage = "Максимальный размер файла - 100 МБ."; break; }
-                    case 'MAXNAMELENGTH': { this.responseMessage = "Имя файла должно содержать как минимум 4 символа."; break; }
+        
+            const newClientId: number = Math.random();
+
+            const headers: HttpHeaders = this.appService.createRequestHeaders();
+    
+            this.http.post('/api/client/uploadImage', {
+                client: {
+                    _id: newClientId, 
+                    uploadImageMeta: imageMetaJson
                 }
-            },
-            error: () => this.responseMessage = "Что-то пошло не так. Попробуйте ещё раз."
-        });
+            }, { headers, responseType: 'text', withCredentials: true }).subscribe({
+                next: result => {
+                    switch (result) {
+                        case 'START': { this.adminPanelService.uploadImage(this._imageFile, this.uploadImageInputElementRef.nativeElement, newClientId, modalRef); break; }
+                        case 'PENDING': { this.responseMessage = "Сервер занят. Повторите попытку позже."; break; }
+                        case 'FILEEXISTS': { this.responseMessage = "Файл с таким именем уже загружен."; break; }
+                        case 'MAXCOUNT': { this.responseMessage = "Загружено максимальное количество файлов."; break; }
+                        case 'MAXSIZE': { this.responseMessage = "Максимальный размер файла - 100 МБ."; break; }
+                        case 'MAXNAMELENGTH': { this.responseMessage = "Имя файла должно содержать как минимум 4 символа."; break; }
+                    }
+                },
+                error: () => this.responseMessage = "Что-то пошло не так. Попробуйте ещё раз."
+            });
+        } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
     }
 }

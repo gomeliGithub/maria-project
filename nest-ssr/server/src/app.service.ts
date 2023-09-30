@@ -43,7 +43,7 @@ export class AppService {
     }
 
     public clientOriginalImagesDir: string = path.join(this.__dirname, 'originalImages');
-    public clientCompressedImagesDir: string = path.join(this.__dirname, 'images_thumb');
+    public clientCompressedImagesDir: string = path.join(this.__dirname, 'compressedImages');
 
     public async getServiceRef ( module: typeof AdminPanelModule, service: typeof AdminPanelService): Promise<AdminPanelService>
     public async getServiceRef ( module: typeof ClientModule, service: typeof ClientService): Promise<ClientService>

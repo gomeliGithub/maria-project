@@ -37,7 +37,19 @@ export interface IModalCreateOptions {
     closeButtonListener?: Function;
     confirmButtonListener?: Function;
 }
+
 export interface IModalRef {
     modalViewRef: ViewContainerRef;
     modalComponentRef: ComponentRef<ModalComponent>;
+}
+
+export interface ICreateImageDirsOptions {
+    originalImages: {
+        dirPath: string;
+        clientDirPath: string;
+    },
+    compressedImages: {
+        dirPath: string;
+        clientDirPath: string;
+    }
 }

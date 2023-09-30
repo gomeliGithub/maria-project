@@ -17,7 +17,7 @@ import { CommonService } from '../common/common.service';
 import { Admin, Member, СompressedImage } from '../../models/client.model';
 
 import { IRequest, IСompressedImageGetResult } from 'types/global';
-import { IСompressedImageGetOptions } from 'types/options';
+import { ICreateImageDirsOptions, IСompressedImageGetOptions } from 'types/options';
 
 @Injectable()
 export class ImageControlService {
@@ -44,7 +44,7 @@ export class ImageControlService {
         }
     }
 
-    public async compressImage (request: IRequest, inputImagePath: string, outputDirPath: string, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
+    public async compressImage (request: IRequest, inputImagePath: string, outputDirPath: string, originalImageSize: number, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
         const supportedImageTypes: string[] = [ 'jpg', 'png', 'webp', 'avif', 'gif', 'svg', 'tiff' ];
 
         const { ext } = await fileTypeFromFile(inputImagePath);
@@ -65,24 +65,28 @@ export class ImageControlService {
 
         const outputImageName: string = `${path.basename(inputImagePath, path.extname(inputImagePath))}_thumb.${ext}`;
         const outputImagePath: string = path.join(outputDirPath, outputImageName);
+
         const outputTempFilePath: string = this.getTempFileName(outputImagePath);
 
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+        const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin);
+
+        let newCompressedImage: СompressedImage = null;
+
         try {
-            const semiTransparentRedBuffer = await sharp(inputImagePath, options).toBuffer();
+            const semiTransparentRedBuffer: Buffer = await sharp(inputImagePath, options).toBuffer();
 
             await fsPromises.writeFile(outputTempFilePath, semiTransparentRedBuffer);
             await fsPromises.rename(outputTempFilePath, outputImagePath);
 
-            const newCompressedImage = await this.compressedImageModel.create({
+            newCompressedImage = await this.compressedImageModel.create({
                 imageName: outputImageName,
                 imageNameDirPath: outputDirPath,
+                // originalImageSize: originalImageSize,
                 originalImageName: inputImageName,
                 originalImageDirPath: inputImageDirPath
             });
-
-            const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
-
-            const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin);
 
             await client.$add('compressedImages', newCompressedImage);
 
@@ -93,19 +97,19 @@ export class ImageControlService {
             const accessResults = await Promise.allSettled([
                 await fsPromises.access(inputImagePath, fsPromises.constants.F_OK),
                 await fsPromises.access(outputImagePath, fsPromises.constants.F_OK),
-                await fsPromises.access(outputTempFilePath, fsPromises.constants.F_OK)
             ]);
 
-            const accessImagesErrorResults = accessResults.filter(result => result.status === 'rejected');
+            const accessImagesErrorResults = accessResults.filter(result => result.status === 'fulfilled');
 
             let imagePath: string = '';
 
             for (const result of accessImagesErrorResults) {
                 if ( accessResults.indexOf(result) === 0 ) imagePath = inputImagePath;
                 else if ( accessResults.indexOf(result) === 1 ) imagePath = outputImagePath;
-                else if ( accessResults.indexOf(result) === 2 ) imagePath = outputTempFilePath;
 
-                fsPromises.unlink(imagePath);
+                await fsPromises.unlink(imagePath);
+
+                if ( newCompressedImage ) await client.$remove('compressedImages', newCompressedImage);
             }
 
             return false;
@@ -117,6 +121,32 @@ export class ImageControlService {
         const targetPathParts = path.parse(targetFilePath);
 
         return targetPathParts.dir + path.sep + targetPathParts.name + postfix + targetPathParts.ext;
+    }
+
+    public async createImageDirs (options: ICreateImageDirsOptions): Promise<void> {
+        try {
+            await fsPromises.access(options.originalImages.dirPath, fsPromises.constants.F_OK);
+        } catch {
+            await fsPromises.mkdir(options.originalImages.dirPath);
+        }
+
+        try {
+            await fsPromises.access(options.originalImages.clientDirPath, fsPromises.constants.F_OK);
+        } catch {
+            await fsPromises.mkdir(options.originalImages.clientDirPath);
+        }
+
+        try {
+            await fsPromises.access(options.compressedImages.dirPath, fsPromises.constants.F_OK);
+        } catch {
+            await fsPromises.mkdir(options.compressedImages.dirPath);
+        }
+
+        try {
+            await fsPromises.access(options.compressedImages.clientDirPath, fsPromises.constants.F_OK);
+        } catch {
+            await fsPromises.mkdir(options.compressedImages.clientDirPath);
+        }
     }
 
     public endianness (): 'big' | 'little' {

@@ -91,11 +91,23 @@ export class AppService {
         componentRef = this.createModalInstance(viewRef, createOptions);
     }
 
-    public createErrorModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): void {
+    public createWarningModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): void {
+        const createOptions: IModalCreateOptions = {
+            title: this.getTranslations('MODAL.WARNINGTITLE'),asdasd
+            type: "warningModal",
+            body: `${bodyText}`,
+            closeButton: false,
+            confirmButtonCaption: this.getTranslations('MODAL.BUTTONS.CONFIRMCAPTIONTEXT')
+        }
+            
+        componentRef = this.createModalInstance(viewRef, createOptions);
+    }
+
+    public createErrorModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText?: string): void {
         const mWCreateOptions: IModalCreateOptions = {
             title: this.getTranslations('MODAL.ERRORTITLE'),
             type: "errorModal",
-            body: `${bodyText} ${this.getTranslations('MODAL.TRYAGAINMESSAGE')}`,
+            body: `${ bodyText ? bodyText : this.getTranslations('MODAL.DEFAULTERRORMESSAGE') } ${this.getTranslations('MODAL.TRYAGAINMESSAGE')}`,
             closeButton: false,
             confirmButtonCaption: this.getTranslations('MODAL.BUTTONS.CONFIRMCAPTIONTEXT')
         }
