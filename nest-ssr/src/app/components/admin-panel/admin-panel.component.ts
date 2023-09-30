@@ -57,8 +57,10 @@ export class AdminPanelComponent implements OnInit {
             return;
         }
 
-        this._imageFile = fileList[0];
-        this.fileSelected = true;
+        if ( fileList[0].size < 104857600 || fileList[0].name.length >= 4 ) {
+            this._imageFile = fileList[0];
+            this.fileSelected = true;
+        }
     }
 
     public uploadImage (): void {
