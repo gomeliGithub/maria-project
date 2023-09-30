@@ -32,7 +32,8 @@ export class WebSocketService {
 
         this._modal = this.appService.createModalInstance(modalRef.modalViewRef, {
             title: this.appService.getTranslations('PROGRESSBAR.TITLE'),
-            type: 'progressBar'
+            type: 'progressBar',
+            confirmButton: false
         });
 
         this._keepAliveTimer = setInterval(() => {

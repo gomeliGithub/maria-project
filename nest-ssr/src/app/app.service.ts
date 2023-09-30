@@ -61,21 +61,22 @@ export class AppService {
     public createModalInstance (viewRef: ViewContainerRef, createOptions: IModalCreateOptions): ComponentRef<ModalComponent> {
         viewRef.clear();
 
-        const modalWindowComponent = viewRef.createComponent(ModalComponent);
+        const modalComponent = viewRef.createComponent(ModalComponent);
 
-        modalWindowComponent.instance.title = createOptions.title;
-        modalWindowComponent.instance.type = createOptions.type;
-        modalWindowComponent.instance.body = createOptions.body;
+        modalComponent.instance.title = createOptions.title;
+        modalComponent.instance.type = createOptions.type;
+        modalComponent.instance.body = createOptions.body;
 
-        modalWindowComponent.instance.closeButton = createOptions.closeButton ? createOptions.closeButton : false;
-        modalWindowComponent.instance.closeButtonCaption = createOptions.closeButtonCaption ? createOptions.closeButtonCaption : undefined;
+        modalComponent.instance.closeButton = createOptions.closeButton ? createOptions.closeButton : false;
+        modalComponent.instance.closeButtonCaption = createOptions.closeButtonCaption ? createOptions.closeButtonCaption : undefined;
 
-        modalWindowComponent.instance.confirmButtonCaption = createOptions.confirmButtonCaption;
+        modalComponent.instance.confirmButton = createOptions.confirmButton;
+        modalComponent.instance.confirmButtonCaption = createOptions.confirmButtonCaption;
 
-        modalWindowComponent.instance.closeButtonListener = createOptions.closeButtonListener ? createOptions.closeButtonListener : undefined;
-        modalWindowComponent.instance.confirmButtonListener = createOptions.confirmButtonListener ? createOptions.confirmButtonListener : undefined;
+        modalComponent.instance.closeButtonListener = createOptions.closeButtonListener ? createOptions.closeButtonListener : undefined;
+        modalComponent.instance.confirmButtonListener = createOptions.confirmButtonListener ? createOptions.confirmButtonListener : undefined;
 
-        return modalWindowComponent;
+        return modalComponent;
     }
 
     public createSuccessModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): void {

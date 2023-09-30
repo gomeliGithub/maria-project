@@ -19,6 +19,7 @@ export class ModalComponent {
     @Input() closeButton: boolean | undefined;
     @Input() closeButtonCaption: string | undefined;
 
+    @Input() confirmButton: boolean | undefined;
     @Input() confirmButtonCaption: string;
 
     @Input() closeButtonListener: Function | undefined;

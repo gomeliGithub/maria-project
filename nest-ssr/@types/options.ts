@@ -31,6 +31,7 @@ export interface IModalCreateOptions {
     closeButton?: boolean;
     closeButtonCaption?: string;
 
+    confirmButton?: boolean;
     confirmButtonCaption?: string;
 
     closeButtonListener?: Function;
