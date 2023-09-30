@@ -83,9 +83,9 @@ export class ImageControlService {
             newCompressedImage = await this.compressedImageModel.create({
                 imageName: outputImageName,
                 imageNameDirPath: outputDirPath,
-                // originalImageSize: originalImageSize,
                 originalImageName: inputImageName,
-                originalImageDirPath: inputImageDirPath
+                originalImageDirPath: inputImageDirPath,
+                originalImageSize: originalImageSize
             });
 
             await client.$add('compressedImages', newCompressedImage);
