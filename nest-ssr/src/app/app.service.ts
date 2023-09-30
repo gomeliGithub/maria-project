@@ -93,7 +93,7 @@ export class AppService {
 
     public createWarningModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): void {
         const createOptions: IModalCreateOptions = {
-            title: this.getTranslations('MODAL.WARNINGTITLE'),asdasd
+            title: this.getTranslations('MODAL.WARNINGTITLE'),
             type: "warningModal",
             body: `${bodyText}`,
             closeButton: false,
