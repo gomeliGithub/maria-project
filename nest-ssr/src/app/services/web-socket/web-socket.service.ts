@@ -74,7 +74,11 @@ export class WebSocketService {
                     setTimeout(() => {
                         this.modalService.changeProgressBar(this._progressElement, 0);
 
-                        this._modal.instance.hideModal().then(() => this._modal.destroy());
+                        this._modal.instance.hideModal().then(() => {
+                            this._modal.destroy();
+
+                            this.appService.createSuccessModal(modalRef.modalViewRef, modalRef.modalComponentRef, this.appService.getTranslations('UPLOADIMAGERESPONSES.FINISH'));
+                        });
                     }, 1000);
                 } else if ( message.text === 'SUCCESS' ) { // console.log(message.percentUploaded);
                     this.modalService.changeProgressBar(this._progressElement, message.percentUploaded);

@@ -34,7 +34,8 @@
 		"FILEEXISTS": "A file with the same name has already been uploaded",
 		"MAXCOUNT": "Maximum number of files uploaded",
 		"MAXSIZE": "Maximum file size - 100 MB",
-		"MAXNAMELENGTH": "The file name must contain at least 4 characters"
+		"MAXNAMELENGTH": "The file name must contain at least 4 characters",
+		"FINISH": "File uploaded successfully"
 	},
     "CLIENTAUTHERRORMESSAGE": "No such client exists, or the password is incorrect",
     "CLIENTSUCCESSMESSAGES": {
