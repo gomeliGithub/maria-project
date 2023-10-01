@@ -74,13 +74,7 @@ export class WebSocketService {
                     setTimeout(() => {
                         this.modalService.changeProgressBar(this._progressElement, 0);
 
-                        const responseMessageElement: HTMLSpanElement = document.getElementById('responseMessage') as HTMLSpanElement;
-
-                        this._modal.instance.hideModal().then(() => {
-                            this._modal.destroy();
-
-                            responseMessageElement.textContent = "Файл успешно загружен.";
-                        });
+                        this._modal.instance.hideModal().then(() => this._modal.destroy());
                     }, 1000);
                 } else if ( message.text === 'SUCCESS' ) { // console.log(message.percentUploaded);
                     this.modalService.changeProgressBar(this._progressElement, message.percentUploaded);
