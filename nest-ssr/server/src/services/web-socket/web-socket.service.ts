@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { WebSocketServer } from 'ws';
 
+import fsPromises from 'fs/promises';
+
 import { CommonModule } from '../../modules/common.module';
 
 import { AppService } from '../../app.service';
 import { ClientService } from '../client/client.service';
 import { CommonService } from '../common/common.service';
-
-import { Admin, Member } from '../../models/client.model';
 
 import { IWebSocketClient } from 'types/web-socket';
 
@@ -86,9 +86,7 @@ export class WebSocketService {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         if (currentClient.uploadedSize !== currentClient.imageMetaSize) {
-            // const compressedImage = await commonServiceRef.getCompressedImages();
-
-            // await commonServiceRef.removeUncompleteImages();
+            await fsPromises.unlink(currentClient.imagePath);
             
             commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter(client => client._id !== currentClient._id);
         }
@@ -96,6 +94,8 @@ export class WebSocketService {
 
     public async connectionOnErrorHandler (currentClient: IWebSocketClient): Promise<void> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+        await fsPromises.unlink(currentClient.imagePath);
 
         commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter(client => client._id !== currentClient._id);
     }

@@ -132,7 +132,9 @@ export class ClientService {
         if ( activeUploadsClientNumber > 3 ) return 'PENDING';
 
         const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin, { rawResult: false });
-        const compressedImage: СompressedImage[] = (await commonServiceRef.getCompressedImages(client, client.dataValues.type)).rows;
+
+        const compressedImageGetResult = await commonServiceRef.getCompressedImages(client, client.dataValues.type);
+        const compressedImage: СompressedImage = compressedImageGetResult ? compressedImageGetResult.rows.find(image => image.originalImageName === path.basename(newOriginalImagePath)) : null;
 
         if ( compressedImage ) return 'FILEEXISTS';
     
@@ -201,8 +203,9 @@ export class ClientService {
             uploadedSize, 
             imageMetaName: imageMeta.name, 
             imageMetaSize: imageMeta.size,
+            imagePath: newOriginalImagePath,
             lastkeepalive: Date.now(),
-            connection: null
+            connection: null,
         });
 
         return 'START';

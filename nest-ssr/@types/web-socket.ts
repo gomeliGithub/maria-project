@@ -9,6 +9,7 @@ export interface IWebSocketClient {
     uploadedSize: number, 
     imageMetaName: string, 
     imageMetaSize: number,
+    imagePath: string,
     lastkeepalive: number,
     connection: WebSocket
 }

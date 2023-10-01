@@ -149,26 +149,6 @@ export class ImageControlService {
         }
     }
 
-    public async removeUncompleteImages (originalImagePath: string, compressedImagePath: string, compressedImage: СompressedImage, client: Admin | Member) {
-        const accessResults = await Promise.allSettled([
-            await fsPromises.access(originalImagePath, fsPromises.constants.F_OK),
-            await fsPromises.access(compressedImagePath, fsPromises.constants.F_OK),
-        ]);
-
-        const accessImagesErrorResults = accessResults.filter(result => result.status === 'fulfilled');
-
-        let imagePath: string = '';
-
-        for (const result of accessImagesErrorResults) {
-            if ( accessResults.indexOf(result) === 0 ) imagePath = originalImagePath;
-            else if ( accessResults.indexOf(result) === 1 ) imagePath = compressedImagePath;
-
-            await fsPromises.unlink(imagePath);
-
-            if ( compressedImage ) await client.$remove('compressedImages', compressedImage);
-        }
-    }
-
     public endianness (): 'big' | 'little' {
         const ab = Buffer.alloc(2);
         const ta16 = new Uint16Array(ab.buffer);
