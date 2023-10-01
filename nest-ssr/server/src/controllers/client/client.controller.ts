@@ -29,7 +29,6 @@ export class ClientController {
     }
 
     @Get('/getCompressedImagesList/:imagesType')
-    @ClientTypes('admin', 'member')
     async getCompressedImagesList (@Param('imagesType') imagesType: string): Promise<string[]> {
         return this.clientService.getCompressedImagesList(imagesType.substring(1));
     }
