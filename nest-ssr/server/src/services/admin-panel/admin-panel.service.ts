@@ -27,7 +27,7 @@ export class AdminPanelService {
         const client: Admin = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false });
 
         const { rows, count } = await commonServiceRef.getCompressedImages(client, 'admin', { 
-            includeFields: [ 'originalImageName', 'originalImageSize', 'uploadDate', 'displayedOnHomePage', 'displayedOnGalleryPage' ],
+            includeFields: [ 'originalName', 'originalSize', 'uploadDate', 'displayedOnHomePage', 'displayedOnGalleryPage' ],
             includeCount: true
         });
 
