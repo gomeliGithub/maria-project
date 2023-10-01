@@ -51,14 +51,14 @@ export class ImageControlService {
 
         if ( !supportedImageTypes.includes(ext) ) return false;
 
-        if ( !options ) options = {
+        if ( !options ) options = null; /*{
             create: {
                 width: 300,
                 height: 300,
                 channels: 4,
                 background: { r: 255, g: 0, b: 0, alpha: 0.5 }
             }
-        }
+        }*/
 
         const inputImageDirPath: string = path.dirname(inputImagePath);
         const inputImageName: string = path.basename(inputImagePath);
@@ -75,7 +75,7 @@ export class ImageControlService {
         let newCompressedImage: СompressedImage = null;
 
         try {
-            const semiTransparentRedBuffer: Buffer = await sharp(inputImagePath, options).toBuffer();
+            const semiTransparentRedBuffer: Buffer = await sharp(inputImagePath).resize(600, 600).toBuffer();
 
             await fsPromises.writeFile(outputTempFilePath, semiTransparentRedBuffer);
             await fsPromises.rename(outputTempFilePath, outputImagePath);

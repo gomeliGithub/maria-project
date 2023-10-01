@@ -51,11 +51,13 @@ export class AppService {
     }
 
     public createRequestHeaders (): HttpHeaders {
-        const token: string | null = localStorage.getItem('access_token');
+        if ( this.checkIsPlatformBrowser() ) {
+            const token: string | null = localStorage.getItem('access_token');
 
-        const headers = new HttpHeaders().set('Authorization', token ? `Bearer ${token}` : "");
+            const headers = new HttpHeaders().set('Authorization', token ? `Bearer ${token}` : "");
 
-        return headers;
+            return headers;
+        } return null;
     }
 
     public createModalInstance (viewRef: ViewContainerRef, createOptions: IModalCreateOptions): ComponentRef<ModalComponent> {
