@@ -21,7 +21,6 @@ export class AdminPanelController {
     }
 
     @Get('/getFullCompressedImagesList')
-    @ClientTypes('admin')
     async getFullCompressedImagesList (@Req() request: IRequest): Promise<IFullCompressedImageData> {
         return this.adminPanelService.getFullCompressedImagesList(request);
     }
