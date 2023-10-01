@@ -53,8 +53,8 @@ export interface ICompressedImage {
     originalName: string;
     originalSize: number;
     uploadDate: Date;
-    displayedOnHomePage: boolean;
-    displayedOnGalleryPage: boolean;
+    displayedOnHomePage: number;
+    displayedOnGalleryPage: number;
 }
 
 export interface IFullCompressedImageData {

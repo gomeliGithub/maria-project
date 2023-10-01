@@ -8,7 +8,7 @@ import { AppService } from '../../app.service';
 export class BooleanPipe implements PipeTransform {
     constructor (private readonly appService: AppService) { }
     
-    transform (value: boolean): string {
+    transform (value: number): string {
         return Boolean(value) === true ? this.appService.getTranslations('ADMINPANEL.BOOLEANTRUETEXT') : this.appService.getTranslations('ADMINPANEL.BOOLEANFALSETEXT');
     }
 }
