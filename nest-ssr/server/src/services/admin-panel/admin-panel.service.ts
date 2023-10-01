@@ -8,7 +8,7 @@ import { CommonService } from '../common/common.service';
 
 import { Admin, СompressedImage } from '../../models/client.model';
 
-import { IFullCompressedImageData, IRequest } from 'types/global';
+import { ICompressedImage, IFullCompressedImageData, IRequest } from 'types/global';
 
 @Injectable()
 export class AdminPanelService {
@@ -31,7 +31,7 @@ export class AdminPanelService {
             includeCount: true
         });
 
-        const imagesList: IFullCompressedImageData = { imagesList: rows, count };
+        const imagesList: IFullCompressedImageData = { imagesList: rows as unknown as ICompressedImage[], count };
 
         return imagesList;
     }
