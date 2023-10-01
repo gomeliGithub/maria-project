@@ -84,14 +84,27 @@ export class AdminPanelService {
         try {
             await this.compressedImageModel.update(updateValues, { where: { originalName: path.basename(originalImagePath) }});
 
-            const oldPath: string = path.join(compressedImage.imageDirPath, compressedImage.imageName);
+            let oldPath: string = path.join(compressedImage.imageDirPath, compressedImage.imageName);
 
             let imagesThumbnailDirName: string = '';
 
             if ( displayTargetPage === 'home' ) imagesThumbnailDirName = 'home';
-            else imagesThumbnailDirName = 'gallery';
+            else if ( displayTargetPage === 'gallery' ) imagesThumbnailDirName = 'gallery';
 
-            const newPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail', imagesThumbnailDirName, compressedImage.imageName);
+            let newPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail', imagesThumbnailDirName, compressedImage.imageName);
+
+            const previousOldPath: string = oldPath;
+            const previousNewPath: string = newPath;
+
+            if ( displayTargetPage === 'home') {
+                if ( updateValues.displayedOnHomePage ) {
+                    oldPath = previousNewPath;
+                    newPath = previousOldPath;
+                }
+            } else if ( displayTargetPage === 'gallery') {
+                oldPath = previousNewPath;
+                newPath = previousOldPath;
+            }
 
             await fsPromises.rename(oldPath, newPath);
 
