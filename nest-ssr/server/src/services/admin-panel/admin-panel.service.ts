@@ -88,7 +88,7 @@ export class AdminPanelService {
 
             let imagesThumbnailDirName: string = '';
 
-            if ( displayTargetPage === 'home' ) imagesThumbnailDirName = 'main';
+            if ( displayTargetPage === 'home' ) imagesThumbnailDirName = 'home';
             else imagesThumbnailDirName = 'gallery';
 
             const newPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail', imagesThumbnailDirName, compressedImage.imageName);
