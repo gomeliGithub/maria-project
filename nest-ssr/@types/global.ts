@@ -30,7 +30,8 @@ export interface IRequestBody {
         _id: number;
     },
     adminPanel?: {
-        originalImageName: string
+        originalImageName: string;
+        displayTargetPage: 'home' | 'gallery';
     },
 
 

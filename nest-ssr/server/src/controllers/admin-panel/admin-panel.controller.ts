@@ -34,5 +34,16 @@ export class AdminPanelController {
         ) throw new BadRequestException();
 
         return this.adminPanelService.deleteImage(request, requestBody);
+    } 
+    
+    @Post('/changeImageDisplayTarget')
+    @ClientTypes('admin')
+    async changeImageDisplayTarget (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> { 
+        if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName || !requestBody.adminPanel.displayTargetPage
+            || (requestBody.adminPanel.originalImageName && typeof requestBody.adminPanel.originalImageName !== 'string') 
+            || (requestBody.adminPanel.displayTargetPage && ( requestBody.adminPanel.displayTargetPage !== 'home' && requestBody.adminPanel.displayTargetPage !== 'gallery' ))
+        ) throw new BadRequestException();
+
+        return this.adminPanelService.changeImageDisplayTarget(request, requestBody);
     }
 }

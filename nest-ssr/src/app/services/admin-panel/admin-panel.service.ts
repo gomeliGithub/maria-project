@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+
+import { ModalComponent } from '../../components/modal/modal.component';
 
 import { AppService } from '../../app.service';
 import { WebSocketService } from '../web-socket/web-socket.service';
@@ -45,5 +47,22 @@ export class AdminPanelService {
         }
 
         reader.readAsArrayBuffer(formFile);
+    }
+
+    public switchImageControlResponses (responseText: string, modalViewRef: ViewContainerRef, modalComponentRef: ComponentRef<ModalComponent>): void {
+        switch ( responseText ) {
+            case 'SUCCESS': { 
+                // this.appService.createSuccessModal(modalViewRef, modalComponentRef, this.appService.getTranslations('ADMINPANEL.DELETEIMAGESUCCESSMESSAGE'));
+
+                window.location.reload();
+
+                break; 
+            }
+            case 'PENDING': { 
+                this.appService.createWarningModal(modalViewRef, modalComponentRef, this.appService.getTranslations('UPLOADIMAGERESPONSES.PENDING')); 
+                    
+                break; 
+            }
+        }
     }
 }

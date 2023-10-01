@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
 import path from 'path';
@@ -57,5 +57,54 @@ export class AdminPanelService {
         const deleteImageResult: boolean = await commonServiceRef.deleteImage(request, originalImagePath, activeAdminLogin);
 
         if ( deleteImageResult ) return 'SUCCESS';
+    }
+
+    public async changeImageDisplayTarget (request: IRequest, requestBody: IRequestBody): Promise<string> {
+        const originalImagePath: string = await this.validateImageControlRequests(request, requestBody);
+
+        if ( !originalImagePath ) return 'ERROR';
+
+        const compressedImage: СompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true });
+
+        const displayTargetPage: 'home' | 'gallery' = requestBody.adminPanel.displayTargetPage;
+
+        const updateValues: { [x: string]: any } = { };
+
+        if ( displayTargetPage === 'home') {
+            updateValues.displayedOnHomePage = true;
+
+            if ( compressedImage.displayedOnHomePage ) updateValues.displayedOnHomePage = false;
+        } else if ( displayTargetPage === 'gallery' ) {
+            updateValues.displayedOnGalleryPage = true;
+
+            if ( compressedImage.displayedOnGalleryPage ) updateValues.displayedOnGalleryPage = false;
+        }
+
+        try {
+            await this.compressedImageModel.update(updateValues, { where: { originalName: path.basename(originalImagePath) }});
+
+            return 'SUCCESS';
+        } catch {
+            throw new InternalServerErrorException();
+        }
+    }
+
+    public async validateImageControlRequests (request: IRequest, requestBody: IRequestBody): Promise<string> {
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        
+        const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
+        const client: Admin | Member = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false });
+
+        const originalImageName: string = requestBody.adminPanel.originalImageName;
+        const originalImagePath: string = path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName);
+
+        const { rows } = await commonServiceRef.getCompressedImages(client, 'admin', { includeFields: [ 'originalName' ] });
+
+        const compressedImageInstance: СompressedImage = rows.find(compressedImage => compressedImage.originalName === originalImageName);
+        const imageExists: boolean = await commonServiceRef.checkImageExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
+
+        if ( !compressedImageInstance || !imageExists ) return null;
+        
+        return originalImagePath;
     }
 }
