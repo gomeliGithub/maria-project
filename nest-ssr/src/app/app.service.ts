@@ -45,7 +45,7 @@ export class AppService {
 
         this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
             this.router.navigate([url]).then(() => {
-                console.log(`After navigation I am on: ${ this.router.url }`);
+                // console.log(`After navigation I am on: ${ this.router.url }`);
             })
         })
     }

@@ -30,7 +30,6 @@ export class AdminPanelComponent implements OnInit {
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
     @ViewChild('uploadImageInput', { static: false }) private readonly uploadImageInputElementRef: ElementRef<HTMLInputElement>;
-    @ViewChild('spinner', { static: false }) private readonly spinnerElementRef: ElementRef<HTMLDivElement>;
 
     private _imageFile: File;
     public fileSelected: boolean;
@@ -127,7 +126,7 @@ export class AdminPanelComponent implements OnInit {
 
                         const successModal: ComponentRef<ModalComponent> = this.appService.createSuccessModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations('ADMINPANEL.DELETEIMAGESUCCESSMESSAGE'));
 
-                        successModal.onDestroy(() => this.appService.reloadComponent(true));
+                        successModal.onDestroy(() => window.location.reload());
 
                         break; 
                     }
