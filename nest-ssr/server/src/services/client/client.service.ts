@@ -134,7 +134,7 @@ export class ClientService {
         const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin, { rawResult: false });
 
         const compressedImageGetResult = await commonServiceRef.getCompressedImages(client, client.dataValues.type);
-        const compressedImage: СompressedImage = compressedImageGetResult ? compressedImageGetResult.rows.find(image => image.originalImageName === path.basename(newOriginalImagePath)) : null;
+        const compressedImage: СompressedImage = compressedImageGetResult ? compressedImageGetResult.rows.find(image => image.originalName === path.basename(newOriginalImagePath)) : null;
 
         if ( compressedImage ) return 'FILEEXISTS';
     
@@ -232,7 +232,7 @@ export class ClientService {
         if ( options.compressedImageName ) {
             const compressedImageData: СompressedImage = await this.compressedImageModel.findOne({ where: { imageName: options.compressedImageName }});
 
-            if ( compressedImageData ) response.download(path.join(compressedImageData.originalImageDirPath, compressedImageData.originalImageName));
+            if ( compressedImageData ) response.download(path.join(compressedImageData.originalDirPath, compressedImageData.originalName));
             else throw new BadRequestException();
 
             return;
