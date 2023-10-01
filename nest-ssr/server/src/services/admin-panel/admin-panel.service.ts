@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
+import fsPromises from 'fs/promises';
 import path from 'path';
 
 import { CommonModule } from '../../modules/common.module';
@@ -82,6 +83,17 @@ export class AdminPanelService {
 
         try {
             await this.compressedImageModel.update(updateValues, { where: { originalName: path.basename(originalImagePath) }});
+
+            const oldPath: string = path.join(compressedImage.imageDirPath, compressedImage.imageName);
+
+            let imagesThumbnailDirName: string = '';
+
+            if ( displayTargetPage === 'home' ) imagesThumbnailDirName = 'main';
+            else imagesThumbnailDirName = 'gallery';
+
+            const newPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail', imagesThumbnailDirName, compressedImage.imageName);
+
+            await fsPromises.rename(oldPath, newPath);
 
             return 'SUCCESS';
         } catch {

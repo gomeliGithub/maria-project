@@ -241,10 +241,6 @@ export class ClientService {
     }
 
     public async getCompressedImagesList (imagesType: string): Promise<string[]> {
-        const compressedImagesDirPaths: string[] = [ 'main' ];
-
-        if ( !compressedImagesDirPaths.includes(imagesType) ) throw new BadRequestException();
-
         const imagesList: string[] = await fsPromises.readdir(path.join(this.compressedImagesDirPath, imagesType));
 
         return imagesList;
