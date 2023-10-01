@@ -14,12 +14,12 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let compressedImage of fullCompressedImagesList; let i = index">
-                        <th scope="row">{{i}}</th>
+                        <th scope="row">{{i + 1}}</th>
                         <td>{{compressedImage.originalName}}</td>
                         <td>{{compressedImage.originalSize}}</td>
-                        <td>{{compressedImage.uploadDate}}</td>
-                        <td>{{compressedImage.displayedOnHomePage}}</td>
-                        <td>{{compressedImage.displayedOnGalleryPage}}</td>
+                        <td>{{compressedImage.uploadDate | date:"M/d/yy, h:mm a"}}</td>
+                        <td>{{compressedImage.displayedOnHomePage | boolean}}</td>
+                        <td>{{compressedImage.displayedOnGalleryPage | boolean}}</td>
                     </tr>
                 </tbody>
             </table>

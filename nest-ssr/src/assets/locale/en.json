@@ -37,6 +37,10 @@
 		"MAXNAMELENGTH": "The file name must contain at least 4 characters",
 		"FINISH": "File uploaded successfully"
 	},
+	"ADMINPANEL": {
+		"BOOLEANTRUETEXT": "Yes",
+		"BOOLEANFALSETEXT": "No"
+	},
     "CLIENTAUTHERRORMESSAGE": "No such client exists, or the password is incorrect",
     "CLIENTSUCCESSMESSAGES": {
 		"CHANGELOCALE": "Language changed successfully"

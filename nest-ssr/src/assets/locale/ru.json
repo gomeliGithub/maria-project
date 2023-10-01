@@ -37,6 +37,10 @@
 		"MAXNAMELENGTH": "Имя файла должно содержать как минимум 4 символа",
 		"FINISH": "Файл успешно загружен"
 	},
+	"ADMINPANEL": {
+		"BOOLEANTRUETEXT": "Да",
+		"BOOLEANFALSETEXT": "Нет"
+	},
 	"CLIENTAUTHERRORMESSAGE": "Не существует такого клиента, либо неверный пароль",
 	"CLIENTSUCCESSMESSAGES": {
 		"CHANGELOCALE": "Язык успешно изменен"
