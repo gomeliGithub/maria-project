@@ -81,7 +81,7 @@ export class AppService {
         return modalComponent;
     }
 
-    public createSuccessModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): void {
+    public createSuccessModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): ComponentRef<ModalComponent> {
         const createOptions: IModalCreateOptions = {
             title: this.getTranslations('MODAL.SUCCESSTITLE'),
             type: 'successModal',
@@ -91,9 +91,11 @@ export class AppService {
         }
             
         componentRef = this.createModalInstance(viewRef, createOptions);
+
+        return componentRef;
     }
 
-    public createWarningModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): void {
+    public createWarningModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): ComponentRef<ModalComponent> {
         const createOptions: IModalCreateOptions = {
             title: this.getTranslations('MODAL.WARNINGTITLE'),
             type: 'warningModal',
@@ -103,9 +105,11 @@ export class AppService {
         }
             
         componentRef = this.createModalInstance(viewRef, createOptions);
+
+        return componentRef;
     }
 
-    public createErrorModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText?: string): void {
+    public createErrorModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText?: string): ComponentRef<ModalComponent> {
         const mWCreateOptions: IModalCreateOptions = {
             title: this.getTranslations('MODAL.ERRORTITLE'),
             type: 'errorModal',
@@ -115,6 +119,8 @@ export class AppService {
         }
             
         componentRef = this.createModalInstance(viewRef, mWCreateOptions);
+
+        return componentRef;
     }
 
     public getTranslations<asyncParameter extends boolean = false> (keys: string, async?: asyncParameter): asyncParameter extends true ? Observable<string> : string;

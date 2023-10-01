@@ -173,7 +173,7 @@ export class ImageControlService {
 
             await client.$remove('compressedImages', compressedImage);
             await compressedImage.destroy();
-            await fsPromises.unlink(imagePath); console.log(path.join(this.appService.clientCompressedImagesDir, clientLogin, compressedImageName));
+            await fsPromises.unlink(imagePath);
             await fsPromises.unlink(path.join(this.appService.clientCompressedImagesDir, clientLogin, compressedImageName));
 
             return true;

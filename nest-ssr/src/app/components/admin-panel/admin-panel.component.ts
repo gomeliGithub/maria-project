@@ -30,6 +30,7 @@ export class AdminPanelComponent implements OnInit {
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
     @ViewChild('uploadImageInput', { static: false }) private readonly uploadImageInputElementRef: ElementRef<HTMLInputElement>;
+    @ViewChild('spinner', { static: false }) private readonly spinnerElementRef: ElementRef<HTMLDivElement>;
 
     private _imageFile: File;
     public fileSelected: boolean;
@@ -38,6 +39,8 @@ export class AdminPanelComponent implements OnInit {
 
     public fullCompressedImagesList: ICompressedImage[];
     public fullCompressedImagesListCount: number;
+
+    public spinnerHidden: boolean = true;
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
@@ -104,43 +107,39 @@ export class AdminPanelComponent implements OnInit {
     public deleteImage (event: MouseEvent) {
         const deleteImageButton: HTMLButtonElement = event.target as HTMLButtonElement;
 
-        const originalImageName: string = deleteImageButton.getAttribute('originalImageName');
+        const originalImageName: string = deleteImageButton.getAttribute('originalImageName'); debugger;
 
         if ( deleteImageButton && originalImageName ) {
-            const modal: ComponentRef<ModalComponent> = this.appService.createModalInstance(this.modalViewRef, {
-                title: this.appService.getTranslations('SPINNER.TITLE'),
-                type: 'spinner',
-                confirmButton: false
-            });
-            
+            this.spinnerHidden = false;
+
             const headers: HttpHeaders = this.appService.createRequestHeaders();
 
             this.http.post('/api/admin-panel/deleteImage', { 
                 adminPanel: { originalImageName }
             }, { responseType: 'text', headers, withCredentials: true }).subscribe(responseText => {
-                modal.instance.hideModal().then(() => {
-                    const currentDataRow: HTMLTableRowElement = deleteImageButton.parentElement.parentElement as HTMLTableRowElement;
+                const currentDataRow: HTMLTableRowElement = deleteImageButton.parentElement.parentElement as HTMLTableRowElement;
 
-                    switch ( responseText ) {
-                        case 'SUCCESS': { 
-                            currentDataRow.remove(); 
+                switch ( responseText ) {
+                    case 'SUCCESS': { 
+                        currentDataRow.remove(); 
 
-                            modal.destroy();
+                        this.spinnerHidden = true;
 
-                            this.appService.createSuccessModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations('ADMINPANEL.DELETEIMAGESUCCESSMESSAGE'));
+                        const successModal: ComponentRef<ModalComponent> = this.appService.createSuccessModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations('ADMINPANEL.DELETEIMAGESUCCESSMESSAGE'));
 
-                            break; 
-                        }
-                        case 'PENDING': { 
-                            modal.destroy();
+                        successModal.onDestroy(() => this.appService.reloadComponent(true));
 
-                            this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations('UPLOADIMAGERESPONSES.PENDING')); 
-                            
-                            break; 
-                        }
-                        case 'ERROR': { modal.destroy(); this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef); break; }
+                        break; 
                     }
-                });
+                    case 'PENDING': { 
+                        this.spinnerHidden = true;
+
+                        this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations('UPLOADIMAGERESPONSES.PENDING')); 
+                            
+                        break; 
+                    }
+                    case 'ERROR': { this.spinnerHidden = true; this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef); break; }
+                }
             });
         }
     }

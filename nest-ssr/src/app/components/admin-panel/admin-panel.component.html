@@ -49,5 +49,10 @@
             </div>
         </div>
     </div>
+    <div class="d-flex justify-content-center visually-hidden" [ngClass]="{ 'visually-hidden': spinnerHidden }" #spinner>
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 </div>
 <ng-template #appModal></ng-template>
