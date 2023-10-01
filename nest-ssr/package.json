@@ -59,6 +59,7 @@
         "mock-aws-s3": "^4.0.2",
         "ms": "^2.1.3",
         "mysql2": "^3.6.1",
+        "ngx-translate-cache": "^12.0.0",
         "nock": "^13.3.3",
         "os-browserify": "^0.3.0",
         "pg-hstore": "^2.3.4",

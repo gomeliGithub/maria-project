@@ -1,5 +1,4 @@
 import { NgModule, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -55,5 +54,5 @@ import { environment } from '../environments/environment';
 export class AppModule { }
 
 export function HttpLoaderFactory (http: HttpClient): TranslateLoader {
-    if ( isPlatformBrowser(PLATFORM_ID) ) return new TranslateHttpLoader(http, `${ environment.webServerURL }/assets/locale/`, '.json');
+    return new TranslateHttpLoader(http, '/assets/locale/', '.json');
 }
