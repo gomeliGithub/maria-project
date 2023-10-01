@@ -75,17 +75,17 @@ export class ImageControlService {
         let newCompressedImage: СompressedImage = null;
 
         try {
-            const semiTransparentRedBuffer: Buffer = await sharp(inputImagePath).resize(600, 600).toBuffer();
+            const semiTransparentRedBuffer: Buffer = await sharp(inputImagePath).resize(1000, 1000).toBuffer();
 
             await fsPromises.writeFile(outputTempFilePath, semiTransparentRedBuffer);
             await fsPromises.rename(outputTempFilePath, outputImagePath);
 
             newCompressedImage = await this.compressedImageModel.create({
                 imageName: outputImageName,
-                imageNameDirPath: outputDirPath,
-                originalImageName: inputImageName,
-                originalImageDirPath: inputImageDirPath,
-                originalImageSize: originalImageSize
+                imageDirPath: outputDirPath,
+                originalName: inputImageName,
+                originalDirPath: inputImageDirPath,
+                originalSize: originalImageSize
             });
 
             await client.$add('compressedImages', newCompressedImage);

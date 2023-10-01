@@ -50,8 +50,8 @@ export interface IClientBrowser {
 }
 
 export interface ICompressedImage {
-    originalImageName: string;
-    originalImageSize: number;
+    originalName: string;
+    originalSize: number;
     uploadDate: Date;
     displayedOnHomePage: boolean;
     displayedOnGalleryPage: boolean;

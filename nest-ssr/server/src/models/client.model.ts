@@ -140,25 +140,25 @@ export class СompressedImage extends Model {
     @Column({ 
         type: DataType.STRING
     })
-    imageNameDirPath: string;
+    imageDirPath: string;
 
     @AllowNull(false)
     @Column({ 
         type: DataType.STRING
     })
-    originalImageName: string;
+    originalName: string;
 
     @AllowNull(false)
     @Column({ 
         type: DataType.STRING
     })
-    originalImageDirPath: string;
+    originalDirPath: string;
 
     @AllowNull(false)
     @Column({ 
         type: DataType.INTEGER
     })
-    originalImageSize: number;
+    originalSize: number;
 
     @Default(sequelize.literal('CURRENT_TIMESTAMP'))
     @CreatedAt

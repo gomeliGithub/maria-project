@@ -1,7 +1,7 @@
 import { Component, ComponentRef, ElementRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { ModalComponent } from '../modal/modal.component';
 
@@ -43,7 +43,7 @@ export class AdminPanelComponent implements OnInit {
         if ( this.appService.checkIsPlatformBrowser() ) {
             this.appService.getTranslations('PAGETITLES.ADMINPANEL', true).subscribe(translation => this.appService.setTitle(translation));
 
-            this.adminPanelService.getFullCompressedImagesData().pipe<IFullCompressedImageData>(imagesList => this.getFullCompressedImagesDataResult = imagesList as Observable<IFullCompressedImageData>).subscribe(imagesList => {
+            this.adminPanelService.getFullCompressedImagesData().pipe<IFullCompressedImageData>(imagesList => this.getFullCompressedImagesDataResult = imagesList).pipe(map(imagesList => imagesList)).subscribe(imagesList => {
                 this.fullCompressedImagesList = imagesList.imagesList;
                 this.fullCompressedImagesListCount = imagesList.count;
             });
