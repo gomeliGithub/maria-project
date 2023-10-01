@@ -29,6 +29,12 @@ export interface IRequestBody {
         uploadImageMeta: string;
         _id: number;
     },
+    adminPanel?: {
+        originalImageName: string
+    },
+
+
+
     clientLogins?: string | string[];
     newLocale?: string;
 }

@@ -108,7 +108,8 @@ export class ClientService {
         const compressedImagesDirPath: string = this.appService.clientCompressedImagesDir;
         const compressedImagesDirClientPath: string = path.join(this.appService.clientCompressedImagesDir, activeClientLogin);
 
-        const newOriginalImagePath: string = path.join(originalImagesDirClientPath, imageMeta.name);
+        const newOriginalImageExt: string = path.extname(imageMeta.name) === '.jpeg' ? '.jpg' : path.extname(imageMeta.name);
+        const newOriginalImagePath: string = path.join(originalImagesDirClientPath, path.basename(imageMeta.name, path.extname(imageMeta.name)) + newOriginalImageExt);
 
         await commonServiceRef.createImageDirs({
             originalImages: { dirPath: originalImagesDirPath, clientDirPath: originalImagesDirClientPath },

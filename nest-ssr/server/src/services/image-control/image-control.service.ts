@@ -109,7 +109,10 @@ export class ImageControlService {
 
                 await fsPromises.unlink(imagePath);
 
-                if ( newCompressedImage ) await client.$remove('compressedImages', newCompressedImage);
+                if ( newCompressedImage ) {
+                    await client.$remove('compressedImages', newCompressedImage);
+                    await newCompressedImage.destroy();
+                }
             }
 
             return false;
@@ -146,6 +149,36 @@ export class ImageControlService {
             await fsPromises.access(options.compressedImages.clientDirPath, fsPromises.constants.F_OK);
         } catch {
             await fsPromises.mkdir(options.compressedImages.clientDirPath);
+        }
+    }
+
+    public async checkImageExists (imagePath: string): Promise<boolean> {
+        try {
+            await fsPromises.access(imagePath, fsPromises.constants.F_OK);
+
+            return true;
+        } catch { 
+            return false;
+        }
+    }
+
+    public async deleteImage (request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+        const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, { rawResult: false });
+        const compressedImage: СompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(imagePath) } });
+
+        try {
+            const compressedImageName: string = `${path.basename(imagePath, path.extname(imagePath))}_thumb${ path.extname(imagePath) }`;
+
+            await client.$remove('compressedImages', compressedImage);
+            await compressedImage.destroy();
+            await fsPromises.unlink(imagePath); console.log(path.join(this.appService.clientCompressedImagesDir, clientLogin, compressedImageName));
+            await fsPromises.unlink(path.join(this.appService.clientCompressedImagesDir, clientLogin, compressedImageName));
+
+            return true;
+        } catch { 
+            return false;
         }
     }
 

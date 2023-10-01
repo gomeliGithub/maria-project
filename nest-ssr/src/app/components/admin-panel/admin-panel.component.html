@@ -18,14 +18,21 @@
                         <td>{{compressedImage.originalName}}</td>
                         <td>{{compressedImage.originalSize}}</td>
                         <td>{{compressedImage.uploadDate | date:"M/d/yy, h:mm a"}}</td>
-                        <td [ngClass]="{ 
+                        <td class="fw-bold" [ngClass]="{ 
                             'text-success': compressedImage.displayedOnHomePage === 1, 
                             'text-danger': compressedImage.displayedOnHomePage === 0
-                        }">{{compressedImage.displayedOnHomePage | boolean}}</td>
-                        <td [ngClass]="{ 
+                        }">
+                            {{compressedImage.displayedOnHomePage | boolean}}
+                        </td>
+                        <td class="fw-bold" [ngClass]="{ 
                             'text-success': compressedImage.displayedOnGalleryPage === 1, 
                             'text-danger': compressedImage.displayedOnGalleryPage === 0
-                        }">{{compressedImage.displayedOnGalleryPage | boolean}}</td>
+                        }">
+                            {{compressedImage.displayedOnGalleryPage | boolean}}
+                        </td>
+                        <td>
+                            <button class="btn btn-danger" [attr.originalImageName]="compressedImage.originalName" (click)="deleteImage($event)">Удалить</button>
+                        </td>
                     </tr>
                 </tbody>
             </table>

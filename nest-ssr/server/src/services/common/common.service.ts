@@ -73,4 +73,16 @@ export class CommonService {
 
         return imageControlServiceRef.get(client, clientType, options);
     }
+
+    public async checkImageExists (imagePath: string): Promise<boolean> {
+        const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
+
+        return imageControlServiceRef.checkImageExists(imagePath);
+    }
+
+    public async deleteImage (request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
+        const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
+
+        return imageControlServiceRef.deleteImage(request, imagePath, clientLogin);
+    }
 }

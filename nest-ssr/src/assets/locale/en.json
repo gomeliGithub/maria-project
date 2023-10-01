@@ -31,15 +31,16 @@
 	},
 	"UPLOADIMAGERESPONSES": {
 		"PENDING": "The server is busy. Please try again later",
-		"FILEEXISTS": "A file with the same name has already been uploaded",
-		"MAXCOUNT": "Maximum number of files uploaded",
-		"MAXSIZE": "Maximum file size - 100 MB",
-		"MAXNAMELENGTH": "The file name must contain at least 4 characters",
-		"FINISH": "File uploaded successfully"
+		"FILEEXISTS": "A image with the same name has already been uploaded",
+		"MAXCOUNT": "Maximum number of images uploaded",
+		"MAXSIZE": "Maximum image size - 100 MB",
+		"MAXNAMELENGTH": "The image name must contain at least 4 characters",
+		"FINISH": "Image uploaded successfully"
 	},
 	"ADMINPANEL": {
 		"BOOLEANTRUETEXT": "Yes",
-		"BOOLEANFALSETEXT": "No"
+		"BOOLEANFALSETEXT": "No",
+		"DELETEIMAGESUCCESSMESSAGE": "Image deleted successfully"
 	},
     "CLIENTAUTHERRORMESSAGE": "No such client exists, or the password is incorrect",
     "CLIENTSUCCESSMESSAGES": {
@@ -47,5 +48,8 @@
 	},
     "PROGRESSBAR": {
 		"TITLE": "Upload image..."
+	},
+	"SPINNER": {
+		"TITLE": "Deleting an image..."
 	}
 }

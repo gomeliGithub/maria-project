@@ -87,7 +87,7 @@ export class AdminPanelComponent implements OnInit {
                 }
             }, { headers, responseType: 'text', withCredentials: true }).subscribe({
                 next: result => {
-                    switch (result) {
+                    switch ( result ) {
                         case 'START': { this.adminPanelService.uploadImage(this._imageFile, this.uploadImageInputElementRef.nativeElement, newClientId, modalRef); break; }
                         case 'PENDING': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
                         case 'FILEEXISTS': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
@@ -99,5 +99,49 @@ export class AdminPanelComponent implements OnInit {
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
         } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+    }
+
+    public deleteImage (event: MouseEvent) {
+        const deleteImageButton: HTMLButtonElement = event.target as HTMLButtonElement;
+
+        const originalImageName: string = deleteImageButton.getAttribute('originalImageName');
+
+        if ( deleteImageButton && originalImageName ) {
+            const modal: ComponentRef<ModalComponent> = this.appService.createModalInstance(this.modalViewRef, {
+                title: this.appService.getTranslations('SPINNER.TITLE'),
+                type: 'spinner',
+                confirmButton: false
+            });
+            
+            const headers: HttpHeaders = this.appService.createRequestHeaders();
+
+            this.http.post('/api/admin-panel/deleteImage', { 
+                adminPanel: { originalImageName }
+            }, { responseType: 'text', headers, withCredentials: true }).subscribe(responseText => {
+                modal.instance.hideModal().then(() => {
+                    const currentDataRow: HTMLTableRowElement = deleteImageButton.parentElement.parentElement as HTMLTableRowElement;
+
+                    switch ( responseText ) {
+                        case 'SUCCESS': { 
+                            currentDataRow.remove(); 
+
+                            modal.destroy();
+
+                            this.appService.createSuccessModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations('ADMINPANEL.DELETEIMAGESUCCESSMESSAGE'));
+
+                            break; 
+                        }
+                        case 'PENDING': { 
+                            modal.destroy();
+
+                            this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations('UPLOADIMAGERESPONSES.PENDING')); 
+                            
+                            break; 
+                        }
+                        case 'ERROR': { modal.destroy(); this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef); break; }
+                    }
+                });
+            });
+        }
     }
 }
