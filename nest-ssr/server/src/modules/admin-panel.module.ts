@@ -11,5 +11,6 @@ import { СompressedImage } from '../models/client.model';
     imports: [ SequelizeModule.forFeature([ СompressedImage ]) ],
     providers: [ AppService, AdminPanelService ],
     controllers: [AdminPanelController],
+    exports: [AdminPanelService]
 })
 export class AdminPanelModule {}

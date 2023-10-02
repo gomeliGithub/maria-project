@@ -62,4 +62,13 @@ export class ClientService {
     private _getBcrypt_hash_saltrounds (): Observable<string> {
         return this.http.get('/api/sign/getBcryptHashSaltrounds', { responseType: 'text', withCredentials: true });
     }
+
+    public getCompressedImagesList (imagesType: 'home'): Observable<string[][]>
+    public getCompressedImagesList (imagesType: 'gallery'): Observable<string[]>
+    public getCompressedImagesList (imagesType: 'home' | 'gallery'): Observable<string[] | string[][]> {
+        return this.http.get(`/api/client/getCompressedImagesList/:${ imagesType }`).pipe<string[] | string[][]>(imagesList => {
+            if ( imagesType === 'home' ) return imagesList as Observable<string[][]>;
+            else if ( imagesType === 'gallery' ) return imagesList as Observable<string[]>;
+        });
+    }
 }

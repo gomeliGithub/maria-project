@@ -40,11 +40,14 @@
 	"ADMINPANEL": {
 		"BOOLEANTRUETEXT": "Да",
 		"BOOLEANFALSETEXT": "Нет",
-		"DELETEIMAGESUCCESSMESSAGE": "Изображение успешно удалено"
+		"NOIMAGESMESSAGE": "Загруженных изображений пока нет",
+		"DELETEIMAGESUCCESSMESSAGE": "Изображение успешно удалено",
+		"MAXCOUNTONHOMEPAGEMESSAGE": "Максимальное количество изображений на главной странице"
 	},
-	"CLIENTAUTHERRORMESSAGE": "Не существует такого клиента, либо неверный пароль",
-	"CLIENTSUCCESSMESSAGES": {
-		"CHANGELOCALE": "Язык успешно изменен"
+	"IMAGEEVENTTYPES": {
+		"WEDDING": "Свадьба",
+		"HOLIDAY": "Праздник",
+		"BIRTHDAY": "День рождения"
 	},
 	"PROGRESSBAR": {
 		"TITLE": "Загрузка изображения..."

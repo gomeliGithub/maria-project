@@ -1,6 +1,7 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
+import * as fs from 'fs';
 import fsPromises from 'fs/promises';
 import path from 'path';
 
@@ -11,7 +12,8 @@ import { CommonService } from '../common/common.service';
 
 import { Admin, Member, СompressedImage } from '../../models/client.model';
 
-import { ICompressedImage, IFullCompressedImageData, IRequest, IRequestBody} from 'types/global';
+import { ICompressedImage, IFullCompressedImageData, IImageAdditionalData, IRequest, IRequestBody} from 'types/global';
+import { IImageMeta, IPercentUploadedOptions, IWSMessage, IWebSocketClient } from 'types/web-socket';
 
 @Injectable()
 export class AdminPanelService {
@@ -21,6 +23,151 @@ export class AdminPanelService {
         @InjectModel(СompressedImage)
         private readonly compressedImageModel: typeof СompressedImage
     ) { }
+
+    public async uploadImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+        const activeClientLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
+
+        let imageMeta: IImageMeta = null;
+
+        try {
+            imageMeta = JSON.parse(requestBody.client.uploadImageMeta);
+        } catch {
+            await this.appService.logLineAsync(`[${ process.env.SERVER_PORT }] UploadImage - not valid imageMeta`);
+    
+            throw new BadRequestException();
+        }
+
+        const imageAdditionalData: IImageAdditionalData = {
+            imageEventType: requestBody.client.imageEventType,
+            imageDescription: requestBody.client.imageDescription
+        }
+
+        const originalImagesDirPath: string = this.appService.clientOriginalImagesDir;
+        const originalImagesDirClientPath: string = path.join(this.appService.clientOriginalImagesDir, activeClientLogin);
+        const compressedImagesDirPath: string = this.appService.clientCompressedImagesDir;
+        const compressedImagesDirClientPath: string = path.join(this.appService.clientCompressedImagesDir, activeClientLogin);
+
+        const newOriginalImageExt: string = path.extname(imageMeta.name) === '.jpeg' ? '.jpg' : path.extname(imageMeta.name);
+        const newOriginalImagePath: string = path.join(originalImagesDirClientPath, path.basename(imageMeta.name, path.extname(imageMeta.name)) + newOriginalImageExt);
+
+        await commonServiceRef.createImageDirs({
+            originalImages: { dirPath: originalImagesDirPath, clientDirPath: originalImagesDirClientPath },
+            compressedImages: { dirPath: compressedImagesDirPath, clientDirPath: compressedImagesDirClientPath }
+        });
+
+        const webSocketClientId = requestBody.client._id;
+
+        const activeUploadClient = commonServiceRef.webSocketClients.some(client => client._id === webSocketClientId);
+    
+        let activeUploadsClientNumber = 0;
+    
+        commonServiceRef.webSocketClients.forEach(client => client.activeWriteStream ? activeUploadsClientNumber += 1 : null);
+    
+        if ( activeUploadClient ) {
+            await this.appService.logLineAsync(`[${ process.env.SERVER_PORT }] UploadImage - webSocketClient with the same id is exists`);
+    
+            throw new BadRequestException();
+        }
+    
+        if ( activeUploadsClientNumber > 3 ) return 'PENDING';
+
+        const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin, { rawResult: false });
+
+        const compressedImageGetResult = await commonServiceRef.getCompressedImages(client, client.dataValues.type);
+        const compressedImage: СompressedImage = compressedImageGetResult ? compressedImageGetResult.rows.find(image => image.originalName === path.basename(newOriginalImagePath)) : null;
+
+        if ( compressedImage ) return 'FILEEXISTS';
+    
+        try {
+            await fsPromises.access(newOriginalImagePath, fsPromises.constants.F_OK);
+    
+            return 'FILEEXISTS';
+        } catch { }
+    
+        const uploadedFilesNumber = (await fsPromises.readdir(originalImagesDirClientPath)).length;
+    
+        if ( uploadedFilesNumber >= 10 ) return 'MAXCOUNT';
+        else if ( imageMeta.size > 104857600 ) return 'MAXSIZE';
+        else if ( imageMeta.name.length < 4 ) return 'MAXNAMELENGTH';
+    
+        const currentChunkNumber: number = 0;
+        const uploadedSize: number = 0;
+    
+        const writeStream = fs.createWriteStream(newOriginalImagePath);
+    
+        writeStream.on('error', async () => {
+            const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+            await fsPromises.unlink(newOriginalImagePath);
+    
+            const currentClient = commonServiceRef.webSocketClients.find(client => client._id === webSocketClientId);
+    
+            await this.appService.logLineAsync(`[${ process.env.WEBSOCKETSERVER_PORT }] WebSocketClientId --- ${webSocketClientId}, login --- ${currentClient.login}. Stream error`);
+    
+            const message = this.createMessage('uploadImage', 'ERROR', { uploadedSize: currentClient.uploadedSize, imageMetaSize: imageMeta.size });
+    
+            currentClient.connection.send(JSON.stringify(message));
+        });
+    
+        writeStream.on('finish', async () => {
+            const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+            const currentClient: IWebSocketClient = commonServiceRef.webSocketClients.find(client => client._id === webSocketClientId);
+    
+            const successMessage: IWSMessage = this.createMessage('uploadImage', 'FINISH', { 
+                uploadedSize: currentClient.uploadedSize, 
+                imageMetaSize: imageMeta.size 
+            });
+    
+            await this.appService.logLineAsync(`[${ process.env.WEBSOCKETSERVER_PORT }] WebSocketClientId --- ${webSocketClientId}, login --- ${currentClient.login}. All chunks writed, overall size --> ${currentClient.uploadedSize}. Image ${imageMeta.name} uploaded`);
+
+            const compressResult: boolean = await commonServiceRef.compressImage(request, {
+                inputImagePath: newOriginalImagePath, 
+                outputDirPath: compressedImagesDirClientPath, 
+                originalImageSize: imageMeta.size, 
+                imageAdditionalData: imageAdditionalData
+            }, activeClientLogin);
+
+            if ( !compressResult ) {
+                const errorMessage: IWSMessage = this.createMessage('uploadImage', 'ERROR');
+
+                currentClient.connection.send(JSON.stringify(errorMessage));
+            } else currentClient.connection.send(JSON.stringify(successMessage));
+
+            currentClient.connection.terminate();
+            currentClient.connection = null;
+    
+            commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter((client => client.connection));
+        });
+
+        commonServiceRef.webSocketClients.push({ 
+            _id: webSocketClientId, 
+            login: activeClientLogin,
+            activeWriteStream: writeStream,
+            currentChunkNumber, 
+            uploadedSize, 
+            imageMetaName: imageMeta.name, 
+            imageMetaSize: imageMeta.size,
+            imagePath: newOriginalImagePath,
+            lastkeepalive: Date.now(),
+            connection: null,
+        });
+
+        return 'START';
+    }
+
+    public createMessage (eventType: string, eventText: string, percentUploadedOptions?: IPercentUploadedOptions) {
+        const message: IWSMessage = {
+            event: eventType,
+            text: eventText
+        }
+    
+        if ( percentUploadedOptions ) message.percentUploaded = Math.round((percentUploadedOptions.uploadedSize / percentUploadedOptions.imageMetaSize) * 100);
+    
+        return message;
+    }
 
     public async getFullCompressedImagesList (request: IRequest): Promise<IFullCompressedImageData> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
@@ -71,6 +218,12 @@ export class AdminPanelService {
 
         const compressedImage: СompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true });
 
+        const staticFilesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
+
+        const homeImagesCount: number = (await fsPromises.readdir(path.join(staticFilesDirPath, 'home'))).length;
+
+        if ( homeImagesCount >= 25 ) return 'MAXCOUNT';
+
         const displayTargetPage: 'home' | 'gallery' | 'original' = requestBody.adminPanel.displayTargetPage;
 
         const updateValues: { [x: string]: any } = { };
@@ -89,8 +242,6 @@ export class AdminPanelService {
             if ( compressedImage.displayedOnHomePage ) updateValues.displayedOnHomePage = false;
             else if ( compressedImage.displayedOnGalleryPage ) updateValues.displayedOnGalleryPage = false;
         }
-
-        const staticFilesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
 
         const staticFilesHomeImagePath: string = path.join(staticFilesDirPath, 'home', compressedImage.imageName);
         const staticFilesGalleryImagePath: string = path.join(staticFilesDirPath, 'gallery', compressedImage.imageName);

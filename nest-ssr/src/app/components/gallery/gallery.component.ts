@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { AppService } from '../../../app/app.service';
+import { ClientService } from '../../services/client/client.service';
 
 @Component({
     selector: 'app-gallery',
@@ -11,8 +11,8 @@ import { AppService } from '../../../app/app.service';
 })
 export class GalleryComponent implements OnInit {
     constructor (
-        private readonly http: HttpClient,
-        private readonly appService: AppService
+        private readonly appService: AppService,
+        private readonly clientService: ClientService
     ) {}
 
     public compressedImagesList: Observable<string[]>;
@@ -26,6 +26,6 @@ export class GalleryComponent implements OnInit {
     }
 
     private _getCompressedImagesList (): Observable<string[]> {
-        return this.http.get('/api/client/getCompressedImagesList/:gallery', { withCredentials: true }).pipe<string[]>(imagesList => this.compressedImagesList = imagesList as Observable<string[]>);
+        return this.clientService.getCompressedImagesList('gallery').pipe(imagesList => this.compressedImagesList = imagesList);
     }
 }

@@ -1,5 +1,6 @@
-import { Component, ComponentRef, ElementRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, ComponentRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Observable, map } from 'rxjs';
 
@@ -22,17 +23,26 @@ export class AdminPanelComponent implements OnInit {
 
         private readonly appService: AppService,
         private readonly adminPanelService: AdminPanelService
-    ) { }
+    ) {
+        this.uploadImageForm = new FormGroup({
+            'imageEventType': new FormControl(null, Validators.required),
+            'image': new FormControl(null as FileList, [ Validators.required, this.imageValidator ]),
+            'imageDescription': new FormControl(null)
+        });
+    }
+
+    public uploadImageForm: FormGroup<{
+        imageEventType: FormControl<string>;
+        image: FormControl<FileList>;
+        imageDescription: FormControl<string>;
+    }>;
 
     @ViewChild(ModalComponent) modalWindowComponent: ModalComponent
     @ViewChild('appModal', { read: ViewContainerRef, static: false })
     private readonly modalViewRef: ViewContainerRef;
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
-    @ViewChild('uploadImageInput', { static: false }) private readonly uploadImageInputElementRef: ElementRef<HTMLInputElement>;
-
     private _imageFile: File;
-    public fileSelected: boolean;
     
     public getFullCompressedImagesDataResult: Observable<IFullCompressedImageData>;
 
@@ -60,13 +70,22 @@ export class AdminPanelComponent implements OnInit {
             return;
         }
 
-        if ( fileList[0].size < 104857600 || fileList[0].name.length >= 4 ) {
-            this._imageFile = fileList[0];
-            this.fileSelected = true;
+        this._imageFile = fileList[0];
+    }
+
+    public imageValidator (): { [ s: string ]: boolean } | null {
+        if ( this && this._imageFile && (this._imageFile.size > 104857600 || this._imageFile.name.length < 4) ) {
+            this._imageFile = null;
+
+            return { 'image' : true };
         }
+
+        return null;
     }
 
     public uploadImage (): void {
+        const { imageEventType, imageDescription } = this.uploadImageForm.value;
+
         const imageMetaJson: string = JSON.stringify({
             name         : this._imageFile ? this._imageFile.name : null,
             size         : this._imageFile ? this._imageFile.size : null,
@@ -83,15 +102,17 @@ export class AdminPanelComponent implements OnInit {
 
             const headers: HttpHeaders = this.appService.createRequestHeaders();
     
-            this.http.post('/api/client/uploadImage', {
+            this.http.post('/api/admin-panel/uploadImage', {
                 client: {
                     _id: newClientId, 
-                    uploadImageMeta: imageMetaJson
+                    uploadImageMeta: imageMetaJson,
+                    imageEventType,
+                    imageDescription
                 }
             }, { headers, responseType: 'text', withCredentials: true }).subscribe({
                 next: result => {
                     switch ( result ) {
-                        case 'START': { this.fileSelected = false; this.adminPanelService.uploadImage(this._imageFile, this.uploadImageInputElementRef.nativeElement, newClientId, modalRef); break; }
+                        case 'START': { this.adminPanelService.uploadImage(this._imageFile, this.uploadImageForm, newClientId, modalRef); break; }
                         case 'PENDING': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
                         case 'FILEEXISTS': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
                         case 'MAXCOUNT': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
@@ -141,9 +162,7 @@ export class AdminPanelComponent implements OnInit {
                 this.http.post('/api/admin-panel/changeImageDisplayTarget', {
                     adminPanel: { originalImageName, displayTargetPage }
                 }, { responseType: 'text', headers, withCredentials: true }).subscribe({
-                    next: responseText => {
-                        this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef);
-                    },
+                    next: responseText => this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef),
                     error: () => {
                         this.spinnerHidden = true;
                         

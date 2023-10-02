@@ -13,7 +13,7 @@ import { ImageControlService } from '../../services/image-control/image-control.
 
 import { Admin, Member } from '../../models/client.model';
 
-import { IClient, IRequest, IСompressedImageGetResult } from 'types/global';
+import { IClient, ICompressImageData, IRequest, IСompressedImageGetResult } from 'types/global';
 import { IClientGetOptions, ICreateImageDirsOptions, IGetActiveClientOptions, IСompressedImageGetOptions } from 'types/options';
 import { IWebSocketClient } from 'types/web-socket';
 
@@ -62,10 +62,10 @@ export class CommonService {
         return imageControlServiceRef.createImageDirs(options);
     }
 
-    public async compressImage (request: IRequest, inputImagePath: string, outputDirPath: string, originalImageSize: number, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
+    public async compressImage (request: IRequest, compressImageData: ICompressImageData, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
         const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
         
-        return imageControlServiceRef.compressImage(request, inputImagePath, outputDirPath, originalImageSize, activeClientLogin, options);
+        return imageControlServiceRef.compressImage(request, compressImageData, activeClientLogin, options);
     }
 
     public async getCompressedImages (client: Admin | Member, clientType: 'admin' | 'member', options?: IСompressedImageGetOptions): Promise<IСompressedImageGetResult> {

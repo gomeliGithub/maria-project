@@ -26,8 +26,10 @@ export interface IRequestBody {
         clientData?: IClientSignData;
     },
     client?: {
-        uploadImageMeta: string;
         _id: number;
+        uploadImageMeta: string;
+        imageEventType: string;
+        imageDescription?: string;
     },
     adminPanel?: {
         originalImageName: string;
@@ -72,4 +74,16 @@ export interface IFullCompressedImageData {
 export interface IСompressedImageGetResult {
     rows: СompressedImage[];
     count?: number;
+}
+
+export interface ICompressImageData {
+    inputImagePath: string;
+    outputDirPath: string;
+    originalImageSize: number;
+    imageAdditionalData: IImageAdditionalData;
+}
+
+export interface IImageAdditionalData {
+    imageEventType: string;
+    imageDescription?: string;
 }

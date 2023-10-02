@@ -20,6 +20,22 @@ export class AdminPanelController {
         return true;
     }
 
+    @Post('/uploadImage')
+    @ClientTypes('admin')
+    async uploadImage (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
+        if ( !requestBody.client || !requestBody.client._id || !requestBody.client.uploadImageMeta || !requestBody.client.imageEventType
+            || typeof requestBody.client._id !== 'number' || requestBody.client._id < 0 || requestBody.client._id > 1 
+            || typeof requestBody.client.uploadImageMeta !== 'string' || typeof requestBody.client.imageEventType !== 'string'
+            || requestBody.client.imageDescription && (typeof requestBody.client.imageDescription !== 'string' || requestBody.client.imageDescription === '')
+        ) {
+            await this.appService.logLineAsync(`[${ process.env.SERVER_PORT }] UploadImage - not valid client data`);
+    
+            throw new BadRequestException();
+        }
+
+        return this.adminPanelService.uploadImage(request, requestBody);
+    }
+
     @Get('/getFullCompressedImagesList')
     @ClientTypes('admin')
     async getFullCompressedImagesList (@Req() request: IRequest): Promise<IFullCompressedImageData> {

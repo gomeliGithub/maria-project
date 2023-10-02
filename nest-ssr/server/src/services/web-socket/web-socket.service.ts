@@ -6,7 +6,7 @@ import fsPromises from 'fs/promises';
 import { CommonModule } from '../../modules/common.module';
 
 import { AppService } from '../../app.service';
-import { ClientService } from '../client/client.service';
+import { AdminPanelService } from '../admin-panel/admin-panel.service';
 import { CommonService } from '../common/common.service';
 
 import { IWebSocketClient } from 'types/web-socket';
@@ -19,7 +19,7 @@ export class WebSocketService {
 
     constructor (
         private readonly appService: AppService,
-        private readonly clientService: ClientService
+        private readonly adminPanelService: AdminPanelService
     ) {
         this.socketServer.on('connection', async (connection, request) => {
             const webSocketClientId: number = parseFloat(request.url.substring(2));
@@ -69,7 +69,7 @@ export class WebSocketService {
                 currentClient.uploadedSize += fileData.length;
 
                 currentClient.activeWriteStream.write(fileData, async () => {
-                    const message = this.clientService.createMessage('uploadImage', 'SUCCESS', { uploadedSize: currentClient.uploadedSize, imageMetaSize: currentClient.imageMetaSize });
+                    const message = this.adminPanelService.createMessage('uploadImage', 'SUCCESS', { uploadedSize: currentClient.uploadedSize, imageMetaSize: currentClient.imageMetaSize });
 
                     await this.appService.logLineAsync(`[${this.webSocketServerPort}] WebSocketClientId --- ${webSocketClientId}, login --- ${currentClient.login}. Chunk ${currentClient.currentChunkNumber} writed, size --> ${fileData.length}, allUploadedSize --> ${currentClient.uploadedSize}`);
 
@@ -117,7 +117,7 @@ export class WebSocketService {
             
                         this.appService.logLineAsync(`[${this.webSocketServerPort}] Один из клиентов отключился, закрываем соединение с ним`);
                     } else if ( client.connection ) {
-                        const message = this.clientService.createMessage('timer', 'timer= ' + timer);
+                        const message = this.adminPanelService.createMessage('timer', 'timer= ' + timer);
         
                         client.connection.send(JSON.stringify(message));
                     }

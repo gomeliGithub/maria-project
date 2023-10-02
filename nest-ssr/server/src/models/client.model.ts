@@ -160,6 +160,18 @@ export class СompressedImage extends Model {
     })
     originalSize: number;
 
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.STRING
+    })
+    imageEventType: string;
+
+    @AllowNull(true)
+    @Column({ 
+        type: DataType.STRING
+    })
+    imageDescription: string;
+
     @Default(sequelize.literal('CURRENT_TIMESTAMP'))
     @CreatedAt
     @AllowNull(false)

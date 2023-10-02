@@ -40,11 +40,14 @@
 	"ADMINPANEL": {
 		"BOOLEANTRUETEXT": "Yes",
 		"BOOLEANFALSETEXT": "No",
-		"DELETEIMAGESUCCESSMESSAGE": "Image deleted successfully"
+		"NOIMAGESMESSAGE": "No images uploaded yet",
+		"DELETEIMAGESUCCESSMESSAGE": "Image deleted successfully",
+		"MAXCOUNTONHOMEPAGEMESSAGE": "Maximum number of images on the home page"
 	},
-    "CLIENTAUTHERRORMESSAGE": "No such client exists, or the password is incorrect",
-    "CLIENTSUCCESSMESSAGES": {
-		"CHANGELOCALE": "Language changed successfully"
+	"IMAGEEVENTTYPES": {
+		"WEDDING": "Wedding",
+		"HOLIDAY": "Holiday",
+		"BIRTHDAY": "Birthday"
 	},
     "PROGRESSBAR": {
 		"TITLE": "Upload image..."

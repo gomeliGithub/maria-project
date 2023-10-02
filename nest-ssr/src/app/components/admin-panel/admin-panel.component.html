@@ -64,15 +64,39 @@
             </table>
             <ng-template #noContentBlock>  
                 <div class="noContentBlock text-center text-danger fs-4 p-4">
-                    <span class="fw-bold">Загруженных изображений пока нет</span>
+                    <span class="fw-bold">{{ 'ADMINPANEL.NOIMAGESMESSAGE' | translate }}</span>
                 </div>
             </ng-template>
         </div>
-        <div id="uploadImageContainer">
-            <div class="input-group">
-                <input type="file" class="form-control" id="inputGroupUploadImage" aria-describedby="uploadImageButton" aria-label="Upload" (change)="fileChange($event)" #uploadImageInput>
-                <button class="btn btn-outline-secondary" type="button" id="uploadImageButton" (click)="uploadImage()" [disabled]="!fileSelected">Загрузить новое изображение</button>
-            </div>
+        <div class="d-flex flex-row justify-content-center" id="uploadImageContainer">
+            <form [formGroup]="uploadImageForm" class="p-3 w-50 border border-light border-3 rounded" novalidate (submit)="uploadImage()">
+                <div class="form-group form-floating mb-3">
+                    <select class="form-control form-select" id="inputEventType" title="My Custom Text" formControlName="imageEventType">
+                        <option value="wedding" selected>{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</option>
+                        <option value="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</option>
+                        <option value="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</option>
+                    </select>
+                    <label for="inputEventType" class="form-label">Тип события</label>
+                    <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imageEventType'].invalid && uploadImageForm.controls['imageEventType'].touched">
+                        Не выбран тип события
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <input type="file" class="form-control" id="inputImage" placeholder="Название события" (change)="fileChange($event)" formControlName="image">
+                    <div class="alert alert-danger" *ngIf="uploadImageForm.controls['image'].invalid && uploadImageForm.controls['image'].touched">
+                        Не выбрано изображение
+                    </div>
+                </div>
+                <div class="form-group form-floating mb-3">
+                    <input type="text" class="form-control" id="inputImageDescription" placeholder="Имя вашего аккаунта" formControlName="imageDescription">
+                    <label for="inputImageDescription" class="form-label">Индивидуальное описание фото</label>
+                </div>
+                <div class="form-group text-center">
+                    <button class="btn btn-primary" [disabled]="uploadImageForm.invalid">
+                        Загрузить новое изображение
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
     <div class="d-flex align-items-center visually-hidden" [ngClass]="{ 'visually-hidden': spinnerHidden }">

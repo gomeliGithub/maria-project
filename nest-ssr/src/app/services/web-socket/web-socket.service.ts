@@ -1,4 +1,5 @@
 import { ComponentRef, Injectable } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 
 import { ModalComponent } from '../../components/modal/modal.component';
 
@@ -27,7 +28,11 @@ export class WebSocketService {
     private _modal: ComponentRef<ModalComponent>;
     private _progressElement: HTMLDivElement;
 
-    public on (host: string, uploadImageInput: HTMLInputElement, slicedImageData: ArrayBuffer[], newClientId: number, modalRef: IModalRef): void {
+    public on (host: string, uploadImageForm: FormGroup<{
+        imageEventType: FormControl<string>;
+        image: FormControl<FileList>;
+        imageDescription: FormControl<string>;
+    }>, slicedImageData: ArrayBuffer[], newClientId: number, modalRef: IModalRef): void {
         this._connection = new WebSocket(host + `/:${newClientId}`);
 
         this._modal = this.appService.createModalInstance(modalRef.modalViewRef, {
@@ -55,7 +60,7 @@ export class WebSocketService {
 
             if ( message.event === 'uploadImage' ) {
                 if ( message.text === 'ERROR' ) {
-                    this._clearUploadImageData(uploadImageInput);
+                    this._clearUploadImageData(uploadImageForm);
 
                     setTimeout(() => {
                         this.modalService.changeProgressBar(this._progressElement, 0)
@@ -69,7 +74,7 @@ export class WebSocketService {
                 } else if ( message.text === 'FINISH' ) { // console.log(message.percentUploaded);
                     this.modalService.changeProgressBar(this._progressElement, message.percentUploaded);
 
-                    this._clearUploadImageData(uploadImageInput);
+                    this._clearUploadImageData(uploadImageForm);
 
                     setTimeout(() => {
                         this.modalService.changeProgressBar(this._progressElement, 0);
@@ -113,8 +118,12 @@ export class WebSocketService {
         this.send(slicedImageData[chunkNumber]);
     }
 
-    private _clearUploadImageData (uploadImageInput: HTMLInputElement) {
-        uploadImageInput.value = '';
+    private _clearUploadImageData (uploadImageForm: FormGroup<{
+        imageEventType: FormControl<string>;
+        image: FormControl<FileList>;
+        imageDescription: FormControl<string>;
+    }>) {
+        uploadImageForm.reset();
 
         this._slicedImageData = [];
         this._currentChunkNumber = 0;

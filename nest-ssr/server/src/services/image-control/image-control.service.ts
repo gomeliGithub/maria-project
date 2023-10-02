@@ -16,7 +16,7 @@ import { CommonService } from '../common/common.service';
 
 import { Admin, Member, СompressedImage } from '../../models/client.model';
 
-import { IRequest, IСompressedImageGetResult } from 'types/global';
+import { ICompressImageData, IRequest, IСompressedImageGetResult } from 'types/global';
 import { ICreateImageDirsOptions, IСompressedImageGetOptions } from 'types/options';
 
 @Injectable()
@@ -44,10 +44,10 @@ export class ImageControlService {
         }
     }
 
-    public async compressImage (request: IRequest, inputImagePath: string, outputDirPath: string, originalImageSize: number, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
+    public async compressImage (request: IRequest, compressImageData: ICompressImageData, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
         const supportedImageTypes: string[] = [ 'jpg', 'png', 'webp', 'avif', 'gif', 'svg', 'tiff' ];
 
-        const { ext } = await fileTypeFromFile(inputImagePath);
+        const { ext } = await fileTypeFromFile(compressImageData.inputImagePath);
 
         if ( !supportedImageTypes.includes(ext) ) return false;
 
@@ -60,11 +60,11 @@ export class ImageControlService {
             }
         }*/
 
-        const inputImageDirPath: string = path.dirname(inputImagePath);
-        const inputImageName: string = path.basename(inputImagePath);
+        const inputImageDirPath: string = path.dirname(compressImageData.inputImagePath);
+        const inputImageName: string = path.basename(compressImageData.inputImagePath);
 
-        const outputImageName: string = `${path.basename(inputImagePath, path.extname(inputImagePath))}_thumb.${ext}`;
-        const outputImagePath: string = path.join(outputDirPath, outputImageName);
+        const outputImageName: string = `${path.basename(compressImageData.inputImagePath, path.extname(compressImageData.inputImagePath))}_thumb.${ext}`;
+        const outputImagePath: string = path.join(compressImageData.outputDirPath, outputImageName);
 
         const outputTempFilePath: string = this.getTempFileName(outputImagePath);
 
@@ -75,17 +75,19 @@ export class ImageControlService {
         let newCompressedImage: СompressedImage = null;
 
         try {
-            const semiTransparentRedBuffer: Buffer = await sharp(inputImagePath).resize(1000, 1000).toBuffer();
+            const semiTransparentRedBuffer: Buffer = await sharp(compressImageData.inputImagePath).resize(1000, 1000).toBuffer();
 
             await fsPromises.writeFile(outputTempFilePath, semiTransparentRedBuffer);
             await fsPromises.rename(outputTempFilePath, outputImagePath);
 
             newCompressedImage = await this.compressedImageModel.create({
                 imageName: outputImageName,
-                imageDirPath: outputDirPath,
+                imageDirPath: compressImageData.outputDirPath,
                 originalName: inputImageName,
                 originalDirPath: inputImageDirPath,
-                originalSize: originalImageSize
+                originalSize: compressImageData.originalImageSize,
+                imageEventType: compressImageData.imageAdditionalData.imageEventType,
+                imageDescription: compressImageData.imageAdditionalData.imageDescription
             });
 
             await client.$add('compressedImages', newCompressedImage);
@@ -95,7 +97,7 @@ export class ImageControlService {
             console.error(error);
 
             const accessResults = await Promise.allSettled([
-                fsPromises.access(inputImagePath, fsPromises.constants.F_OK),
+                fsPromises.access(compressImageData.inputImagePath, fsPromises.constants.F_OK),
                 fsPromises.access(outputImagePath, fsPromises.constants.F_OK),
             ]);
 
@@ -104,7 +106,7 @@ export class ImageControlService {
             let imagePath: string = '';
 
             for (const result of accessImagesErrorResults) {
-                if ( accessResults.indexOf(result) === 0 ) imagePath = inputImagePath;
+                if ( accessResults.indexOf(result) === 0 ) imagePath = compressImageData.inputImagePath;
                 else if ( accessResults.indexOf(result) === 1 ) imagePath = outputImagePath;
 
                 await fsPromises.unlink(imagePath);
