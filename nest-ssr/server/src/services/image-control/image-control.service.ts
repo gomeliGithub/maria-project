@@ -95,8 +95,8 @@ export class ImageControlService {
             console.error(error);
 
             const accessResults = await Promise.allSettled([
-                await fsPromises.access(inputImagePath, fsPromises.constants.F_OK),
-                await fsPromises.access(outputImagePath, fsPromises.constants.F_OK),
+                fsPromises.access(inputImagePath, fsPromises.constants.F_OK),
+                fsPromises.access(outputImagePath, fsPromises.constants.F_OK),
             ]);
 
             const accessImagesErrorResults = accessResults.filter(result => result.status === 'fulfilled');

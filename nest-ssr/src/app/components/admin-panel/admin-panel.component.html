@@ -31,9 +31,33 @@
                             {{compressedImage.displayedOnGalleryPage | boolean}}
                         </td>
                         <td>
-                            <button class="btn btn-danger btn-sm" [attr.originalImageName]="compressedImage.originalName" (click)="deleteImage($event)">Удалить</button>
-                            <button class="btn btn-warning btn-sm" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'home'" (click)="changeImageDisplayTarget($event)">На главную</button>
-                            <button class="btn btn-warning btn-sm" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'gallery'" (click)="changeImageDisplayTarget($event)">В галерею</button>
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Управление
+                                </button>
+                                <ul class="dropdown-menu border-0 bg-transparent">
+                                    <li class="text-bg-danger rounded">
+                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" (click)="deleteImage($event)">
+                                            Удалить
+                                        </button>
+                                    </li>
+                                    <li *ngIf="compressedImage.displayedOnHomePage === 0" class="text-bg-warning rounded">
+                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'home'" (click)="changeImageDisplayTarget($event)">
+                                            На главную
+                                        </button>
+                                    </li>
+                                    <li *ngIf="compressedImage.displayedOnGalleryPage === 0" class="text-bg-warning rounded">
+                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'gallery'" (click)="changeImageDisplayTarget($event)">
+                                            В галерею
+                                        </button>
+                                    </li>
+                                    <li *ngIf="compressedImage.displayedOnHomePage === 1 || compressedImage.displayedOnGalleryPage === 1" class="text-bg-warning rounded">                            
+                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'original'" (click)="changeImageDisplayTarget($event)">
+                                            В архив
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                 </tbody>

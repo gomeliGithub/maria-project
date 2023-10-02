@@ -125,48 +125,6 @@ export class AdminPanelComponent implements OnInit {
         }
     }
 
-    public displayOnHomePage (event: MouseEvent) {
-        const imageButton: HTMLButtonElement = event.target as HTMLButtonElement;
-
-        if ( imageButton ) {
-            const originalImageName: string = imageButton.getAttribute('originalImageName');
-
-            if ( originalImageName ) {
-                this.spinnerTitle = this.appService.getTranslations('SPINNERTITLES.DISPLAYIMAGE');
-                this.spinnerHidden = false;
-
-                const headers: HttpHeaders = this.appService.createRequestHeaders();
-
-                this.http.post('/api/admin-panel/displayOnHomePage', {
-                    adminPanel: { originalImageName }
-                }, { responseType: 'text', headers, withCredentials: true }).subscribe(responseText => {
-                    this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef);
-                });
-            }
-        }
-    }
-
-    public displayOnGalleryPage (event: MouseEvent) {
-        const imageButton: HTMLButtonElement = event.target as HTMLButtonElement;
-
-        if ( imageButton ) {
-            const originalImageName: string = imageButton.getAttribute('originalImageName');
-
-            if ( originalImageName ) {
-                this.spinnerTitle = this.appService.getTranslations('SPINNERTITLES.DISPLAYIMAGE');
-                this.spinnerHidden = false;
-
-                const headers: HttpHeaders = this.appService.createRequestHeaders();
-
-                this.http.post('/api/admin-panel/displayOnGalleryPage', {
-                    adminPanel: { originalImageName }
-                }, { responseType: 'text', headers, withCredentials: true }).subscribe(responseText => {
-                    this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef);
-                });
-            }
-        }
-    }
-
     public changeImageDisplayTarget (event: MouseEvent) {
         const imageButton: HTMLButtonElement = event.target as HTMLButtonElement;
 

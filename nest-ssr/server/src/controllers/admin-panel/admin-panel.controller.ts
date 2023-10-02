@@ -41,7 +41,7 @@ export class AdminPanelController {
     async changeImageDisplayTarget (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> { 
         if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName || !requestBody.adminPanel.displayTargetPage
             || (requestBody.adminPanel.originalImageName && typeof requestBody.adminPanel.originalImageName !== 'string') 
-            || (requestBody.adminPanel.displayTargetPage && ( requestBody.adminPanel.displayTargetPage !== 'home' && requestBody.adminPanel.displayTargetPage !== 'gallery' ))
+            || (requestBody.adminPanel.displayTargetPage && ( requestBody.adminPanel.displayTargetPage !== 'home' && requestBody.adminPanel.displayTargetPage !== 'gallery' && requestBody.adminPanel.displayTargetPage !== 'original' ))
         ) throw new BadRequestException();
 
         return this.adminPanelService.changeImageDisplayTarget(request, requestBody);

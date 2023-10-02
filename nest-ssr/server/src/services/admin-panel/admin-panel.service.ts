@@ -61,13 +61,17 @@ export class AdminPanelService {
     }
 
     public async changeImageDisplayTarget (request: IRequest, requestBody: IRequestBody): Promise<string> {
-        const originalImagePath: string = await this.validateImageControlRequests(request, requestBody);
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+        const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
+
+        const originalImagePath: string = await this.validateImageControlRequests(request, requestBody, activeAdminLogin);
 
         if ( !originalImagePath ) return 'ERROR';
 
         const compressedImage: СompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true });
 
-        const displayTargetPage: 'home' | 'gallery' = requestBody.adminPanel.displayTargetPage;
+        const displayTargetPage: 'home' | 'gallery' | 'original' = requestBody.adminPanel.displayTargetPage;
 
         const updateValues: { [x: string]: any } = { };
 
@@ -75,49 +79,55 @@ export class AdminPanelService {
             updateValues.displayedOnHomePage = true;
 
             if ( compressedImage.displayedOnHomePage ) updateValues.displayedOnHomePage = false;
+            else if ( compressedImage.displayedOnGalleryPage ) updateValues.displayedOnGalleryPage = false;
         } else if ( displayTargetPage === 'gallery' ) {
             updateValues.displayedOnGalleryPage = true;
 
             if ( compressedImage.displayedOnGalleryPage ) updateValues.displayedOnGalleryPage = false;
+            else if ( compressedImage.displayedOnHomePage ) updateValues.displayedOnHomePage = false;
+        } else if ( displayTargetPage === 'original' ) {
+            if ( compressedImage.displayedOnHomePage ) updateValues.displayedOnHomePage = false;
+            else if ( compressedImage.displayedOnGalleryPage ) updateValues.displayedOnGalleryPage = false;
         }
 
+        const staticFilesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
+
+        const staticFilesHomeImagePath: string = path.join(staticFilesDirPath, 'home', compressedImage.imageName);
+        const staticFilesGalleryImagePath: string = path.join(staticFilesDirPath, 'gallery', compressedImage.imageName);
+        const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImage.imageName);
+
+        let oldPath: string = '';
+        let newPath: string = '';
+
+        const accessResults = await Promise.allSettled([
+            fsPromises.access(compressedImageOriginalPath, fsPromises.constants.F_OK),
+            fsPromises.access(staticFilesHomeImagePath, fsPromises.constants.F_OK),
+            fsPromises.access(staticFilesGalleryImagePath, fsPromises.constants.F_OK)
+        ]);
+
+        if ( accessResults[0].status === 'fulfilled' ) oldPath = compressedImageOriginalPath;
+        else if ( accessResults[1].status === 'fulfilled' ) oldPath = staticFilesHomeImagePath;
+        else if ( accessResults[2].status === 'fulfilled' ) oldPath = staticFilesGalleryImagePath;
+
+        if ( displayTargetPage === 'home' ) newPath = staticFilesHomeImagePath;
+        else if ( displayTargetPage === 'gallery' ) newPath = staticFilesGalleryImagePath;
+        else if ( displayTargetPage === 'original' ) newPath = compressedImageOriginalPath;
+        
         try {
+            await fsPromises.rename(oldPath, newPath);
             await this.compressedImageModel.update(updateValues, { where: { originalName: path.basename(originalImagePath) }});
 
-            let oldPath: string = path.join(compressedImage.imageDirPath, compressedImage.imageName);
-
-            let imagesThumbnailDirName: string = '';
-
-            if ( displayTargetPage === 'home' ) imagesThumbnailDirName = 'home';
-            else if ( displayTargetPage === 'gallery' ) imagesThumbnailDirName = 'gallery';
-
-            let newPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail', imagesThumbnailDirName, compressedImage.imageName);
-
-            const previousOldPath: string = oldPath;
-            const previousNewPath: string = newPath;
-
-            if ( displayTargetPage === 'home') {
-                if ( updateValues.displayedOnHomePage ) {
-                    oldPath = previousNewPath;
-                    newPath = previousOldPath;
-                }
-            } else if ( displayTargetPage === 'gallery') {
-                oldPath = previousNewPath;
-                newPath = previousOldPath;
-            }
-
-            await fsPromises.rename(oldPath, newPath);
-
             return 'SUCCESS';
-        } catch {
+        } catch (error) {
+            console.error (error);
+
             throw new InternalServerErrorException();
         }
     }
 
-    public async validateImageControlRequests (request: IRequest, requestBody: IRequestBody): Promise<string> {
+    public async validateImageControlRequests (request: IRequest, requestBody: IRequestBody, activeAdminLogin: string): Promise<string> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
-        const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
         const client: Admin | Member = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false });
 
         const originalImageName: string = requestBody.adminPanel.originalImageName;
