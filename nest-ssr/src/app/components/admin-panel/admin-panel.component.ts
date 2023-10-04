@@ -172,7 +172,7 @@ export class AdminPanelComponent implements OnInit {
 
                 this.http.post('/api/admin-panel/deleteImage', { 
                     adminPanel: { originalImageName }
-                }, { responseType: 'text', headers, withCredentials: true }).subscribe(responseText => {
+                }, { headers, responseType: 'text', withCredentials: true }).subscribe(responseText => {
                     this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef);
                 });
             }
@@ -194,7 +194,7 @@ export class AdminPanelComponent implements OnInit {
 
                 this.http.post('/api/admin-panel/changeImageDisplayTarget', {
                     adminPanel: { originalImageName, displayTargetPage }
-                }, { responseType: 'text', headers, withCredentials: true }).subscribe({
+                }, { headers, responseType: 'text', withCredentials: true }).subscribe({
                     next: responseText => this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef),
                     error: () => {
                         this.spinnerHidden = true;
