@@ -2,6 +2,8 @@ import { ComponentRef, ViewContainerRef } from "@angular/core";
 
 import { ModalComponent } from "src/app/components/modal/modal.component";
 
+import { Admin, Member } from "server/src/models/client.model";
+
 export interface IGetActiveClientOptions {
     includeFields?: string | string[];
     allowedIncludedFields?: string[];
@@ -19,8 +21,13 @@ export interface IDownloadOriginalImageOptions {
 }
 
 export interface IСompressedImageGetOptions {
-    includeFields?: string[];
-    includeCount?: boolean;
+    client?: Admin | Member; 
+    clientType?: 'admin' | 'member';
+    find?: {
+        searchFields?: string[];
+        includeFields?: string[];
+        rawResult?: boolean;
+    }
 }
 
 export interface IModalCreateOptions {

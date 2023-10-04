@@ -39,7 +39,8 @@ export class AppService {
         httpOnly: true,
         maxAge: ms(process.env.COOKIE_MAXAGE_TIME as string),
         sameSite: 'strict',
-        secure: false
+        secure: false,
+        priority: 'high'
     }
 
     public clientOriginalImagesDir: string = path.join(this.__dirname, 'originalImages');

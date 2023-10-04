@@ -1,4 +1,4 @@
-import { Component, ComponentRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, ComponentRef, ElementRef, HostListener, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
@@ -25,9 +25,14 @@ export class AdminPanelComponent implements OnInit {
         private readonly adminPanelService: AdminPanelService
     ) {
         this.uploadImageForm = new FormGroup({
-            'imageEventType': new FormControl(null, Validators.required),
+            'imageEventType': new FormControl("", [ Validators.required, this.imageEventTypeValidator ]),
             'image': new FormControl(null as FileList, [ Validators.required, this.imageValidator ]),
-            'imageDescription': new FormControl(null)
+            'imageDescription': new FormControl("", Validators.maxLength(20))
+        });
+
+        this.changeImageDataForm = new FormGroup({
+            'newImageEventType': new FormControl("", [ Validators.nullValidator, this.imageEventTypeValidator ]),
+            'newImageDescription': new FormControl("", Validators.maxLength(20)) 
         });
     }
 
@@ -36,6 +41,24 @@ export class AdminPanelComponent implements OnInit {
         image: FormControl<FileList>;
         imageDescription: FormControl<string>;
     }>;
+
+    public changeImageDataForm: FormGroup<{
+        newImageEventType: FormControl<string>;
+        newImageDescription: FormControl<string>;
+    }>;
+
+    @ViewChild('changeImageDataContainer', { static: false }) private readonly changeImageDataContainerViewRef: ElementRef<HTMLDivElement>;
+
+    @HostListener('document:mousedown', ['$event'])
+    public onGlobalClick(event): void {
+       if ( !this.changeImageDataContainerViewRef.nativeElement.contains(event.target) ) {
+            // clicked outside => close dropdown list
+            this.changeImageDataFormHidden = true;
+       }
+    }
+
+    public changeImageDataFormHidden: boolean = true;
+    public changingOriginalImageName: string;
 
     @ViewChild(ModalComponent) modalWindowComponent: ModalComponent
     @ViewChild('appModal', { read: ViewContainerRef, static: false })
@@ -78,6 +101,16 @@ export class AdminPanelComponent implements OnInit {
             this._imageFile = null;
 
             return { 'image' : true };
+        }
+
+        return null;
+    }
+
+    public imageEventTypeValidator (control: FormControl<string>): { [ s: string ]: boolean } | null {
+        const imageEventTypes: string[] = [ 'wedding', 'holiday', 'birthday' ];
+
+        if ( !imageEventTypes.includes(control.value) ) {
+            return { 'imageEventType': true, 'newImageEventType': true };
         }
 
         return null;
@@ -143,7 +176,7 @@ export class AdminPanelComponent implements OnInit {
                     this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef);
                 });
             }
-        }
+        } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
     }
 
     public changeImageDisplayTarget (event: MouseEvent) {
@@ -170,6 +203,42 @@ export class AdminPanelComponent implements OnInit {
                     }
                 });
             }
-        }
+        } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+    }
+
+    public changeImageData (): void {
+        const { newImageEventType, newImageDescription } = this.changeImageDataForm.value;
+
+        const originalImageName: string = this.changingOriginalImageName;
+
+        if ( originalImageName ) {
+            this.spinnerHidden = false;
+
+            const headers: HttpHeaders = this.appService.createRequestHeaders();
+
+            this.http.put('/api/admin-panel/changeImageData', {
+                adminPanel: { originalImageName, newImageEventType, newImageDescription }
+            }, { responseType: 'text', headers, withCredentials: true }).subscribe({
+                next: responseText => {
+                    this.changeImageDataFormHidden = true;
+                    this.spinnerHidden = true;
+
+                    this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef);
+
+                    this.changeImageDataForm.reset();
+                },
+                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+            });
+        } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+    }
+
+    public changeImageFormActivate (event: MouseEvent): void {
+        const imageButton: HTMLButtonElement = event.target as HTMLButtonElement;
+
+        if ( imageButton ) {
+            this.changeImageDataFormHidden = false;
+
+            this.changingOriginalImageName = imageButton.getAttribute('originalImageName');
+        } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
     }
 }

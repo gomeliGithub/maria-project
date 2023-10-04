@@ -1,7 +1,5 @@
 import { Request } from "express";
 
-import { СompressedImage } from "server/src/models/client.model";
-
 import { IClientSignData } from "./sign";
 
 export interface ICookieSerializeOptions {
@@ -34,6 +32,8 @@ export interface IRequestBody {
     adminPanel?: {
         originalImageName: string;
         displayTargetPage: 'home' | 'gallery' | 'original';
+        newImageEventType?: string; 
+        newImageDescription?: string;
     },
 
 
@@ -59,21 +59,19 @@ export interface IClientBrowser {
 }
 
 export interface ICompressedImage {
-    originalName: string;
-    originalSize: number;
-    uploadDate: Date;
-    displayedOnHomePage: number;
-    displayedOnGalleryPage: number;
+    imageName?: string;
+    originalName?: string;
+    originalSize?: number;
+    imageEventType?: string; 
+    imageDescription?: string;
+    uploadDate?: Date;
+    displayedOnHomePage?: number;
+    displayedOnGalleryPage?: number;
 }
 
 export interface IFullCompressedImageData {
     imagesList: ICompressedImage[];
     count: number;
-}
-
-export interface IСompressedImageGetResult {
-    rows: СompressedImage[];
-    count?: number;
 }
 
 export interface ICompressImageData {

@@ -11,9 +11,9 @@ import { ClientService } from '../../services/client/client.service';
 import { SignService } from '../../services/sign/sign.service';
 import { ImageControlService } from '../../services/image-control/image-control.service';
 
-import { Admin, Member } from '../../models/client.model';
+import { Admin, Member, СompressedImage } from '../../models/client.model';
 
-import { IClient, ICompressImageData, IRequest, IСompressedImageGetResult } from 'types/global';
+import { IClient, ICompressImageData, IRequest } from 'types/global';
 import { IClientGetOptions, ICreateImageDirsOptions, IGetActiveClientOptions, IСompressedImageGetOptions } from 'types/options';
 import { IWebSocketClient } from 'types/web-socket';
 
@@ -68,10 +68,10 @@ export class CommonService {
         return imageControlServiceRef.compressImage(request, compressImageData, activeClientLogin, options);
     }
 
-    public async getCompressedImages (client: Admin | Member, clientType: 'admin' | 'member', options?: IСompressedImageGetOptions): Promise<IСompressedImageGetResult> {
+    public async getCompressedImages (options: IСompressedImageGetOptions): Promise<СompressedImage[]> {
         const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
 
-        return imageControlServiceRef.get(client, clientType, options);
+        return imageControlServiceRef.get(options);
     }
 
     public async checkImageExists (imagePath: string): Promise<boolean> {

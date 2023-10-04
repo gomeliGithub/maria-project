@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 
+import { ICompressedImage } from 'types/global';
+
 @Component({
     selector: 'app-home',
     templateUrl: './home.component.html',
@@ -16,7 +18,7 @@ export class HomeComponent implements OnInit {
         private readonly clientService: ClientService
     ) { }
 
-    public compressedImagesList: Observable<string[][]>;
+    public compressedImagesList: Observable<ICompressedImage[][]>;
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
@@ -26,7 +28,7 @@ export class HomeComponent implements OnInit {
         }
     }
 
-    private _getCompressedImagesList (): Observable<string[][]> {
+    private _getCompressedImagesList (): Observable<ICompressedImage[][]> {
         return this.clientService.getCompressedImagesList('home').pipe(imagesList => this.compressedImagesList = imagesList);
     }
 }

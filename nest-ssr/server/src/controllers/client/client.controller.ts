@@ -3,6 +3,8 @@ import { BadRequestException, Controller, Get, Param } from '@nestjs/common';
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 
+import { ICompressedImage } from 'types/global';
+
 @Controller('/client')
 export class ClientController {
     constructor(
@@ -11,7 +13,7 @@ export class ClientController {
     ) { }
 
     @Get('/getCompressedImagesList/:imagesType')
-    async getCompressedImagesList (@Param('imagesType') imagesType: string): Promise<string[] | string[][]> {
+    async getCompressedImagesList (@Param('imagesType') imagesType: string): Promise<string[] | ICompressedImage[][]> {
         const thumbnailImagesDirPaths: string[] = [ 'home', 'gallery' ];
 
         if ( !thumbnailImagesDirPaths.includes(imagesType.substring(1)) ) throw new BadRequestException();

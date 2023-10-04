@@ -8,11 +8,14 @@ import path from 'path';
 
 import { Response } from 'express';
 
+import { CommonModule } from '../../modules/common.module';
+
 import { AppService } from '../../app.service';
+import { CommonService } from '../common/common.service';
 
 import { Admin, Member, СompressedImage } from '../../models/client.model';
 
-import { IRequest } from 'types/global';
+import { ICompressedImage, IRequest } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions } from 'types/options';
 
 @Injectable()
@@ -100,12 +103,21 @@ export class ClientService {
         }
     }
 
-    public async getCompressedImagesList (imagesType: 'home' | 'gallery'): Promise<string[] | string[][]> {
+    public async getCompressedImagesList (imagesType: 'home' | 'gallery'): Promise<string[] | ICompressedImage[][]> {
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        
         const imagesList: string[] = await fsPromises.readdir(path.join(this.compressedImagesDirPath, imagesType));
 
-        let reducedImagesList: string[][] = null;
+        const compressedImages = await commonServiceRef.getCompressedImages({
+            find: {
+                searchFields: imagesList,
+                includeFields: [ 'imageName', 'imageEventType', 'imageDescription', 'uploadDate' ]
+            }
+        }) as unknown as ICompressedImage[];
 
-        if ( imagesType === 'home' ) reducedImagesList = imagesList.reduce((previousImage: string[][], currentImage, currentIndex) => {
+        let reducedImagesList: ICompressedImage[][] = null;
+
+        if ( imagesType === 'home' ) reducedImagesList = compressedImages.reduce((previousImage: ICompressedImage[][], currentImage, currentIndex) => {
             if ( currentIndex === 0 ) {
                 previousImage[currentIndex] = [];
 

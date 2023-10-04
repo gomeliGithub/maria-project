@@ -8,7 +8,7 @@
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <div class="collapse navbar-collapse" id="navbarNavDropdown" [attr.activeClient]="activeClient">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
@@ -20,7 +20,7 @@
                             Галерея
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li *ngIf="activeClientLogin" class="nav-item">
                         <a class="nav-link" routerLink="/adminPanel" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                             Панель администратора
                         </a>
@@ -43,7 +43,7 @@
                         </ul>
                     </li>
                 </ul>
-                <div class="navbar-text fw-bold" [attr.activeClient]="activeClient">
+                <div class="navbar-text fw-bold">
                     <span *ngIf="activeClientLogin; else noActiveClientBlock" class="">
                         {{activeClientLogin}} - {{activeClientFullName}}
                     </span>

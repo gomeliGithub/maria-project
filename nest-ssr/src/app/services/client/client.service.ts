@@ -7,7 +7,7 @@ import * as bcryptjs from 'bcryptjs';
 
 import { AppService } from '../../app.service';
 
-import { IClientBrowser } from 'types/global';
+import { IClientBrowser, ICompressedImage } from 'types/global';
 import { IClientAccessData, IClientSignData } from 'types/sign';
 
 @Injectable({
@@ -63,11 +63,11 @@ export class ClientService {
         return this.http.get('/api/sign/getBcryptHashSaltrounds', { responseType: 'text', withCredentials: true });
     }
 
-    public getCompressedImagesList (imagesType: 'home'): Observable<string[][]>
+    public getCompressedImagesList (imagesType: 'home'): Observable<ICompressedImage[][]>
     public getCompressedImagesList (imagesType: 'gallery'): Observable<string[]>
-    public getCompressedImagesList (imagesType: 'home' | 'gallery'): Observable<string[] | string[][]> {
-        return this.http.get(`/api/client/getCompressedImagesList/:${ imagesType }`).pipe<string[] | string[][]>(imagesList => {
-            if ( imagesType === 'home' ) return imagesList as Observable<string[][]>;
+    public getCompressedImagesList (imagesType: 'home' | 'gallery'): Observable<string[] | ICompressedImage[][]> {
+        return this.http.get(`/api/client/getCompressedImagesList/:${ imagesType }`).pipe<string[] | ICompressedImage[][]>(imagesList => {
+            if ( imagesType === 'home' ) return imagesList as Observable<ICompressedImage[][]>;
             else if ( imagesType === 'gallery' ) return imagesList as Observable<string[]>;
         });
     }

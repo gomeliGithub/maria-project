@@ -75,8 +75,8 @@ export class AdminPanelService {
 
         const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin, { rawResult: false });
 
-        const compressedImageGetResult = await commonServiceRef.getCompressedImages(client, client.dataValues.type);
-        const compressedImage: СompressedImage = compressedImageGetResult ? compressedImageGetResult.rows.find(image => image.originalName === path.basename(newOriginalImagePath)) : null;
+        const compressedImages: СompressedImage[] = await commonServiceRef.getCompressedImages({ client, clientType: client.dataValues.type });
+        const compressedImage: СompressedImage = compressedImages.length !== 0 ? compressedImages.find(image => image.originalName === path.basename(newOriginalImagePath)) : null;
 
         if ( compressedImage ) return 'FILEEXISTS';
     
@@ -176,12 +176,15 @@ export class AdminPanelService {
 
         const client: Admin = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false });
 
-        const { rows, count } = await commonServiceRef.getCompressedImages(client, 'admin', { 
-            includeFields: [ 'originalName', 'originalSize', 'uploadDate', 'displayedOnHomePage', 'displayedOnGalleryPage' ],
-            includeCount: true
+        const compressedImages: СompressedImage[] = await commonServiceRef.getCompressedImages({ 
+            client, 
+            clientType: 'admin', 
+            find: { 
+                includeFields: [ 'originalName', 'originalSize', 'imageEventType', 'imageDescription', 'uploadDate', 'displayedOnHomePage', 'displayedOnGalleryPage' ] 
+            }
         });
 
-        const imagesList: IFullCompressedImageData = { imagesList: rows as unknown as ICompressedImage[], count };
+        const imagesList: IFullCompressedImageData = { imagesList: compressedImages as unknown as ICompressedImage[], count: compressedImages.length };
 
         return imagesList;
     }
@@ -195,12 +198,16 @@ export class AdminPanelService {
         const originalImageName: string = requestBody.adminPanel.originalImageName;
         const originalImagePath: string = path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName);
 
-        const { rows } = await commonServiceRef.getCompressedImages(client, 'admin', { includeFields: [ 'originalName' ] });
+        const compressedImages: СompressedImage[] = await commonServiceRef.getCompressedImages({ 
+            client, 
+            clientType: 'admin', 
+            find : { includeFields: [ 'originalName' ] }});
 
-        const compressedImageInstance: СompressedImage = rows.find(compressedImage => compressedImage.originalName === originalImageName);
+        const compressedImageInstance: СompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
+
         const imageExists: boolean = await commonServiceRef.checkImageExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
 
-        if ( !compressedImageInstance || !imageExists ) return 'ERROR';
+        if ( !compressedImageInstance || !imageExists ) throw new BadRequestException();
 
         const deleteImageResult: boolean = await commonServiceRef.deleteImage(request, originalImagePath, activeAdminLogin);
 
@@ -213,8 +220,6 @@ export class AdminPanelService {
         const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
 
         const originalImagePath: string = await this.validateImageControlRequests(request, requestBody, activeAdminLogin);
-
-        if ( !originalImagePath ) return 'ERROR';
 
         const compressedImage: СompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true });
 
@@ -284,13 +289,38 @@ export class AdminPanelService {
         const originalImageName: string = requestBody.adminPanel.originalImageName;
         const originalImagePath: string = path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName);
 
-        const { rows } = await commonServiceRef.getCompressedImages(client, 'admin', { includeFields: [ 'originalName' ] });
+        const compressedImages: СompressedImage[] = await commonServiceRef.getCompressedImages({ 
+            client, 
+            clientType: 'admin', 
+            find: { includeFields: [ 'originalName' ] }
+        });
 
-        const compressedImageInstance: СompressedImage = rows.find(compressedImage => compressedImage.originalName === originalImageName);
+        const compressedImageInstance: СompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
+
         const imageExists: boolean = await commonServiceRef.checkImageExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
 
-        if ( !compressedImageInstance || !imageExists ) return null;
+        if ( !compressedImageInstance || !imageExists ) throw new BadRequestException();
         
         return originalImagePath;
+    }
+
+    public async changeImageData (request: IRequest, requestBody: IRequestBody): Promise<string> {
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+        const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
+
+        await this.validateImageControlRequests(request, requestBody, activeAdminLogin);
+
+        const originalImageName: string = requestBody.adminPanel.originalImageName;
+
+        const updateValues: { [x: string]: any } = { };
+        const { newImageEventType, newImageDescription } = requestBody.adminPanel;
+
+        if ( newImageEventType ) updateValues.imageEventType = newImageEventType;
+        if ( newImageDescription ) updateValues.imageDescription = newImageDescription;
+
+        await this.compressedImageModel.update(updateValues, { where: { originalName: originalImageName } });
+
+        return 'SUCCESS';
     }
 }

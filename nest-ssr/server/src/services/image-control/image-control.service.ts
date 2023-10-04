@@ -16,7 +16,7 @@ import { CommonService } from '../common/common.service';
 
 import { Admin, Member, СompressedImage } from '../../models/client.model';
 
-import { ICompressImageData, IRequest, IСompressedImageGetResult } from 'types/global';
+import { ICompressImageData, IRequest } from 'types/global';
 import { ICreateImageDirsOptions, IСompressedImageGetOptions } from 'types/options';
 
 @Injectable()
@@ -28,20 +28,20 @@ export class ImageControlService {
         private readonly compressedImageModel: typeof СompressedImage
     ) { }
 
-    public async get (client: Admin | Member, clientType: 'admin' | 'member', options?: IСompressedImageGetOptions): Promise<IСompressedImageGetResult> {
+    public async get (options: IСompressedImageGetOptions): Promise<СompressedImage[]> {
         const findOptions: AssociationGetOptions = { raw: true }
 
-        if ( options && options.includeFields ) findOptions.attributes = options.includeFields;
+        if ( options && options.find.includeFields ) findOptions.attributes = options.find.includeFields;
+        if ( options && options.hasOwnProperty('rawResult') ) findOptions.raw = options.find.rawResult;
 
         let compressedImages: СompressedImage[] = null;
 
-        if ( clientType === 'admin' ) compressedImages = await (client as Admin).$get('compressedImages', findOptions);
-        else if ( clientType === 'member' ) compressedImages = await (client as Member).$get('compressedImages', findOptions);
+        if ( options.client ) {
+            if ( options.clientType === 'admin' ) compressedImages = await (options.client as Admin).$get('compressedImages', findOptions);
+            else if ( options.clientType === 'member' ) compressedImages = await (options.client as Member).$get('compressedImages', findOptions);
+        } else compressedImages = await this.compressedImageModel.findAll(findOptions);
 
-        if ( options ) {
-            if ( options.includeCount ) return { rows: compressedImages, count: await client.$count('compressedImages') };
-            else return { rows: compressedImages };
-        }
+        return compressedImages;
     }
 
     public async compressImage (request: IRequest, compressImageData: ICompressImageData, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
