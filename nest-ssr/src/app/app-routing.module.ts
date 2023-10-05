@@ -17,7 +17,7 @@ const routes: Routes = [
     { path: 'sign/:op', component: ClientComponent },
     { path: 'signUp', redirectTo: '/sign/up', pathMatch: 'full' },
     { path: 'signIn', redirectTo: '/sign/in', pathMatch: 'full' },
-    { path: '*', component: NotFoundComponent }
+    { path: '**', component: NotFoundComponent }
 ];
 
 @NgModule({

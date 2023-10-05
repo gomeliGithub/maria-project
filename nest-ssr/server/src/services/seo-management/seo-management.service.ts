@@ -44,7 +44,7 @@ export class SeoManagementService {
         return components;
     }
 
-    // @Interval(10000)
+    @Interval(10000)
     public async createSitemap (): Promise<void> {
         const componentsInfo: IComponentInfo[] = await this.getComponentsInfo(path.join(process.cwd(), 'src'), [] as IComponentInfo[]);
 
