@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { SequelizeModule } from '@nestjs/sequelize';
 import mysql2 from 'mysql2';
 import { JwtModule, JwtSecretRequestType } from '@nestjs/jwt';
@@ -34,6 +35,7 @@ import { Admin, Member, СompressedImage } from './models/client.model';
             envFilePath: [ 'server/config/.env.development', 'server/config/.env.production' ],
             isGlobal: true
         }),
+        ScheduleModule.forRoot(),
         SequelizeModule.forRootAsync({
             useFactory: () => ({
                 dialect: 'mysql',

@@ -85,3 +85,8 @@ export interface IImageAdditionalData {
     imageEventType: string;
     imageDescription?: string;
 }
+
+export interface IComponentInfo {
+    url: string;
+    changeTime: Date;
+}

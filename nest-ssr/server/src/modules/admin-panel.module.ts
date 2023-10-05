@@ -3,13 +3,13 @@ import { SequelizeModule } from '@nestjs/sequelize';
 
 import { AppService } from '../app.service';
 import { AdminPanelService } from '../services/admin-panel/admin-panel.service';
+import { SeoManagementService } from '../services/seo-management/seo-management.service';
 import { AdminPanelController } from '../controllers/admin-panel/admin-panel.controller';
 
 import { СompressedImage } from '../models/client.model';
-
 @Module({
     imports: [ SequelizeModule.forFeature([ СompressedImage ]) ],
-    providers: [ AppService, AdminPanelService ],
+    providers: [ AppService, AdminPanelService, SeoManagementService ],
     controllers: [AdminPanelController],
     exports: [AdminPanelService]
 })

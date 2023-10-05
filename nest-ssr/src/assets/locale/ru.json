@@ -6,7 +6,13 @@
 		"GALLERY": "Галерея",
 		"ADMINPANEL": "Панель администратора",
 		"SIGNUP": "Регистрация",
-		"SIGNIN": "Вход"
+		"SIGNIN": "Вход",
+		"NOTFOUND": "Не найдено"
+	},
+	"NOTFOUNDPAGE": {
+		"MAINTEXT": "Страница, которую вы ищете, не существует.",
+		"SECONDARYTEXT": "Страница не найдена.",
+		"GOHOMETEXT": "На главную"
 	},
   	"CLIENTMENU": {
     	"LOGINTEXT": "Войти",

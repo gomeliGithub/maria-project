@@ -16,6 +16,6 @@ import { BooleanPipe } from '../pipes/boolean/boolean.pipe';
         ReactiveFormsModule,
         TranslateModule.forChild()
     ],
-    providers: [AdminPanelService]
+    providers: [ AdminPanelService ]
 })
 export class AdminPanelModule { }

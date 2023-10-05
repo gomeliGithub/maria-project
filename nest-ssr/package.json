@@ -36,6 +36,7 @@
         "@nestjs/jwt": "^10.1.1",
         "@nestjs/ng-universal": "^8.0.0",
         "@nestjs/platform-express": "^10.2.6",
+        "@nestjs/schedule": "^3.0.4",
         "@nestjs/sequelize": "^10.0.0",
         "@nguniversal/express-engine": "^15.2.1",
         "@ngx-translate/core": "^15.0.0",

@@ -15,6 +15,7 @@ import { ClientModule } from './modules/client.module';
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
 import { ModalComponent } from './components/modal/modal.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 import { MissingTranslationService } from './missingTranslationService';
 
@@ -27,7 +28,8 @@ import { environment } from '../environments/environment';
         AppComponent,
         HomeComponent,
         GalleryComponent,
-        ModalComponent
+        ModalComponent,
+        NotFoundComponent
     ],
     imports: [
         BrowserModule.withServerTransition({ appId: 'serverApp' }),
