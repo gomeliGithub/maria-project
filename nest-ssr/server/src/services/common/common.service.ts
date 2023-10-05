@@ -11,7 +11,7 @@ import { ClientService } from '../../services/client/client.service';
 import { SignService } from '../../services/sign/sign.service';
 import { ImageControlService } from '../../services/image-control/image-control.service';
 
-import { Admin, Member, СompressedImage } from '../../models/client.model';
+import { Admin, Member, ClientСompressedImage } from '../../models/client.model';
 
 import { IClient, ICompressImageData, IRequest } from 'types/global';
 import { IClientGetOptions, ICreateImageDirsOptions, IGetActiveClientOptions, IСompressedImageGetOptions } from 'types/options';
@@ -68,7 +68,7 @@ export class CommonService {
         return imageControlServiceRef.compressImage(request, compressImageData, activeClientLogin, options);
     }
 
-    public async getCompressedImages (options: IСompressedImageGetOptions): Promise<СompressedImage[]> {
+    public async getCompressedImages (options: IСompressedImageGetOptions): Promise<ClientСompressedImage[]> {
         const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
 
         return imageControlServiceRef.get(options);

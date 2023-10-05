@@ -14,7 +14,7 @@ import { CommonModule } from '../../modules/common.module';
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 
-import { Admin, Member, СompressedImage } from '../../models/client.model';
+import { Admin, Member, ClientСompressedImage } from '../../models/client.model';
 
 import { ICompressImageData, IRequest } from 'types/global';
 import { ICreateImageDirsOptions, IСompressedImageGetOptions } from 'types/options';
@@ -24,17 +24,17 @@ export class ImageControlService {
     constructor (
         private readonly appService: AppService,
 
-        @InjectModel(СompressedImage) 
-        private readonly compressedImageModel: typeof СompressedImage
+        @InjectModel(ClientСompressedImage) 
+        private readonly compressedImageModel: typeof ClientСompressedImage
     ) { }
 
-    public async get (options: IСompressedImageGetOptions): Promise<СompressedImage[]> {
+    public async get (options: IСompressedImageGetOptions): Promise<ClientСompressedImage[]> {
         const findOptions: AssociationGetOptions = { raw: true }
 
         if ( options && options.find.includeFields ) findOptions.attributes = options.find.includeFields;
         if ( options && options.hasOwnProperty('rawResult') ) findOptions.raw = options.find.rawResult;
 
-        let compressedImages: СompressedImage[] = null;
+        let compressedImages: ClientСompressedImage[] = null;
 
         if ( options.client ) {
             if ( options.clientType === 'admin' ) compressedImages = await (options.client as Admin).$get('compressedImages', findOptions);
@@ -72,7 +72,7 @@ export class ImageControlService {
 
         const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin, { rawResult: false });
 
-        let newCompressedImage: СompressedImage = null;
+        let newCompressedImage: ClientСompressedImage = null;
 
         try {
             const semiTransparentRedBuffer: Buffer = await sharp(compressImageData.inputImagePath).resize(1000, 1000).toBuffer();
@@ -168,7 +168,7 @@ export class ImageControlService {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, { rawResult: false });
-        const compressedImage: СompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(imagePath) } });
+        const compressedImage: ClientСompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(imagePath) } });
 
         try {
             const compressedImageName: string = `${path.basename(imagePath, path.extname(imagePath))}_thumb${ path.extname(imagePath) }`;
