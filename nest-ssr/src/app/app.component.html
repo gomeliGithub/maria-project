@@ -43,9 +43,10 @@
                         </ul>
                     </li>
                 </ul>
-                <div class="navbar-text fw-bold">
-                    <span *ngIf="activeClientLogin; else noActiveClientBlock" class="">
-                        {{activeClientLogin}} - {{activeClientFullName}}
+                <div class="navbar-text">
+                    <span *ngIf="activeClientLogin; else noActiveClientBlock">
+                        <span class="text-success fw-bold">{{activeClientLogin}}</span>
+                        <small class="d-block">{{activeClientFullName}}</small>
                     </span>
                     <ng-template #noActiveClientBlock>  
                         <span class="text-warning">Гость</span>

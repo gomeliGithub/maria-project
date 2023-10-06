@@ -43,11 +43,11 @@ export class WebSocketService {
 
         this._modal.onDestroy(() => this._connection ? this._connection.close() : null);
 
-        this._keepAliveTimer = setInterval(() => {
-            this.send('KEEP_ME_ALIVE');
-        }, 5000);
-
         this._connection.onopen = () => {
+            this._keepAliveTimer = setInterval(() => {
+                this.send('KEEP_ME_ALIVE');
+            }, 5000);
+            
             this._progressElement = document.getElementById('progressBar') as HTMLDivElement;
 
             this.sendImage(slicedImageData, 0);

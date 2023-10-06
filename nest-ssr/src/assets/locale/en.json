@@ -49,7 +49,36 @@
 		"BOOLEANFALSETEXT": "No",
 		"NOIMAGESMESSAGE": "No images uploaded yet",
 		"DELETEIMAGESUCCESSMESSAGE": "Image deleted successfully",
-		"MAXCOUNTONHOMEPAGEMESSAGE": "Maximum number of images on the home page"
+		"MAXCOUNTONHOMEPAGEMESSAGE": "Maximum number of images on the home page",
+		"TABLECOLTITLES": {
+			"ORIGINALNAME": "Original name",
+			"ORIGINALSIZE": "Original image size",
+			"IMAGEEVENTTYPE": "Event type",
+			"IMAGEEVENTDESCRIPTION": "Image description",
+			"UPLOADAT": "Upload at",
+			"ONHOMEPAGE": "Displayed on Home page",
+			"ONGALLERYPAGE": "Displayed on Gallery page"
+		},
+		"IMAGECONTROLTEXT": {
+			"TITLE": "Control",
+			"CHANGEBUTTON": "Change event type or description",
+			"DELETEBUTTON": "Delete",
+			"MOVETOHOMEPAGEBUTTON": "To the home",
+			"MOVETOGALLERYPAGEBUTTON": "To the gallery",
+			"MOVETOARCHIVEBUTTON": "To the archive"
+		},
+		"CHANGEIMAGEDATATEXT": {
+			"EVENTTYPE": "Event type",
+			"DESCRIPTION": "Individual image description",
+			"CHANGEBUTTON": "Change"
+		},
+		"UPLOADIMAGETEXT": {
+			"EVENTTYPE": "Event type",
+			"INVALIDEVENTTYPE": "Event type not selected",
+			"INVALIDSELECTIMAGE": "No image selected",
+			"DESCRIPTION": "Individual image description",
+			"BUTTON": "Upload new image"
+		}
 	},
 	"IMAGEEVENTTYPES": {
 		"WEDDING": "Wedding",

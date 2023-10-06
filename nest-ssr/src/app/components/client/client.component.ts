@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, ComponentRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+
+import { ModalComponent } from '../modal/modal.component';
 
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
@@ -32,6 +34,11 @@ export class ClientComponent implements OnInit {
         this.signForm = new FormGroup(formControls);
     }
 
+    @ViewChild(ModalComponent) modalComponent: ModalComponent
+    @ViewChild('appModal', { read: ViewContainerRef, static: false })
+    private readonly modalViewRef: ViewContainerRef;
+    private readonly modalComponentRef: ComponentRef<ModalComponent>;
+
     public signForm: FormGroup<{
         clientLogin: FormControl<string>;
         clientPassword: FormControl<string>;
@@ -41,22 +48,34 @@ export class ClientComponent implements OnInit {
 
     public signOp: 'up' | 'in';
 
+    public url: string;
+
     ngOnInit (): void {
+        this.router.events.subscribe((evt) => {
+            if ( !(evt instanceof NavigationEnd) ) return;
+            else this.url = evt.url;
+            
+            if ( this.url === '/signUp' || this.url === '/signIn') window.location.reload();
+        });
+        
         if ( this.appService.checkIsPlatformBrowser() ) {
-            this.appService.getTranslations(`PAGETITLES.${this.signOp === 'up' ? 'SIGNUP' : 'SIGNIN'}`, true).subscribe(translation => this.appService.setTitle(translation));
+            this.appService.getTranslations(`PAGETITLES.${ this.signOp === 'up' ? 'SIGNUP' : 'SIGNIN' }`, true).subscribe({
+                next: translation => this.appService.setTitle(translation),
+                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+            });
         }
     }
 
     public clientLoginValidator (control: FormControl<'string'>): { [ s: string ]: boolean } | null {
         const loginPattern: RegExp = /^[a-zA-Z](.[a-zA-Z0-9_-]*)$/;
 
-        if ( !loginPattern.test(control.value) ) return { "clientLogin": true };
+        if ( !loginPattern.test(control.value) ) return { 'clientLogin': true };
 
         return null;
     }
 
     public clientPasswordValidator (control: FormControl<string>): { [ s: string ]: boolean } | null {
-        if ( control.value.length < 4 ) return { "clientPassword": true };
+        if ( control.value.length < 4 ) return { 'clientPassword': true };
 
         return null;
     }
@@ -68,6 +87,6 @@ export class ClientComponent implements OnInit {
     }
 
     public sign (): void {
-        return this.clientService.sign(this.signForm.value, this.signOp);
+        return this.clientService.sign(this.modalViewRef, this.modalComponentRef, this.signForm.value, this.signOp);
     }
 }

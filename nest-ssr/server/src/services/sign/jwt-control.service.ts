@@ -47,9 +47,9 @@ export class JwtControlService {
     public async addRevokedToken (token: string): Promise<void> {
         const revokedToken: JWT_token = await this.checkRevokedTokenIs(token);
 
-        if ( !revokedToken ) {
+        if ( revokedToken ) {
             await revokedToken.update({ revokation_date: new Date(), revoked: true });
-        } else throw new UnauthorizedException();
+        }
     }
 
     public async saveToken (token: string): Promise<void> {

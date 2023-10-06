@@ -48,7 +48,36 @@
 		"BOOLEANFALSETEXT": "Нет",
 		"NOIMAGESMESSAGE": "Загруженных изображений пока нет",
 		"DELETEIMAGESUCCESSMESSAGE": "Изображение успешно удалено",
-		"MAXCOUNTONHOMEPAGEMESSAGE": "Максимальное количество изображений на главной странице"
+		"MAXCOUNTONHOMEPAGEMESSAGE": "Максимальное количество изображений на главной странице",
+		"TABLECOLTITLES": {
+			"ORIGINALNAME": "Оригинальное имя",
+			"ORIGINALSIZE": "Размер оригинального изображения",
+			"IMAGEEVENTTYPE": "Тип события",
+			"IMAGEEVENTDESCRIPTION": "Описание фото",
+			"UPLOADAT": "Загружен",
+			"ONHOMEPAGE": "Отображён на главной",
+			"ONGALLERYPAGE": "Отображён на галерее"
+		},
+		"IMAGECONTROLTEXT": {
+			"TITLE": "Управление",
+			"CHANGEBUTTON": "Изменить тип события или описание",
+			"DELETEBUTTON": "Удалить",
+			"MOVETOHOMEPAGEBUTTON": "На главную",
+			"MOVETOGALLERYPAGEBUTTON": "В галерею",
+			"MOVETOARCHIVEBUTTON": "В архив"
+		},
+		"CHANGEIMAGEDATATEXT": {
+			"EVENTTYPE": "Тип события",
+			"DESCRIPTION": "Индивидуальное описание фото",
+			"CHANGEBUTTON": "Изменить"
+		},
+		"UPLOADIMAGETEXT": {
+			"EVENTTYPE": "Тип события",
+			"INVALIDEVENTTYPE": "Не выбран тип события",
+			"INVALIDSELECTIMAGE": "Не выбрано изображение",
+			"DESCRIPTION": "Индивидуальное описание фото",
+			"BUTTON": "Загрузить новое изображение"
+		}
 	},
 	"IMAGEEVENTTYPES": {
 		"WEDDING": "Свадьба",

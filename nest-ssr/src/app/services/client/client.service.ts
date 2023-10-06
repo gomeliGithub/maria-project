@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
+import { ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
 import * as bcryptjs from 'bcryptjs';
+
+import { ModalComponent } from '../../components/modal/modal.component';
 
 import { AppService } from '../../app.service';
 
@@ -26,7 +28,7 @@ export class ClientService {
         ).pipe(activeClient => activeClient as Observable<IClientBrowser>);
     }
 
-    public sign (signFormValue: Partial<{
+    public sign (modalViewRef: ViewContainerRef, modalComponentRef: ComponentRef<ModalComponent>, signFormValue: Partial<{
         clientLogin: string;
         clientPassword: string;
         clientFullName: string;
@@ -42,19 +44,27 @@ export class ClientService {
                 password: signOp === 'up' ? await bcryptjs.hash(clientPassword, parseInt(bcrypt_hash_saltrounds, 10)) : clientPassword
             }
 
+            const headers: HttpHeaders = this.appService.createRequestHeaders();
+
             if ( signOp === 'up') {
                 clientData.fullName = clientFullName;
                 clientData.email = clientEmail;
 
                 this.http.post('/api/sign/up', { 
                     sign: { clientData }
-                }, { withCredentials: true }).subscribe(() => this.appService.reloadComponent(false, '/signIn'));
+                }, { headers, withCredentials: true }).subscribe({
+                    next: () => this.appService.reloadComponent(false, '/signIn'),
+                    error: () => this.appService.createErrorModal(modalViewRef, modalComponentRef)
+                });
             } else this.http.put('/api/sign/in', { 
                 sign: { clientData }
-            }, { withCredentials: true }).pipe(accessData => accessData as Observable<IClientAccessData>).subscribe(accessData => {
-                localStorage.setItem('access_token', accessData.access_token);
+            }, { headers, withCredentials: true }).pipe(accessData => accessData as Observable<IClientAccessData>).subscribe({
+                next: accessData => {
+                    localStorage.setItem('access_token', accessData.access_token);
 
-                this.appService.reloadComponent(false, '');
+                    this.appService.reloadComponent(false, '');
+                },
+                error: () => this.appService.createErrorModal(modalViewRef, modalComponentRef)
             });
         });
     }

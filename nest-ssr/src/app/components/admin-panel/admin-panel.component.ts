@@ -49,8 +49,8 @@ export class AdminPanelComponent implements OnInit {
 
     @ViewChild('changeImageDataContainer', { static: false }) private readonly changeImageDataContainerViewRef: ElementRef<HTMLDivElement>;
 
-    @HostListener('document:mousedown', ['$event'])
-    public onGlobalClick(event): void {
+    @HostListener('document:mousedown', [ '$event' ])
+    public onGlobalClick (event): void {
        if ( !this.changeImageDataContainerViewRef.nativeElement.contains(event.target) ) {
             // clicked outside => close dropdown list
             this.changeImageDataFormHidden = true;
@@ -79,9 +79,12 @@ export class AdminPanelComponent implements OnInit {
         if ( this.appService.checkIsPlatformBrowser() ) {
             this.appService.getTranslations('PAGETITLES.ADMINPANEL', true).subscribe(translation => this.appService.setTitle(translation));
 
-            this.adminPanelService.getFullCompressedImagesData().pipe<IFullCompressedImageData>(imagesList => this.getFullCompressedImagesDataResult = imagesList).pipe(map(imagesList => imagesList)).subscribe(imagesList => {
-                this.fullCompressedImagesList = imagesList.imagesList;
-                this.fullCompressedImagesListCount = imagesList.count;
+            this.adminPanelService.getFullCompressedImagesData().pipe<IFullCompressedImageData>(imagesList => this.getFullCompressedImagesDataResult = imagesList).pipe(map(imagesList => imagesList)).subscribe({
+                next: imagesList => {
+                    this.fullCompressedImagesList = imagesList.imagesList;
+                    this.fullCompressedImagesListCount = imagesList.count;
+                },
+                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
         }
     }
@@ -172,8 +175,9 @@ export class AdminPanelComponent implements OnInit {
 
                 this.http.post('/api/admin-panel/deleteImage', { 
                     adminPanel: { originalImageName }
-                }, { headers, responseType: 'text', withCredentials: true }).subscribe(responseText => {
-                    this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef);
+                }, { headers, responseType: 'text', withCredentials: true }).subscribe({
+                    next: responseText => this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef),
+                    error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
                 });
             }
         } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);

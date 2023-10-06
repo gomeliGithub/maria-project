@@ -5,13 +5,13 @@
                 <thead>
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Оригинальное имя</th>
-                        <th scope="col">Размер оригинального изображения</th>
-                        <th scope="col">Тип события</th>
-                        <th scope="col">Описание фото</th>
-                        <th scope="col">Загружен</th>
-                        <th scope="col">Отображён на главной</th>
-                        <th scope="col">Отображён на галерее</th>
+                        <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALNAME' | translate }}</th>
+                        <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALSIZE' | translate }}</th>
+                        <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEEVENTTYPE' | translate }}</th>
+                        <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEEVENTDESCRIPTION' | translate }}</th>
+                        <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.UPLOADAT' | translate }}</th>
+                        <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ONHOMEPAGE' | translate }}</th>
+                        <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ONGALLERYPAGE' | translate }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,32 +41,32 @@
                         <td>
                             <div class="dropdown">
                                 <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Управление
+                                    {{ 'ADMINPANEL.IMAGECONTROLTEXT.TITLE' | translate }}
                                 </button>
                                 <ul class="dropdown-menu border-0 bg-transparent">
                                     <li class="text-bg-secondary rounded">
                                         <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" (click)="changeImageFormActivate($event)">
-                                            Изменить тип события или описание
+                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.CHANGEBUTTON' | translate }}
                                         </button>
                                     </li>
                                     <li class="text-bg-danger rounded">
                                         <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" (click)="deleteImage($event)">
-                                            Удалить
+                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.DELETEBUTTON' | translate }}
                                         </button>
                                     </li>
                                     <li *ngIf="compressedImage.displayedOnHomePage === 0" class="text-bg-warning rounded">
                                         <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'home'" (click)="changeImageDisplayTarget($event)">
-                                            На главную
+                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.MOVETOHOMEPAGEBUTTON' | translate }}
                                         </button>
                                     </li>
                                     <li *ngIf="compressedImage.displayedOnGalleryPage === 0" class="text-bg-warning rounded">
                                         <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'gallery'" (click)="changeImageDisplayTarget($event)">
-                                            В галерею
+                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.MOVETOGALLERYPAGEBUTTON' | translate }}
                                         </button>
                                     </li>
                                     <li *ngIf="compressedImage.displayedOnHomePage === 1 || compressedImage.displayedOnGalleryPage === 1" class="text-bg-warning rounded">                            
                                         <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'original'" (click)="changeImageDisplayTarget($event)">
-                                            В архив
+                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.MOVETOARCHIVEBUTTON' | translate }}
                                         </button>
                                     </li>
                                 </ul>
@@ -89,15 +89,15 @@
                         <option value="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</option>
                         <option value="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</option>
                     </select>
-                    <label for="inputChangeEventType" class="form-label">Тип события</label>
+                    <label for="inputChangeEventType" class="form-label">{{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.EVENTTYPE' | translate }}</label>
                 </div>
                 <div class="form-group form-floating mb-3">
                     <input type="text" class="form-control" id="inputChangeImageDescription" formControlName="newImageDescription">
-                    <label for="inputChangeImageDescription" class="form-label">Индивидуальное описание фото</label>
+                    <label for="inputChangeImageDescription" class="form-label">{{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.DESCRIPTION' | translate }}</label>
                 </div>
                 <div class="form-group text-center">
                     <button class="btn btn-secondary" [disabled]="changeImageDataForm.invalid">
-                        Изменить
+                        {{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.CHANGEBUTTON' | translate }}
                     </button>
                 </div>
             </form>
@@ -114,24 +114,24 @@
                         <option value="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</option>
                         <option value="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</option>
                     </select>
-                    <label for="inputEventType" class="form-label">Тип события</label>
+                    <label for="inputEventType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.EVENTTYPE' | translate }}</label>
                     <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imageEventType'].invalid && uploadImageForm.controls['imageEventType'].touched">
-                        Не выбран тип события
+                        {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDEVENTTYPE' | translate }}
                     </div>
                 </div>
                 <div class="form-group mb-3">
                     <input type="file" class="form-control" id="inputImage" placeholder="Название события" (change)="fileChange($event)" formControlName="image">
                     <div class="alert alert-danger" *ngIf="uploadImageForm.controls['image'].invalid && uploadImageForm.controls['image'].touched">
-                        Не выбрано изображение
+                        {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDSELECTIMAGE' | translate }}
                     </div>
                 </div>
                 <div class="form-group form-floating mb-3">
                     <input type="text" class="form-control" id="inputImageDescription" formControlName="imageDescription">
-                    <label for="inputImageDescription" class="form-label">Индивидуальное описание фото</label>
+                    <label for="inputImageDescription" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.DESCRIPTION' | translate }}</label>
                 </div>
                 <div class="form-group text-center">
                     <button class="btn btn-primary" [disabled]="uploadImageForm.invalid">
-                        Загрузить новое изображение
+                        {{ 'ADMINPANEL.UPLOADIMAGETEXT.BUTTON' | translate }}
                     </button>
                 </div>
             </form>
