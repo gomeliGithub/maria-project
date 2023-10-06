@@ -24,7 +24,7 @@ async function bootstrap() {
 
     app.setGlobalPrefix('/api');
 
-    await app.listen(process.env.PORT ?? 4000);
+    await app.listen(process.env.PORT ?? process.env.SERVER_API_PORT);
 }
 
 declare const __non_webpack_require__: NodeRequire;

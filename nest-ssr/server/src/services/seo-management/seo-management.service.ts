@@ -44,7 +44,7 @@ export class SeoManagementService {
         return components;
     }
 
-    // @Interval(10000)
+    @Interval(43200000) // 12 hours
     public async createSitemap (): Promise<void> {
         const componentsInfo: IComponentInfo[] = await this.getComponentsInfo(path.join(process.cwd(), 'src'), [] as IComponentInfo[]);
 
@@ -56,7 +56,7 @@ const sitemap=`
 ${
     componentsInfo.map(componentsInfo => `
     <url>
-        <loc>${ process.env.SERVER_DOMAIN }:${ process.env.SERVERF_PORT ?? process.env.SERVER_PORT }${ componentsInfo.url }</loc>
+        <loc>${ process.env.SERVER_DOMAIN }:${ process.env.SERVER_WEB_PORT }${ componentsInfo.url }</loc>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
         <lastmod>${ componentsInfo.changeTime.toISOString() }</lastmod>

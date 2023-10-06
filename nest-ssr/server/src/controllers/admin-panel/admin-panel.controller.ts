@@ -30,7 +30,7 @@ export class AdminPanelController {
             || typeof requestBody.client.uploadImageMeta !== 'string' || typeof requestBody.client.imageEventType !== 'string' || !imageEventTypes.includes(requestBody.client.imageEventType)
             || requestBody.client.imageDescription && (typeof requestBody.client.imageDescription !== 'string' || requestBody.client.imageDescription.length > 20)
         ) {
-            await this.appService.logLineAsync(`[${ process.env.SERVER_PORT }] UploadImage - not valid client data`);
+            await this.appService.logLineAsync(`[${ process.env.SERVER_API_PORT }] UploadImage - not valid client data`);
     
             throw new BadRequestException();
         }

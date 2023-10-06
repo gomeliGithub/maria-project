@@ -34,7 +34,7 @@ export class AdminPanelService {
         try {
             imageMeta = JSON.parse(requestBody.client.uploadImageMeta);
         } catch {
-            await this.appService.logLineAsync(`[${ process.env.SERVER_PORT }] UploadImage - not valid imageMeta`);
+            await this.appService.logLineAsync(`[${ process.env.SERVER_API_PORT }] UploadImage - not valid imageMeta`);
     
             throw new BadRequestException();
         }
@@ -66,7 +66,7 @@ export class AdminPanelService {
         commonServiceRef.webSocketClients.forEach(client => client.activeWriteStream ? activeUploadsClientNumber += 1 : null);
     
         if ( activeUploadClient ) {
-            await this.appService.logLineAsync(`[${ process.env.SERVER_PORT }] UploadImage - webSocketClient with the same id is exists`);
+            await this.appService.logLineAsync(`[${ process.env.SERVER_API_PORT }] UploadImage - webSocketClient with the same id is exists`);
     
             throw new BadRequestException();
         }

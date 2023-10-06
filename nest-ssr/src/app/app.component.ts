@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ComponentRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
+
+import { ModalComponent } from './components/modal/modal.component';
 
 import { AppService } from './app.service';
 import { ClientService } from './services/client/client.service';
@@ -22,7 +24,10 @@ export class AppComponent implements OnInit {
         private readonly translateService: TranslateService
     ) { }
 
-    title = 'nest-ssr';
+    @ViewChild(ModalComponent) modalComponent: ModalComponent
+    @ViewChild('appModal', { read: ViewContainerRef, static: false })
+    private readonly modalViewRef: ViewContainerRef;
+    private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
     activeClient: Observable<IClientBrowser>
 
@@ -33,9 +38,12 @@ export class AppComponent implements OnInit {
     ngOnInit (): void {
         this.translateService.use(environment.defaultLocale);
 
-        if ( this.appService.checkIsPlatformBrowser() ) this.clientService.getActiveClient().pipe(activeClient => this.activeClient = activeClient).subscribe(activeClient => {
-            this.activeClientLogin = activeClient ? activeClient.login : null;
-            this.activeClientFullName = activeClient ? activeClient.fullName : null;
+        if ( this.appService.checkIsPlatformBrowser() ) this.clientService.getActiveClient().pipe(activeClient => this.activeClient = activeClient).subscribe({
+            next: activeClient => {
+                this.activeClientLogin = activeClient ? activeClient.login : null;
+                this.activeClientFullName = activeClient ? activeClient.fullName : null;
+            },
+            error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
         });
     }
 }
