@@ -10,7 +10,7 @@ import { CommonModule } from '../../modules/common.module';
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 
-import { Admin, Member, ClientСompressedImage } from '../../models/client.model';
+import { Admin, Member, ClientCompressedImage } from '../../models/client.model';
 
 import { ICompressedImage, IFullCompressedImageData, IImageAdditionalData, IRequest, IRequestBody} from 'types/global';
 import { IImageMeta, IPercentUploadedOptions, IWSMessage, IWebSocketClient } from 'types/web-socket';
@@ -20,8 +20,8 @@ export class AdminPanelService {
     constructor (
         private readonly appService: AppService,
 
-        @InjectModel(ClientСompressedImage)
-        private readonly compressedImageModel: typeof ClientСompressedImage
+        @InjectModel(ClientCompressedImage)
+        private readonly compressedImageModel: typeof ClientCompressedImage
     ) { }
 
     public async uploadImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
@@ -75,8 +75,8 @@ export class AdminPanelService {
 
         const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin, { rawResult: false });
 
-        const compressedImages: ClientСompressedImage[] = await commonServiceRef.getCompressedImages({ client, clientType: client.dataValues.type });
-        const compressedImage: ClientСompressedImage = compressedImages.length !== 0 ? compressedImages.find(image => image.originalName === path.basename(newOriginalImagePath)) : null;
+        const compressedImages: ClientCompressedImage[] = await commonServiceRef.getCompressedImages({ client, clientType: client.dataValues.type });
+        const compressedImage: ClientCompressedImage = compressedImages.length !== 0 ? compressedImages.find(image => image.originalName === path.basename(newOriginalImagePath)) : null;
 
         if ( compressedImage ) return 'FILEEXISTS';
     
@@ -176,7 +176,7 @@ export class AdminPanelService {
 
         const client: Admin = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false });
 
-        const compressedImages: ClientСompressedImage[] = await commonServiceRef.getCompressedImages({ 
+        const compressedImages: ClientCompressedImage[] = await commonServiceRef.getCompressedImages({ 
             client, 
             clientType: 'admin', 
             find: { 
@@ -198,12 +198,12 @@ export class AdminPanelService {
         const originalImageName: string = requestBody.adminPanel.originalImageName;
         const originalImagePath: string = path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName);
 
-        const compressedImages: ClientСompressedImage[] = await commonServiceRef.getCompressedImages({ 
+        const compressedImages: ClientCompressedImage[] = await commonServiceRef.getCompressedImages({ 
             client, 
             clientType: 'admin', 
             find : { includeFields: [ 'originalName' ] }});
 
-        const compressedImageInstance: ClientСompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
+        const compressedImageInstance: ClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
 
         const imageExists: boolean = await commonServiceRef.checkImageExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
 
@@ -221,7 +221,7 @@ export class AdminPanelService {
 
         const originalImagePath: string = await this.validateImageControlRequests(request, requestBody, activeAdminLogin);
 
-        const compressedImage: ClientСompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true });
+        const compressedImage: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true });
 
         const staticFilesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
 
@@ -289,13 +289,13 @@ export class AdminPanelService {
         const originalImageName: string = requestBody.adminPanel.originalImageName;
         const originalImagePath: string = path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName);
 
-        const compressedImages: ClientСompressedImage[] = await commonServiceRef.getCompressedImages({ 
+        const compressedImages: ClientCompressedImage[] = await commonServiceRef.getCompressedImages({ 
             client, 
             clientType: 'admin', 
             find: { includeFields: [ 'originalName' ] }
         });
 
-        const compressedImageInstance: ClientСompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
+        const compressedImageInstance: ClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
 
         const imageExists: boolean = await commonServiceRef.checkImageExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
 

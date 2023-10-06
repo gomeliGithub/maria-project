@@ -13,7 +13,7 @@ import { CommonModule } from '../../modules/common.module';
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 
-import { Admin, Member, ClientСompressedImage } from '../../models/client.model';
+import { Admin, Member, ClientCompressedImage } from '../../models/client.model';
 
 import { ICompressedImage, IRequest } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions } from 'types/options';
@@ -27,8 +27,8 @@ export class ClientService {
         private readonly adminModel: typeof Admin,
         @InjectModel(Member) 
         private readonly memberModel: typeof Member,
-        @InjectModel(ClientСompressedImage)
-        private readonly compressedImageModel: typeof ClientСompressedImage
+        @InjectModel(ClientCompressedImage)
+        private readonly compressedImageModel: typeof ClientCompressedImage
     ) { }
 
     public compressedImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
@@ -94,7 +94,7 @@ export class ClientService {
         }
 
         if ( options.compressedImageName ) {
-            const compressedImageData: ClientСompressedImage = await this.compressedImageModel.findOne({ where: { imageName: options.compressedImageName }});
+            const compressedImageData: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { imageName: options.compressedImageName }});
 
             if ( compressedImageData ) response.download(path.join(compressedImageData.originalDirPath, compressedImageData.originalName));
             else throw new BadRequestException();

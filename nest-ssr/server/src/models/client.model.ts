@@ -56,8 +56,8 @@ export class Admin extends Model {
     })
     lastActiveDate: Date;
 
-    @HasMany(() => ClientСompressedImage)
-    compressedImages: ClientСompressedImage[];
+    @HasMany(() => ClientCompressedImage)
+    compressedImages: ClientCompressedImage[];
 }
 
 @Table({
@@ -114,14 +114,14 @@ export class Member extends Model {
     })
     lastActiveDate: Date;
 
-    @HasMany(() => ClientСompressedImage)
-    compressedImages: ClientСompressedImage[];
+    @HasMany(() => ClientCompressedImage)
+    compressedImages: ClientCompressedImage[];
 }
 
 @Table({
     timestamps: false
 })
-export class ClientСompressedImage extends Model {
+export class ClientCompressedImage extends Model {
     @AutoIncrement
     @PrimaryKey
     @AllowNull(false)
