@@ -22,6 +22,7 @@ export interface IRequestBody {
     clientLogin?: string;
     sign?: {
         clientData?: IClientSignData;
+        newLocale?: string;
     },
     client?: {
         _id: number;
@@ -39,13 +40,12 @@ export interface IRequestBody {
 
 
     clientLogins?: string | string[];
-    newLocale?: string;
 }
 
 export interface IClient {
     login: string;
     type: 'admin' | 'member';
-    // locale: string;
+    locale: string;
     fullName: string;
     __secure_fgpHash?: string;
     iat?: number;
@@ -54,8 +54,14 @@ export interface IClient {
 
 export interface IClientBrowser {
     login: string;
+    type: string;
     fullName: string;
-    // locale: string;
+    locale: string;
+}
+
+export interface IClientLocale {
+    code: string; 
+    title: string;
 }
 
 export interface ICompressedImage {

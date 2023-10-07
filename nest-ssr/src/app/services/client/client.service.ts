@@ -1,7 +1,8 @@
 import { ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { Observable } from 'rxjs';
+import { Observable, forkJoin, map } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 import * as bcryptjs from 'bcryptjs';
 
@@ -10,15 +11,16 @@ import { ModalComponent } from '../../components/modal/modal.component';
 import { AppService } from '../../app.service';
 
 import { IClientBrowser, ICompressedImage } from 'types/global';
-import { IClientAccessData, IClientSignData } from 'types/sign';
+import { IClientSignData } from 'types/sign';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ClientService {
     constructor (
+        private readonly translateService: TranslateService,
         private readonly http: HttpClient,
-        private readonly appService: AppService,
+        private readonly appService: AppService
     ) { }
 
     public getActiveClient (): Observable<IClientBrowser> {
@@ -58,9 +60,9 @@ export class ClientService {
                 });
             } else this.http.put('/api/sign/in', { 
                 sign: { clientData }
-            }, { headers, withCredentials: true }).pipe(accessData => accessData as Observable<IClientAccessData>).subscribe({
-                next: accessData => {
-                    localStorage.setItem('access_token', accessData.access_token);
+            }, { responseType: 'text', headers, withCredentials: true }).pipe(access_token => access_token).subscribe({
+                next: access_token => {
+                    localStorage.setItem('access_token', access_token);
 
                     this.appService.reloadComponent(false, '');
                 },
@@ -80,5 +82,20 @@ export class ClientService {
             if ( imagesType === 'home' ) return imagesList as Observable<ICompressedImage[][]>;
             else if ( imagesType === 'gallery' ) return imagesList as Observable<string[]>;
         });
+    }
+
+    public signOut (): Observable<void> {
+        const headers = this.appService.createRequestHeaders();
+
+        return this.http.put('/api/sign/out', { }, { headers: headers, withCredentials: true }).pipe(map((() => this.appService.reloadComponent(true)))) as Observable<void>;
+    }
+
+    public changeClientLocale (newLocale: string) {
+        const headers = this.appService.createRequestHeaders();
+
+        return forkJoin([ 
+            this.http.post('/api/client/changeLocale', { sign: { newLocale } }, { responseType: 'text', headers, withCredentials: true }),
+            this.translateService.use(newLocale)
+        ]);
     }
 }

@@ -25,7 +25,8 @@ export class HomeComponent implements OnInit {
     private readonly modalViewRef: ViewContainerRef;
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
-    public compressedImagesList: Observable<ICompressedImage[][]>;
+    public observableCompressedImagesList: Observable<ICompressedImage[][]>;
+    public compressedImagesList: ICompressedImage[][];
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
@@ -34,15 +35,19 @@ export class HomeComponent implements OnInit {
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
 
-            this._getCompressedImagesList().pipe(map(() => catchError(() => {
+            this._getCompressedImagesList().pipe(map(imagesList => {
+                this.compressedImagesList = imagesList; 
+
+                return imagesList;
+            }), catchError(() => {
                 this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
 
                 return EMPTY;
-            })));
+            }));
         }
     }
 
     private _getCompressedImagesList (): Observable<ICompressedImage[][]> {
-        return this.clientService.getCompressedImagesList('home').pipe(imagesList => this.compressedImagesList = imagesList);
+        return this.clientService.getCompressedImagesList('home').pipe(imagesList => this.observableCompressedImagesList = imagesList);
     }
 }

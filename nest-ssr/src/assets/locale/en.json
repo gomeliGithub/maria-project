@@ -1,5 +1,4 @@
 {
-    "NAVBARBRANDTITLE": "DOT",
 	"DEFAULTERRORMESSAGE": "Something went wrong. Try again",
 	"PAGETITLES": {
 		"HOME": "Home",
@@ -9,15 +8,18 @@
 		"SIGNIN": "Sign in",
 		"NOTFOUND": "Not Found"
 	},
+	"NOIMAGESMESSAGE": "No images yet",
 	"NOTFOUNDPAGE": {
 		"MAINTEXT": "The page you’re looking for doesn’t exist.",
 		"SECONDARYTEXT": "Page not found.",
 		"GOHOMETEXT": "Go Home"
 	},
     "CLIENTMENU": {
-        "LOGINTEXT": "Log In",
-        "LOGOUTTEXT": "Log Out",
-        "NONLOGINTEXT": "You are not logged in"
+		"TITLE": "Account",
+		"SIGNUPTEXT": "Sign Up",
+        "SIGNINTEXT": "Sign In",
+        "SIGNOUTTEXT": "Sign Out",
+        "NONSIGNINTEXT": "Guest"
     },
     "LOGINFORM": {
 		"TITLE": "Sign In",

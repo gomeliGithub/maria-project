@@ -1,7 +1,7 @@
-<div class="p-3" id="galleryContainer">
+<div class="p-3" id="galleryContainer" [attr.observableCompressedImagesList]="observableCompressedImagesList | async">
     <h1 class="display-6 text-center">Лучшие работы</h1>
-    <div class="d-flex flex-row flex-wrap h-50 w-100 w-25 mt-3" id="commonImages">
-        <div *ngFor="let imagesDataArr of compressedImagesList | async" class="d-flex flex-row imagesGroup">
+    <div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-row flex-wrap h-50 w-100 w-25 mt-3" id="commonImages">
+        <div *ngFor="let imagesDataArr of compressedImagesList" class="d-flex flex-row imagesGroup">
             <div *ngFor="let imageData of imagesDataArr" class="card mb-3 me-2">
                 <div class="row g-0">
                     <div class="col-md-4">
@@ -24,5 +24,10 @@
             </div>
         </div>
     </div>
+    <ng-template #noContentBlock>
+        <div class="noContentBlock text-center text-info fs-4 p-4">
+            <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
+        </div>
+    </ng-template>
 </div>
 <ng-template #appModal></ng-template>

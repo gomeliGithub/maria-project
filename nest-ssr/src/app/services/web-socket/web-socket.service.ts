@@ -81,6 +81,8 @@ export class WebSocketService {
                             this._modal.destroy();
 
                             this.appService.createSuccessModal(modalRef.modalViewRef, modalRef.modalComponentRef, this.appService.getTranslations('UPLOADIMAGERESPONSES.FINISH'));
+
+                            window.location.reload();
                         });
                     }, 1000);
                 } else if ( message.text === 'SUCCESS' ) {

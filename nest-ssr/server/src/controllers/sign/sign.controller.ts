@@ -6,7 +6,6 @@ import { ClientTypes } from '../../decorators/client.types.decorator';
 import { SignService } from '../../services/sign/sign.service';
 
 import { IClient, IRequest, IRequestBody } from 'types/global';
-import { IClientAccessData } from 'types/sign';
 
 @Controller('/sign')
 export class SignController {
@@ -26,7 +25,7 @@ export class SignController {
 
     @Put('/in')
     @ClientTypes('admin', 'member')
-    async signIn (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<IClientAccessData> {
+    async signIn (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string> {
         if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password ||
             typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
         ) throw new BadRequestException();
@@ -41,7 +40,7 @@ export class SignController {
 
     @Get('/getActiveClient')
     async getActiveClient (@Req() request: IRequest): Promise<string | IClient> {
-        const includedFields: string[] = [ 'login', 'locale', 'fullName' ];
+        const includedFields: string[] = [ 'login', 'locale', 'fullName', 'type' ];
 
         return this.signService.getActiveClient(request, { includeFields: includedFields });
     }

@@ -29,8 +29,9 @@ export class ImageControlService {
     ) { }
 
     public async get (options: IСompressedImageGetOptions): Promise<ClientCompressedImage[]> {
-        const findOptions: AssociationGetOptions = { raw: true }
+        const findOptions: AssociationGetOptions = { where: [], raw: true }
 
+        if ( options && options.find && options.find.searchFields ) findOptions.where = { imageName: options.find.searchFields };
         if ( options && options.find && options.find.includeFields ) findOptions.attributes = options.find.includeFields;
         if ( options && options.find && options.hasOwnProperty('rawResult') ) findOptions.raw = options.find.rawResult;
 

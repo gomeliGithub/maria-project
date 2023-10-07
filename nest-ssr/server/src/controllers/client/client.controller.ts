@@ -1,9 +1,12 @@
-import { BadRequestException, Controller, Get, Param } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
+import { Response } from 'express';
+
+import { ClientTypes } from 'server/src/decorators/client.types.decorator';
 
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 
-import { ICompressedImage } from 'types/global';
+import { ICompressedImage, IRequest, IRequestBody } from 'types/global';
 
 @Controller('/client')
 export class ClientController {
@@ -20,4 +23,16 @@ export class ClientController {
         
         return this.clientService.getCompressedImagesList(imagesType.substring(1) as 'home' | 'gallery');
     }
+
+    @Post('/changeLocale')
+    @ClientTypes('admin', 'member')
+    async changeLocale (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string> {
+        if ( !requestBody.sign.newLocale || typeof requestBody.sign.newLocale !== 'string' ) throw new BadRequestException();
+
+        const locales: string[] = [ 'ru', 'en' ];
+
+        if ( !locales.includes(requestBody.sign.newLocale) ) throw new BadRequestException();
+        
+        return this.clientService.changeLocale(request, requestBody.sign.newLocale, response);
+    } 
 }

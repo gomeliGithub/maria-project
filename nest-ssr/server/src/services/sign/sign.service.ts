@@ -5,7 +5,6 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 
 import * as bcrypt from 'bcrypt';
-import ms from 'ms';
 
 import { CommonModule } from '../../modules/common.module';
 
@@ -18,7 +17,7 @@ import { Admin, Member } from '../../models/client.model';
 import { generate__secure_fgp } from './sign.generateKeys';
 
 import { IClient, IRequest, IRequestBody } from 'types/global';
-import { IClientAccessData, IClientSignData } from 'types/sign';
+import { IClientSignData } from 'types/sign';
 import { IGetActiveClientOptions } from 'types/options';
 
 @Injectable()
@@ -101,7 +100,7 @@ export class SignService {
         });
     }
 
-    public async signIn (request: IRequest, clientSignData: IClientSignData, response: Response): Promise<IClientAccessData> {
+    public async signIn (request: IRequest, clientSignData: IClientSignData, response: Response): Promise<string> {
         const clientLogin: string = clientSignData.login;
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
@@ -114,7 +113,7 @@ export class SignService {
         const payload: IClient = {
             login: clientInstance.login,
             type: clientInstance.type as 'admin' | 'member',
-            // locale: process.env.CLIENT_DEFAULT_LOCALE,
+            locale: process.env.CLIENT_DEFAULT_LOCALE,
             fullName: clientInstance.fullName,
             __secure_fgpHash: ""
         }
@@ -134,11 +133,7 @@ export class SignService {
 
         response.cookie('__secure_fgp', __secure_fgp, this.appService.cookieSerializeOptions);
 
-        return {
-            access_token,
-            // locale: process.env.CLIENT_DEFAULT_LOCALE,
-            expiresTime: ms(process.env.JWT_EXPIRESIN_TIME)
-        }
+        return access_token;
     }
 
     public async signOut (request: IRequest): Promise<void> {

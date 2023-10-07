@@ -1,27 +1,32 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 
 import sequelize, { NonNullFindOptions } from 'sequelize';
+import ms from 'ms';
 
 import fsPromises from 'fs/promises';
 import path from 'path';
-
-import { Response } from 'express';
 
 import { CommonModule } from '../../modules/common.module';
 
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
+import { JwtControlService } from '../sign/jwt-control.service';
 
 import { Admin, Member, ClientCompressedImage } from '../../models/client.model';
 
-import { ICompressedImage, IRequest } from 'types/global';
+import { IClient, ICompressedImage, ICookieSerializeOptions, IRequest } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions } from 'types/options';
 
 @Injectable()
 export class ClientService {
     constructor (
+        private readonly jwtService: JwtService,
+        
         private readonly appService: AppService,
+        private readonly jwtControlService: JwtControlService,
         
         @InjectModel(Admin)
         private readonly adminModel: typeof Admin,
@@ -106,7 +111,7 @@ export class ClientService {
     public async getCompressedImagesList (imagesType: 'home' | 'gallery'): Promise<string[] | ICompressedImage[][]> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
-        const imagesList: string[] = await fsPromises.readdir(path.join(this.compressedImagesDirPath, imagesType));
+        const imagesList: string[] = (await fsPromises.readdir(path.join(this.compressedImagesDirPath, imagesType))).filter(imageName => path.extname(imageName) !== '.txt');
 
         const compressedImages = await commonServiceRef.getCompressedImages({
             find: {
@@ -133,5 +138,31 @@ export class ClientService {
         }, []);
 
         return reducedImagesList ?? imagesList;
+    }
+
+    async changeLocale (request: IRequest, newLocale: string, response: Response): Promise<string> {
+        const token: string = this.jwtControlService.extractTokenFromHeader(request); 
+
+        const decodedToken: IClient = this.jwtService.decode(token) as IClient;
+
+        const now: Date = new Date();
+
+        const tokenExpiresAt: number = new Date(ms(`${decodedToken.exp}s`)).getTime();
+        const tokenExpiresIn: number = Math.round(new Date(tokenExpiresAt - now.getTime()).getTime() / 1000);
+
+        decodedToken.locale = newLocale;
+
+        delete decodedToken.iat;
+        delete decodedToken.exp;
+
+        const updatedAccess_token: string = this.jwtService.sign(decodedToken, { expiresIn: tokenExpiresIn });
+
+        const cookieSerializeOptions: ICookieSerializeOptions = this.appService.cookieSerializeOptions;
+
+        cookieSerializeOptions.maxAge = ms(`${tokenExpiresIn}s`);
+
+        response.cookie('locale', newLocale, this.appService.cookieSerializeOptions);
+
+        return updatedAccess_token;
     }
 }

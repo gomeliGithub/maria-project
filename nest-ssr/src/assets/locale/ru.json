@@ -1,5 +1,4 @@
 {
-  	"NAVBARBRANDTITLE": "ДОТ",
 	"DEFAULTERRORMESSAGE": "Что-то пошло не так. Попробуйте ещё раз",
 	"PAGETITLES": {
 		"HOME": "Главная",
@@ -9,15 +8,18 @@
 		"SIGNIN": "Вход",
 		"NOTFOUND": "Не найдено"
 	},
+	"NOIMAGESMESSAGE": "Изображений пока нет",
 	"NOTFOUNDPAGE": {
 		"MAINTEXT": "Страница, которую вы ищете, не существует.",
 		"SECONDARYTEXT": "Страница не найдена.",
 		"GOHOMETEXT": "На главную"
 	},
   	"CLIENTMENU": {
-    	"LOGINTEXT": "Войти",
-    	"LOGOUTTEXT": "Выйти",
-		"NONLOGINTEXT": "Вы не вошли в систему"
+		"TITLE": "Аккаунт",
+		"SIGNUPTEXT": "Создать",
+    	"SIGNINTEXT": "Войти",
+    	"SIGNOUTTEXT": "Выйти",
+		"NONSIGNINTEXT": "Гость"
 	},
 	"LOGINFORM": {
 		"TITLE": "Вход в систему",

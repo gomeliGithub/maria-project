@@ -45,10 +45,12 @@ export class JwtControlService {
     }
 
     public async addRevokedToken (token: string): Promise<void> {
-        const revokedToken: JWT_token = await this.checkRevokedTokenIs(token);
+        const revokedToken: JWT_token = await this.checkRevokedTokenIs(token); 
 
-        if ( revokedToken ) {
-            await revokedToken.update({ revokation_date: new Date(), revoked: true });
+        if ( !revokedToken ) {
+            const token_hash: string = (crypto.createHmac("SHA256", token)).digest('hex');
+
+            await this.JWT_tokenModel.update({ revokation_date: new Date(), revoked: true }, { where: { token_hash } });
         }
     }
 

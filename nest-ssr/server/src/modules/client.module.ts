@@ -4,13 +4,15 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { AppService } from '../app.service';
 
 import { ClientService } from '../services/client/client.service';
+import { JwtControlService } from '../services/sign/jwt-control.service';
 import { ClientController } from '../controllers/client/client.controller';
 
 import { Admin, Member, ClientCompressedImage } from '../models/client.model';
+import { JWT_token } from '../models/sign.model';
 
 @Module({
-    imports: [ SequelizeModule.forFeature([ Admin, Member, ClientCompressedImage ]) ],
-    providers: [ AppService, ClientService ],
+    imports: [ SequelizeModule.forFeature([ Admin, Member, ClientCompressedImage, JWT_token ]) ],
+    providers: [ AppService, ClientService, JwtControlService ],
     controllers: [ClientController],
     exports: [ClientService]
 })

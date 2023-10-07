@@ -1,7 +1,12 @@
-<div class="p-3" id="galleryContainer">
+<div class="p-3" id="galleryContainer" [attr.observableCompressedImagesList]="observableCompressedImagesList | async">
     <h1 class="display-6 text-center">Галерея</h1>
-    <div class="h-50 w-25" id="galleryImages">
-        <img *ngFor="let imagePath of compressedImagesList | async" src="/assets/images_thumbnail/gallery/{{imagePath}}" class="img-thumbnail">
+    <div *ngIf="compressedImagesList; else noContentBlock" class="h-50 w-25" id="galleryImages">
+        <img *ngFor="let imagePath of compressedImagesList" src="/assets/images_thumbnail/gallery/{{imagePath}}" class="img-thumbnail">
     </div>
+    <ng-template #noContentBlock>
+        <div class="noContentBlock text-center text-info fs-4 p-4">
+            <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
+        </div>
+    </ng-template>
 </div>
 <ng-template #appModal></ng-template>

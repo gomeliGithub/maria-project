@@ -12,33 +12,48 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                            Главная
+                            {{ 'PAGETITLES.HOME' | translate }}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" routerLink="/gallery" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                            Галерея
+                            {{ 'PAGETITLES.GALLERY' | translate }}
                         </a>
                     </li>
-                    <li *ngIf="activeClientLogin" class="nav-item">
+                    <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item">
                         <a class="nav-link" routerLink="/adminPanel" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                            Панель администратора
+                            {{ 'PAGETITLES.ADMINPANEL' | translate }}
                         </a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Аккаунт
+                            {{ 'CLIENTMENU.TITLE' | translate }}
                         </a>
                         <ul class="dropdown-menu">
                             <li>
                                 <a class="dropdown-item" routerLink="/signUp" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                                    Создать
+                                    {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                                    Войти
+                                    {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
                                 </a>
+                            </li>
+                            <li *ngIf="activeClientLogin">
+                                <button type="button" class="dropdown-item" (click)="signOut()">
+                                    {{ 'CLIENTMENU.SIGNOUTTEXT' | translate }}
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+                    <li *ngIf="activeClientLogin" class="nav-item dropdown">
+                        <button type="button" class="nav-link dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" #changeClientLocaleButton>
+                            {{ activeClientLocale }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                            <li *ngFor="let locale of locales">
+                                <button type="button" class="dropdown-item" id={{locale.code}} (click)="changeClientLocale($event)">{{locale.code}} ({{locale.title}})</button>
                             </li>
                         </ul>
                     </li>
@@ -49,7 +64,7 @@
                         <small class="d-block">{{activeClientFullName}}</small>
                     </span>
                     <ng-template #noActiveClientBlock>  
-                        <span class="text-warning">Гость</span>
+                        <span class="text-warning">{{ 'CLIENTMENU.NONSIGNINTEXT' | translate }}</span>
                     </ng-template>
                 </div>
             </div>
