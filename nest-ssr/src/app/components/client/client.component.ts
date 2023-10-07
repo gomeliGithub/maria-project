@@ -20,14 +20,14 @@ export class ClientComponent implements OnInit {
         private readonly clientService: ClientService
     ) {
         const formControls = {
-            'clientLogin': new FormControl("", [ Validators.required, this.clientLoginValidator ]),
+            'clientLogin': new FormControl("", [ Validators.required, Validators.minLength(4), this.clientLoginValidator ]),
             'clientPassword': new FormControl("", [ Validators.required, this.clientPasswordValidator ])
         };
 
         this.signOp = this.activateRoute.snapshot.paramMap.get('op') as 'up' | 'in';
 
         if (this.signOp === 'up') {
-            formControls['clientFullName'] = new FormControl("", [ Validators.required, this.clientFullNameValidator ]),
+            formControls['clientFullName'] = new FormControl("", [ Validators.required, Validators.minLength(5) ]),
             formControls['clientEmail'] = new FormControl("", Validators.email);
         }
 
@@ -76,12 +76,6 @@ export class ClientComponent implements OnInit {
 
     public clientPasswordValidator (control: FormControl<string>): { [ s: string ]: boolean } | null {
         if ( control.value.length < 4 ) return { 'clientPassword': true };
-
-        return null;
-    }
-
-    public clientFullNameValidator (control: FormControl<string>): { [ s: string ]: boolean } | null {
-        if ( control.value.length < 10 ) return { "clientFullName": true };
 
         return null;
     }

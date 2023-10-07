@@ -35,8 +35,8 @@ export class HomeComponent implements OnInit {
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
 
-            this._getCompressedImagesList().pipe(map(imagesList => {
-                this.compressedImagesList = imagesList; 
+            this.observableCompressedImagesList = this.clientService.getCompressedImagesList('home').pipe(map(imagesList => {
+                this.compressedImagesList = imagesList && imagesList.length !== 0 ? imagesList : null;
 
                 return imagesList;
             }), catchError(() => {
@@ -45,9 +45,5 @@ export class HomeComponent implements OnInit {
                 return EMPTY;
             }));
         }
-    }
-
-    private _getCompressedImagesList (): Observable<ICompressedImage[][]> {
-        return this.clientService.getCompressedImagesList('home').pipe(imagesList => this.observableCompressedImagesList = imagesList);
     }
 }

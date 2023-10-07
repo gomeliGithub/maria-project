@@ -32,8 +32,8 @@ export class GalleryComponent implements OnInit {
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
 
-            this._getCompressedImagesList().pipe(map(imagesList => {
-                this.compressedImagesList = imagesList; 
+            this.observableCompressedImagesList = this.clientService.getCompressedImagesList('gallery').pipe(map(imagesList => {
+                this.compressedImagesList = imagesList && imagesList.length !== 0 ? imagesList : null;
                 
                 return imagesList;
             }), catchError(() => {
@@ -42,9 +42,5 @@ export class GalleryComponent implements OnInit {
                 return EMPTY;
             }));
         }
-    }
-
-    private _getCompressedImagesList (): Observable<string[]> {
-        return this.clientService.getCompressedImagesList('gallery').pipe(imagesList => this.observableCompressedImagesList = imagesList);
     }
 }
