@@ -9,6 +9,12 @@
 		"NOTFOUND": "Not Found"
 	},
 	"NOIMAGESMESSAGE": "No images yet",
+	"HOMEPAGE": {
+		"HEADERTITLE": "Best works"
+	},
+	"GALLERYPAGE": {
+		"HEADERTITLE": "Photo gallery"
+	},
 	"NOTFOUNDPAGE": {
 		"MAINTEXT": "The page you’re looking for doesn’t exist.",
 		"SECONDARYTEXT": "Page not found.",

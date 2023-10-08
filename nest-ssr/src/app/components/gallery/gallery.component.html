@@ -1,5 +1,5 @@
 <div class="p-3" id="galleryContainer" [attr.observableCompressedImagesList]="observableCompressedImagesList | async">
-    <h1 class="display-6 text-center">Галерея</h1>
+    <h1 class="display-6 text-center">{{ 'GALLERYPAGE.HEADERTITLE' | translate }}</h1>
     <div *ngIf="compressedImagesList; else noContentBlock" class="h-50 w-25" id="galleryImages">
         <img *ngFor="let imagePath of compressedImagesList" src="/assets/images_thumbnail/gallery/{{imagePath}}" class="img-thumbnail">
     </div>

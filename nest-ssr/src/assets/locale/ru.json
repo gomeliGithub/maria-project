@@ -9,6 +9,12 @@
 		"NOTFOUND": "Не найдено"
 	},
 	"NOIMAGESMESSAGE": "Изображений пока нет",
+	"HOMEPAGE": {
+		"HEADERTITLE": "Лучшие работы"
+	},
+	"GALLERYPAGE": {
+		"HEADERTITLE": "Галерея фото"
+	},
 	"NOTFOUNDPAGE": {
 		"MAINTEXT": "Страница, которую вы ищете, не существует.",
 		"SECONDARYTEXT": "Страница не найдена.",
