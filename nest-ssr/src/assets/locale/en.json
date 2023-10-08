@@ -15,6 +15,21 @@
 	"GALLERYPAGE": {
 		"HEADERTITLE": "Photo gallery"
 	},
+	"CLIENTPAGE": {
+		"LOGININVALIDMESSAGE": "Incorrect login",
+		"PASSWORDINVALIDMESSAGE": "Incorrect password",
+		"FULLNAMEINVALIDMESSAGE": "Incorrect full name",
+		"EMAILINVALIDMESSAGE": "Incorrect email",
+		"HELPBLOCKS": {
+			"LOGIN": "Your login must contain only latin characters and (or) numbers.",
+			"PASSWORD": "Your password must be 5-20 characters long.",
+			"FULLNAME": "Your full name must be 5-25 characters long."
+		},
+		"ACCOUNTHAVEMESSAGES": {
+			"HAVE": "Already have an account?",
+			"HAVENT": "Don't have an account yet?"
+		}
+	},
 	"NOTFOUNDPAGE": {
 		"MAINTEXT": "The page you’re looking for doesn’t exist.",
 		"SECONDARYTEXT": "Page not found.",

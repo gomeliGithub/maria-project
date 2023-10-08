@@ -21,13 +21,13 @@ export class ClientComponent implements OnInit {
     ) {
         const formControls = {
             'clientLogin': new FormControl("", [ Validators.required, Validators.minLength(4), this.clientLoginValidator ]),
-            'clientPassword': new FormControl("", [ Validators.required, this.clientPasswordValidator ])
+            'clientPassword': new FormControl("", [ Validators.required, Validators.minLength(5), Validators.maxLength(20) ])
         };
 
         this.signOp = this.activateRoute.snapshot.paramMap.get('op') as 'up' | 'in';
 
         if (this.signOp === 'up') {
-            formControls['clientFullName'] = new FormControl("", [ Validators.required, Validators.minLength(5) ]),
+            formControls['clientFullName'] = new FormControl("", [ Validators.required, Validators.minLength(5), Validators.maxLength(25) ]),
             formControls['clientEmail'] = new FormControl("", Validators.email);
         }
 
@@ -70,12 +70,6 @@ export class ClientComponent implements OnInit {
         const loginPattern: RegExp = /^[a-zA-Z](.[a-zA-Z0-9_-]*)$/;
 
         if ( !loginPattern.test(control.value) ) return { 'clientLogin': true };
-
-        return null;
-    }
-
-    public clientPasswordValidator (control: FormControl<string>): { [ s: string ]: boolean } | null {
-        if ( control.value.length < 4 ) return { 'clientPassword': true };
 
         return null;
     }

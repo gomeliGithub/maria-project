@@ -3,29 +3,38 @@
         <div class="form-group form-floating mb-3">
             <input type="text" class="form-control" id="inputLogin" placeholder="Имя вашего аккаунта" formControlName="clientLogin">
             <label for="inputLogin" class="form-label">Логин</label>
+            <div id="loginHelpBlock" class="form-text">
+                {{ 'CLIENTPAGE.HELPBLOCKS.LOGIN' | translate }}
+            </div>
             <div class="alert alert-danger" *ngIf="signForm.controls['clientLogin'].invalid && signForm.controls['clientLogin'].touched">
-                Не указан логин
+                {{ 'CLIENTPAGE.LOGININVALIDMESSAGE' | translate }}
             </div>
         </div>
         <div class="form-group form-floating mb-3">
             <input type="password" class="form-control" id="inputPassword" placeholder="Ваш пароль" formControlName="clientPassword">
             <label for="inputPassword" class="form-label">Пароль</label>
+            <div id="passwordHelpBlock" class="form-text">
+                {{ 'CLIENTPAGE.HELPBLOCKS.PASSWORD' | translate }}
+            </div>
             <div class="alert alert-danger" *ngIf="signForm.controls['clientPassword'].invalid && signForm.controls['clientPassword'].touched">
-                Не указан пароль
+                {{ 'CLIENTPAGE.PASSWORDINVALIDMESSAGE' | translate }}
             </div>
         </div>
         <div *ngIf="signOp === 'up'" class="form-group form-floating mb-3">
             <input type="text" class="form-control" id="inputFullName" placeholder="Ваше собственное ФИО" formControlName="clientFullName">
             <label for="inputFullName" class="form-label">ФИО</label>
+            <div id="fullNameHelpBlock" class="form-text">
+                {{ 'CLIENTPAGE.HELPBLOCKS.FULLNAME' | translate }}
+            </div>
             <div class="alert alert-danger" *ngIf="signForm.controls['clientFullName'].invalid && signForm.controls['clientFullName'].touched">
-                Не указано ФИО
+                {{ 'CLIENTPAGE.FULLNAMEINVALIDMESSAGE' | translate }}
             </div>
         </div>
         <div *ngIf="signOp === 'up'" class="form-group form-floating mb-3">
             <input type="email" class="form-control" id="inputEmail" placeholder="Ваша электронная почта" formControlName="clientEmail">
             <label for="inputEmail" class="form-label">Email</label>
             <div class="alert alert-danger" *ngIf="signForm.controls['clientEmail'].invalid && signForm.controls['clientEmail'].touched">
-                Не указан email
+                {{ 'CLIENTPAGE.EMAILINVALIDMESSAGE' | translate }}
             </div>
         </div>
         <div class="form-group text-center">
@@ -34,16 +43,16 @@
             </button>
             <div class="mt-2">
                 <span *ngIf="signOp === 'up'; else signInSpan" class="fw-bold text-light">
-                    Уже есть аккаунт?   
+                    {{ 'CLIENTPAGE.ACCOUNTHAVEMESSAGES.HAVE' | translate }}
                     (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover link-light" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                        Войти
+                        {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
                     </a>)
                 </span>
                 <ng-template #signInSpan>  
                     <span class="fw-bold text-light">
-                        Ещё нет аккаунта?   
+                        {{ 'CLIENTPAGE.ACCOUNTHAVEMESSAGES.HAVENT' | translate }} 
                         (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover link-light" routerLink="/signUp" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                            Создать
+                            {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
                         </a>)
                     </span>
                 </ng-template>

@@ -71,7 +71,7 @@ export class SignService {
         const emailPattern: RegExp = /^[^\s()<>@,;:\/]+@\w[\w\.-]+\.[a-z]{2,}$/i;
 
         // clientPassword.length < 4 
-        if ( !loginPattern.test(clientLogin) || clientLogin.length < 4 || clientFullName.length < 5 || ( clientEmail && !emailPattern.test(clientEmail) ) ) throw new BadRequestException();
+        if ( !loginPattern.test(clientLogin) || clientLogin.length < 4 || clientFullName.length < 5 || clientFullName.length > 25 || ( clientEmail && !emailPattern.test(clientEmail) ) ) throw new BadRequestException();
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
