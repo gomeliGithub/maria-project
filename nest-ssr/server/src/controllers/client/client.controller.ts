@@ -6,7 +6,8 @@ import { ClientTypes } from 'server/src/decorators/client.types.decorator';
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 
-import { ICompressedImage, IRequest, IRequestBody } from 'types/global';
+import { IRequest, IRequestBody } from 'types/global';
+import { IClientCompressedImage } from 'types/models';
 
 @Controller('/client')
 export class ClientController {
@@ -16,7 +17,7 @@ export class ClientController {
     ) { }
 
     @Get('/getCompressedImagesList/:imagesType')
-    async getCompressedImagesList (@Param('imagesType') imagesType: string): Promise<string[] | ICompressedImage[][]> {
+    async getCompressedImagesList (@Param('imagesType') imagesType: string): Promise<string[] | IClientCompressedImage[][]> {
         const thumbnailImagesDirPaths: string[] = [ 'home', 'gallery' ];
 
         if ( !thumbnailImagesDirPaths.includes(imagesType.substring(1)) ) throw new BadRequestException();

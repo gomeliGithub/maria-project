@@ -10,8 +10,9 @@ import { ModalComponent } from '../../components/modal/modal.component';
 
 import { AppService } from '../../app.service';
 
-import { IClientBrowser, ICompressedImage } from 'types/global';
+import { IClientBrowser } from 'types/global';
 import { IClientSignData } from 'types/sign';
+import { IClientCompressedImage } from 'types/models';
 
 @Injectable({
     providedIn: 'root'
@@ -75,11 +76,11 @@ export class ClientService {
         return this.http.get('/api/sign/getBcryptHashSaltrounds', { responseType: 'text', withCredentials: true });
     }
 
-    public getCompressedImagesList (imagesType: 'home'): Observable<ICompressedImage[][]>
+    public getCompressedImagesList (imagesType: 'home'): Observable<IClientCompressedImage[][]>
     public getCompressedImagesList (imagesType: 'gallery'): Observable<string[]>
-    public getCompressedImagesList (imagesType: 'home' | 'gallery'): Observable<string[] | ICompressedImage[][]> {
-        return this.http.get(`/api/client/getCompressedImagesList/:${ imagesType }`).pipe<string[] | ICompressedImage[][]>(imagesList => {
-            if ( imagesType === 'home' ) return imagesList as Observable<ICompressedImage[][]>;
+    public getCompressedImagesList (imagesType: 'home' | 'gallery'): Observable<string[] | IClientCompressedImage[][]> {
+        return this.http.get(`/api/client/getCompressedImagesList/:${ imagesType }`).pipe<string[] | IClientCompressedImage[][]>(imagesList => {
+            if ( imagesType === 'home' ) return imagesList as Observable<IClientCompressedImage[][]>;
             else if ( imagesType === 'gallery' ) return imagesList as Observable<string[]>;
         });
     }

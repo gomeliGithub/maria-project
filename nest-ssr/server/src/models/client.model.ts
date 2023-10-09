@@ -1,11 +1,18 @@
 import sequelize from 'sequelize';
-import { Column, Model, Table, DataType, PrimaryKey, AllowNull, Default, CreatedAt, HasMany, AutoIncrement, DeletedAt, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, PrimaryKey, AllowNull, Default, CreatedAt, HasMany, ForeignKey, BelongsTo, AutoIncrement } from 'sequelize-typescript';
 
 @Table({
     timestamps: false
 })
 export class Admin extends Model {
     @PrimaryKey
+    @AutoIncrement
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.INTEGER
+    })
+    id: number;
+
     @AllowNull(false)
     @Column({ 
         type: DataType.STRING
@@ -65,6 +72,13 @@ export class Admin extends Model {
 })
 export class Member extends Model {
     @PrimaryKey
+    @AutoIncrement
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.INTEGER
+    })
+    id: number;
+
     @AllowNull(false)
     @Column({ 
         type: DataType.STRING
@@ -122,25 +136,18 @@ export class Member extends Model {
     timestamps: false
 })
 export class ClientCompressedImage extends Model {
-    @AutoIncrement
     @PrimaryKey
     @AllowNull(false)
     @Column({ 
-        type: DataType.INTEGER
+        type: DataType.STRING
     })
-    id: number;
+    name: string;
 
     @AllowNull(false)
     @Column({ 
         type: DataType.STRING
     })
-    imageName: string;
-
-    @AllowNull(false)
-    @Column({ 
-        type: DataType.STRING
-    })
-    imageDirPath: string;
+    dirPath: string;
 
     @AllowNull(false)
     @Column({ 
@@ -164,13 +171,19 @@ export class ClientCompressedImage extends Model {
     @Column({ 
         type: DataType.STRING
     })
-    imageEventType: string;
+    eventType: string;
+
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.STRING
+    })
+    viewSizeType: string;
 
     @AllowNull(true)
     @Column({ 
         type: DataType.STRING
     })
-    imageDescription: string;
+    description: string;
 
     @Default(sequelize.literal('CURRENT_TIMESTAMP'))
     @CreatedAt
@@ -179,13 +192,6 @@ export class ClientCompressedImage extends Model {
         type: DataType.DATE
     })
     uploadDate: Date;
-
-    @DeletedAt
-    @AllowNull(true)
-    @Column({ 
-        type: DataType.DATE
-    })
-    deletionDate: Date;
 
     @Default(false)
     @AllowNull(false)
@@ -204,16 +210,16 @@ export class ClientCompressedImage extends Model {
     @ForeignKey(() => Admin)
     @AllowNull(true)
     @Column({
-        type: DataType.STRING
+        type: DataType.INTEGER
     })
-    adminLogin: string;
+    adminLoginId: number;
 
     @ForeignKey(() => Member)
     @AllowNull(true)
     @Column({
-        type: DataType.STRING
+        type: DataType.INTEGER
     })
-    memberLogin: string;
+    memberLoginId: number;
 
     @BelongsTo(() => Admin)
     admin: Admin;

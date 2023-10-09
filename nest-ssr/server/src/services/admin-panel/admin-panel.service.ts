@@ -12,8 +12,9 @@ import { CommonService } from '../common/common.service';
 
 import { Admin, Member, ClientCompressedImage } from '../../models/client.model';
 
-import { ICompressedImage, IFullCompressedImageData, IImageAdditionalData, IRequest, IRequestBody} from 'types/global';
+import { IFullCompressedImageData, IImageAdditionalData, IRequest, IRequestBody} from 'types/global';
 import { IImageMeta, IPercentUploadedOptions, IWSMessage, IWebSocketClient } from 'types/web-socket';
+import { IClientCompressedImage } from 'types/models';
 
 @Injectable()
 export class AdminPanelService {
@@ -40,8 +41,9 @@ export class AdminPanelService {
         }
 
         const imageAdditionalData: IImageAdditionalData = {
-            imageEventType: requestBody.client.imageEventType,
-            imageDescription: requestBody.client.imageDescription
+            eventType: requestBody.client.imageEventType,
+            viewSizeType: requestBody.client.imageViewSizeType,
+            description: requestBody.client.imageDescription
         }
 
         const originalImagesDirPath: string = this.appService.clientOriginalImagesDir;
@@ -180,11 +182,11 @@ export class AdminPanelService {
             client, 
             clientType: 'admin', 
             find: { 
-                includeFields: [ 'originalName', 'originalSize', 'imageEventType', 'imageDescription', 'uploadDate', 'displayedOnHomePage', 'displayedOnGalleryPage' ] 
+                includeFields: [ 'originalName', 'originalSize', 'eventType', 'viewSizeType', 'description', 'uploadDate', 'displayedOnHomePage', 'displayedOnGalleryPage' ] 
             }
         });
 
-        const imagesList: IFullCompressedImageData = { imagesList: compressedImages as unknown as ICompressedImage[], count: compressedImages.length };
+        const imagesList: IFullCompressedImageData = { imagesList: compressedImages as unknown as IClientCompressedImage[], count: compressedImages.length };
 
         return imagesList;
     }
@@ -248,9 +250,9 @@ export class AdminPanelService {
             else if ( compressedImage.displayedOnGalleryPage ) updateValues.displayedOnGalleryPage = false;
         }
 
-        const staticFilesHomeImagePath: string = path.join(staticFilesDirPath, 'home', compressedImage.imageName);
-        const staticFilesGalleryImagePath: string = path.join(staticFilesDirPath, 'gallery', compressedImage.imageName);
-        const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImage.imageName);
+        const staticFilesHomeImagePath: string = path.join(staticFilesDirPath, 'home', compressedImage.name);
+        const staticFilesGalleryImagePath: string = path.join(staticFilesDirPath, 'gallery', compressedImage.name);
+        const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImage.name);
 
         let oldPath: string = '';
         let newPath: string = '';

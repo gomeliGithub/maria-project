@@ -31,7 +31,7 @@ export class ImageControlService {
     public async get (options: IСompressedImageGetOptions): Promise<ClientCompressedImage[]> {
         const findOptions: AssociationGetOptions = { where: [], raw: true }
 
-        if ( options && options.find && options.find.searchFields ) findOptions.where = { imageName: options.find.searchFields };
+        if ( options && options.find && options.find.searchFields ) findOptions.where = { name: options.find.searchFields };
         if ( options && options.find && options.find.includeFields ) findOptions.attributes = options.find.includeFields;
         if ( options && options.find && options.hasOwnProperty('rawResult') ) findOptions.raw = options.find.rawResult;
 
@@ -82,13 +82,14 @@ export class ImageControlService {
             await fsPromises.rename(outputTempFilePath, outputImagePath);
 
             newCompressedImage = await this.compressedImageModel.create({
-                imageName: outputImageName,
-                imageDirPath: compressImageData.outputDirPath,
+                name: outputImageName,
+                dirPath: compressImageData.outputDirPath,
                 originalName: inputImageName,
                 originalDirPath: inputImageDirPath,
                 originalSize: compressImageData.originalImageSize,
-                imageEventType: compressImageData.imageAdditionalData.imageEventType,
-                imageDescription: compressImageData.imageAdditionalData.imageDescription
+                eventType: compressImageData.imageAdditionalData.eventType,
+                viewSizeType: compressImageData.imageAdditionalData.viewSizeType,
+                description: compressImageData.imageAdditionalData.description,
             });
 
             await client.$add('compressedImages', newCompressedImage);
@@ -122,7 +123,6 @@ export class ImageControlService {
         }
     }
 
-    // дописывает заданный постфикс к имени (не расширению) файла
     public getTempFileName (targetFilePath: string, postfix = "_tmp"): string {
         const targetPathParts = path.parse(targetFilePath);
 
@@ -169,7 +169,7 @@ export class ImageControlService {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, { rawResult: false });
-        const compressedImage: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(imagePath) } });
+        const compressedImage: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { name: path.basename(imagePath) } });
 
         try {
             const compressedImageName: string = `${path.basename(imagePath, path.extname(imagePath))}_thumb${ path.extname(imagePath) }`;

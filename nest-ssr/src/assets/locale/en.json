@@ -77,6 +77,7 @@
 			"ORIGINALNAME": "Original name",
 			"ORIGINALSIZE": "Original image size",
 			"IMAGEEVENTTYPE": "Event type",
+			"VIEWSIZETYPE": "View size type",
 			"IMAGEEVENTDESCRIPTION": "Image description",
 			"UPLOADAT": "Upload at",
 			"ONHOMEPAGE": "Displayed on Home page",
@@ -92,12 +93,15 @@
 		},
 		"CHANGEIMAGEDATATEXT": {
 			"EVENTTYPE": "Event type",
+			"VIEWSIZETYPE": "View size type",
 			"DESCRIPTION": "Individual image description",
 			"CHANGEBUTTON": "Change"
 		},
 		"UPLOADIMAGETEXT": {
 			"EVENTTYPE": "Event type",
+			"VIEWSIZETYPE": "",
 			"INVALIDEVENTTYPE": "Event type not selected",
+			"INVALIDVIEWSIZETYPE": "View size not selected",
 			"INVALIDSELECTIMAGE": "No image selected",
 			"DESCRIPTION": "Individual image description",
 			"BUTTON": "Upload new image"
@@ -107,6 +111,11 @@
 		"WEDDING": "Wedding",
 		"HOLIDAY": "Holiday",
 		"BIRTHDAY": "Birthday"
+	},
+	"IMAGEVIEWSIZETYPES": {
+		"SMALL": "Small",
+		"MEDIUM": "Medium",
+		"BIG": "Big"
 	},
     "PROGRESSBAR": {
 		"TITLE": "Upload image..."

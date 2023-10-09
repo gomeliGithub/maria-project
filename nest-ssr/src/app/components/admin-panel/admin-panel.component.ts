@@ -9,8 +9,9 @@ import { ModalComponent } from '../modal/modal.component';
 import { AppService } from '../../app.service';
 import { AdminPanelService } from '../../services/admin-panel/admin-panel.service';
 
-import { ICompressedImage, IFullCompressedImageData } from 'types/global';
+import { IFullCompressedImageData } from 'types/global';
 import { IModalRef } from 'types/options';
+import { IClientCompressedImage } from 'types/models';
 
 @Component({
     selector: 'app-admin-panel',
@@ -26,24 +27,28 @@ export class AdminPanelComponent implements OnInit {
     ) {
         this.uploadImageForm = new FormGroup({
             'imageEventType': new FormControl("", [ Validators.required, this.imageEventTypeValidator ]),
+            'imageViewSizeType': new FormControl("", [ Validators.required, this.imageViewSizeTypeValidator ]),
             'image': new FormControl(null as FileList, [ Validators.required, this.imageValidator ]),
             'imageDescription': new FormControl("", Validators.maxLength(20))
         });
 
         this.changeImageDataForm = new FormGroup({
             'newImageEventType': new FormControl("", [ Validators.nullValidator, this.imageEventTypeValidator ]),
+            'newImageViewSizeType': new FormControl("", [ Validators.nullValidator, this.imageViewSizeTypeValidator ]),
             'newImageDescription': new FormControl("", Validators.maxLength(20)) 
         });
     }
 
     public uploadImageForm: FormGroup<{
         imageEventType: FormControl<string>;
+        imageViewSizeType: FormControl<string>;
         image: FormControl<FileList>;
         imageDescription: FormControl<string>;
     }>;
 
     public changeImageDataForm: FormGroup<{
         newImageEventType: FormControl<string>;
+        newImageViewSizeType: FormControl<string>;
         newImageDescription: FormControl<string>;
     }>;
 
@@ -69,7 +74,7 @@ export class AdminPanelComponent implements OnInit {
     
     public getFullCompressedImagesDataResult: Observable<IFullCompressedImageData>;
 
-    public fullCompressedImagesList: ICompressedImage[];
+    public fullCompressedImagesList: IClientCompressedImage[];
     public fullCompressedImagesListCount: number;
 
     public spinnerTitle: string;
@@ -119,8 +124,18 @@ export class AdminPanelComponent implements OnInit {
         return null;
     }
 
+    public imageViewSizeTypeValidator (control: FormControl<string>): { [ s: string ]: boolean } | null {
+        const imageViewSizeTypes: string[] = [ 'small', 'medium', 'big' ];
+
+        if ( !imageViewSizeTypes.includes(control.value) ) {
+            return { 'imageViewSizeType': true, 'newImageViewSizeType': true };
+        }
+
+        return null;
+    }
+
     public uploadImage (): void {
-        const { imageEventType, imageDescription } = this.uploadImageForm.value;
+        const { imageEventType, imageViewSizeType, imageDescription } = this.uploadImageForm.value;
 
         const imageMetaJson: string = JSON.stringify({
             name         : this._imageFile ? this._imageFile.name : null,
@@ -143,6 +158,7 @@ export class AdminPanelComponent implements OnInit {
                     _id: newClientId, 
                     uploadImageMeta: imageMetaJson,
                     imageEventType,
+                    imageViewSizeType,
                     imageDescription
                 }
             }, { headers, responseType: 'text', withCredentials: true }).subscribe({
@@ -177,7 +193,11 @@ export class AdminPanelComponent implements OnInit {
                     adminPanel: { originalImageName }
                 }, { headers, responseType: 'text', withCredentials: true }).subscribe({
                     next: responseText => this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef),
-                    error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+                    error: () => {
+                        this.spinnerHidden = true;
+
+                        this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+                    }
                 });
             }
         } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);

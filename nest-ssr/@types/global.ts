@@ -1,6 +1,7 @@
 import { Request } from "express";
 
 import { IClientSignData } from "./sign";
+import { IClientCompressedImage } from "./models";
 
 export interface ICookieSerializeOptions {
     domain?: string;
@@ -8,7 +9,7 @@ export interface ICookieSerializeOptions {
     httpOnly?: boolean;
     maxAge?: number;
     priority?: 'low' | 'medium' | 'high';
-    sameSite?: boolean | 'lax' | 'none' |'strict';
+    sameSite?: boolean | 'lax' | 'none' | 'strict';
     secure?: boolean;
 }
 
@@ -28,6 +29,7 @@ export interface IRequestBody {
         _id: number;
         uploadImageMeta: string;
         imageEventType: string;
+        imageViewSizeType: string;
         imageDescription?: string;
     },
     adminPanel?: {
@@ -35,14 +37,11 @@ export interface IRequestBody {
         displayTargetPage: 'home' | 'gallery' | 'original';
         newImageEventType?: string; 
         newImageDescription?: string;
-    },
-
-
-
-    clientLogins?: string | string[];
+    }
 }
 
 export interface IClient {
+    id: number;
     login: string;
     type: 'admin' | 'member';
     locale: string;
@@ -64,19 +63,8 @@ export interface IClientLocale {
     title: string;
 }
 
-export interface ICompressedImage {
-    imageName?: string;
-    originalName?: string;
-    originalSize?: number;
-    imageEventType?: string; 
-    imageDescription?: string;
-    uploadDate?: Date;
-    displayedOnHomePage?: number;
-    displayedOnGalleryPage?: number;
-}
-
 export interface IFullCompressedImageData {
-    imagesList: ICompressedImage[];
+    imagesList: IClientCompressedImage[];
     count: number;
 }
 
@@ -88,8 +76,9 @@ export interface ICompressImageData {
 }
 
 export interface IImageAdditionalData {
-    imageEventType: string;
-    imageDescription?: string;
+    eventType: string;
+    viewSizeType: string;
+    description?: string;
 }
 
 export interface IComponentInfo {

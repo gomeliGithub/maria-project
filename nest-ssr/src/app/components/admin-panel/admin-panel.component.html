@@ -8,6 +8,7 @@
                         <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALNAME' | translate }}</th>
                         <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALSIZE' | translate }}</th>
                         <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEEVENTTYPE' | translate }}</th>
+                        <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.VIEWSIZETYPE' | translate }}</th>
                         <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEEVENTDESCRIPTION' | translate }}</th>
                         <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.UPLOADAT' | translate }}</th>
                         <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ONHOMEPAGE' | translate }}</th>
@@ -19,12 +20,17 @@
                         <th scope="row">{{ i + 1 }}</th>
                         <td>{{ compressedImage.originalName }}</td>
                         <td>{{ compressedImage.originalSize }}</td>
-                        <td [ngSwitch]="compressedImage.imageEventType">
+                        <td [ngSwitch]="compressedImage.eventType">
                             <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
                             <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
                             <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
                         </td>
-                        <td>{{ compressedImage.imageDescription }}</td>
+                        <td [ngSwitch]="compressedImage.viewSizeType">
+                            <ng-template ngSwitchCase="small">{{ 'IMAGEVIEWSIZETYPES.SMALL' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="medium">{{ 'IMAGEVIEWSIZETYPES.MEDIUM' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="big">{{ 'IMAGEVIEWSIZETYPES.BIG' | translate }}</ng-template>
+                        </td>
+                        <td>{{ compressedImage.description }}</td>
                         <td>{{ compressedImage.uploadDate | date:"d/M/yy, H:mm" }}</td>
                         <td class="fw-bold" [ngClass]="{ 
                             'text-success': compressedImage.displayedOnHomePage === 1, 
@@ -92,6 +98,14 @@
                     <label for="inputChangeEventType" class="form-label">{{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.EVENTTYPE' | translate }}</label>
                 </div>
                 <div class="form-group form-floating mb-3">
+                    <select class="form-control form-select" id="inputChangeViewSizeType" formControlName="newImageViewSizeType">
+                        <option value="small" selected>{{ 'IMAGEVIEWSIZETYPES.SMALL' | translate }}</option>
+                        <option value="medium">{{ 'IMAGEVIEWSIZETYPES.MEDIUM' | translate }}</option>
+                        <option value="big">{{ 'IMAGEVIEWSIZETYPES.BIG' | translate }}</option>
+                    </select>
+                    <label for="inputChangeViewSizeType" class="form-label">{{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.VIEWSIZETYPE' | translate }}</label>
+                </div>
+                <div class="form-group form-floating mb-3">
                     <input type="text" class="form-control" id="inputChangeImageDescription" formControlName="newImageDescription">
                     <label for="inputChangeImageDescription" class="form-label">{{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.DESCRIPTION' | translate }}</label>
                 </div>
@@ -119,8 +133,19 @@
                         {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDEVENTTYPE' | translate }}
                     </div>
                 </div>
+                <div class="form-group form-floating mb-3">
+                    <select class="form-control form-select" id="inputViewSizeType" formControlName="imageViewSizeType">
+                        <option value="small" selected>{{ 'IMAGEVIEWSIZETYPES.SMALL' | translate }}</option>
+                        <option value="medium">{{ 'IMAGEVIEWSIZETYPES.MEDIUM' | translate }}</option>
+                        <option value="big">{{ 'IMAGEVIEWSIZETYPES.BIG' | translate }}</option>
+                    </select>
+                    <label for="inputViewSizeType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.VIEWSIZETYPE' | translate }}</label>
+                    <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imageViewSizeType'].invalid && uploadImageForm.controls['imageViewSizeType'].touched">
+                        {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDVIEWSIZETYPE' | translate }}
+                    </div>
+                </div>
                 <div class="form-group mb-3">
-                    <input type="file" class="form-control" id="inputImage" placeholder="Название события" (change)="fileChange($event)" formControlName="image">
+                    <input type="file" class="form-control" id="inputImage" (change)="fileChange($event)" formControlName="image">
                     <div class="alert alert-danger" *ngIf="uploadImageForm.controls['image'].invalid && uploadImageForm.controls['image'].touched">
                         {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDSELECTIMAGE' | translate }}
                     </div>

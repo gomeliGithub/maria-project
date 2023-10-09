@@ -7,7 +7,7 @@ import { ModalComponent } from '../modal/modal.component';
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 
-import { ICompressedImage } from 'types/global';
+import { IClientCompressedImage } from 'types/models';
 
 @Component({
     selector: 'app-home',
@@ -25,8 +25,8 @@ export class HomeComponent implements OnInit {
     private readonly modalViewRef: ViewContainerRef;
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
-    public observableCompressedImagesList: Observable<ICompressedImage[][]>;
-    public compressedImagesList: ICompressedImage[][];
+    public observableCompressedImagesList: Observable<IClientCompressedImage[][]>;
+    public compressedImagesList: IClientCompressedImage[][];
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
@@ -36,7 +36,7 @@ export class HomeComponent implements OnInit {
             });
 
             this.observableCompressedImagesList = this.clientService.getCompressedImagesList('home').pipe(map(imagesList => {
-                this.compressedImagesList = imagesList && imagesList.length !== 0 ? imagesList : null;
+                this.compressedImagesList = imagesList.length !== 0 ? imagesList : null;
 
                 return imagesList;
             }), catchError(() => {

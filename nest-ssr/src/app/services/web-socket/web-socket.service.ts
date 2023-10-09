@@ -30,6 +30,7 @@ export class WebSocketService {
 
     public on (host: string, uploadImageForm: FormGroup<{
         imageEventType: FormControl<string>;
+        imageViewSizeType: FormControl<string>;
         image: FormControl<FileList>;
         imageDescription: FormControl<string>;
     }>, slicedImageData: ArrayBuffer[], newClientId: number, modalRef: IModalRef): void {
@@ -120,6 +121,7 @@ export class WebSocketService {
 
     private _clearUploadImageData (uploadImageForm: FormGroup<{
         imageEventType: FormControl<string>;
+        imageViewSizeType: FormControl<string>;
         image: FormControl<FileList>;
         imageDescription: FormControl<string>;
     }>) {

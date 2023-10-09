@@ -1,9 +1,9 @@
 <div class="d-flex flex-row justify-content-center align-items-center h-100" id="signFormContainer" (submit)="sign()">
     <form [formGroup]="signForm" class="p-3 w-50 border border-light border-3 rounded" novalidate>
         <div class="form-group form-floating mb-3">
-            <input type="text" class="form-control" id="inputLogin" placeholder="Имя вашего аккаунта" formControlName="clientLogin">
+            <input type="text" class="form-control" id="inputLogin" aria-describedby="loginHelpBlock" placeholder="Имя вашего аккаунта" formControlName="clientLogin">
             <label for="inputLogin" class="form-label">Логин</label>
-            <div id="loginHelpBlock" class="form-text">
+            <div id="loginHelpBlock" class="form-text text-light">
                 {{ 'CLIENTPAGE.HELPBLOCKS.LOGIN' | translate }}
             </div>
             <div class="alert alert-danger" *ngIf="signForm.controls['clientLogin'].invalid && signForm.controls['clientLogin'].touched">
@@ -11,9 +11,9 @@
             </div>
         </div>
         <div class="form-group form-floating mb-3">
-            <input type="password" class="form-control" id="inputPassword" placeholder="Ваш пароль" formControlName="clientPassword">
+            <input type="password" class="form-control" id="inputPassword" aria-describedby="passwordHelpBlock" placeholder="Ваш пароль" formControlName="clientPassword">
             <label for="inputPassword" class="form-label">Пароль</label>
-            <div id="passwordHelpBlock" class="form-text">
+            <div id="passwordHelpBlock" class="form-text text-light">
                 {{ 'CLIENTPAGE.HELPBLOCKS.PASSWORD' | translate }}
             </div>
             <div class="alert alert-danger" *ngIf="signForm.controls['clientPassword'].invalid && signForm.controls['clientPassword'].touched">
@@ -21,9 +21,9 @@
             </div>
         </div>
         <div *ngIf="signOp === 'up'" class="form-group form-floating mb-3">
-            <input type="text" class="form-control" id="inputFullName" placeholder="Ваше собственное ФИО" formControlName="clientFullName">
+            <input type="text" class="form-control" id="inputFullName" aria-describedby="fullNameHelpBlock" placeholder="Ваше собственное ФИО" formControlName="clientFullName">
             <label for="inputFullName" class="form-label">ФИО</label>
-            <div id="fullNameHelpBlock" class="form-text">
+            <div id="fullNameHelpBlock" class="form-text text-light">
                 {{ 'CLIENTPAGE.HELPBLOCKS.FULLNAME' | translate }}
             </div>
             <div class="alert alert-danger" *ngIf="signForm.controls['clientFullName'].invalid && signForm.controls['clientFullName'].touched">

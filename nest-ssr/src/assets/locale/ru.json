@@ -76,6 +76,7 @@
 			"ORIGINALNAME": "Оригинальное имя",
 			"ORIGINALSIZE": "Размер оригинального изображения",
 			"IMAGEEVENTTYPE": "Тип события",
+			"VIEWSIZETYPE": "Размер отображения",
 			"IMAGEEVENTDESCRIPTION": "Описание фото",
 			"UPLOADAT": "Загружен",
 			"ONHOMEPAGE": "Отображён на главной",
@@ -91,12 +92,15 @@
 		},
 		"CHANGEIMAGEDATATEXT": {
 			"EVENTTYPE": "Тип события",
+			"VIEWSIZETYPE": "Размер отображения",
 			"DESCRIPTION": "Индивидуальное описание фото",
 			"CHANGEBUTTON": "Изменить"
 		},
 		"UPLOADIMAGETEXT": {
 			"EVENTTYPE": "Тип события",
+			"VIEWSIZETYPE": "Размер отображения",
 			"INVALIDEVENTTYPE": "Не выбран тип события",
+			"INVALIDVIEWSIZETYPE": "Не выбран размер отображения",
 			"INVALIDSELECTIMAGE": "Не выбрано изображение",
 			"DESCRIPTION": "Индивидуальное описание фото",
 			"BUTTON": "Загрузить новое изображение"
@@ -106,6 +110,11 @@
 		"WEDDING": "Свадьба",
 		"HOLIDAY": "Праздник",
 		"BIRTHDAY": "День рождения"
+	},
+	"IMAGEVIEWSIZETYPES": {
+		"SMALL": "Небольшой",
+		"MEDIUM": "Средний",
+		"BIG": "Большой"
 	},
 	"PROGRESSBAR": {
 		"TITLE": "Загрузка изображения..."

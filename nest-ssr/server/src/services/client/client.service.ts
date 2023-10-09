@@ -17,8 +17,9 @@ import { JwtControlService } from '../sign/jwt-control.service';
 
 import { Admin, Member, ClientCompressedImage } from '../../models/client.model';
 
-import { IClient, ICompressedImage, ICookieSerializeOptions, IRequest } from 'types/global';
+import { IClient, ICookieSerializeOptions, IRequest } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions } from 'types/options';
+import { IClientCompressedImage } from 'types/models';
 
 @Injectable()
 export class ClientService {
@@ -99,7 +100,7 @@ export class ClientService {
         }
 
         if ( options.compressedImageName ) {
-            const compressedImageData: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { imageName: options.compressedImageName }});
+            const compressedImageData: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { name: options.compressedImageName }});
 
             if ( compressedImageData ) response.download(path.join(compressedImageData.originalDirPath, compressedImageData.originalName));
             else throw new BadRequestException();
@@ -108,21 +109,21 @@ export class ClientService {
         }
     }
 
-    public async getCompressedImagesList (imagesType: 'home' | 'gallery'): Promise<string[] | ICompressedImage[][]> {
+    public async getCompressedImagesList (imagesType: 'home' | 'gallery'): Promise<string[] | IClientCompressedImage[][]> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
         const imagesList: string[] = (await fsPromises.readdir(path.join(this.compressedImagesDirPath, imagesType))).filter(imageName => path.extname(imageName) !== '.txt');
 
-        const compressedImages = await commonServiceRef.getCompressedImages({
+        const compressedImages: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({
             find: {
                 searchFields: imagesList,
-                includeFields: [ 'imageName', 'imageEventType', 'imageDescription', 'uploadDate' ]
+                includeFields: [ 'name', 'eventType', 'viewSizeType', 'description', 'uploadDate' ]
             }
-        }) as unknown as ICompressedImage[];
+        }) as unknown as IClientCompressedImage[];
 
-        let reducedImagesList: ICompressedImage[][] = null;
+        let reducedImagesList: IClientCompressedImage[][] = null;
 
-        if ( imagesType === 'home' ) reducedImagesList = compressedImages.reduce((previousImage: ICompressedImage[][], currentImage, currentIndex) => {
+        if ( imagesType === 'home' ) reducedImagesList = compressedImages.reduce((previousImage: IClientCompressedImage[][], currentImage, currentIndex) => {
             if ( currentIndex === 0 ) {
                 previousImage[currentIndex] = [];
 
@@ -136,6 +137,23 @@ export class ClientService {
 
             return previousImage;
         }, []);
+
+
+
+
+
+
+        const smallViewImages = compressedImages.filter(image => image.viewSizeType === 'small');
+        const mediumViewImages = compressedImages.filter(image => image.viewSizeType === 'medium');
+        const bigViewImages = compressedImages.filter(image => image.viewSizeType === 'big');
+
+        console.log(smallViewImages);
+        console.log(mediumViewImages);
+        console.log(bigViewImages);
+
+
+
+
 
         return reducedImagesList ?? imagesList;
     }

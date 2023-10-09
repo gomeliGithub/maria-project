@@ -106,11 +106,12 @@ export class SignService {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
         const clientInstance: Admin | Member = await commonServiceRef.getClients(request, clientLogin, {
-            includeFields: [ 'login', 'fullName', 'type' ],
+            includeFields: [ 'id', 'login', 'fullName', 'type' ],
             rawResult: true
-        }) as Admin | Member;
+        });
 
         const payload: IClient = {
+            id: clientInstance.id,
             login: clientInstance.login,
             type: clientInstance.type as 'admin' | 'member',
             locale: process.env.CLIENT_DEFAULT_LOCALE,

@@ -24,10 +24,12 @@ export class AdminPanelController {
     @ClientTypes('admin')
     async uploadImage (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
         const imageEventTypes: string[] = [ 'wedding', 'holiday', 'birthday' ];
+        const imageViewSizeTypes: string[] = [ 'small', 'medium', 'big' ];
 
-        if ( !requestBody.client || !requestBody.client._id || !requestBody.client.uploadImageMeta || !requestBody.client.imageEventType
+        if ( !requestBody.client || !requestBody.client._id || !requestBody.client.uploadImageMeta || !requestBody.client.imageEventType || !requestBody.client.imageViewSizeType
             || typeof requestBody.client._id !== 'number' || requestBody.client._id < 0 || requestBody.client._id > 1 
             || typeof requestBody.client.uploadImageMeta !== 'string' || typeof requestBody.client.imageEventType !== 'string' || !imageEventTypes.includes(requestBody.client.imageEventType)
+            || typeof requestBody.client.imageViewSizeType !== 'string' || !imageViewSizeTypes.includes(requestBody.client.imageViewSizeType)
             || requestBody.client.imageDescription && (typeof requestBody.client.imageDescription !== 'string' || requestBody.client.imageDescription.length > 20)
         ) {
             await this.appService.logLineAsync(`[${ process.env.SERVER_API_PORT }] UploadImage - not valid client data`);
