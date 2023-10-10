@@ -1,11 +1,11 @@
 <div class="bg-image d-flex flex-column align-items-center h-100" #bgImage>
-    <nav class="navbar navbar-expand navbar-light w-100 sticky-top" style="background-color: #e3f2fd;">
+    <nav class="navbar navbar-expand-sm navbar-light w-100 sticky-top" style="background-color: #e3f2fd;">
         <div class="container-fluid">
             <a class="navbar-brand" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                 <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
                 Mashulik
             </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavDropdown" [attr.activeClient]="activeClient">
@@ -26,9 +26,9 @@
                         </a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             {{ 'CLIENTMENU.TITLE' | translate }}
-                        </a>
+                        </button>
                         <ul class="dropdown-menu">
                             <li *ngIf="!activeClientLogin">
                                 <a class="dropdown-item" routerLink="/signUp" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
