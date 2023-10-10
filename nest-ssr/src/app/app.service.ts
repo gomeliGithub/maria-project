@@ -37,7 +37,7 @@ export class AppService {
     }
 
     public setTitle (title: string): void {
-        const mainTitle: string = this.platformTitle.getTitle();
+        const mainTitle: string = this.platformTitle.getTitle().split('-')[0].trim();
 
         this.platformTitle.setTitle(`${ mainTitle } - ${ title }`);
     }

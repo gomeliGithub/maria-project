@@ -2,7 +2,7 @@
 <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
 <div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-row flex-wrap justify-content-center mt-3" id="commonImages">
     <ng-template ngFor let-imagesDataSizedArr [ngForOf]="compressedImagesList" let-i="index">
-        <div *ngFor="let imagesDataArr of imagesDataSizedArr" class="d-flex flex-column imagesGroup" [ngClass]="{ 
+        <div *ngFor="let imagesDataArr of imagesDataSizedArr" class="d-flex flex-column w-100 imagesGroup" [ngClass]="{ 
             'small': i === 0,
             'medium': i === 1,
             'big': i === 2,
