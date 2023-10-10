@@ -1,7 +1,8 @@
 <div class="d-flex flex-column" id="controls">
     <div class="p-3" id="images" [attr.getFullCompressedImagesDataResult]="getFullCompressedImagesDataResult">
-        <div id="listContainer">
-            <table *ngIf="fullCompressedImagesListCount !== 0; else noContentBlock" class="table table-borderless table-hover">
+        <div class="table-responsive" id="listContainer">
+            <table *ngIf="fullCompressedImagesListCount !== 0; else noContentBlock" class="table caption-top table-borderless table-hover">
+                <caption>{{ 'ADMINPANEL.TABLECAPTION' | translate }}</caption>
                 <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -19,7 +20,7 @@
                     <tr *ngFor="let compressedImage of fullCompressedImagesList; let i = index">
                         <th scope="row">{{ i + 1 }}</th>
                         <td>{{ compressedImage.originalName }}</td>
-                        <td>{{ compressedImage.originalSize }}</td>
+                        <td>{{ compressedImage.originalSize | imageSize }}</td>
                         <td [ngSwitch]="compressedImage.eventType">
                             <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
                             <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>

@@ -1,6 +1,6 @@
 
 <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
-<div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-row flex-wrap mt-3" id="commonImages">
+<div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-row flex-wrap justify-content-center mt-3" id="commonImages">
     <ng-template ngFor let-imagesDataSizedArr [ngForOf]="compressedImagesList" let-i="index">
         <div *ngFor="let imagesDataArr of imagesDataSizedArr" class="d-flex flex-column imagesGroup" [ngClass]="{ 
             'small': i === 0,
@@ -15,13 +15,13 @@
                 'w-25': i === 0,
                 'w-50 ': i === 1
             }">
-                <img src="/assets/images_thumbnail/home/{{imageData.name}}" class="card-img-top img-fluid rounded-start" alt="...">
+                <img src="/assets/images_thumbnail/home/{{imageData.name}}" class="card-img-top img-fluid rounded-top" alt="...">
                 <div class="card-body">
-                    <h5 [ngSwitch]="imageData.eventType" class="card-title w-100">
+                    <h6 [ngSwitch]="imageData.eventType" class="card-title w-100">
                         <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
                         <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
                         <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
-                    </h5>
+                    </h6>
                     <p *ngIf="imageData.description" class="card-text">{{ imageData.description }}</p>
                     <p class="card-text align-self-end">
                         <small class="text-body-secondary">{{ imageData.uploadDate | date:"d/M/yy" }}</small>

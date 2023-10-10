@@ -73,6 +73,7 @@
 		"NOIMAGESMESSAGE": "No images uploaded yet",
 		"DELETEIMAGESUCCESSMESSAGE": "Image deleted successfully",
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Maximum number of images on the home page",
+		"TABLECAPTION": "Image management",
 		"TABLECOLTITLES": {
 			"ORIGINALNAME": "Original name",
 			"ORIGINALSIZE": "Original image size",
@@ -105,6 +106,13 @@
 			"INVALIDSELECTIMAGE": "No image selected",
 			"DESCRIPTION": "Individual image description",
 			"BUTTON": "Upload new image"
+		},
+		"IMAGESIZES": {
+			"BYTE": "byte",
+			"KBYTE": "КB",
+			"MBYTE": "МB",
+			"GBYTE": "ГB",
+			"TBYTE": "ТB"
 		}
 	},
 	"IMAGEEVENTTYPES": {

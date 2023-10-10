@@ -72,6 +72,7 @@
 		"NOIMAGESMESSAGE": "Загруженных изображений пока нет",
 		"DELETEIMAGESUCCESSMESSAGE": "Изображение успешно удалено",
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Максимальное количество изображений на главной странице",
+		"TABLECAPTION": "Управление изображениями",
 		"TABLECOLTITLES": {
 			"ORIGINALNAME": "Оригинальное имя",
 			"ORIGINALSIZE": "Размер оригинального изображения",
@@ -104,6 +105,13 @@
 			"INVALIDSELECTIMAGE": "Не выбрано изображение",
 			"DESCRIPTION": "Индивидуальное описание фото",
 			"BUTTON": "Загрузить новое изображение"
+		},
+		"IMAGESIZES": {
+			"BYTE": "байт",
+			"KBYTE": "КБ",
+			"MBYTE": "МБ",
+			"GBYTE": "ГБ",
+			"TBYTE": "ТБ"
 		}
 	},
 	"IMAGEEVENTTYPES": {

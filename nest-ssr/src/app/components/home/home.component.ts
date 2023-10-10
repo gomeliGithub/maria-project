@@ -1,6 +1,6 @@
 import { Component, ComponentRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 
-import { EMPTY, Observable, catchError, map } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { ModalComponent } from '../modal/modal.component';
 

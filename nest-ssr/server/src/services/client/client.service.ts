@@ -130,18 +130,7 @@ export class ClientService {
                 big: this._reduceCompressedImages(compressedImages.filter(image => image.viewSizeType === 'big'), 1)
             }
         }
-
-        console.log(fullReduceImages);
-        console.log(fullReduceImages.small.length);
-        console.log(fullReduceImages.medium.length);
-        console.log(fullReduceImages.big.length);
-
-
-
-
-
-
-
+        
         return fullReduceImages ?? imagesList;
     }
 

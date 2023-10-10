@@ -18,13 +18,16 @@ body {
 }
 
 app-home, app-gallery, app-client, app-admin-panel, app-not-found {
-    height: 100%!important;
+    height: auto!important;
     width: 100%!important;
 }
 
 app-home {
-    height: auto!important;
     padding: 1rem!important;
+}
+
+app-client {
+    height: 100%!important;
 }
 
 input.ng-touched.ng-invalid {

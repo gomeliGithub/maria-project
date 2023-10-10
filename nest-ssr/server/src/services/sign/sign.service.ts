@@ -133,6 +133,7 @@ export class SignService {
         await this.jwtControlService.saveToken(access_token);
 
         response.cookie('__secure_fgp', __secure_fgp, this.appService.cookieSerializeOptions);
+        response.cookie('locale', process.env.CLIENT_DEFAULT_LOCALE, this.appService.cookieSerializeOptions);
 
         return access_token;
     }

@@ -7,10 +7,11 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AdminPanelComponent } from '../components/admin-panel/admin-panel.component';
 import { AdminPanelService } from '../services/admin-panel/admin-panel.service';
 
+import { ImageSizePipe } from '../pipes/image-size/image-size.pipe';
 import { BooleanPipe } from '../pipes/boolean/boolean.pipe';
 
 @NgModule({
-    declarations: [ AdminPanelComponent, BooleanPipe ],
+    declarations: [ AdminPanelComponent, ImageSizePipe, BooleanPipe ],
     imports: [
         CommonModule,
         ReactiveFormsModule,

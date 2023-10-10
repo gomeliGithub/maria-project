@@ -1,5 +1,5 @@
 <div class="bg-image d-flex flex-column align-items-center h-100" #bgImage>
-    <nav class="navbar navbar-expand navbar-light w-100" style="background-color: #e3f2fd;">
+    <nav class="navbar navbar-expand navbar-light w-100 sticky-top" style="background-color: #e3f2fd;">
         <div class="container-fluid">
             <a class="navbar-brand" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                 <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
@@ -30,12 +30,12 @@
                             {{ 'CLIENTMENU.TITLE' | translate }}
                         </a>
                         <ul class="dropdown-menu">
-                            <li>
+                            <li *ngIf="!activeClientLogin">
                                 <a class="dropdown-item" routerLink="/signUp" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                                     {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
                                 </a>
                             </li>
-                            <li>
+                            <li *ngIf="!activeClientLogin">
                                 <a class="dropdown-item" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                                     {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
                                 </a>
@@ -44,16 +44,6 @@
                                 <button type="button" class="dropdown-item" (click)="signOut()">
                                     {{ 'CLIENTMENU.SIGNOUTTEXT' | translate }}
                                 </button>
-                            </li>
-                        </ul>
-                    </li>
-                    <li *ngIf="activeClientLogin" class="nav-item dropdown">
-                        <button type="button" class="nav-link dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" #changeClientLocaleButton>
-                            {{ activeClientLocale }}
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                            <li *ngFor="let locale of locales">
-                                <button type="button" class="dropdown-item" id={{locale.code}} (click)="changeClientLocale($event)">{{locale.code}} ({{locale.title}})</button>
                             </li>
                         </ul>
                     </li>
@@ -67,29 +57,36 @@
                         <span class="text-warning">{{ 'CLIENTMENU.NONSIGNINTEXT' | translate }}</span>
                     </ng-template>
                 </div>
+                <ul *ngIf="activeClientLogin" class="navbar-nav ms-2">
+                    <li class="nav-item dropdown">
+                        <button type="button" class="nav-link dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" #changeClientLocaleButton>
+                            {{ activeClientLocale }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                            <li *ngFor="let locale of locales">
+                                <button type="button" class="dropdown-item" id={{locale.code}} (click)="changeClientLocale($event)">{{locale.code}} ({{locale.title}})</button>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
     <router-outlet></router-outlet>
     <ng-template #appModal></ng-template>
-    <footer class="footer mt-auto w-100 py-2 bg-secondary text-center">
-        <div class="container">
+    <footer class="footer mt-auto w-100 text-center text-white" style="background-color: #f1f1f1;">
+        <div class="container pt-3">
             <section class="mb-3">
-                <a class="btn btn-primary btn-floating m-3" style="background-color: #55acee" href="#!" role="button">
+                <a class="btn btn-link btn-floating btn-lg text-dark m-1" href="#!" role="button" data-mdb-ripple-color="dark">
                     <i class="bi bi-twitter"></i>
                 </a>
-                <a class="btn btn-primary btn-floating m-1" style="background-color: #ac2bac" href="#!" role="button">
+                <a class="btn btn-link btn-floating btn-lg text-dark m-1" href="#!" role="button" data-mdb-ripple-color="dark">
                     <i class="bi bi-instagram"></i>
                 </a>
             </section>
-            <section class="mb-3">
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt
-                    distinctio earum repellat quaerat voluptatibus placeat nam,
-                    commodi optio pariatur est quia magnam eum harum corrupti dicta,
-                    aliquam sequi voluptate quas.
-                </p>
-            </section>
+        </div>
+        <div class="text-center text-dark p-3 rounded" style="background-color: rgba(0, 0, 0, 0.2);">
+            © 2023 Copyright: Mashulik. <span class="text-danger">Work In Progress...</span>
         </div>
     </footer>
 </div>
