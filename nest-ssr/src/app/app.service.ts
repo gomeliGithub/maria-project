@@ -37,7 +37,9 @@ export class AppService {
     }
 
     public setTitle (title: string): void {
-        this.platformTitle.setTitle(title);
+        const mainTitle: string = this.platformTitle.getTitle();
+
+        this.platformTitle.setTitle(`${ mainTitle } - ${ title }`);
     }
 
     public reloadComponent (self: boolean, urlToNavigateTo?: string) {

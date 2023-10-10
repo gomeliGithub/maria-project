@@ -1,4 +1,5 @@
-import { Component, ComponentRef, ElementRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, ComponentRef, ElementRef, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
@@ -19,6 +20,8 @@ import { IClientBrowser, IClientLocale } from 'types/global';
 })
 export class AppComponent implements OnInit {
     constructor (
+        @Inject(DOCUMENT) private readonly document: Document,
+        
         private readonly appService: AppService,
         private readonly clientService: ClientService,
         private readonly translateService: TranslateService
@@ -50,6 +53,8 @@ export class AppComponent implements OnInit {
 
                 if ( this.activeClientLocale ) this.translateService.use(this.activeClientLocale);
                 else this.translateService.use(environment.defaultLocale);
+
+                this.document.documentElement.lang = this.activeClientLocale ?? environment.defaultLocale;
             },
             error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
         });
@@ -62,13 +67,15 @@ export class AppComponent implements OnInit {
         });
     }
 
-    public changeClientLocale (event: MouseEvent) {
+    public changeClientLocale (event: MouseEvent): void {
         const localeButton: HTMLAnchorElement = event.target as HTMLAnchorElement;
 
         const newLocale: string = localeButton.id;
 
         this.clientService.changeClientLocale(newLocale).subscribe({
             next: data => {
+                this.document.documentElement.lang = newLocale;
+
                 localStorage.setItem('access_token', data[0]);
 
                 this.changeClientLocaleButtonViewRef.nativeElement.textContent = newLocale;

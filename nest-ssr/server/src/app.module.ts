@@ -29,7 +29,9 @@ import { Admin, Member, ClientCompressedImage } from './models/client.model';
     imports: [
         AngularUniversalModule.forRoot({
             bootstrap: AppServerModule,
-            viewsPath: join(process.cwd(), 'dist/nest-ssr/browser')
+            viewsPath: join(process.cwd(), 'dist/nest-ssr/browser'),
+            inlineCriticalCss: false,
+            cache: false
         }),
         ConfigModule.forRoot({
             envFilePath: [ 'server/config/.env.development', 'server/config/.env.production' ],
