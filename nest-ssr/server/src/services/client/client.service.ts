@@ -17,7 +17,7 @@ import { JwtControlService } from '../sign/jwt-control.service';
 
 import { Admin, Member, ClientCompressedImage } from '../../models/client.model';
 
-import { IClient, ICookieSerializeOptions, IRequest } from 'types/global';
+import { IClient, ICookieSerializeOptions, ISizedHomeImages, IRequest } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions } from 'types/options';
 import { IClientCompressedImage } from 'types/models';
 
@@ -109,7 +109,7 @@ export class ClientService {
         }
     }
 
-    public async getCompressedImagesList (imagesType: 'home' | 'gallery'): Promise<string[] | IClientCompressedImage[][]> {
+    public async getCompressedImagesList (imagesType: 'home' | 'gallery'): Promise<string[] | ISizedHomeImages> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
         const imagesList: string[] = (await fsPromises.readdir(path.join(this.compressedImagesDirPath, imagesType))).filter(imageName => path.extname(imageName) !== '.txt');
@@ -121,15 +121,38 @@ export class ClientService {
             }
         }) as unknown as IClientCompressedImage[];
 
-        let reducedImagesList: IClientCompressedImage[][] = null;
+        let fullReduceImages: ISizedHomeImages = null;
 
-        if ( imagesType === 'home' ) reducedImagesList = compressedImages.reduce((previousImage: IClientCompressedImage[][], currentImage, currentIndex) => {
+        if ( imagesType === 'home' ) {
+            fullReduceImages = {
+                small: this._reduceCompressedImages(compressedImages.filter(image => image.viewSizeType === 'small'), 4),
+                medium: this._reduceCompressedImages(compressedImages.filter(image => image.viewSizeType === 'medium'), 2),
+                big: this._reduceCompressedImages(compressedImages.filter(image => image.viewSizeType === 'big'), 1)
+            }
+        }
+
+        console.log(fullReduceImages);
+        console.log(fullReduceImages.small.length);
+        console.log(fullReduceImages.medium.length);
+        console.log(fullReduceImages.big.length);
+
+
+
+
+
+
+
+        return fullReduceImages ?? imagesList;
+    }
+
+    private _reduceCompressedImages (compressedImages: IClientCompressedImage[], rowlength: number): IClientCompressedImage[][] {
+        const reducedImagesList = compressedImages.reduce((previousImage: IClientCompressedImage[][], currentImage, currentIndex) => {
             if ( currentIndex === 0 ) {
                 previousImage[currentIndex] = [];
 
                 previousImage[currentIndex].push(currentImage);
-            } else if ( currentIndex === 1 ) previousImage[currentIndex - 1].push(currentImage);
-            else if ( currentIndex % 2 === 0 ) {
+            } else if ( currentIndex === 1 &&  rowlength !== 1 ) previousImage[currentIndex - 1].push(currentImage);
+            else if ( currentIndex % rowlength === 0 ) {
                 previousImage[previousImage.length] = [];
 
                 previousImage[previousImage.length - 1].push(currentImage);
@@ -138,27 +161,10 @@ export class ClientService {
             return previousImage;
         }, []);
 
-
-
-
-
-
-        const smallViewImages = compressedImages.filter(image => image.viewSizeType === 'small');
-        const mediumViewImages = compressedImages.filter(image => image.viewSizeType === 'medium');
-        const bigViewImages = compressedImages.filter(image => image.viewSizeType === 'big');
-
-        console.log(smallViewImages);
-        console.log(mediumViewImages);
-        console.log(bigViewImages);
-
-
-
-
-
-        return reducedImagesList ?? imagesList;
+        return reducedImagesList;
     }
 
-    async changeLocale (request: IRequest, newLocale: string, response: Response): Promise<string> {
+    public async changeLocale (request: IRequest, newLocale: string, response: Response): Promise<string> {
         const token: string = this.jwtControlService.extractTokenFromHeader(request); 
 
         const decodedToken: IClient = this.jwtService.decode(token) as IClient;

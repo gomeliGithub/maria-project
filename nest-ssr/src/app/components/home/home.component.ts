@@ -8,6 +8,7 @@ import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 
 import { IClientCompressedImage } from 'types/models';
+import { ISizedHomeImages } from 'types/global';
 
 @Component({
     selector: 'app-home',
@@ -25,8 +26,8 @@ export class HomeComponent implements OnInit {
     private readonly modalViewRef: ViewContainerRef;
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
-    public observableCompressedImagesList: Observable<IClientCompressedImage[][]>;
-    public compressedImagesList: IClientCompressedImage[][];
+    public observableCompressedImagesList: Observable<ISizedHomeImages>;
+    public compressedImagesList: IClientCompressedImage[][][] = [];
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
@@ -35,15 +36,15 @@ export class HomeComponent implements OnInit {
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
 
-            this.observableCompressedImagesList = this.clientService.getCompressedImagesList('home').pipe(map(imagesList => {
-                this.compressedImagesList = imagesList.length !== 0 ? imagesList : null;
+            this.clientService.getCompressedImagesList('home').subscribe({
+                next: imagesList => {
+                    if ( imagesList.small.length !== 0 || imagesList.medium.length !== 0 || imagesList.big.length !== 0 ) {
+                        this.compressedImagesList.push(imagesList.small, imagesList.medium, imagesList.big);
 
-                return imagesList;
-            }), catchError(() => {
-                this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
-
-                return EMPTY;
-            }));
+                    } else this.compressedImagesList = null;
+                },
+                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+            })
         }
     }
 }

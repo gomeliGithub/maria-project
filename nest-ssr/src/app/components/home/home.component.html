@@ -1,33 +1,39 @@
-<div class="p-3" id="galleryContainer" [attr.observableCompressedImagesList]="observableCompressedImagesList | async">
-    <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
-    <div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-row flex-wrap h-50 w-100 w-25 mt-3" id="commonImages">
-        <div *ngFor="let imagesDataArr of compressedImagesList" class="d-flex flex-row imagesGroup">
-            <div *ngFor="let imageData of imagesDataArr" class="card mb-3 me-2">
-                <div class="row g-0">
-                    <div class="col-md-4">
-                        <img src="/assets/images_thumbnail/home/{{imageData.name}}" class="img-fluid rounded-start" alt="...">
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body d-flex h-100">
-                            <h5 [ngSwitch]="imageData.eventType" class="card-title w-100">
-                                <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
-                                <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
-                                <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
-                            </h5>
-                            <p *ngIf="imageData.description" class="card-text">{{ imageData.description }}</p>
-                            <p class="card-text align-self-end">
-                                <small class="text-body-secondary">{{ imageData.uploadDate | date:"d/M/yy" }}</small>
-                            </p>
-                        </div>
-                    </div>
+
+<h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
+<div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-row flex-wrap mt-3" id="commonImages">
+    <ng-template ngFor let-imagesDataSizedArr [ngForOf]="compressedImagesList" let-i="index">
+        <div *ngFor="let imagesDataArr of imagesDataSizedArr" class="d-flex flex-column imagesGroup" [ngClass]="{ 
+            'small': i === 0,
+            'medium': i === 1,
+            'big': i === 2,
+            'justify-content-center': i === 1 && imagesDataArr.length === 1 
+        }">
+            <div *ngFor="let imageData of imagesDataArr; let i2 = index" class="card mb-3 me-2" [ngClass]="{
+                'align-self-center': i === 0 && imagesDataArr.length !== 1 && (i2 === 0 || i2 === 3),
+                'align-self-end': (i === 0 && i2 === 1) || (i === 1 && (i2 === 1)),
+                'align-self-start': (i === 0 && i2 === 2) || (i === 0 && imagesDataArr.length === 1) || (i === 1 && (i2 === 0)),
+                'w-25': i === 0,
+                'w-50 ': i === 1
+            }">
+                <img src="/assets/images_thumbnail/home/{{imageData.name}}" class="card-img-top img-fluid rounded-start" alt="...">
+                <div class="card-body">
+                    <h5 [ngSwitch]="imageData.eventType" class="card-title w-100">
+                        <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
+                        <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
+                        <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
+                    </h5>
+                    <p *ngIf="imageData.description" class="card-text">{{ imageData.description }}</p>
+                    <p class="card-text align-self-end">
+                        <small class="text-body-secondary">{{ imageData.uploadDate | date:"d/M/yy" }}</small>
+                    </p>
                 </div>
             </div>
         </div>
-    </div>
-    <ng-template #noContentBlock>
-        <div class="noContentBlock text-center text-info fs-4 p-4">
-            <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
-        </div>
     </ng-template>
 </div>
+<ng-template #noContentBlock>
+    <div class="noContentBlock text-center text-info fs-4 p-4">
+        <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
+    </div>
+</ng-template>
 <ng-template #appModal></ng-template>

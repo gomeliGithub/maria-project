@@ -81,6 +81,12 @@ export interface IImageAdditionalData {
     description?: string;
 }
 
+export interface ISizedHomeImages {
+    small: IClientCompressedImage[][];
+    medium: IClientCompressedImage[][];
+    big: IClientCompressedImage[][];
+}
+
 export interface IComponentInfo {
     url: string;
     changeTime: Date;
