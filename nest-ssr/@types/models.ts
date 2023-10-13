@@ -49,3 +49,9 @@ export interface IJWT_token {
     revokation_date?: Date;
     revoked?: boolean;
 }
+
+export interface IEventType {
+    name: string;
+    description?: string;
+    originalImageName?: string;
+}

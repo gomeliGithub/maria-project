@@ -8,10 +8,11 @@ import { ModalComponent } from '../modal/modal.component';
 
 import { AppService } from '../../app.service';
 import { AdminPanelService } from '../../services/admin-panel/admin-panel.service';
+import { ClientService } from '../../services/client/client.service';
 
 import { IFullCompressedImageData } from 'types/global';
 import { IModalRef } from 'types/options';
-import { IClientCompressedImage } from 'types/models';
+import { IClientCompressedImage, IEventType } from 'types/models';
 
 @Component({
     selector: 'app-admin-panel',
@@ -23,7 +24,8 @@ export class AdminPanelComponent implements OnInit {
         private readonly http: HttpClient,
 
         private readonly appService: AppService,
-        private readonly adminPanelService: AdminPanelService
+        private readonly adminPanelService: AdminPanelService,
+        private readonly clientService: ClientService
     ) {
         this.uploadImageForm = new FormGroup({
             'imageEventType': new FormControl("", [ Validators.required, this.imageEventTypeValidator ]),
@@ -77,6 +79,8 @@ export class AdminPanelComponent implements OnInit {
     public fullCompressedImagesList: IClientCompressedImage[];
     public fullCompressedImagesListCount: number;
 
+    public eventTypes: IEventType[];
+
     public spinnerTitle: string;
     public spinnerHidden: boolean = true;
 
@@ -89,6 +93,11 @@ export class AdminPanelComponent implements OnInit {
                     this.fullCompressedImagesList = imagesList.imagesList;
                     this.fullCompressedImagesListCount = imagesList.count;
                 },
+                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+            });
+
+            this.clientService.getEventTypesData('admin').subscribe({
+                next: eventTypesData => this.eventTypes = eventTypesData.length !== 0 ? eventTypesData : null,
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
         }
@@ -251,7 +260,11 @@ export class AdminPanelComponent implements OnInit {
 
                     this.changeImageDataForm.reset();
                 },
-                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+                error: () => {
+                    this.spinnerHidden = true;
+
+                    this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+                }
             });
         } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
     }
@@ -264,5 +277,36 @@ export class AdminPanelComponent implements OnInit {
 
             this.changingOriginalImageName = imageButton.getAttribute('originalImageName');
         } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+    }
+
+    public setEventTypeImage (event: MouseEvent): void {
+        const imageButton: HTMLButtonElement = event.target as HTMLButtonElement;
+
+        if ( imageButton ) {
+            const originalImageName: string = imageButton.getAttribute('originalImageName');
+            const eventTypeName: string = imageButton.getAttribute('eventTypeName');
+
+            if ( originalImageName && eventTypeName ) {
+                this.spinnerTitle = this.appService.getTranslations('SPINNERTITLES.DISPLAYIMAGE');
+                this.spinnerHidden = false;
+
+                const headers: HttpHeaders = this.appService.createRequestHeaders();
+
+                this.http.post('/api/admin-panel/setEventTypeImage', { 
+                    adminPanel: { originalImageName, eventTypeName }
+                }, { responseType: 'text', headers, withCredentials: true }).subscribe({
+                    next: responseText => {
+                        this.spinnerHidden = true;
+    
+                        this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef);
+                    },
+                    error: () => {
+                        this.spinnerHidden = true;
+                        
+                        this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+                    }
+                });
+            }
+        }
     }
 }

@@ -1,19 +1,29 @@
 import { Component, ComponentRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
-
-import { Observable } from 'rxjs';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
 import { ModalComponent } from '../modal/modal.component';
 
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 
-import { IClientCompressedImage } from 'types/models';
-import { ISizedHomeImages } from 'types/global';
+import { IClientCompressedImage, IEventType } from 'types/models';
 
 @Component({
     selector: 'app-home',
     templateUrl: './home.component.html',
-    styleUrls: ['./home.component.css']
+    styleUrls: ['./home.component.css'],
+    animations: [
+        trigger("portfolioContentAnimationTrigger", [
+            state('visiable', style({ 
+                opacity: '1'
+            })),
+            state('hide', style({ 
+                opacity: '0'
+            })),
+            transition("void => *", animate(100)),
+            transition("* => void", animate(100))
+        ])
+    ]
 })
 export class HomeComponent implements OnInit {
     constructor (
@@ -26,8 +36,9 @@ export class HomeComponent implements OnInit {
     private readonly modalViewRef: ViewContainerRef;
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
-    public observableCompressedImagesList: Observable<ISizedHomeImages>;
-    public compressedImagesList: IClientCompressedImage[][][] = [];
+    public compressedImagesList: IClientCompressedImage[];
+
+    public eventTypes: IEventType[];
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
@@ -37,14 +48,18 @@ export class HomeComponent implements OnInit {
             });
 
             this.clientService.getCompressedImagesList('home').subscribe({
-                next: imagesList => {
-                    if ( imagesList.small.length !== 0 || imagesList.medium.length !== 0 || imagesList.big.length !== 0 ) {
-                        this.compressedImagesList.push(imagesList.small, imagesList.medium, imagesList.big);
+                next: imagesList => imagesList.length !== 0 ? this.compressedImagesList = imagesList : this.compressedImagesList = null,
+                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+            });
 
-                    } else this.compressedImagesList = null;
+            this.clientService.getEventTypesData('home').subscribe({
+                next: eventTypesData => {
+                    const nullable: boolean = eventTypesData.some(eventTypeData => !eventTypeData.originalImageName);
+
+                    this.eventTypes = nullable ? null : eventTypesData;
                 },
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
-            })
+            });
         }
     }
 }

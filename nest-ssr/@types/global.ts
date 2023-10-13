@@ -37,6 +37,7 @@ export interface IRequestBody {
         displayTargetPage: 'home' | 'gallery' | 'original';
         newImageEventType?: string; 
         newImageDescription?: string;
+        eventTypeName?: string;
     }
 }
 
@@ -79,12 +80,6 @@ export interface IImageAdditionalData {
     eventType: string;
     viewSizeType: string;
     description?: string;
-}
-
-export interface ISizedHomeImages {
-    small: IClientCompressedImage[][];
-    medium: IClientCompressedImage[][];
-    big: IClientCompressedImage[][];
 }
 
 export interface IComponentInfo {

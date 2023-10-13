@@ -76,6 +76,21 @@
                                             {{ 'ADMINPANEL.IMAGECONTROLTEXT.MOVETOARCHIVEBUTTON' | translate }}
                                         </button>
                                     </li>
+                                    <li class="text-bg-secondary rounded">
+                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.eventTypeName]="'wedding'" (click)="setEventTypeImage($event)">
+                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETASWEDDINGEVENTTYPEIMAGEBUTTON' | translate }}
+                                        </button>
+                                    </li>
+                                    <li class="text-bg-secondary rounded">
+                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.eventTypeName]="'holiday'" (click)="setEventTypeImage($event)">
+                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETASHOLIDAYEVENTTYPEIMAGEBUTTON' | translate }}
+                                        </button>
+                                    </li>
+                                    <li class="text-bg-secondary rounded">
+                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.eventTypeName]="'birthday'" (click)="setEventTypeImage($event)">
+                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETASBIRTHDAYEVENTTYPEIMAGEBUTTON' | translate }}
+                                        </button>
+                                    </li>
                                 </ul>
                             </div>
                         </td>
@@ -161,6 +176,31 @@
                     </button>
                 </div>
             </form>
+        </div>
+        <div id="eventTypesImages">
+            <div class="table-responsive">
+                <table class="table caption-top table-borderless table-hover">
+                    <caption>{{ 'ADMINPANEL.SECONDTABLECAPTION' | translate }}</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEEVENTTYPE' | translate }}</th>
+                            <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEEVENTDESCRIPTION' | translate }}</th>
+                            <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALNAME' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let eventTypeData of eventTypes" [ngSwitch]="eventTypeData.name">
+                            <td>
+                                <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
+                                <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
+                                <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
+                            </td>
+                            <td>{{ eventTypeData.description }}</td>
+                            <td>{{ eventTypeData.originalImageName }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

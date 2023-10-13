@@ -86,4 +86,17 @@ export class AdminPanelController {
 
         return this.adminPanelService.changeImageData(request, requestBody);
     }
+
+    @Post('/setEventTypeImage')
+    @ClientTypes('admin')
+    async setEventTypeImage (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
+        const imageEventTypes: string[] = [ 'wedding', 'holiday', 'birthday' ];
+
+        if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName || !requestBody.adminPanel.eventTypeName
+            || typeof requestBody.adminPanel.originalImageName !== 'string' 
+            || typeof requestBody.adminPanel.eventTypeName !== 'string' || !imageEventTypes.includes(requestBody.adminPanel.eventTypeName)
+        ) throw new BadRequestException();
+
+        return this.adminPanelService.setEventTypeImage(request, requestBody);
+    }
 }

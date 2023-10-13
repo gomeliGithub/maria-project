@@ -227,3 +227,27 @@ export class ClientCompressedImage extends Model {
     @BelongsTo(() => Member)
     member: Member;
 }
+
+@Table({
+    timestamps: false
+})
+export class EventType extends Model {
+    @PrimaryKey
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.STRING
+    })
+    name: string;
+
+    @AllowNull(true)
+    @Column({ 
+        type: DataType.STRING
+    })
+    description: string;
+
+    @AllowNull(true)
+    @Column({ 
+        type: DataType.STRING
+    })
+    originalImageName: string;
+}

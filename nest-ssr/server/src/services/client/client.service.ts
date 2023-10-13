@@ -15,11 +15,11 @@ import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 import { JwtControlService } from '../sign/jwt-control.service';
 
-import { Admin, Member, ClientCompressedImage } from '../../models/client.model';
+import { Admin, Member, ClientCompressedImage, EventType } from '../../models/client.model';
 
-import { IClient, ICookieSerializeOptions, ISizedHomeImages, IRequest } from 'types/global';
+import { IClient, ICookieSerializeOptions, IRequest } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions } from 'types/options';
-import { IClientCompressedImage } from 'types/models';
+import { IClientCompressedImage, IEventType } from 'types/models';
 
 @Injectable()
 export class ClientService {
@@ -34,7 +34,9 @@ export class ClientService {
         @InjectModel(Member) 
         private readonly memberModel: typeof Member,
         @InjectModel(ClientCompressedImage)
-        private readonly compressedImageModel: typeof ClientCompressedImage
+        private readonly compressedImageModel: typeof ClientCompressedImage,
+        @InjectModel(EventType)
+        private readonly eventTypeModel: typeof EventType
     ) { }
 
     public compressedImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
@@ -109,7 +111,7 @@ export class ClientService {
         }
     }
 
-    public async getCompressedImagesList (imagesType: 'home' | 'gallery'): Promise<string[] | ISizedHomeImages> {
+    public async getCompressedImagesList (imagesType: 'home' | 'gallery'): Promise<string[] | IClientCompressedImage[]> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
         const imagesList: string[] = (await fsPromises.readdir(path.join(this.compressedImagesDirPath, imagesType))).filter(imageName => path.extname(imageName) !== '.txt');
@@ -121,36 +123,13 @@ export class ClientService {
             }
         }) as unknown as IClientCompressedImage[];
 
-        let fullReduceImages: ISizedHomeImages = null;
-
-        if ( imagesType === 'home' ) {
-            fullReduceImages = {
-                small: this._reduceCompressedImages(compressedImages.filter(image => image.viewSizeType === 'small'), 4),
-                medium: this._reduceCompressedImages(compressedImages.filter(image => image.viewSizeType === 'medium'), 2),
-                big: this._reduceCompressedImages(compressedImages.filter(image => image.viewSizeType === 'big'), 1)
-            }
-        }
-        
-        return fullReduceImages ?? imagesList;
+        return compressedImages ?? imagesList;
     }
 
-    private _reduceCompressedImages (compressedImages: IClientCompressedImage[], rowlength: number): IClientCompressedImage[][] {
-        const reducedImagesList = compressedImages.reduce((previousImage: IClientCompressedImage[][], currentImage, currentIndex) => {
-            if ( currentIndex === 0 ) {
-                previousImage[currentIndex] = [];
+    public async getEventTypesData (requiredFields: string[]): Promise<IEventType[]> {
+        const eventTypesData: IEventType[] = await this.eventTypeModel.findAll({ attributes: requiredFields, raw: true });
 
-                previousImage[currentIndex].push(currentImage);
-            } else if ( currentIndex === 1 &&  rowlength !== 1 ) previousImage[currentIndex - 1].push(currentImage);
-            else if ( currentIndex % rowlength === 0 ) {
-                previousImage[previousImage.length] = [];
-
-                previousImage[previousImage.length - 1].push(currentImage);
-            } else previousImage[previousImage.length - 1].push(currentImage);
-
-            return previousImage;
-        }, []);
-
-        return reducedImagesList;
+        return eventTypesData;
     }
 
     public async changeLocale (request: IRequest, newLocale: string, response: Response): Promise<string> {

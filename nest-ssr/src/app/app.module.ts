@@ -1,6 +1,7 @@
 import { NgModule, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -33,6 +34,7 @@ import { environment } from '../environments/environment';
     ],
     imports: [
         BrowserModule.withServerTransition({ appId: 'serverApp' }),
+        BrowserAnimationsModule,
         HttpClientModule,
         FormsModule,
         ReactiveFormsModule,

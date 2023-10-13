@@ -10,7 +10,7 @@ import { CommonModule } from '../../modules/common.module';
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 
-import { Admin, Member, ClientCompressedImage } from '../../models/client.model';
+import { Admin, Member, ClientCompressedImage, EventType } from '../../models/client.model';
 
 import { IFullCompressedImageData, IImageAdditionalData, IRequest, IRequestBody} from 'types/global';
 import { IImageMeta, IPercentUploadedOptions, IWSMessage, IWebSocketClient } from 'types/web-socket';
@@ -22,7 +22,9 @@ export class AdminPanelService {
         private readonly appService: AppService,
 
         @InjectModel(ClientCompressedImage)
-        private readonly compressedImageModel: typeof ClientCompressedImage
+        private readonly compressedImageModel: typeof ClientCompressedImage,
+        @InjectModel(EventType)
+        private readonly eventTypeModel: typeof EventType
     ) { }
 
     public async uploadImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
@@ -324,5 +326,53 @@ export class AdminPanelService {
         await this.compressedImageModel.update(updateValues, { where: { originalName: originalImageName } });
 
         return 'SUCCESS';
+    }
+
+    public async setEventTypeImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+        const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
+
+        const originalImagePath: string = await this.validateImageControlRequests(request, requestBody, activeAdminLogin);
+
+        const compressedImage: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true });
+
+        const eventTypeName: string = requestBody.adminPanel.eventTypeName;
+
+        const staticFilesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
+
+        const staticFilesHomeImagePath: string = path.join(staticFilesDirPath, 'home', compressedImage.name);
+        const staticFilesGalleryImagePath: string = path.join(staticFilesDirPath, 'gallery', compressedImage.name);
+        const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImage.name);
+
+        let currentPath: string = '';
+        const newPath: string = path.join(staticFilesDirPath, 'home', 'eventTypes', compressedImage.name);
+
+        const accessResults = await Promise.allSettled([
+            fsPromises.access(compressedImageOriginalPath, fsPromises.constants.F_OK),
+            fsPromises.access(staticFilesHomeImagePath, fsPromises.constants.F_OK),
+            fsPromises.access(staticFilesGalleryImagePath, fsPromises.constants.F_OK)
+        ]);
+
+        if ( accessResults[0].status === 'fulfilled' ) currentPath = compressedImageOriginalPath;
+        else if ( accessResults[1].status === 'fulfilled' ) currentPath = staticFilesHomeImagePath;
+        else if ( accessResults[2].status === 'fulfilled' ) currentPath = staticFilesGalleryImagePath;
+
+        const currentEventTypeImage: EventType = await this.eventTypeModel.findOne({ where: { name: eventTypeName } });
+
+        try {
+            if ( currentEventTypeImage && currentEventTypeImage.originalImageName && path.extname(currentEventTypeImage.originalImageName) !== '' ) {
+                await fsPromises.unlink(path.join(staticFilesDirPath, 'home', 'eventTypes', currentEventTypeImage.originalImageName));
+            }
+
+            await fsPromises.copyFile(currentPath, newPath);
+            await this.eventTypeModel.update({ originalImageName: compressedImage.name }, { where: { name: eventTypeName }});
+
+            return 'SUCCESS';
+        } catch (error) {
+            console.error(error);
+
+            throw new InternalServerErrorException();
+        }
     }
 }

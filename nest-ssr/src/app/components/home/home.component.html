@@ -1,35 +1,37 @@
-
-<h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
-<div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-row flex-wrap justify-content-center mt-3" id="commonImages">
-    <ng-template ngFor let-imagesDataSizedArr [ngForOf]="compressedImagesList" let-i="index">
-        <div *ngFor="let imagesDataArr of imagesDataSizedArr" class="d-flex flex-column w-100 imagesGroup" [ngClass]="{ 
-            'small': i === 0,
-            'medium': i === 1,
-            'big': i === 2,
-            'justify-content-center': i === 1 && imagesDataArr.length === 1 
-        }">
-            <div *ngFor="let imageData of imagesDataArr; let i2 = index" class="card mb-3 me-2" [ngClass]="{
-                'align-self-center': i === 0 && imagesDataArr.length !== 1 && (i2 === 0 || i2 === 3),
-                'align-self-end': (i === 0 && i2 === 1) || (i === 1 && (i2 === 1)),
-                'align-self-start': (i === 0 && i2 === 2) || (i === 0 && imagesDataArr.length === 1) || (i === 1 && (i2 === 0)),
-                'w-50': i === 0,
-                'w-70 ': i === 1
-            }">
-                <img src="/assets/images_thumbnail/home/{{imageData.name}}" class="card-img-top img-fluid rounded-top" alt="...">
-                <div class="card-body">
-                    <h6 [ngSwitch]="imageData.eventType" class="card-title w-100">
-                        <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
-                        <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
-                        <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
-                    </h6>
-                    <p *ngIf="imageData.description" class="card-text">{{ imageData.description }}</p>
-                    <p class="card-text align-self-end">
-                        <small class="text-body-secondary">{{ imageData.uploadDate | date:"d/M/yy" }}</small>
-                    </p>
-                </div>
+<div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-row flex-wrap justify-content-center" id="imagesCarousel">
+    <div id="carouselExampleAutoplaying" class="carousel slide carousel-fade w-100" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div *ngFor="let imageData of compressedImagesList; let i2 = index" class="carousel-item" [ngClass]="{ 'active': i2 === 0 }">
+                <img src="/assets/images_thumbnail/home/{{imageData.name}}" class="d-block w-100" alt="...">
             </div>
         </div>
-    </ng-template>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+<div *ngIf="eventTypes && eventTypes.length !== 0" class="container d-flex flex-column align-items-center" id="portfolioContent">
+    <div class="p-5 mt-3 mb-3">
+        <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
+    </div>
+    <div *ngFor="let eventTypeData of eventTypes" class="card mb-3 w-75">
+        <img src="/assets/images_thumbnail/home/eventTypes/{{ eventTypeData.originalImageName }}" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title" [ngSwitch]="eventTypeData.name">
+                <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
+                <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
+                <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
+            </h5>
+            <p class="card-text">
+                <small class="text-body-secondary">{{ 'HOMEPAGE.EVENTTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i></small>
+            </p>
+        </div>
+    </div>
 </div>
 <ng-template #noContentBlock>
     <div class="noContentBlock text-center text-info fs-4 p-4">

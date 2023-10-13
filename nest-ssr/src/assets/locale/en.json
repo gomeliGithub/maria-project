@@ -10,7 +10,8 @@
 	},
 	"NOIMAGESMESSAGE": "No images yet",
 	"HOMEPAGE": {
-		"HEADERTITLE": "Best works"
+		"HEADERTITLE": "Portfolio",
+		"EVENTTYPESLINKTEXT": "Works"
 	},
 	"GALLERYPAGE": {
 		"HEADERTITLE": "Photo gallery"
@@ -74,6 +75,7 @@
 		"DELETEIMAGESUCCESSMESSAGE": "Image deleted successfully",
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Maximum number of images on the home page",
 		"TABLECAPTION": "Image management",
+		"SECONDTABLECAPTION": "Images for event types",
 		"TABLECOLTITLES": {
 			"ORIGINALNAME": "Original name",
 			"ORIGINALSIZE": "Original image size",
@@ -90,7 +92,10 @@
 			"DELETEBUTTON": "Delete",
 			"MOVETOHOMEPAGEBUTTON": "To the home",
 			"MOVETOGALLERYPAGEBUTTON": "To the gallery",
-			"MOVETOARCHIVEBUTTON": "To the archive"
+			"MOVETOARCHIVEBUTTON": "To the archive",
+			"SETASWEDDINGEVENTTYPEIMAGEBUTTON": "For wedding",
+			"SETASHOLIDAYEVENTTYPEIMAGEBUTTON": "For holiday",
+			"SETASBIRTHDAYEVENTTYPEIMAGEBUTTON": "For birthday"
 		},
 		"CHANGEIMAGEDATATEXT": {
 			"EVENTTYPE": "Event type",

@@ -10,7 +10,8 @@
 	},
 	"NOIMAGESMESSAGE": "Изображений пока нет",
 	"HOMEPAGE": {
-		"HEADERTITLE": "Лучшие работы"
+		"HEADERTITLE": "Портфолио",
+		"EVENTTYPESLINKTEXT": "Работы"
 	},
 	"GALLERYPAGE": {
 		"HEADERTITLE": "Галерея фото"
@@ -73,6 +74,7 @@
 		"DELETEIMAGESUCCESSMESSAGE": "Изображение успешно удалено",
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Максимальное количество изображений на главной странице",
 		"TABLECAPTION": "Управление изображениями",
+		"SECONDTABLECAPTION": "Изображения для типов событий",
 		"TABLECOLTITLES": {
 			"ORIGINALNAME": "Оригинальное имя",
 			"ORIGINALSIZE": "Размер оригинального изображения",
@@ -89,7 +91,10 @@
 			"DELETEBUTTON": "Удалить",
 			"MOVETOHOMEPAGEBUTTON": "На главную",
 			"MOVETOGALLERYPAGEBUTTON": "В галерею",
-			"MOVETOARCHIVEBUTTON": "В архив"
+			"MOVETOARCHIVEBUTTON": "В архив",
+			"SETASWEDDINGEVENTTYPEIMAGEBUTTON": "Для свадьбы",
+			"SETASHOLIDAYEVENTTYPEIMAGEBUTTON": "Для праздника",
+			"SETASBIRTHDAYEVENTTYPEIMAGEBUTTON": "Для дня рождения"
 		},
 		"CHANGEIMAGEDATATEXT": {
 			"EVENTTYPE": "Тип события",

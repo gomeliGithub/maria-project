@@ -25,10 +25,6 @@ app-home, app-gallery, app-client, app-admin-panel, app-not-found {
     width: 100%!important;
 }
 
-app-home {
-    padding: 1rem!important;
-}
-
 app-client {
     height: 100%!important;
 }
