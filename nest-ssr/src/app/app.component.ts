@@ -1,5 +1,6 @@
 import { Component, ComponentRef, ElementRef, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
@@ -16,7 +17,24 @@ import { IClientBrowser, IClientLocale } from 'types/global';
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+    styleUrls: ['./app.component.css'],
+    animations: [
+        trigger('navbar-toggler-iconTrigger', [
+            state('expanded', style({
+                opacity: 1
+            })),
+            state('collapsed', style({
+                opacity: 0,
+                transform: 'translate(15%, -33%) rotate(45deg)'
+            })),
+            transition('enter => leave', [
+                animate('1s ease-out')
+            ]),
+            transition('leave => enter', [
+                animate('1s ease-out')
+            ])
+        ])
+    ]
 })
 export class AppComponent implements OnInit {
     constructor (

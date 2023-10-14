@@ -22,11 +22,11 @@ import { IClientCompressedImage, IEventType } from 'types/models';
                 opacity: 1
             })),
             transition('enter => leave', [
-                animate('0.4s')
+                animate('0.4s ease-in-out')
             ]),
             transition('leave => enter', [
-                animate('0.4s')
-            ]),
+                animate('0.4s ease-in-out')
+            ])
         ]),
     ]
 })

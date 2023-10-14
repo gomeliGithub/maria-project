@@ -1,89 +1,87 @@
-<!-- <div class="bg-image d-flex flex-column align-items-center h-100" #bgImage> -->
-    <nav class="navbar navbar-expand-sm navbar-light w-100 sticky-top" style="background-color: #e3f2fd;">
-        <div class="container-fluid">
-            <a class="navbar-brand" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
-                Mashulik
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown" [attr.activeClient]="activeClient">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                            {{ 'PAGETITLES.HOME' | translate }}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" routerLink="/gallery" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                            {{ 'PAGETITLES.GALLERY' | translate }}
-                        </a>
-                    </li>
-                    <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item">
-                        <a class="nav-link" routerLink="/adminPanel" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                            {{ 'PAGETITLES.ADMINPANEL' | translate }}
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <button class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ 'CLIENTMENU.TITLE' | translate }}
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li *ngIf="!activeClientLogin">
-                                <a class="dropdown-item" routerLink="/signUp" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                                    {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
-                                </a>
-                            </li>
-                            <li *ngIf="!activeClientLogin">
-                                <a class="dropdown-item" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                                    {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
-                                </a>
-                            </li>
-                            <li *ngIf="activeClientLogin">
-                                <button type="button" class="dropdown-item" (click)="signOut()">
-                                    {{ 'CLIENTMENU.SIGNOUTTEXT' | translate }}
-                                </button>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-                <div class="navbar-text">
-                    <span *ngIf="activeClientLogin; else noActiveClientBlock">
-                        <span class="text-success fw-bold">{{activeClientLogin}}</span>
-                        <small class="d-block">{{activeClientFullName}}</small>
-                    </span>
-                    <ng-template #noActiveClientBlock>  
-                        <span class="text-warning">{{ 'CLIENTMENU.NONSIGNINTEXT' | translate }}</span>
-                    </ng-template>
-                </div>
-                <ul *ngIf="activeClientLogin" class="navbar-nav ms-2">
-                    <li class="nav-item dropdown">
-                        <button type="button" class="nav-link dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" #changeClientLocaleButton>
-                            {{ activeClientLocale }}
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                            <li *ngFor="let locale of locales">
-                                <button type="button" class="dropdown-item" id={{locale.code}} (click)="changeClientLocale($event)">{{locale.code}} ({{locale.title}})</button>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+<nav class="navbar navbar-expand-sm navbar-light w-100 sticky-top" style="background-color: #e3f2fd;">
+    <div class="container-fluid">
+        <a class="navbar-brand" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+            Mashulik
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown" [attr.activeClient]="activeClient">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                        {{ 'PAGETITLES.HOME' | translate }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="/gallery" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                        {{ 'PAGETITLES.GALLERY' | translate }}
+                    </a>
+                </li>
+                <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item">
+                    <a class="nav-link" routerLink="/adminPanel" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                        {{ 'PAGETITLES.ADMINPANEL' | translate }}
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <button class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ 'CLIENTMENU.TITLE' | translate }}
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li *ngIf="!activeClientLogin">
+                            <a class="dropdown-item" routerLink="/signUp" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                                {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
+                            </a>
+                        </li>
+                        <li *ngIf="!activeClientLogin">
+                            <a class="dropdown-item" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                                {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
+                            </a>
+                        </li>
+                        <li *ngIf="activeClientLogin">
+                            <button type="button" class="dropdown-item" (click)="signOut()">
+                                {{ 'CLIENTMENU.SIGNOUTTEXT' | translate }}
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="navbar-text">
+                <span *ngIf="activeClientLogin; else noActiveClientBlock">
+                    <span class="text-success fw-bold">{{activeClientLogin}}</span>
+                    <small class="d-block">{{activeClientFullName}}</small>
+                </span>
+                <ng-template #noActiveClientBlock>  
+                    <span class="text-warning">{{ 'CLIENTMENU.NONSIGNINTEXT' | translate }}</span>
+                </ng-template>
             </div>
+            <ul *ngIf="activeClientLogin" class="navbar-nav ms-2">
+                <li class="nav-item dropdown">
+                    <button type="button" class="nav-link dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" #changeClientLocaleButton>
+                        {{ activeClientLocale }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                        <li *ngFor="let locale of locales">
+                            <button type="button" class="dropdown-item" id={{locale.code}} (click)="changeClientLocale($event)">{{locale.code}} ({{locale.title}})</button>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
-    </nav>
-    <router-outlet></router-outlet>
-    <ng-template #appModal></ng-template>
-    <footer class="footer mt-auto w-100 fixed-bottom text-center text-white" style="background-color: #f1f1f1;">
-        <div class="container pt-3">
-            <section class="mb-3">
-                <a class="btn btn-link btn-floating btn-lg text-dark m-1" href="https://www.instagram.com/burtseva__maria" role="button" data-mdb-ripple-color="dark">
-                    <i class="bi bi-instagram"></i>
-                </a>
-            </section>
-        </div>
-        <div class="text-center text-dark p-3 rounded" style="background-color: rgba(0, 0, 0, 0.2);">
-            © 2023 Copyright: Mashulik. <span class="text-danger">Work In Progress...</span>
-        </div>
-    </footer>
-<!-- </div> -->
+    </div>
+</nav>
+<router-outlet></router-outlet>
+<ng-template #appModal></ng-template>
+<footer class="footer mt-auto w-100 fixed-bottom text-center text-white" style="background-color: #f1f1f1;">
+    <div class="container pt-3">
+        <section class="mb-3">
+            <a class="btn btn-link btn-floating btn-lg text-dark m-1" href="https://www.instagram.com/burtseva__maria" role="button" data-mdb-ripple-color="dark">
+                <i class="bi bi-instagram"></i>
+            </a>
+        </section>
+    </div>
+    <div class="text-center text-dark p-3 rounded" style="background-color: rgba(0, 0, 0, 0.2);">
+        © 2023 Copyright: Mashulik. <span class="text-danger">Work In Progress...</span>
+    </div>
+</footer>

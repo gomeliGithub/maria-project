@@ -92,7 +92,7 @@ export class AdminPanelService {
     
         const uploadedFilesNumber = (await fsPromises.readdir(originalImagesDirClientPath)).length;
     
-        if ( uploadedFilesNumber >= 10 ) return 'MAXCOUNT';
+        if ( uploadedFilesNumber >= 40 ) return 'MAXCOUNT';
         else if ( imageMeta.size > 104857600 ) return 'MAXSIZE';
         else if ( imageMeta.name.length < 4 ) return 'MAXNAMELENGTH';
     
@@ -259,15 +259,7 @@ export class AdminPanelService {
         let oldPath: string = '';
         let newPath: string = '';
 
-        const accessResults = await Promise.allSettled([
-            fsPromises.access(compressedImageOriginalPath, fsPromises.constants.F_OK),
-            fsPromises.access(staticFilesHomeImagePath, fsPromises.constants.F_OK),
-            fsPromises.access(staticFilesGalleryImagePath, fsPromises.constants.F_OK)
-        ]);
-
-        if ( accessResults[0].status === 'fulfilled' ) oldPath = compressedImageOriginalPath;
-        else if ( accessResults[1].status === 'fulfilled' ) oldPath = staticFilesHomeImagePath;
-        else if ( accessResults[2].status === 'fulfilled' ) oldPath = staticFilesGalleryImagePath;
+        oldPath = await this._getFulfilledAccessPath(compressedImageOriginalPath, staticFilesHomeImagePath, staticFilesGalleryImagePath);
 
         if ( displayTargetPage === 'home' ) newPath = staticFilesHomeImagePath;
         else if ( displayTargetPage === 'gallery' ) newPath = staticFilesGalleryImagePath;
@@ -348,15 +340,7 @@ export class AdminPanelService {
         let currentPath: string = '';
         const newPath: string = path.join(staticFilesDirPath, 'home', 'eventTypes', compressedImage.name);
 
-        const accessResults = await Promise.allSettled([
-            fsPromises.access(compressedImageOriginalPath, fsPromises.constants.F_OK),
-            fsPromises.access(staticFilesHomeImagePath, fsPromises.constants.F_OK),
-            fsPromises.access(staticFilesGalleryImagePath, fsPromises.constants.F_OK)
-        ]);
-
-        if ( accessResults[0].status === 'fulfilled' ) currentPath = compressedImageOriginalPath;
-        else if ( accessResults[1].status === 'fulfilled' ) currentPath = staticFilesHomeImagePath;
-        else if ( accessResults[2].status === 'fulfilled' ) currentPath = staticFilesGalleryImagePath;
+        currentPath = await this._getFulfilledAccessPath(compressedImageOriginalPath, staticFilesHomeImagePath, staticFilesGalleryImagePath);
 
         const currentEventTypeImage: EventType = await this.eventTypeModel.findOne({ where: { name: eventTypeName } });
 
@@ -374,5 +358,21 @@ export class AdminPanelService {
 
             throw new InternalServerErrorException();
         }
+    }
+
+    private async _getFulfilledAccessPath (firstPath: string, secondPath: string, thirdPath: string): Promise<string> {
+        const accessResults = await Promise.allSettled([
+            fsPromises.access(firstPath, fsPromises.constants.F_OK),
+            fsPromises.access(secondPath, fsPromises.constants.F_OK),
+            fsPromises.access(thirdPath, fsPromises.constants.F_OK)
+        ]);
+
+        let fulfilledPath: string = null;
+
+        if ( accessResults[0].status === 'fulfilled' ) fulfilledPath = firstPath;
+        else if ( accessResults[1].status === 'fulfilled' ) fulfilledPath = secondPath;
+        else if ( accessResults[2].status === 'fulfilled' ) fulfilledPath = thirdPath;
+
+        return fulfilledPath;
     }
 }

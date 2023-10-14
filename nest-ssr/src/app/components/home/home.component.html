@@ -1,16 +1,23 @@
-<div *ngIf="compressedImagesList; else noContentBlock" class="" id="imagesCarousel">
-    <div id="carouselExampleAutoplaying" class="carousel slide carousel-fade" data-bs-ride="carousel">
+<div *ngIf="compressedImagesList; else noContentBlock" class="" id="imagesCarouselContainer">
+    <div class="carousel slide carousel-fade" id="imagesCarousel" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button *ngFor="let imageData of compressedImagesList; let i = index" type="button" 
+                data-bs-target="#imagesCarousel" [attr.data-bs-slide-to]="i" class="bg-dark"
+                [ngClass]="{ 'active': i === 0 }" [attr.aria-current]="i === 0 ? true : null"
+            >
+            </button>
+        </div>
         <div class="carousel-inner vw-100">
             <div *ngFor="let imageData of compressedImagesList; let i = index" 
                 class="carousel-item vh-100 vw-100 bg-image" style="background-image: url('/assets/images_thumbnail/home/{{ imageData.name }}')" 
                 [ngClass]="{ 'active': i === 0 }">
             </div>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
+        <button class="carousel-control-prev" type="button" data-bs-target="#imagesCarousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Previous</span>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
+        <button class="carousel-control-next" type="button" data-bs-target="#imagesCarousel" data-bs-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Next</span>
         </button>
@@ -29,11 +36,11 @@
             >
                 <img src="/assets/images_thumbnail/home/eventTypes/{{ eventTypeData.originalImageName }}" class="card-img-top" alt="...">
                 <div class="card-body">
-                    <h5 class="card-title" [ngSwitch]="eventTypeData.name">
+                    <h6 class="card-title" [ngSwitch]="eventTypeData.name">
                         <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
                         <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
                         <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
-                    </h5>
+                    </h6>
                     <p class="card-text">
                         <small class="text-body-secondary">{{ 'HOMEPAGE.EVENTTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i></small>
                     </p>
