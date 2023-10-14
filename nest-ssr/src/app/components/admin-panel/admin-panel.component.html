@@ -191,12 +191,15 @@
                     <tbody>
                         <tr *ngFor="let eventTypeData of eventTypes" [ngSwitch]="eventTypeData.name">
                             <td>
-                                <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
-                                <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
-                                <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
+                                <ng-template [ngIf]="eventTypeData.name && eventTypeData.name !== ''" [ngIfElse]="noTextSpan">
+                                    <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
+                                    <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
+                                    <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
+                                </ng-template>
+                                <ng-template #noTextSpan>-</ng-template>
                             </td>
-                            <td>{{ eventTypeData.description }}</td>
-                            <td>{{ eventTypeData.originalImageName }}</td>
+                            <td>{{ eventTypeData.description && eventTypeData.description !== '' ? eventTypeData.description : '-' }}</td>
+                            <td>{{ eventTypeData.originalImageName && eventTypeData.originalImageName !== '' ? eventTypeData.originalImageName : '-' }}</td>
                         </tr>
                     </tbody>
                 </table>

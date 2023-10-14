@@ -19,8 +19,8 @@ app-home, app-gallery, app-client, app-admin-panel, app-not-found {
     width: 100%!important;
 }
 
-app-home {
-    bottom: 15%!important;
+app-home, app-admin-panel {
+    margin-bottom: 8rem!important;
     position: relative!important;
 }
 
