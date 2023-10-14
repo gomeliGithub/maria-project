@@ -1,7 +1,7 @@
 <div class="d-flex flex-column" id="controls">
     <div class="p-3" id="images" [attr.getFullCompressedImagesDataResult]="getFullCompressedImagesDataResult">
         <div class="table-responsive" id="listContainer">
-            <table *ngIf="fullCompressedImagesListCount !== 0; else noContentBlock" class="table caption-top table-borderless table-hover">
+            <table *ngIf="fullCompressedImagesListCount !== 0; else noContentBlock" class="table caption-top table-borderless table-hover text-center align-middle">
                 <caption>{{ 'ADMINPANEL.TABLECAPTION' | translate }}</caption>
                 <thead>
                     <tr>
@@ -31,9 +31,16 @@
                             <ng-template ngSwitchCase="medium">{{ 'IMAGEVIEWSIZETYPES.MEDIUM' | translate }}</ng-template>
                             <ng-template ngSwitchCase="big">{{ 'IMAGEVIEWSIZETYPES.BIG' | translate }}</ng-template>
                         </td>
-                        <td>{{ compressedImage.description }}</td>
+                        <td>
+                            <ng-template [ngIf]="compressedImage.description && compressedImage.description !== ''" [ngIfElse]="noTextIcon">
+                                {{ compressedImage.description }}
+                            </ng-template>
+                            <ng-template #noTextIcon>
+                                <i class="bi bi-dash-lg text-black"></i>
+                            </ng-template>
+                        </td>
                         <td>{{ compressedImage.uploadDate | date:"d/M/yy, H:mm" }}</td>
-                        <td class="fw-bold" [ngClass]="{ 
+                        <td class="fw-bold" [ngClass]="{
                             'text-success': compressedImage.displayedOnHomePage === 1, 
                             'text-danger': compressedImage.displayedOnHomePage === 0
                         }">
@@ -179,7 +186,7 @@
         </div>
         <div id="eventTypesImages">
             <div class="table-responsive">
-                <table class="table caption-top table-borderless table-hover">
+                <table class="table caption-top table-borderless table-hover text-center align-middle">
                     <caption>{{ 'ADMINPANEL.SECONDTABLECAPTION' | translate }}</caption>
                     <thead>
                         <tr>
@@ -189,17 +196,28 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let eventTypeData of eventTypes" [ngSwitch]="eventTypeData.name">
-                            <td>
-                                <ng-template [ngIf]="eventTypeData.name && eventTypeData.name !== ''" [ngIfElse]="noTextSpan">
-                                    <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
-                                    <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
-                                    <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
-                                </ng-template>
-                                <ng-template #noTextSpan>-</ng-template>
+                        <tr *ngFor="let eventTypeData of eventTypes">
+                            <td [ngSwitch]="eventTypeData.name">
+                                <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
+                                <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
+                                <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
                             </td>
-                            <td>{{ eventTypeData.description && eventTypeData.description !== '' ? eventTypeData.description : '-' }}</td>
-                            <td>{{ eventTypeData.originalImageName && eventTypeData.originalImageName !== '' ? eventTypeData.originalImageName : '-' }}</td>
+                            <td>
+                                <ng-template [ngIf]="eventTypeData.description && eventTypeData.description !== ''" [ngIfElse]="noTextIcon">
+                                    {{ eventTypeData.description }}
+                                </ng-template>
+                                <ng-template #noTextIcon>
+                                    <i class="bi bi-dash-lg text-black"></i>
+                                </ng-template>
+                            </td>
+                            <td>
+                                <ng-template [ngIf]="eventTypeData.originalImageName && eventTypeData.originalImageName !== ''" [ngIfElse]="noTextIcon">
+                                    {{ eventTypeData.originalImageName }}
+                                </ng-template>
+                                <ng-template #noTextIcon>
+                                    <i class="bi bi-dash-lg text-black"></i>
+                                </ng-template>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
