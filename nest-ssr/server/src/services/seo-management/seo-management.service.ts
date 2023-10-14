@@ -56,9 +56,9 @@ const sitemap=`
 ${
     componentsInfo.map(componentsInfo => `
     <url>
-        <loc>${ process.env.SERVER_DOMAIN }:${ process.env.SERVER_WEB_PORT }${ componentsInfo.url }</loc>
+        <loc>${ process.env.SERVER_DOMAIN }${ componentsInfo.url }</loc>
         <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
+        <priority>1</priority>
         <lastmod>${ componentsInfo.changeTime.toISOString() }</lastmod>
     </url>    
 `).join("")

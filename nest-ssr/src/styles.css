@@ -7,14 +7,11 @@ body {
     width: 100%;
 }
 
-.w-70 {
-    width: 70%!important;
-}
-
 .bg-image {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+    background-attachment: fixed;
 }
 
 app-home, app-gallery, app-client, app-admin-panel, app-not-found {
