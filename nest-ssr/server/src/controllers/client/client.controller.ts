@@ -29,7 +29,7 @@ export class ClientController {
     }
 
     @Get('/getEventTypesData/:targetPage')
-    async getEventTypesData (@Param('targetPage') targetPage: string): Promise<IEventType[]> {
+    async getEventTypesData (@Param('targetPage') targetPage: string): Promise<IEventType[][] | IEventType[]> {
         targetPage = targetPage.substring(1);
         
         if ( !targetPage || ( targetPage !== 'home' && targetPage !== 'admin' ) ) throw new BadRequestException();
@@ -38,7 +38,7 @@ export class ClientController {
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        return commonServiceRef.getEventTypesData(requiredFields);
+        return commonServiceRef.getEventTypesData(requiredFields, targetPage);
     }
 
     @Post('/changeLocale')

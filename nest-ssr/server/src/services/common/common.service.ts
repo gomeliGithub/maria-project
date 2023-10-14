@@ -87,9 +87,9 @@ export class CommonService {
         return imageControlServiceRef.deleteImage(request, imagePath, clientLogin);
     }
 
-    public async getEventTypesData (requiredFields: string[]): Promise<IEventType[]> {
+    public async getEventTypesData (requiredFields: string[], targetPage: 'home' | 'admin'): Promise<IEventType[][] | IEventType[]> {
         const clientServiceRef = await this.appService.getServiceRef(ClientModule, ClientService);
 
-        return clientServiceRef.getEventTypesData(requiredFields);
+        return clientServiceRef.getEventTypesData(requiredFields, targetPage);
     }
 }

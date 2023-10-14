@@ -85,8 +85,13 @@ export class ClientService {
         });
     }
 
-    public getEventTypesData (targetPage: 'home' | 'admin'): Observable<IEventType[]> {
-        return this.http.get<IEventType[]>(`/api/client/getEventTypesData/:${ targetPage }`);
+    public getEventTypesData (targetPage: 'home'): Observable<IEventType[][]>
+    public getEventTypesData (targetPage: 'admin'): Observable<IEventType[]>
+    public getEventTypesData (targetPage: 'home' | 'admin'): Observable<IEventType[][] | IEventType[]> {
+        return this.http.get(`/api/client/getEventTypesData/:${ targetPage }`).pipe<IEventType[][] | IEventType[]>(data => {
+            if ( targetPage === 'home' ) return data as Observable<IEventType[][]>;
+            else if ( targetPage === 'admin' ) return data as Observable<IEventType[]>;
+        });
     }
 
     public signOut (): Observable<void> {

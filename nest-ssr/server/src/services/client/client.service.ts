@@ -126,10 +126,16 @@ export class ClientService {
         return compressedImages ?? imagesList;
     }
 
-    public async getEventTypesData (requiredFields: string[]): Promise<IEventType[]> {
+    public async getEventTypesData (requiredFields: string[], targetPage: 'home' | 'admin'): Promise<IEventType[][] | IEventType[]> {
         const eventTypesData: IEventType[] = await this.eventTypeModel.findAll({ attributes: requiredFields, raw: true });
 
-        return eventTypesData;
+        const reducedEventTypesData: IEventType[][] = [];
+
+        if ( targetPage === 'home' ) for (let i = 0; i < eventTypesData.length; i += 2 ) {
+            reducedEventTypesData.push(eventTypesData.slice(i, i + 2));
+        }
+
+        return targetPage === 'home' ? reducedEventTypesData : eventTypesData;
     }
 
     public async changeLocale (request: IRequest, newLocale: string, response: Response): Promise<string> {

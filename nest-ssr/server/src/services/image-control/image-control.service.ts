@@ -64,7 +64,7 @@ export class ImageControlService {
         const inputImageDirPath: string = path.dirname(compressImageData.inputImagePath);
         const inputImageName: string = path.basename(compressImageData.inputImagePath);
 
-        const outputImageName: string = `${path.basename(compressImageData.inputImagePath, path.extname(compressImageData.inputImagePath))}_thumb.${ext}`;
+        const outputImageName: string = `${path.basename(compressImageData.inputImagePath, path.extname(compressImageData.inputImagePath))}_thumb.jpeg`;
         const outputImagePath: string = path.join(compressImageData.outputDirPath, outputImageName);
 
         const outputTempFilePath: string = this.getTempFileName(outputImagePath);
@@ -76,7 +76,10 @@ export class ImageControlService {
         let newCompressedImage: ClientCompressedImage = null;
 
         try {
-            const semiTransparentRedBuffer: Buffer = await sharp(compressImageData.inputImagePath).resize(1000, 1000).toBuffer();
+            const semiTransparentRedBuffer: Buffer = await sharp(compressImageData.inputImagePath).jpeg({
+                quality: 50,
+                progressive: true
+            }).toBuffer();
 
             await fsPromises.writeFile(outputTempFilePath, semiTransparentRedBuffer);
             await fsPromises.rename(outputTempFilePath, outputImagePath);

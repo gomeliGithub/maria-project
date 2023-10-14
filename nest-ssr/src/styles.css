@@ -12,12 +12,9 @@ body {
 }
 
 .bg-image {
-    background-image: url('assets/TestBackground.jpg');
-    position: relative;
-    overflow: auto;
     background-repeat: no-repeat;
     background-size: cover;
-    background-position: 50%;
+    background-position: center;
 }
 
 app-home, app-gallery, app-client, app-admin-panel, app-not-found {

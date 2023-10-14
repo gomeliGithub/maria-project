@@ -38,7 +38,7 @@ export class HomeComponent implements OnInit {
 
     public compressedImagesList: IClientCompressedImage[];
 
-    public eventTypes: IEventType[];
+    public eventTypes: IEventType[][];
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
@@ -54,7 +54,7 @@ export class HomeComponent implements OnInit {
 
             this.clientService.getEventTypesData('home').subscribe({
                 next: eventTypesData => {
-                    const nullable: boolean = eventTypesData.some(eventTypeData => !eventTypeData.originalImageName);
+                    const nullable: boolean = eventTypesData.some(eventTypesDataArr => eventTypesDataArr.some(eventTypeData => !eventTypeData.originalImageName ));
 
                     this.eventTypes = nullable ? null : eventTypesData;
                 },
