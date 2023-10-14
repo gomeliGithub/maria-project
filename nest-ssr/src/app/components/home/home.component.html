@@ -21,8 +21,12 @@
         <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
     </div>
     <div class="d-flex flex-column align-items-center">
-        <div *ngFor="let eventTypesDataArr of eventTypes" class="d-flex flex-row justify-content-center mb-3 eventTypesGroup">
-            <div *ngFor="let eventTypeData of eventTypesDataArr; let i = index" class="card mb-3 w-75" [ngClass]="{ 'me-3': i === 0}">
+        <div *ngFor="let eventTypesDataArr of eventTypes; let i2 = index" class="d-flex flex-row justify-content-center mb-3 eventTypesGroup">
+            <div *ngFor="let eventTypeData of eventTypesDataArr; let i = index" class="card mb-3 w-75" 
+                [ngClass]="{ 'me-3': i === 0}" [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(eventTypeData.name)]"
+                (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(eventTypeData.name))" 
+                (mouseleave)="stopMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(eventTypeData.name))"
+            >
                 <img src="/assets/images_thumbnail/home/eventTypes/{{ eventTypeData.originalImageName }}" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title" [ngSwitch]="eventTypeData.name">

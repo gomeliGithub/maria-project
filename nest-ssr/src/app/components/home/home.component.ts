@@ -13,16 +13,21 @@ import { IClientCompressedImage, IEventType } from 'types/models';
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.css'],
     animations: [
-        trigger("portfolioContentAnimationTrigger", [
-            state('visiable', style({ 
-                opacity: '1'
+        trigger('mouseTrigger', [
+            state('enter', style({
+                opacity: 0.4,
+                transform: 'rotate3d(0, -5, 0, -0.5turn) scale(0.8)'
             })),
-            state('hide', style({ 
-                opacity: '0'
+            state('leave', style({
+                opacity: 1
             })),
-            transition("void => *", animate(100)),
-            transition("* => void", animate(100))
-        ])
+            transition('enter => leave', [
+                animate('0.4s')
+            ]),
+            transition('leave => enter', [
+                animate('0.4s')
+            ]),
+        ]),
     ]
 })
 export class HomeComponent implements OnInit {
@@ -30,6 +35,8 @@ export class HomeComponent implements OnInit {
         private readonly appService: AppService,
         private readonly clientService: ClientService
     ) { }
+    
+    public currentMouseTriggerStates: string[] = [];
 
     @ViewChild(ModalComponent) modalComponent: ModalComponent
     @ViewChild('appModal', { read: ViewContainerRef, static: false })
@@ -39,6 +46,7 @@ export class HomeComponent implements OnInit {
     public compressedImagesList: IClientCompressedImage[];
 
     public eventTypes: IEventType[][];
+    public flatEventTypes: IEventType[];
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
@@ -56,10 +64,25 @@ export class HomeComponent implements OnInit {
                 next: eventTypesData => {
                     const nullable: boolean = eventTypesData.some(eventTypesDataArr => eventTypesDataArr.some(eventTypeData => !eventTypeData.originalImageName ));
 
+                    this.flatEventTypes = eventTypesData.flat();
+                    this.flatEventTypes.forEach(() => this.currentMouseTriggerStates.push('leave'));
+
                     this.eventTypes = nullable ? null : eventTypesData;
                 },
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
         }
+    }
+
+    public startMouseTriggerAnimation (index: number): void {
+        this.currentMouseTriggerStates[index] = this.currentMouseTriggerStates[index] === 'enter' ? 'leave' : 'enter';
+    }
+
+    public stopMouseTriggerAnimation (index: number): void {
+        this.currentMouseTriggerStates[index] = this.currentMouseTriggerStates[index] === 'leave' ? 'enter' : 'leave';
+    }
+
+    public setCurrentMouseTriggerStateIndex (name: string): number {
+        return this.flatEventTypes.findIndex(eventTypeData => eventTypeData.name === name);
     }
 }
