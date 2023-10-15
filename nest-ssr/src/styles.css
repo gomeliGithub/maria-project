@@ -17,9 +17,6 @@ body {
 app-home, app-gallery, app-client, app-admin-panel, app-not-found {
     height: auto!important;
     width: 100%!important;
-}
-
-app-home, app-admin-panel {
     margin-bottom: 8rem!important;
     position: relative!important;
 }

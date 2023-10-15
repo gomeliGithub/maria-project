@@ -47,6 +47,7 @@
 		"TITLE": "Sign In",
         "LOGINLABELTEXT": "Login",
 		"PASSWORDLABELTEXT": "Password",
+		"FULLNAMELABELTEXT": "Full name",
 		"NOLOGINTEXT": "Login not specified",
 		"NOPASSWORDTEXT": "Password not specified",
 		"CONFIRMBUTTONCAPTIONTEXT": "Sign In"

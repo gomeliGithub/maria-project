@@ -3,7 +3,7 @@ import { DOCUMENT } from '@angular/common';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { ModalComponent } from './components/modal/modal.component';
 
@@ -12,7 +12,7 @@ import { ClientService } from './services/client/client.service';
 
 import { environment } from '../environments/environment';
 
-import { IClientBrowser, IClientLocale } from 'types/global';
+import { IClientLocale } from 'types/global';
 
 @Component({
     selector: 'app-root',
@@ -54,15 +54,13 @@ export class AppComponent implements OnInit {
 
     public readonly locales: IClientLocale[] = environment.locales;
 
-    public activeClient: Observable<IClientBrowser>
-
     public activeClientLogin: string;
     public activeClientType: string;
     public activeClientLocale: string;
     public activeClientFullName: string;
 
     ngOnInit (): void {
-        if ( this.appService.checkIsPlatformBrowser() ) this.clientService.getActiveClient().pipe(activeClient => this.activeClient = activeClient).subscribe({
+        if ( this.appService.checkIsPlatformBrowser() ) this.clientService.getActiveClient().subscribe({
             next: activeClient => {
                 this.activeClientLogin = activeClient ? activeClient.login : null;
                 this.activeClientType = activeClient ? activeClient.type : null;

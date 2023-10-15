@@ -47,6 +47,7 @@
 		"TITLE": "Вход в систему",
 		"LOGINLABELTEXT": "Логин",
 		"PASSWORDLABELTEXT": "Пароль",
+		"FULLNAMELABELTEXT": "Полное имя",
 		"NOLOGINTEXT": "Не указан логин",
 		"NOPASSWORDTEXT": "Не указан пароль",
 		"CONFIRMBUTTONCAPTIONTEXT": "Войти"

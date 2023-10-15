@@ -59,6 +59,11 @@ export class ClientComponent implements OnInit {
         });
         
         if ( this.appService.checkIsPlatformBrowser() ) {
+            import('bootstrap').then(bootstrap => {
+                const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            });
+
             this.appService.getTranslations(`PAGETITLES.${ this.signOp === 'up' ? 'SIGNUP' : 'SIGNIN' }`, true).subscribe({
                 next: translation => this.appService.setTitle(translation),
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)

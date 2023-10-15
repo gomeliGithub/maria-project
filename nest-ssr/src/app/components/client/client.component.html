@@ -1,37 +1,40 @@
 <div class="d-flex flex-row justify-content-center align-items-center h-100" id="signFormContainer" (submit)="sign()">
     <form [formGroup]="signForm" class="p-3 w-50 border border-light border-3 rounded" novalidate>
         <div class="form-group form-floating mb-3">
-            <input type="text" class="form-control" id="inputLogin" aria-describedby="loginHelpBlock" placeholder="Имя вашего аккаунта" formControlName="clientLogin">
-            <label for="inputLogin" class="form-label">Логин</label>
-            <div id="loginHelpBlock" class="form-text">
-                {{ 'CLIENTPAGE.HELPBLOCKS.LOGIN' | translate }}
-            </div>
+            <input type="text" class="form-control" id="inputLogin" formControlName="clientLogin"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip"
+                [attr.data-bs-title]="'CLIENTPAGE.HELPBLOCKS.LOGIN' | translate"
+            >
+            <label for="inputLogin" class="form-label">{{ 'LOGINFORM.LOGINLABELTEXT' | translate }}</label>
             <div class="alert alert-danger" *ngIf="signForm.controls['clientLogin'].invalid && signForm.controls['clientLogin'].touched">
                 {{ 'CLIENTPAGE.LOGININVALIDMESSAGE' | translate }}
             </div>
         </div>
         <div class="form-group form-floating mb-3">
-            <input type="password" class="form-control" id="inputPassword" aria-describedby="passwordHelpBlock" placeholder="Ваш пароль" formControlName="clientPassword">
-            <label for="inputPassword" class="form-label">Пароль</label>
-            <div id="passwordHelpBlock" class="form-text">
-                {{ 'CLIENTPAGE.HELPBLOCKS.PASSWORD' | translate }}
-            </div>
+            <input type="password" class="form-control" id="inputPassword" formControlName="clientPassword"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip"
+                [attr.data-bs-title]="'CLIENTPAGE.HELPBLOCKS.PASSWORD' | translate"
+            >
+            <label for="inputPassword" class="form-label">{{ 'LOGINFORM.PASSWORDLABELTEXT' | translate }}</label>
             <div class="alert alert-danger" *ngIf="signForm.controls['clientPassword'].invalid && signForm.controls['clientPassword'].touched">
                 {{ 'CLIENTPAGE.PASSWORDINVALIDMESSAGE' | translate }}
             </div>
         </div>
         <div *ngIf="signOp === 'up'" class="form-group form-floating mb-3">
-            <input type="text" class="form-control" id="inputFullName" aria-describedby="fullNameHelpBlock" placeholder="Ваше собственное ФИО" formControlName="clientFullName">
-            <label for="inputFullName" class="form-label">ФИО</label>
-            <div id="fullNameHelpBlock" class="form-text">
-                {{ 'CLIENTPAGE.HELPBLOCKS.FULLNAME' | translate }}
-            </div>
+            <input type="text" class="form-control" id="inputFullName" formControlName="clientFullName"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip"
+                [attr.data-bs-title]="'CLIENTPAGE.HELPBLOCKS.FULLNAME' | translate"
+            >
+            <label for="inputFullName" class="form-label">{{ 'LOGINFORM.FULLNAMELABELTEXT' | translate }}</label>
             <div class="alert alert-danger" *ngIf="signForm.controls['clientFullName'].invalid && signForm.controls['clientFullName'].touched">
                 {{ 'CLIENTPAGE.FULLNAMEINVALIDMESSAGE' | translate }}
             </div>
         </div>
         <div *ngIf="signOp === 'up'" class="form-group form-floating mb-3">
-            <input type="email" class="form-control" id="inputEmail" placeholder="Ваша электронная почта" formControlName="clientEmail">
+            <input type="email" class="form-control" id="inputEmail" formControlName="clientEmail">
             <label for="inputEmail" class="form-label">Email</label>
             <div class="alert alert-danger" *ngIf="signForm.controls['clientEmail'].invalid && signForm.controls['clientEmail'].touched">
                 {{ 'CLIENTPAGE.EMAILINVALIDMESSAGE' | translate }}
