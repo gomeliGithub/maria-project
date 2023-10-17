@@ -30,7 +30,7 @@ export interface IClientCompressedImage {
     originalName?: string;
     originalDirPath?: string;
     originalSize?: number;
-    eventType?: string;
+    photographyType?: string;
     viewSizeType?: string;
     description?: string;
     uploadDate?: Date;
@@ -50,7 +50,7 @@ export interface IJWT_token {
     revoked?: boolean;
 }
 
-export interface IEventType {
+export interface IImagePhotographyType {
     name: string;
     description?: string;
     originalImageName?: string;

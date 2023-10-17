@@ -8,9 +8,9 @@
                         <th scope="col">#</th>
                         <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALNAME' | translate }}</th>
                         <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALSIZE' | translate }}</th>
-                        <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEEVENTTYPE' | translate }}</th>
+                        <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPE' | translate }}</th>
                         <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.VIEWSIZETYPE' | translate }}</th>
-                        <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEEVENTDESCRIPTION' | translate }}</th>
+                        <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPEDESCRIPTION' | translate }}</th>
                         <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.UPLOADAT' | translate }}</th>
                         <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ONHOMEPAGE' | translate }}</th>
                         <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ONGALLERYPAGE' | translate }}</th>
@@ -21,10 +21,12 @@
                         <th scope="row">{{ i + 1 }}</th>
                         <td>{{ compressedImage.originalName }}</td>
                         <td>{{ compressedImage.originalSize | imageSize }}</td>
-                        <td [ngSwitch]="compressedImage.eventType">
-                            <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
-                            <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
-                            <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
+                        <td [ngSwitch]="compressedImage.photographyType">
+                            <ng-template ngSwitchCase="individual">{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="event">{{ 'IMAGEPHOTOGRAPHYTYPES.EVENT' | translate }}</ng-template>
                         </td>
                         <td [ngSwitch]="compressedImage.viewSizeType">
                             <ng-template ngSwitchCase="small">{{ 'IMAGEVIEWSIZETYPES.SMALL' | translate }}</ng-template>
@@ -84,18 +86,28 @@
                                         </button>
                                     </li>
                                     <li class="text-bg-secondary rounded">
-                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.eventTypeName]="'wedding'" (click)="setEventTypeImage($event)">
-                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETASWEDDINGEVENTTYPEIMAGEBUTTON' | translate }}
+                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.imagePhotographyType]="'individual'" (click)="setPhotographyTypeImage($event)">
+                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.INDIVIDUALBUTTONTEXT' | translate }}
                                         </button>
                                     </li>
                                     <li class="text-bg-secondary rounded">
-                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.eventTypeName]="'holiday'" (click)="setEventTypeImage($event)">
-                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETASHOLIDAYEVENTTYPEIMAGEBUTTON' | translate }}
+                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.imagePhotographyType]="'children'" (click)="setPhotographyTypeImage($event)">
+                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.CHILDRENBUTTONTEXT' | translate }}
                                         </button>
                                     </li>
                                     <li class="text-bg-secondary rounded">
-                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.eventTypeName]="'birthday'" (click)="setEventTypeImage($event)">
-                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETASBIRTHDAYEVENTTYPEIMAGEBUTTON' | translate }}
+                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.imagePhotographyType]="'wedding'" (click)="setPhotographyTypeImage($event)">
+                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.WEDDINGBUTTONTEXT' | translate }}
+                                        </button>
+                                    </li>
+                                    <li class="text-bg-secondary rounded">
+                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.imagePhotographyType]="'family'" (click)="setPhotographyTypeImage($event)">
+                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.FAMILYBUTTONTEXT' | translate }}
+                                        </button>
+                                    </li>
+                                    <li class="text-bg-secondary rounded">
+                                        <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.imagePhotographyType]="'event'" (click)="setPhotographyTypeImage($event)">
+                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.EVENTBUTTONTEXT' | translate }}
                                         </button>
                                     </li>
                                 </ul>
@@ -113,12 +125,14 @@
         <div class="d-flex flex-row justify-content-center" id="changeImageDataContainer" [ngClass]="{ 'visually-hidden': changeImageDataFormHidden }" #changeImageDataContainer>
             <form [formGroup]="changeImageDataForm" novalidate (submit)="changeImageData()">
                 <div class="form-group form-floating mb-3">
-                    <select class="form-control form-select" id="inputChangeEventType" formControlName="newImageEventType">
-                        <option value="wedding" selected>{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</option>
-                        <option value="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</option>
-                        <option value="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</option>
+                    <select class="form-control form-select" id="inputChangePhotographyType" formControlName="newImagePhotographyType">
+                        <option value="individual" selected>{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</option>
+                        <option value="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</option>
+                        <option value="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</option>
+                        <option value="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</option>
+                        <option value="event">{{ 'IMAGEPHOTOGRAPHYTYPES.EVENT' | translate }}</option>
                     </select>
-                    <label for="inputChangeEventType" class="form-label">{{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.EVENTTYPE' | translate }}</label>
+                    <label for="inputChangePhotographyType" class="form-label">{{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.PHOTOGRAPHYTYPE' | translate }}</label>
                 </div>
                 <div class="form-group form-floating mb-3">
                     <select class="form-control form-select" id="inputChangeViewSizeType" formControlName="newImageViewSizeType">
@@ -146,14 +160,16 @@
         <div class="d-flex flex-row justify-content-center" id="uploadImageContainer">
             <form [formGroup]="uploadImageForm" class="p-3 w-50 border border-light border-3 rounded" novalidate (submit)="uploadImage()">
                 <div class="form-group form-floating mb-3">
-                    <select class="form-control form-select" id="inputEventType" formControlName="imageEventType">
-                        <option value="wedding" selected>{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</option>
-                        <option value="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</option>
-                        <option value="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</option>
+                    <select class="form-control form-select" id="inputPhotographyType" formControlName="imagePhotographyType">
+                        <option value="individual" selected>{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</option>
+                        <option value="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</option>
+                        <option value="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</option>
+                        <option value="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</option>
+                        <option value="event">{{ 'IMAGEPHOTOGRAPHYTYPES.EVENT' | translate }}</option>
                     </select>
-                    <label for="inputEventType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.EVENTTYPE' | translate }}</label>
-                    <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imageEventType'].invalid && uploadImageForm.controls['imageEventType'].touched">
-                        {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDEVENTTYPE' | translate }}
+                    <label for="inputPhotographyType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.PHOTOGRAPHYTYPE' | translate }}</label>
+                    <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imagePhotographyType'].invalid && uploadImageForm.controls['imagePhotographyType'].touched">
+                        {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDPHOTOGRAPHYTYPE' | translate }}
                     </div>
                 </div>
                 <div class="form-group form-floating mb-3">
@@ -184,35 +200,37 @@
                 </div>
             </form>
         </div>
-        <div id="eventTypesImages">
+        <div *ngIf="imagePhotographyTypes && imagePhotographyTypes.length !== 0" id="photographyTypesImages">
             <div class="table-responsive">
                 <table class="table caption-top table-borderless table-hover text-center align-middle">
                     <caption>{{ 'ADMINPANEL.SECONDTABLECAPTION' | translate }}</caption>
                     <thead>
                         <tr>
-                            <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEEVENTTYPE' | translate }}</th>
-                            <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEEVENTDESCRIPTION' | translate }}</th>
+                            <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPE' | translate }}</th>
+                            <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPEDESCRIPTION' | translate }}</th>
                             <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALNAME' | translate }}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let eventTypeData of eventTypes">
-                            <td [ngSwitch]="eventTypeData.name">
-                                <ng-template ngSwitchCase="wedding">{{ 'IMAGEEVENTTYPES.WEDDING' | translate }}</ng-template>
-                                <ng-template ngSwitchCase="holiday">{{ 'IMAGEEVENTTYPES.HOLIDAY' | translate }}</ng-template>
-                                <ng-template ngSwitchCase="birthday">{{ 'IMAGEEVENTTYPES.BIRTHDAY' | translate }}</ng-template>
+                        <tr *ngFor="let imagePhotographyTypeData of imagePhotographyTypes">
+                            <td [ngSwitch]="imagePhotographyTypeData.name">
+                                <ng-template ngSwitchCase="individual">{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</ng-template>
+                                <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</ng-template>
+                                <ng-template ngSwitchCase="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</ng-template>
+                                <ng-template ngSwitchCase="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</ng-template>
+                                <ng-template ngSwitchCase="event">{{ 'IMAGEPHOTOGRAPHYTYPES.EVENT' | translate }}</ng-template>
                             </td>
                             <td>
-                                <ng-template [ngIf]="eventTypeData.description && eventTypeData.description !== ''" [ngIfElse]="noTextIcon">
-                                    {{ eventTypeData.description }}
+                                <ng-template [ngIf]="imagePhotographyTypeData.description && imagePhotographyTypeData.description !== ''" [ngIfElse]="noTextIcon">
+                                    {{ imagePhotographyTypeData.description }}
                                 </ng-template>
                                 <ng-template #noTextIcon>
                                     <i class="bi bi-dash-lg text-black"></i>
                                 </ng-template>
                             </td>
                             <td>
-                                <ng-template [ngIf]="eventTypeData.originalImageName && eventTypeData.originalImageName !== ''" [ngIfElse]="noTextIcon">
-                                    {{ eventTypeData.originalImageName }}
+                                <ng-template [ngIf]="imagePhotographyTypeData.originalImageName && imagePhotographyTypeData.originalImageName !== ''" [ngIfElse]="noTextIcon">
+                                    {{ imagePhotographyTypeData.originalImageName }}
                                 </ng-template>
                                 <ng-template #noTextIcon>
                                     <i class="bi bi-dash-lg text-black"></i>

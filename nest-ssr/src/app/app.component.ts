@@ -1,6 +1,6 @@
 import { Component, ComponentRef, ElementRef, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { animate, state, style, transition, trigger } from '@angular/animations';
+import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
 
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -19,19 +19,34 @@ import { IClientLocale } from 'types/global';
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
     animations: [
-        trigger('navbar-toggler-iconTrigger', [
-            state('expanded', style({
-                opacity: 1
-            })),
-            state('collapsed', style({
-                opacity: 0,
-                transform: 'translate(15%, -33%) rotate(45deg)'
-            })),
-            transition('enter => leave', [
-                animate('1s ease-out')
-            ]),
-            transition('leave => enter', [
-                animate('1s ease-out')
+        trigger('navbar-toggler-icon-trigger', [
+            transition('collapsed => expanded', [
+                group([
+                    query('@top-bar-animation', [ animateChild() ]),
+                    query('@middle-bar-animation', [ animateChild() ]),
+                    query('@bottom-bar-animation', [ animateChild() ])
+                ])
+            ])
+        ]),
+        trigger('top-bar-animation', [
+            state('collapsed', style({ transform: 'rotate(0)' })),
+            state('expanded', style({ transform: 'rotate(45deg)', transformOrigin: '10% 10%' })),
+            transition('collapsed => expanded', [
+                animate('0.2s ease', style({ transform: 'rotate(45deg)', transformOrigin: '10% 10%' }))
+            ])
+        ]),
+        trigger('middle-bar-animation', [
+            state('collapsed', style({ opacity: 1 })),
+            state('expanded', style({ opacity: 0 })),
+            transition('collapsed => expanded', [
+                animate('0.2s ease', style({ opacity: 0 }))
+            ])
+        ]),
+        trigger('bottom-bar-animation', [
+            state('collapsed', style({ transform: 'rotate(0)' })),
+            state('expanded', style({ transform: 'rotate(-45deg)', transformOrigin: '10% 90%' })),
+            transition('collapsed => expanded', [
+                animate('0.2s ease', style({ transform: 'rotate(-45deg)', transformOrigin: '10% 90%' }))
             ])
         ])
     ]
@@ -44,6 +59,8 @@ export class AppComponent implements OnInit {
         private readonly clientService: ClientService,
         private readonly translateService: TranslateService
     ) { }
+
+    public navbarTogglerIconTriggerState: string = 'collapsed';
 
     @ViewChild(ModalComponent) modalComponent: ModalComponent
     @ViewChild('appModal', { read: ViewContainerRef, static: false })
@@ -74,6 +91,10 @@ export class AppComponent implements OnInit {
             },
             error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
         });
+    }
+
+    public changeNavbarTogglerIconTriggerState (): void {
+        this.navbarTogglerIconTriggerState = this.navbarTogglerIconTriggerState === 'collapsed' ? 'expanded' : 'collapsed';
     }
 
     public signOut (): Subscription {

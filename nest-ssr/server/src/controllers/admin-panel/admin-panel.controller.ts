@@ -23,13 +23,12 @@ export class AdminPanelController {
     @Post('/uploadImage')
     @ClientTypes('admin')
     async uploadImage (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
-        const imageEventTypes: string[] = [ 'wedding', 'holiday', 'birthday' ];
-        const imageViewSizeTypes: string[] = [ 'small', 'medium', 'big' ];
-
-        if ( !requestBody.client || !requestBody.client._id || !requestBody.client.uploadImageMeta || !requestBody.client.imageEventType || !requestBody.client.imageViewSizeType
+        if ( !requestBody.client || !requestBody.client._id || !requestBody.client.uploadImageMeta || !requestBody.client.imagePhotographyType
+            || !requestBody.client.imageViewSizeType
             || typeof requestBody.client._id !== 'number' || requestBody.client._id < 0 || requestBody.client._id > 1 
-            || typeof requestBody.client.uploadImageMeta !== 'string' || typeof requestBody.client.imageEventType !== 'string' || !imageEventTypes.includes(requestBody.client.imageEventType)
-            || typeof requestBody.client.imageViewSizeType !== 'string' || !imageViewSizeTypes.includes(requestBody.client.imageViewSizeType)
+            || typeof requestBody.client.uploadImageMeta !== 'string' || typeof requestBody.client.imagePhotographyType !== 'string' 
+            || !this.appService.imagePhotographyTypes.includes(requestBody.client.imagePhotographyType)
+            || typeof requestBody.client.imageViewSizeType !== 'string' || !this.appService.imageViewSizeTypes.includes(requestBody.client.imageViewSizeType)
             || requestBody.client.imageDescription && (typeof requestBody.client.imageDescription !== 'string' || requestBody.client.imageDescription.length > 20)
         ) {
             await this.appService.logLineAsync(`[${ process.env.SERVER_API_PORT }] UploadImage - not valid client data`);
@@ -73,11 +72,10 @@ export class AdminPanelController {
     @Put('/changeImageData')
     @ClientTypes('admin')
     async changeImageData (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
-        const imageEventTypes: string[] = [ 'wedding', 'holiday', 'birthday' ];
-
         if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName || typeof requestBody.adminPanel.originalImageName !== 'string'
-            || ( requestBody.adminPanel.newImageEventType && ( 
-                typeof requestBody.adminPanel.newImageEventType !== 'string' || !imageEventTypes.includes(requestBody.adminPanel.newImageEventType)
+            || ( requestBody.adminPanel.newImagePhotographyType && ( 
+                typeof requestBody.adminPanel.newImagePhotographyType !== 'string' 
+                || !this.appService.imagePhotographyTypes.includes(requestBody.adminPanel.newImagePhotographyType)
             ))
             || ( requestBody.adminPanel.newImageDescription && ( 
                 typeof requestBody.adminPanel.newImageDescription !== 'string' || requestBody.adminPanel.newImageDescription.length > 20
@@ -87,16 +85,14 @@ export class AdminPanelController {
         return this.adminPanelService.changeImageData(request, requestBody);
     }
 
-    @Post('/setEventTypeImage')
+    @Post('/setPhotographyTypeImage')
     @ClientTypes('admin')
-    async setEventTypeImage (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
-        const imageEventTypes: string[] = [ 'wedding', 'holiday', 'birthday' ];
-
-        if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName || !requestBody.adminPanel.eventTypeName
+    async setPhotographyTypeImage (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
+        if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName || !requestBody.adminPanel.imagePhotographyType
             || typeof requestBody.adminPanel.originalImageName !== 'string' 
-            || typeof requestBody.adminPanel.eventTypeName !== 'string' || !imageEventTypes.includes(requestBody.adminPanel.eventTypeName)
+            || typeof requestBody.adminPanel.imagePhotographyType !== 'string' || !this.appService.imagePhotographyTypes.includes(requestBody.adminPanel.imagePhotographyType)
         ) throw new BadRequestException();
 
-        return this.adminPanelService.setEventTypeImage(request, requestBody);
+        return this.adminPanelService.setPhotographyTypeImage(request, requestBody);
     }
 }

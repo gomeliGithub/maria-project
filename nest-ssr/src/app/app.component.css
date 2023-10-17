@@ -1,0 +1,14 @@
+.navbar-toggler {
+    border: none;
+    background: transparent !important;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+}
+
+.icon-bar {
+    width: 22px;
+    height: 2px;
+    background-color: #888;
+}

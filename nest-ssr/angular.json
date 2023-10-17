@@ -31,9 +31,9 @@
                         ],
                         "scripts": [
                             "node_modules/hammerjs/hammer.min.js",
-                            "node_modules/jquery/dist/jquery.min.js",
                             "node_modules/@popperjs/core/dist/umd/popper.min.js",
-                            "node_modules/bootstrap/dist/js/bootstrap.min.js"
+                            "node_modules/bootstrap/dist/js/bootstrap.min.js",
+                            "node_modules/jquery/dist/jquery.min.js"
                         ],
                         "allowedCommonJsDependencies": [
                             "bcryptjs"
@@ -44,8 +44,8 @@
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "800kb",
-                                    "maximumError": "1mb"
+                                    "maximumWarning": "2mb",
+                                    "maximumError": "3mb"
                                 },
                                 {
                                     "type": "anyComponentStyle",
@@ -54,14 +54,7 @@
                                 }
                             ],
                             "outputHashing": "all",
-                            "optimization": {
-                                "scripts": true,
-                                "styles": {
-                                    "minify": true,
-                                    "inlineCritical": false
-                                },
-                                "fonts": true
-                            },
+                            "optimization": false,
                             "sourceMap": false,
                             "namedChunks": false,
                             "extractLicenses": true,
@@ -121,9 +114,9 @@
                         ],
                         "scripts": [
                             "node_modules/hammerjs/hammer.min.js",
-                            "node_modules/jquery/dist/jquery.min.js",
                             "node_modules/@popperjs/core/dist/umd/popper.min.js",
-                            "node_modules/bootstrap/dist/js/bootstrap.min.js"
+                            "node_modules/bootstrap/dist/js/bootstrap.min.js",
+                            "node_modules/jquery/dist/jquery.min.js"
                         ]
                     }
                 },

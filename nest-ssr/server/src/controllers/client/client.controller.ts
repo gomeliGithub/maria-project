@@ -10,7 +10,7 @@ import { ClientService } from '../../services/client/client.service';
 import { CommonService } from 'server/src/services/common/common.service';
 
 import { IRequest, IRequestBody } from 'types/global';
-import { IClientCompressedImage, IEventType } from 'types/models';
+import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
 
 @Controller('/client')
 export class ClientController {
@@ -28,8 +28,8 @@ export class ClientController {
         return this.clientService.getCompressedImagesList(imagesType.substring(1) as 'home' | 'gallery');
     }
 
-    @Get('/getEventTypesData/:targetPage')
-    async getEventTypesData (@Param('targetPage') targetPage: string): Promise<IEventType[][] | IEventType[]> {
+    @Get('/getImagePhotographyTypesData/:targetPage')
+    async getImagePhotographyTypesData (@Param('targetPage') targetPage: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[]> {
         targetPage = targetPage.substring(1);
         
         if ( !targetPage || ( targetPage !== 'home' && targetPage !== 'admin' ) ) throw new BadRequestException();
@@ -38,7 +38,7 @@ export class ClientController {
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        return commonServiceRef.getEventTypesData(requiredFields, targetPage);
+        return commonServiceRef.getImagePhotographyTypesData(requiredFields, targetPage);
     }
 
     @Post('/changeLocale')

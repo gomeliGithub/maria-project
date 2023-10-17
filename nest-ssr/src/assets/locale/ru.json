@@ -11,7 +11,7 @@
 	"NOIMAGESMESSAGE": "Изображений пока нет",
 	"HOMEPAGE": {
 		"HEADERTITLE": "Портфолио",
-		"EVENTTYPESLINKTEXT": "Работы"
+		"PHOTOGRAPHYTYPESLINKTEXT": "Работы"
 	},
 	"GALLERYPAGE": {
 		"HEADERTITLE": "Галерея фото"
@@ -75,38 +75,42 @@
 		"DELETEIMAGESUCCESSMESSAGE": "Изображение успешно удалено",
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Максимальное количество изображений на главной странице",
 		"TABLECAPTION": "Управление изображениями",
-		"SECONDTABLECAPTION": "Изображения для типов событий",
+		"SECONDTABLECAPTION": "Изображения для типов съёмок",
 		"TABLECOLTITLES": {
 			"ORIGINALNAME": "Оригинальное имя",
 			"ORIGINALSIZE": "Размер оригинального изображения",
-			"IMAGEEVENTTYPE": "Тип события",
+			"IMAGEPHOTOGRAPHYTYPE": "Тип съёмки",
 			"VIEWSIZETYPE": "Размер отображения",
-			"IMAGEEVENTDESCRIPTION": "Описание фото",
+			"IMAGEPHOTOGRAPHYTYPEDESCRIPTION": "Описание фото",
 			"UPLOADAT": "Загружен",
 			"ONHOMEPAGE": "Отображён на главной",
 			"ONGALLERYPAGE": "Отображён на галерее"
 		},
 		"IMAGECONTROLTEXT": {
 			"TITLE": "Управление",
-			"CHANGEBUTTON": "Изменить тип события или описание",
+			"CHANGEBUTTON": "Изменить тип съёмки или описание",
 			"DELETEBUTTON": "Удалить",
 			"MOVETOHOMEPAGEBUTTON": "На главную",
 			"MOVETOGALLERYPAGEBUTTON": "В галерею",
 			"MOVETOARCHIVEBUTTON": "В архив",
-			"SETASWEDDINGEVENTTYPEIMAGEBUTTON": "Для свадьбы",
-			"SETASHOLIDAYEVENTTYPEIMAGEBUTTON": "Для праздника",
-			"SETASBIRTHDAYEVENTTYPEIMAGEBUTTON": "Для дня рождения"
+			"SETPHOTOGRAPHYTYPEIMAGE": {
+				"INDIVIDUALBUTTONTEXT": "Для индивидуальной съёмки", 
+				"CHILDRENBUTTONTEXT": "Для детской съёмки", 
+				"WEDDINGBUTTONTEXT": "Для свадебной съёмки",
+				"FAMILYBUTTONTEXT": "Для семейной съёмки", 
+				"EVENTBUTTONTEXT": "Для съёмки мероприятий"
+			}
 		},
 		"CHANGEIMAGEDATATEXT": {
-			"EVENTTYPE": "Тип события",
+			"PHOTOGRAPHYTYPE": "Тип съёмки",
 			"VIEWSIZETYPE": "Размер отображения",
 			"DESCRIPTION": "Индивидуальное описание фото",
 			"CHANGEBUTTON": "Изменить"
 		},
 		"UPLOADIMAGETEXT": {
-			"EVENTTYPE": "Тип события",
+			"PHOTOGRAPHYTYPE": "Тип съёмки",
 			"VIEWSIZETYPE": "Размер отображения",
-			"INVALIDEVENTTYPE": "Не выбран тип события",
+			"INVALIDPHOTOGRAPHYTYPE": "Не выбран тип съёмки",
 			"INVALIDVIEWSIZETYPE": "Не выбран размер отображения",
 			"INVALIDSELECTIMAGE": "Не выбрано изображение",
 			"DESCRIPTION": "Индивидуальное описание фото",
@@ -120,10 +124,19 @@
 			"TBYTE": "ТБ"
 		}
 	},
-	"IMAGEEVENTTYPES": {
-		"WEDDING": "Свадьба",
-		"HOLIDAY": "Праздник",
-		"BIRTHDAY": "День рождения"
+	"IMAGEPHOTOGRAPHYTYPES": {
+		"INDIVIDUAL": "Индивидуальная", 
+		"CHILDREN": "Детская", 
+		"WEDDING": "Свадьба", 
+		"FAMILY": "Семейная", 
+		"EVENT": "Мероприятие"
+	},
+	"IMAGEPHOTOGRAPHYTYPESFULLTEXT": {
+		"INDIVIDUAL": "Индивидуальная съёмка", 
+		"CHILDREN": "Детская съёмка", 
+		"WEDDING": "Свадебная съёмка", 
+		"FAMILY": "Семейная съёмка", 
+		"EVENT": "Мероприятия"
 	},
 	"IMAGEVIEWSIZETYPES": {
 		"SMALL": "Небольшой",

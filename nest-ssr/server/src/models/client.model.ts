@@ -171,7 +171,7 @@ export class ClientCompressedImage extends Model {
     @Column({ 
         type: DataType.STRING
     })
-    eventType: string;
+    photographyType: string;
 
     @AllowNull(false)
     @Column({ 
@@ -231,7 +231,7 @@ export class ClientCompressedImage extends Model {
 @Table({
     timestamps: false
 })
-export class EventType extends Model {
+export class ImagePhotographyType extends Model {
     @PrimaryKey
     @AllowNull(false)
     @Column({ 

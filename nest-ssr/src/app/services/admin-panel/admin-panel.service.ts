@@ -34,7 +34,7 @@ export class AdminPanelService {
     }
 
     public uploadImage (formFile: File, uploadImageForm: FormGroup<{
-        imageEventType: FormControl<string>;
+        imagePhotographyType: FormControl<string>;
         imageViewSizeType: FormControl<string>;
         image: FormControl<FileList>;
         imageDescription: FormControl<string>;

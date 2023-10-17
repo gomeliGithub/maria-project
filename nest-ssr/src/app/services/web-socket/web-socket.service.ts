@@ -29,7 +29,7 @@ export class WebSocketService {
     private _progressElement: HTMLDivElement;
 
     public on (host: string, uploadImageForm: FormGroup<{
-        imageEventType: FormControl<string>;
+        imagePhotographyType: FormControl<string>;
         imageViewSizeType: FormControl<string>;
         image: FormControl<FileList>;
         imageDescription: FormControl<string>;
@@ -120,7 +120,7 @@ export class WebSocketService {
     }
 
     private _clearUploadImageData (uploadImageForm: FormGroup<{
-        imageEventType: FormControl<string>;
+        imagePhotographyType: FormControl<string>;
         imageViewSizeType: FormControl<string>;
         image: FormControl<FileList>;
         imageDescription: FormControl<string>;

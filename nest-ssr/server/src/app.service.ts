@@ -25,8 +25,8 @@ import { JwtControlService } from './services/sign/jwt-control.service';
 @Injectable()
 export class AppService {
     constructor (
-        private lazyModuleLoader: LazyModuleLoader
-    ) { }
+        private readonly lazyModuleLoader: LazyModuleLoader
+    ) {}
 
     public staticFilesDirPath: string = join(process.cwd(), 'dist/nest-ssr/browser/assets');
 
@@ -45,6 +45,9 @@ export class AppService {
 
     public clientOriginalImagesDir: string = path.join(this.__dirname, 'originalImages');
     public clientCompressedImagesDir: string = path.join(this.__dirname, 'compressedImages');
+
+    public imagePhotographyTypes: string[] = [ 'individual', 'children', 'wedding', 'family', 'event' ];
+    public imageViewSizeTypes: string[] = [ 'small', 'medium', 'big' ];
 
     public async getServiceRef ( module: typeof AdminPanelModule, service: typeof AdminPanelService): Promise<AdminPanelService>
     public async getServiceRef ( module: typeof ClientModule, service: typeof ClientService): Promise<ClientService>

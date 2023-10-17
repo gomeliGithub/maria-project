@@ -6,7 +6,8 @@ import { ModalComponent } from '../modal/modal.component';
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 
-import { IClientCompressedImage, IEventType } from 'types/models';
+import { AnimationEvent } from 'types/global';
+import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
 
 @Component({
     selector: 'app-home',
@@ -22,10 +23,10 @@ import { IClientCompressedImage, IEventType } from 'types/models';
                 opacity: 1
             })),
             transition('enter => leave', [
-                animate('0.3s 300ms ease-out')
+                animate('0.3s 200ms ease-out')
             ]),
             transition('leave => enter', [
-                animate('0.3s 300ms ease-out')
+                animate('0.3s 200ms ease-out')
             ])
         ]),
     ]
@@ -37,6 +38,7 @@ export class HomeComponent implements OnInit {
     ) { }
     
     public currentMouseTriggerStates: string[] = [];
+    public linkButtonVisuallyHiddenStates: boolean[] = [];
 
     @ViewChild(ModalComponent) modalComponent: ModalComponent
     @ViewChild('appModal', { read: ViewContainerRef, static: false })
@@ -45,8 +47,8 @@ export class HomeComponent implements OnInit {
 
     public compressedImagesList: IClientCompressedImage[];
 
-    public eventTypes: IEventType[][];
-    public flatEventTypes: IEventType[];
+    public imagePhotographyTypes: IImagePhotographyType[][];
+    public flatImagePhotographyTypes: IImagePhotographyType[];
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
@@ -60,14 +62,17 @@ export class HomeComponent implements OnInit {
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
 
-            this.clientService.getEventTypesData('home').subscribe({
-                next: eventTypesData => {
-                    const nullable: boolean = eventTypesData.some(eventTypesDataArr => eventTypesDataArr.some(eventTypeData => !eventTypeData.originalImageName ));
+            this.clientService.getImagePhotographyTypesData('home').subscribe({
+                next: imagePhotographyTypesData => {
+                    const nullable: boolean = imagePhotographyTypesData.some(imagePhotographyTypesDataArr => imagePhotographyTypesDataArr.some(imagePhotographyTypeData => !imagePhotographyTypeData.originalImageName ));
 
-                    this.flatEventTypes = eventTypesData.flat();
-                    this.flatEventTypes.forEach(() => this.currentMouseTriggerStates.push('leave'));
+                    this.flatImagePhotographyTypes = imagePhotographyTypesData.flat();
+                    this.flatImagePhotographyTypes.forEach(() => {
+                        this.currentMouseTriggerStates.push('leave');
+                        this.linkButtonVisuallyHiddenStates.push(true);
+                    });
 
-                    this.eventTypes = nullable ? null : eventTypesData;
+                    this.imagePhotographyTypes = nullable ? null : imagePhotographyTypesData;
                 },
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
@@ -76,13 +81,23 @@ export class HomeComponent implements OnInit {
 
     public startMouseTriggerAnimation (index: number): void {
         this.currentMouseTriggerStates[index] = this.currentMouseTriggerStates[index] === 'enter' ? 'leave' : 'enter';
+        this.linkButtonVisuallyHiddenStates[index] = !this.linkButtonVisuallyHiddenStates[index] ? true : false;
     }
 
     public stopMouseTriggerAnimation (index: number): void {
         this.currentMouseTriggerStates[index] = this.currentMouseTriggerStates[index] === 'leave' ? 'enter' : 'leave';
+        this.linkButtonVisuallyHiddenStates[index] = this.linkButtonVisuallyHiddenStates[index] ? false : true;
     }
 
     public setCurrentMouseTriggerStateIndex (name: string): number {
-        return this.flatEventTypes.findIndex(eventTypeData => eventTypeData.name === name);
+        return this.flatImagePhotographyTypes.findIndex(imagePhotographyTypeData => imagePhotographyTypeData.name === name);
+    }
+
+    public mouseTriggerAnimationStarted (event: AnimationEvent): void {
+        event;
+    }
+
+    public mouseTriggerAnimationDone (event: AnimationEvent): void {
+        event;
     }
 }

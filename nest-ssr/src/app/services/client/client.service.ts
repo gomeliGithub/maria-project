@@ -12,7 +12,7 @@ import { AppService } from '../../app.service';
 
 import { IClientBrowser } from 'types/global';
 import { IClientSignData } from 'types/sign';
-import { IClientCompressedImage, IEventType } from 'types/models';
+import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
 
 @Injectable({
     providedIn: 'root'
@@ -85,12 +85,12 @@ export class ClientService {
         });
     }
 
-    public getEventTypesData (targetPage: 'home'): Observable<IEventType[][]>
-    public getEventTypesData (targetPage: 'admin'): Observable<IEventType[]>
-    public getEventTypesData (targetPage: 'home' | 'admin'): Observable<IEventType[][] | IEventType[]> {
-        return this.http.get(`/api/client/getEventTypesData/:${ targetPage }`).pipe<IEventType[][] | IEventType[]>(data => {
-            if ( targetPage === 'home' ) return data as Observable<IEventType[][]>;
-            else if ( targetPage === 'admin' ) return data as Observable<IEventType[]>;
+    public getImagePhotographyTypesData (targetPage: 'home'): Observable<IImagePhotographyType[][]>
+    public getImagePhotographyTypesData (targetPage: 'admin'): Observable<IImagePhotographyType[]>
+    public getImagePhotographyTypesData (targetPage: 'home' | 'admin'): Observable<IImagePhotographyType[][] | IImagePhotographyType[]> {
+        return this.http.get(`/api/client/getImagePhotographyTypesData/:${ targetPage }`).pipe<IImagePhotographyType[][] | IImagePhotographyType[]>(data => {
+            if ( targetPage === 'home' ) return data as Observable<IImagePhotographyType[][]>;
+            else if ( targetPage === 'admin' ) return data as Observable<IImagePhotographyType[]>;
         });
     }
 

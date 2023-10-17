@@ -76,10 +76,12 @@ export class ImageControlService {
         let newCompressedImage: ClientCompressedImage = null;
 
         try {
+            const { width, height } = await sharp(compressImageData.inputImagePath).metadata();
+
             const semiTransparentRedBuffer: Buffer = await sharp(compressImageData.inputImagePath).jpeg({
                 quality: 50,
                 progressive: true
-            }).toBuffer();
+            }).resize(Math.round(width / 2), Math.round(height / 2)).toBuffer();
 
             await fsPromises.writeFile(outputTempFilePath, semiTransparentRedBuffer);
             await fsPromises.rename(outputTempFilePath, outputImagePath);
@@ -90,7 +92,7 @@ export class ImageControlService {
                 originalName: inputImageName,
                 originalDirPath: inputImageDirPath,
                 originalSize: compressImageData.originalImageSize,
-                eventType: compressImageData.imageAdditionalData.eventType,
+                photographyType: compressImageData.imageAdditionalData.photographyType,
                 viewSizeType: compressImageData.imageAdditionalData.viewSizeType,
                 description: compressImageData.imageAdditionalData.description,
             });

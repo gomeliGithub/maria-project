@@ -23,7 +23,7 @@ import { CommonModule } from './modules/common.module';
 import { WebSocketService } from './services/web-socket/web-socket.service';
 
 import { JWT_token } from './models/sign.model';
-import { Admin, Member, ClientCompressedImage, EventType } from './models/client.model';
+import { Admin, Member, ClientCompressedImage, ImagePhotographyType } from './models/client.model';
 
 @Module({
     imports: [
@@ -47,7 +47,7 @@ import { Admin, Member, ClientCompressedImage, EventType } from './models/client
                 username: process.env.DB_USERNAME,
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
-                models: [ JWT_token, Admin, Member, ClientCompressedImage, EventType ],
+                models: [ JWT_token, Admin, Member, ClientCompressedImage, ImagePhotographyType ],
                 autoLoadModels: true,
                 synchronize: true
             })

@@ -11,7 +11,7 @@
 	"NOIMAGESMESSAGE": "No images yet",
 	"HOMEPAGE": {
 		"HEADERTITLE": "Portfolio",
-		"EVENTTYPESLINKTEXT": "Works"
+		"PHOTOGRAPHYTYPESLINKTEXT": "Works"
 	},
 	"GALLERYPAGE": {
 		"HEADERTITLE": "Photo gallery"
@@ -76,38 +76,42 @@
 		"DELETEIMAGESUCCESSMESSAGE": "Image deleted successfully",
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Maximum number of images on the home page",
 		"TABLECAPTION": "Image management",
-		"SECONDTABLECAPTION": "Images for event types",
+		"SECONDTABLECAPTION": "Images for photography types",
 		"TABLECOLTITLES": {
 			"ORIGINALNAME": "Original name",
 			"ORIGINALSIZE": "Original image size",
-			"IMAGEEVENTTYPE": "Event type",
+			"IMAGEPHOTOGRAPHYTYPE": "Photography type",
 			"VIEWSIZETYPE": "View size type",
-			"IMAGEEVENTDESCRIPTION": "Image description",
+			"IMAGEPHOTOGRAPHYTYPEDESCRIPTION": "Image description",
 			"UPLOADAT": "Upload at",
 			"ONHOMEPAGE": "Displayed on Home page",
 			"ONGALLERYPAGE": "Displayed on Gallery page"
 		},
 		"IMAGECONTROLTEXT": {
 			"TITLE": "Control",
-			"CHANGEBUTTON": "Change event type or description",
+			"CHANGEBUTTON": "Change Photography type or description",
 			"DELETEBUTTON": "Delete",
 			"MOVETOHOMEPAGEBUTTON": "To the home",
 			"MOVETOGALLERYPAGEBUTTON": "To the gallery",
 			"MOVETOARCHIVEBUTTON": "To the archive",
-			"SETASWEDDINGEVENTTYPEIMAGEBUTTON": "For wedding",
-			"SETASHOLIDAYEVENTTYPEIMAGEBUTTON": "For holiday",
-			"SETASBIRTHDAYEVENTTYPEIMAGEBUTTON": "For birthday"
+			"SETPHOTOGRAPHYTYPEIMAGE": {
+				"INDIVIDUALBUTTONTEXT": "For individual photography", 
+				"CHILDRENBUTTONTEXT": "For children's photography", 
+				"WEDDINGBUTTONTEXT": "For wedding photography",
+				"FAMILYBUTTONTEXT": "For family photography", 
+				"EVENTBUTTONTEXT": "For event photography"
+			}
 		},
 		"CHANGEIMAGEDATATEXT": {
-			"EVENTTYPE": "Event type",
+			"PHOTOGRAPHYTYPE": "Photography type",
 			"VIEWSIZETYPE": "View size type",
 			"DESCRIPTION": "Individual image description",
 			"CHANGEBUTTON": "Change"
 		},
 		"UPLOADIMAGETEXT": {
-			"EVENTTYPE": "Event type",
+			"PHOTOGRAPHYTYPE": "Photography type",
 			"VIEWSIZETYPE": "",
-			"INVALIDEVENTTYPE": "Event type not selected",
+			"INVALIDPHOTOGRAPHYTYPE": "Photography type not selected",
 			"INVALIDVIEWSIZETYPE": "View size not selected",
 			"INVALIDSELECTIMAGE": "No image selected",
 			"DESCRIPTION": "Individual image description",
@@ -121,10 +125,19 @@
 			"TBYTE": "ТB"
 		}
 	},
-	"IMAGEEVENTTYPES": {
-		"WEDDING": "Wedding",
-		"HOLIDAY": "Holiday",
-		"BIRTHDAY": "Birthday"
+	"IMAGEPHOTOGRAPHYTYPES": {
+		"INDIVIDUAL": "Individual", 
+		"CHILDREN": "Children", 
+		"WEDDING": "Wedding", 
+		"FAMILY": "Family", 
+		"EVENT": "Event"
+	},
+	"IMAGEPHOTOGRAPHYTYPESFULLTEXT": {
+		"INDIVIDUAL": "Individual photography", 
+		"CHILDREN": "Children photography", 
+		"WEDDING": "Wedding photography", 
+		"FAMILY": "Family photography", 
+		"EVENT": "Events"
 	},
 	"IMAGEVIEWSIZETYPES": {
 		"SMALL": "Small",

@@ -28,16 +28,16 @@ export interface IRequestBody {
     client?: {
         _id: number;
         uploadImageMeta: string;
-        imageEventType: string;
+        imagePhotographyType: string;
         imageViewSizeType: string;
         imageDescription?: string;
     },
     adminPanel?: {
         originalImageName: string;
         displayTargetPage: 'home' | 'gallery' | 'original';
-        newImageEventType?: string; 
+        newImagePhotographyType?: string; 
         newImageDescription?: string;
-        eventTypeName?: string;
+        imagePhotographyType?: string;
     }
 }
 
@@ -77,7 +77,7 @@ export interface ICompressImageData {
 }
 
 export interface IImageAdditionalData {
-    eventType: string;
+    photographyType: string;
     viewSizeType: string;
     description?: string;
 }
@@ -85,4 +85,14 @@ export interface IImageAdditionalData {
 export interface IComponentInfo {
     url: string;
     changeTime: Date;
+}
+
+export interface AnimationEvent {
+    fromState: string
+    toState: string
+    totalTime: number
+    phaseName: string
+    element: any
+    triggerName: string
+    disabled: boolean
 }

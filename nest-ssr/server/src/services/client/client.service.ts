@@ -15,11 +15,11 @@ import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 import { JwtControlService } from '../sign/jwt-control.service';
 
-import { Admin, Member, ClientCompressedImage, EventType } from '../../models/client.model';
+import { Admin, Member, ClientCompressedImage, ImagePhotographyType } from '../../models/client.model';
 
 import { IClient, ICookieSerializeOptions, IRequest } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions } from 'types/options';
-import { IClientCompressedImage, IEventType } from 'types/models';
+import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
 
 @Injectable()
 export class ClientService {
@@ -35,8 +35,8 @@ export class ClientService {
         private readonly memberModel: typeof Member,
         @InjectModel(ClientCompressedImage)
         private readonly compressedImageModel: typeof ClientCompressedImage,
-        @InjectModel(EventType)
-        private readonly eventTypeModel: typeof EventType
+        @InjectModel(ImagePhotographyType)
+        private readonly imagePhotographyTypeModel: typeof ImagePhotographyType
     ) { }
 
     public compressedImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
@@ -119,23 +119,23 @@ export class ClientService {
         const compressedImages: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({
             find: {
                 searchFields: imagesList,
-                includeFields: [ 'name', 'eventType', 'viewSizeType', 'description', 'uploadDate' ]
+                includeFields: [ 'name', 'photographyType', 'viewSizeType', 'description', 'uploadDate' ]
             }
         }) as unknown as IClientCompressedImage[];
 
         return compressedImages ?? imagesList;
     }
 
-    public async getEventTypesData (requiredFields: string[], targetPage: 'home' | 'admin'): Promise<IEventType[][] | IEventType[]> {
-        const eventTypesData: IEventType[] = await this.eventTypeModel.findAll({ attributes: requiredFields, raw: true });
+    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin'): Promise<IImagePhotographyType[][] | IImagePhotographyType[]> {
+        const photographyTypesData: IImagePhotographyType[] = await this.imagePhotographyTypeModel.findAll({ attributes: requiredFields, raw: true });
 
-        const reducedEventTypesData: IEventType[][] = [];
+        const reducedImagePhotographyTypesData: IImagePhotographyType[][] = [];
 
-        if ( targetPage === 'home' ) for (let i = 0; i < eventTypesData.length; i += 2 ) {
-            reducedEventTypesData.push(eventTypesData.slice(i, i + 2));
+        if ( targetPage === 'home' ) for (let i = 0; i < photographyTypesData.length; i += 2 ) {
+            reducedImagePhotographyTypesData.push(photographyTypesData.slice(i, i + 2));
         }
 
-        return targetPage === 'home' ? reducedEventTypesData : eventTypesData;
+        return targetPage === 'home' ? reducedImagePhotographyTypesData : photographyTypesData;
     }
 
     public async changeLocale (request: IRequest, newLocale: string, response: Response): Promise<string> {

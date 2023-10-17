@@ -10,7 +10,7 @@ import { CommonModule } from '../../modules/common.module';
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 
-import { Admin, Member, ClientCompressedImage, EventType } from '../../models/client.model';
+import { Admin, Member, ClientCompressedImage, ImagePhotographyType } from '../../models/client.model';
 
 import { IFullCompressedImageData, IImageAdditionalData, IRequest, IRequestBody} from 'types/global';
 import { IImageMeta, IPercentUploadedOptions, IWSMessage, IWebSocketClient } from 'types/web-socket';
@@ -23,8 +23,8 @@ export class AdminPanelService {
 
         @InjectModel(ClientCompressedImage)
         private readonly compressedImageModel: typeof ClientCompressedImage,
-        @InjectModel(EventType)
-        private readonly eventTypeModel: typeof EventType
+        @InjectModel(ImagePhotographyType)
+        private readonly imagePhotographyTypeModel: typeof ImagePhotographyType
     ) { }
 
     public async uploadImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
@@ -43,7 +43,7 @@ export class AdminPanelService {
         }
 
         const imageAdditionalData: IImageAdditionalData = {
-            eventType: requestBody.client.imageEventType,
+            photographyType: requestBody.client.imagePhotographyType,
             viewSizeType: requestBody.client.imageViewSizeType,
             description: requestBody.client.imageDescription
         }
@@ -184,7 +184,16 @@ export class AdminPanelService {
             client, 
             clientType: 'admin', 
             find: { 
-                includeFields: [ 'originalName', 'originalSize', 'eventType', 'viewSizeType', 'description', 'uploadDate', 'displayedOnHomePage', 'displayedOnGalleryPage' ] 
+                includeFields: [ 
+                    'originalName', 
+                    'originalSize', 
+                    'photographyType', 
+                    'viewSizeType', 
+                    'description', 
+                    'uploadDate', 
+                    'displayedOnHomePage', 
+                    'displayedOnGalleryPage' 
+                ] 
             }
         });
 
@@ -310,9 +319,9 @@ export class AdminPanelService {
         const originalImageName: string = requestBody.adminPanel.originalImageName;
 
         const updateValues: { [x: string]: any } = { };
-        const { newImageEventType, newImageDescription } = requestBody.adminPanel;
+        const { newImagePhotographyType, newImageDescription } = requestBody.adminPanel;
 
-        if ( newImageEventType ) updateValues.imageEventType = newImageEventType;
+        if ( newImagePhotographyType ) updateValues.photographyType = newImagePhotographyType;
         if ( newImageDescription ) updateValues.imageDescription = newImageDescription;
 
         await this.compressedImageModel.update(updateValues, { where: { originalName: originalImageName } });
@@ -320,7 +329,7 @@ export class AdminPanelService {
         return 'SUCCESS';
     }
 
-    public async setEventTypeImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
+    public async setPhotographyTypeImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
@@ -329,7 +338,7 @@ export class AdminPanelService {
 
         const compressedImage: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true });
 
-        const eventTypeName: string = requestBody.adminPanel.eventTypeName;
+        const imagePhotographyType: string = requestBody.adminPanel.imagePhotographyType;
 
         const staticFilesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
 
@@ -338,19 +347,19 @@ export class AdminPanelService {
         const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImage.name);
 
         let currentPath: string = '';
-        const newPath: string = path.join(staticFilesDirPath, 'home', 'eventTypes', compressedImage.name);
+        const newPath: string = path.join(staticFilesDirPath, 'home', 'imagePhotographyTypes', compressedImage.name);
 
         currentPath = await this._getFulfilledAccessPath(compressedImageOriginalPath, staticFilesHomeImagePath, staticFilesGalleryImagePath);
 
-        const currentEventTypeImage: EventType = await this.eventTypeModel.findOne({ where: { name: eventTypeName } });
+        const currentPhotographyTypeImage: ImagePhotographyType = await this.imagePhotographyTypeModel.findOne({ where: { name: imagePhotographyType } });
 
         try {
-            if ( currentEventTypeImage && currentEventTypeImage.originalImageName && path.extname(currentEventTypeImage.originalImageName) !== '' ) {
-                await fsPromises.unlink(path.join(staticFilesDirPath, 'home', 'eventTypes', currentEventTypeImage.originalImageName));
+            if ( currentPhotographyTypeImage && currentPhotographyTypeImage.originalImageName && path.extname(currentPhotographyTypeImage.originalImageName) !== '' ) {
+                await fsPromises.unlink(path.join(staticFilesDirPath, 'home', 'imagePhotographyTypes', currentPhotographyTypeImage.originalImageName));
             }
 
             await fsPromises.copyFile(currentPath, newPath);
-            await this.eventTypeModel.update({ originalImageName: compressedImage.name }, { where: { name: eventTypeName }});
+            await this.imagePhotographyTypeModel.update({ originalImageName: compressedImage.name }, { where: { name: imagePhotographyType }});
 
             return 'SUCCESS';
         } catch (error) {

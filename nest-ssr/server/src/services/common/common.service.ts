@@ -16,7 +16,7 @@ import { Admin, Member, ClientCompressedImage } from '../../models/client.model'
 import { IClient, ICompressImageData, IRequest } from 'types/global';
 import { IClientGetOptions, ICreateImageDirsOptions, IGetActiveClientOptions, IСompressedImageGetOptions } from 'types/options';
 import { IWebSocketClient } from 'types/web-socket';
-import { IEventType } from 'types/models';
+import { IImagePhotographyType } from 'types/models';
 
 @Injectable()
 export class CommonService {
@@ -87,9 +87,9 @@ export class CommonService {
         return imageControlServiceRef.deleteImage(request, imagePath, clientLogin);
     }
 
-    public async getEventTypesData (requiredFields: string[], targetPage: 'home' | 'admin'): Promise<IEventType[][] | IEventType[]> {
+    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin'): Promise<IImagePhotographyType[][] | IImagePhotographyType[]> {
         const clientServiceRef = await this.appService.getServiceRef(ClientModule, ClientService);
 
-        return clientServiceRef.getEventTypesData(requiredFields, targetPage);
+        return clientServiceRef.getImagePhotographyTypesData(requiredFields, targetPage);
     }
 }

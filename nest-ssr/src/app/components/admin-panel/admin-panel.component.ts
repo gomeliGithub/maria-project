@@ -12,7 +12,7 @@ import { ClientService } from '../../services/client/client.service';
 
 import { IFullCompressedImageData } from 'types/global';
 import { IModalRef } from 'types/options';
-import { IClientCompressedImage, IEventType } from 'types/models';
+import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
 
 @Component({
     selector: 'app-admin-panel',
@@ -28,28 +28,28 @@ export class AdminPanelComponent implements OnInit {
         private readonly clientService: ClientService
     ) {
         this.uploadImageForm = new FormGroup({
-            'imageEventType': new FormControl("", [ Validators.required, this.imageEventTypeValidator ]),
+            'imagePhotographyType': new FormControl("", [ Validators.required, this.imagePhotographyTypeValidator ]),
             'imageViewSizeType': new FormControl("", [ Validators.required, this.imageViewSizeTypeValidator ]),
             'image': new FormControl(null as FileList, [ Validators.required, this.imageValidator ]),
             'imageDescription': new FormControl("", Validators.maxLength(20))
         });
 
         this.changeImageDataForm = new FormGroup({
-            'newImageEventType': new FormControl("", [ Validators.nullValidator, this.imageEventTypeValidator ]),
+            'newImagePhotographyType': new FormControl("", [ Validators.nullValidator, this.imagePhotographyTypeValidator ]),
             'newImageViewSizeType': new FormControl("", [ Validators.nullValidator, this.imageViewSizeTypeValidator ]),
             'newImageDescription': new FormControl("", Validators.maxLength(20)) 
         });
     }
 
     public uploadImageForm: FormGroup<{
-        imageEventType: FormControl<string>;
+        imagePhotographyType: FormControl<string>;
         imageViewSizeType: FormControl<string>;
         image: FormControl<FileList>;
         imageDescription: FormControl<string>;
     }>;
 
     public changeImageDataForm: FormGroup<{
-        newImageEventType: FormControl<string>;
+        newImagePhotographyType: FormControl<string>;
         newImageViewSizeType: FormControl<string>;
         newImageDescription: FormControl<string>;
     }>;
@@ -79,7 +79,7 @@ export class AdminPanelComponent implements OnInit {
     public fullCompressedImagesList: IClientCompressedImage[];
     public fullCompressedImagesListCount: number;
 
-    public eventTypes: IEventType[];
+    public imagePhotographyTypes: IImagePhotographyType[];
 
     public spinnerTitle: string;
     public spinnerHidden: boolean = true;
@@ -96,8 +96,8 @@ export class AdminPanelComponent implements OnInit {
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
 
-            this.clientService.getEventTypesData('admin').subscribe({
-                next: eventTypesData => this.eventTypes = eventTypesData.length !== 0 ? eventTypesData : null,
+            this.clientService.getImagePhotographyTypesData('admin').subscribe({
+                next: imagePhotographyTypesData => this.imagePhotographyTypes = imagePhotographyTypesData.length !== 0 ? imagePhotographyTypesData : null,
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
         }
@@ -123,11 +123,11 @@ export class AdminPanelComponent implements OnInit {
         return null;
     }
 
-    public imageEventTypeValidator (control: FormControl<string>): { [ s: string ]: boolean } | null {
-        const imageEventTypes: string[] = [ 'wedding', 'holiday', 'birthday' ];
+    public imagePhotographyTypeValidator (control: FormControl<string>): { [ s: string ]: boolean } | null {
+        const imagePhotographyTypes: string[] = [ 'individual', 'children', 'wedding', 'family', 'event' ];
 
-        if ( !imageEventTypes.includes(control.value) ) {
-            return { 'imageEventType': true, 'newImageEventType': true };
+        if ( !imagePhotographyTypes.includes(control.value) ) {
+            return { 'imagePhotographyType': true, 'newImagePhotographyType': true };
         }
 
         return null;
@@ -144,7 +144,7 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public uploadImage (): void {
-        const { imageEventType, imageViewSizeType, imageDescription } = this.uploadImageForm.value;
+        const { imagePhotographyType, imageViewSizeType, imageDescription } = this.uploadImageForm.value;
 
         const imageMetaJson: string = JSON.stringify({
             name         : this._imageFile ? this._imageFile.name : null,
@@ -166,7 +166,7 @@ export class AdminPanelComponent implements OnInit {
                 client: {
                     _id: newClientId, 
                     uploadImageMeta: imageMetaJson,
-                    imageEventType,
+                    imagePhotographyType,
                     imageViewSizeType,
                     imageDescription
                 }
@@ -240,7 +240,7 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public changeImageData (): void {
-        const { newImageEventType, newImageDescription } = this.changeImageDataForm.value;
+        const { newImagePhotographyType, newImageDescription } = this.changeImageDataForm.value;
 
         const originalImageName: string = this.changingOriginalImageName;
 
@@ -250,7 +250,7 @@ export class AdminPanelComponent implements OnInit {
             const headers: HttpHeaders = this.appService.createRequestHeaders();
 
             this.http.put('/api/admin-panel/changeImageData', {
-                adminPanel: { originalImageName, newImageEventType, newImageDescription }
+                adminPanel: { originalImageName, newImagePhotographyType, newImageDescription }
             }, { responseType: 'text', headers, withCredentials: true }).subscribe({
                 next: responseText => {
                     this.changeImageDataFormHidden = true;
@@ -279,21 +279,21 @@ export class AdminPanelComponent implements OnInit {
         } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
     }
 
-    public setEventTypeImage (event: MouseEvent): void {
+    public setPhotographyTypeImage (event: MouseEvent): void {
         const imageButton: HTMLButtonElement = event.target as HTMLButtonElement;
 
         if ( imageButton ) {
             const originalImageName: string = imageButton.getAttribute('originalImageName');
-            const eventTypeName: string = imageButton.getAttribute('eventTypeName');
+            const imagePhotographyType: string = imageButton.getAttribute('imagePhotographyType');
 
-            if ( originalImageName && eventTypeName ) {
+            if ( originalImageName && imagePhotographyType ) {
                 this.spinnerTitle = this.appService.getTranslations('SPINNERTITLES.DISPLAYIMAGE');
                 this.spinnerHidden = false;
 
                 const headers: HttpHeaders = this.appService.createRequestHeaders();
 
-                this.http.post('/api/admin-panel/setEventTypeImage', { 
-                    adminPanel: { originalImageName, eventTypeName }
+                this.http.post('/api/admin-panel/setPhotographyTypeImage', {
+                    adminPanel: { originalImageName, imagePhotographyType }
                 }, { responseType: 'text', headers, withCredentials: true }).subscribe({
                     next: responseText => {
                         this.spinnerHidden = true;
