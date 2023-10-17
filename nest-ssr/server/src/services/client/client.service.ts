@@ -131,6 +131,12 @@ export class ClientService {
 
         const reducedImagePhotographyTypesData: IImagePhotographyType[][] = [];
 
+        if ( photographyTypesData.length === 0 ) {
+            for ( const photographyType of this.appService.imagePhotographyTypes) {
+                await this.imagePhotographyTypeModel.create({ name: photographyType });
+            }
+        }
+
         if ( targetPage === 'home' ) for (let i = 0; i < photographyTypesData.length; i += 2 ) {
             reducedImagePhotographyTypesData.push(photographyTypesData.slice(i, i + 2));
         }

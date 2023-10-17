@@ -39,14 +39,7 @@
                     (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
                     [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
                 >
-                    <div class="card">
-                        <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.originalImageName }}" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <p class="card-text">
-                                <small class="text-body-secondary">{{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i></small>
-                            </p>
-                        </div>
-                    </div>
+                    <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.originalImageName }}" class="img-fluid">
                 </div>
                 <div class="position-absolute top-50 start-50 translate-middle w-50 linkButtonContainer"
                     [ngClass]="{ 'visually-hidden': linkButtonVisuallyHiddenStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)] }"

@@ -23,10 +23,10 @@ import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
                 opacity: 1
             })),
             transition('enter => leave', [
-                animate('0.3s 200ms ease-out')
+                animate('0.3s 100ms ease-out')
             ]),
             transition('leave => enter', [
-                animate('0.3s 200ms ease-out')
+                animate('0.3s 100ms ease-out')
             ])
         ]),
     ]
