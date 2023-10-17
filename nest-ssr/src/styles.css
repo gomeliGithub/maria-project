@@ -7,6 +7,16 @@ body {
     width: 100%;
 }
 
+@media (max-width: 767px) {
+    html {
+        font-size: 10px;
+    }
+
+    body {
+        font-size: 10px;
+    }
+}
+
 .bg-image {
     background-repeat: no-repeat;
     background-size: cover;

@@ -44,7 +44,7 @@
                 <div class="position-absolute top-50 start-50 translate-middle w-50 linkButtonContainer"
                     [ngClass]="{ 'visually-hidden': linkButtonVisuallyHiddenStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)] }"
                 >
-                    <h5 class="text-center text-primary fw-bold" [ngSwitch]="imagePhotographyTypeData.name">
+                    <h5 class="text-center text-primary fw-bold text-break" [ngSwitch]="imagePhotographyTypeData.name">
                         <ng-template ngSwitchCase="individual">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
                         <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.CHILDREN' | translate }}</ng-template>
                         <ng-template ngSwitchCase="wedding">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.WEDDING' | translate }}</ng-template>

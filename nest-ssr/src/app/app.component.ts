@@ -20,7 +20,7 @@ import { IClientLocale } from 'types/global';
     styleUrls: ['./app.component.css'],
     animations: [
         trigger('navbar-toggler-icon-trigger', [
-            transition('collapsed => expanded', [
+            transition('collapsed <=> expanded', [
                 group([
                     query('@top-bar-animation', [ animateChild() ]),
                     query('@middle-bar-animation', [ animateChild() ]),
@@ -30,9 +30,12 @@ import { IClientLocale } from 'types/global';
         ]),
         trigger('top-bar-animation', [
             state('collapsed', style({ transform: 'rotate(0)' })),
-            state('expanded', style({ transform: 'rotate(45deg)', transformOrigin: '10% 10%' })),
+            state('expanded', style({ transform: 'rotate(45deg)', transformOrigin: '10% 20%' })),
             transition('collapsed => expanded', [
-                animate('0.2s ease', style({ transform: 'rotate(45deg)', transformOrigin: '10% 10%' }))
+                animate('0.2s ease', style({ transform: 'rotate(45deg)', transformOrigin: '10% 20%' }))
+            ]),
+            transition('expanded => collapsed', [
+                animate('0.2s ease', style({ transform: 'rotate(0)', transformOrigin: '10% 20%' }))
             ])
         ]),
         trigger('middle-bar-animation', [
@@ -40,13 +43,19 @@ import { IClientLocale } from 'types/global';
             state('expanded', style({ opacity: 0 })),
             transition('collapsed => expanded', [
                 animate('0.2s ease', style({ opacity: 0 }))
+            ]),
+            transition('expanded => collapsed', [
+                animate('0.2s ease', style({ opacity: 1 }))
             ])
         ]),
         trigger('bottom-bar-animation', [
             state('collapsed', style({ transform: 'rotate(0)' })),
-            state('expanded', style({ transform: 'rotate(-45deg)', transformOrigin: '10% 90%' })),
+            state('expanded', style({ transform: 'rotate(-45deg)', transformOrigin: '0 50%' })),
             transition('collapsed => expanded', [
-                animate('0.2s ease', style({ transform: 'rotate(-45deg)', transformOrigin: '10% 90%' }))
+                animate('0.2s ease', style({ transform: 'rotate(-45deg)', transformOrigin: '0 50%' }))
+            ]),
+            transition('expanded => collapsed', [
+                animate('0.2s ease', style({ transform: 'rotate(0)', transformOrigin: '0 50%' }))
             ])
         ])
     ]
