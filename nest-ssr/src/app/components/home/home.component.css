@@ -28,3 +28,7 @@
 #emptyContainer {
     height: 20vh;
 }
+
+.linkButtonContainer {
+    display: none;
+}

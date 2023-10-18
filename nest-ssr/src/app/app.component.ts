@@ -1,4 +1,4 @@
-import { Component, ComponentRef, ElementRef, HostListener, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ComponentRef, ElementRef, HostListener, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
 
@@ -75,7 +75,7 @@ import { IClientLocale } from 'types/global';
         ])
     ]
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
     constructor (
         @Inject(DOCUMENT) private readonly document: Document,
         
@@ -141,6 +141,10 @@ export class AppComponent implements OnInit {
             },
             error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
         });
+    }
+
+    ngAfterViewInit (): void {
+        this.navbarTogglerElementRef.nativeElement.classList.add('collapsed');
     }
 
     public async changeNavbarTogglerIconTriggerState (): Promise<void> {

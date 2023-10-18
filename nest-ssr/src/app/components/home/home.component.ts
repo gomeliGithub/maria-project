@@ -39,6 +39,7 @@ export class HomeComponent implements OnInit {
     
     public currentMouseTriggerStates: string[] = [];
     public linkButtonVisuallyHiddenStates: boolean[] = [];
+    public currentMouseTriggerAnimationsDone: boolean[] = [];
 
     @ViewChild(ModalComponent) modalComponent: ModalComponent
     @ViewChild('appModal', { read: ViewContainerRef, static: false })
@@ -70,6 +71,7 @@ export class HomeComponent implements OnInit {
                     this.flatImagePhotographyTypes.forEach(() => {
                         this.currentMouseTriggerStates.push('leave');
                         this.linkButtonVisuallyHiddenStates.push(true);
+                        this.currentMouseTriggerAnimationsDone.push(false);
                     });
 
                     this.imagePhotographyTypes = nullable ? null : imagePhotographyTypesData;
@@ -89,7 +91,7 @@ export class HomeComponent implements OnInit {
         this.linkButtonVisuallyHiddenStates[index] = this.linkButtonVisuallyHiddenStates[index] ? false : true;
     }
 
-    public setCurrentMouseTriggerStateIndex (name: string): number {
+    public setCurrentMouseTriggerStateIndex (name: string): number { 
         return this.flatImagePhotographyTypes.findIndex(imagePhotographyTypeData => imagePhotographyTypeData.name === name);
     }
 
@@ -98,6 +100,16 @@ export class HomeComponent implements OnInit {
     }
 
     public mouseTriggerAnimationDone (event: AnimationEvent): void {
-        event;
+        const mouseTriggerElement: HTMLDivElement = event.element as HTMLDivElement;
+        // const indexNumber: number = parseInt(mouseTriggerElement.getAttribute('index-number'), 10);
+
+        const linkButtonContainer: HTMLDivElement = mouseTriggerElement.nextElementSibling as HTMLDivElement;
+
+        if ( event.toState === 'enter') {
+            linkButtonContainer.style.display = 'block';
+            // this.currentMouseTriggerAnimationsDone[indexNumber] = true;
+
+            // console.log(this.currentMouseTriggerAnimationsDone);
+        } if ( event.toState === 'leave' ) linkButtonContainer.style.display = 'none';
     }
 }

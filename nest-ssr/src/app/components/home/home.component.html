@@ -35,7 +35,7 @@
                 (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
                 (mouseleave)="stopMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
             >
-                <div class=""
+                <div class="" [attr.index-number]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
                     (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
                     (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
                     [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
@@ -44,9 +44,7 @@
                         [ngClass]="{ 'vw-80': imagePhotographyTypesDataArr.length === 1 }"
                     >
                 </div>
-                <div class="position-absolute top-50 start-50 translate-middle w-50 linkButtonContainer"
-                    [ngClass]="{ 'visually-hidden': linkButtonVisuallyHiddenStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)] }"
-                >
+                <div class="position-absolute top-50 start-50 translate-middle w-50 linkButtonContainer">
                     <h5 class="text-center text-primary fw-bold text-break" [ngSwitch]="imagePhotographyTypeData.name">
                         <ng-template ngSwitchCase="individual">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
                         <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.CHILDREN' | translate }}</ng-template>
