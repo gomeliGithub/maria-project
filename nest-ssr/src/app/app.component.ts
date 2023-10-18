@@ -5,6 +5,11 @@ import { animate, animateChild, group, query, state, style, transition, trigger 
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
+import { HomeComponent } from './components/home/home.component';
+import { GalleryComponent } from './components/gallery/gallery.component';
+import { ClientComponent } from './components/client/client.component';
+import { AdminPanelComponent } from './components/admin-panel/admin-panel.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 import { ModalComponent } from './components/modal/modal.component';
 
 import { AppService } from './app.service';
@@ -79,6 +84,11 @@ export class AppComponent implements OnInit {
         private readonly translateService: TranslateService
     ) { }
 
+    public onRouterOutlet (component: HomeComponent | GalleryComponent | ClientComponent | AdminPanelComponent | NotFoundComponent): void {
+        if ( !(component instanceof HomeComponent) ) this.isHomePage = false;
+        else this.isHomePage = true;
+    }
+
     @HostListener("scroll", ["$event"]) private onScroll ($event: any): void {
         if ( $event.srcElement.scrollTop > 100 ) this.navbarAnimationState = 'scrolled';
         else this.navbarAnimationState = 'static';
@@ -87,10 +97,6 @@ export class AppComponent implements OnInit {
     @HostListener('document:mousedown', ['$event'])
     public onGlobalClick (event: any): void {
         if ( !this.navbarElementRef.nativeElement.contains(event.target) ) { 
-            console.log(this.navbarTogglerElementRef.nativeElement.classList.contains('collapsed')); 
-            console.log(event.target);
-
-            if ( event.target.id === 'signFormContainer' ) debugger;
             if ( !this.navbarTogglerElementRef.nativeElement.classList.contains('collapsed') ) this.navbarTogglerClick();
         }
     }
@@ -98,6 +104,8 @@ export class AppComponent implements OnInit {
     public navbarTogglerClick (): void {
         this.navbarTogglerElementRef.nativeElement.click();
     }
+
+    public isHomePage: boolean = true;
 
     public navbarTogglerIconTriggerState: string = 'collapsed';
     public navbarAnimationState: string = 'static';

@@ -31,8 +31,12 @@ body {
 app-home, app-gallery, app-client, app-admin-panel, app-not-found {
     height: auto !important;
     width: 100% !important;
-    margin-bottom: 8rem !important;
+    margin-bottom: 12rem !important;
     position: relative !important;
+}
+
+app-gallery, app-admin-panel {
+    margin-top: 3rem !important;
 }
 
 app-client {
