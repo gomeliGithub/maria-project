@@ -1,5 +1,4 @@
 import { Component, ComponentRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
-import { EMPTY, Observable, catchError, map } from 'rxjs';
 
 import { ModalComponent } from '../modal/modal.component';
 
@@ -22,7 +21,6 @@ export class GalleryComponent implements OnInit {
     private readonly modalViewRef: ViewContainerRef;
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
-    public observableCompressedImagesList: Observable<string[]>;
     public compressedImagesList: string[];
 
     ngOnInit (): void {
@@ -32,15 +30,10 @@ export class GalleryComponent implements OnInit {
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
 
-            this.observableCompressedImagesList = this.clientService.getCompressedImagesList('gallery').pipe(map(imagesList => {
-                this.compressedImagesList = imagesList && imagesList.length !== 0 ? imagesList : null;
-                
-                return imagesList;
-            }), catchError(() => {
-                this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
-
-                return EMPTY;
-            }));
+            this.clientService.getCompressedImagesList('gallery').subscribe({
+                next: imagesList => this.compressedImagesList = imagesList && imagesList.length !== 0 ? imagesList : null,
+                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+            });
         }
     }
 }

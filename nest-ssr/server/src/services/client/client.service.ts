@@ -118,7 +118,7 @@ export class ClientService {
 
         const compressedImages: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({
             find: {
-                searchFields: imagesList,
+                imageNames: imagesList,
                 includeFields: [ 'name', 'photographyType', 'viewSizeType', 'description', 'uploadDate' ]
             }
         }) as unknown as IClientCompressedImage[];

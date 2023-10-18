@@ -24,7 +24,7 @@ export interface IСompressedImageGetOptions {
     client?: Admin | Member; 
     clientType?: 'admin' | 'member';
     find?: {
-        searchFields?: string[];
+        imageNames?: string[];
         includeFields?: string[];
         rawResult?: boolean;
     }

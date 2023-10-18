@@ -9,3 +9,22 @@
 #imagesCarousel .carousel-indicators button {
     height: 6px!important;
 }
+
+.images {
+    width: 50vw;
+    height: calc(.55 * 100vh);
+    object-fit: cover;
+}
+
+#aboutImage {
+    height: 100%;
+    width: 30vw;
+}
+
+#aboutText {
+    width: 50vw;
+}
+
+#emptyContainer {
+    height: 20vh;
+}
