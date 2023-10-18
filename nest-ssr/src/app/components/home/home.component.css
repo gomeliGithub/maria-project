@@ -12,7 +12,7 @@
 
 .images {
     width: 50vw;
-    height: calc(.55 * 100vh);
+    height: calc(.35 * 100vh);
     object-fit: cover;
 }
 
