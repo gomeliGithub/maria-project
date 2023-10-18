@@ -11,7 +11,7 @@
 }
 
 .images {
-    width: 50vw;
+    width: 40vw;
     height: calc(.35 * 100vh);
     object-fit: cover;
 }

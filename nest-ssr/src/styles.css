@@ -17,6 +17,10 @@ body {
     }
 }
 
+.vw-80 {
+    width: 80vw !important;
+}
+
 .w-60 {
     width: 60% !important;
 }
