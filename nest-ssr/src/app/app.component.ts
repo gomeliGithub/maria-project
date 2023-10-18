@@ -1,4 +1,4 @@
-import { Component, ComponentRef, ElementRef, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, ComponentRef, ElementRef, HostListener, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
 
@@ -57,6 +57,16 @@ import { IClientLocale } from 'types/global';
             transition('expanded => collapsed', [
                 animate('0.2s ease', style({ transform: 'rotate(0)', transformOrigin: '0 50%' }))
             ])
+        ]),
+        trigger('navbar-animation', [
+            state('static', style({ backgroundColor: 'transparent' })),
+            state('scrolled', style({ backgroundColor: '#e3f2fd' })),
+            transition('static => scrolled', [
+                animate('200ms', style({ backgroundColor: '#e3f2fd' }))
+            ]),
+            transition('scrolled => static', [
+                animate('200ms', style({ backgroundColor: 'transparent' }))
+            ])
         ])
     ]
 })
@@ -69,7 +79,28 @@ export class AppComponent implements OnInit {
         private readonly translateService: TranslateService
     ) { }
 
+    @HostListener("scroll", ["$event"]) private onScroll ($event: any): void {
+        if ( $event.srcElement.scrollTop > 100 ) this.navbarAnimationState = 'scrolled';
+        else this.navbarAnimationState = 'static';
+    }
+
+    @HostListener('document:mousedown', ['$event'])
+    public onGlobalClick (event: any): void {
+        if ( !this.navbarElementRef.nativeElement.contains(event.target) ) { 
+            console.log(this.navbarTogglerElementRef.nativeElement.classList.contains('collapsed')); 
+            console.log(event.target);
+
+            if ( event.target.id === 'signFormContainer' ) debugger;
+            if ( !this.navbarTogglerElementRef.nativeElement.classList.contains('collapsed') ) this.navbarTogglerClick();
+        }
+    }
+
+    public navbarTogglerClick (): void {
+        this.navbarTogglerElementRef.nativeElement.click();
+    }
+
     public navbarTogglerIconTriggerState: string = 'collapsed';
+    public navbarAnimationState: string = 'static';
 
     @ViewChild(ModalComponent) modalComponent: ModalComponent
     @ViewChild('appModal', { read: ViewContainerRef, static: false })
@@ -77,6 +108,8 @@ export class AppComponent implements OnInit {
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
     @ViewChild('changeClientLocaleButton', { static: false }) private readonly changeClientLocaleButtonViewRef: ElementRef<HTMLButtonElement>;
+    @ViewChild('navbar', { static: false }) private readonly navbarElementRef: ElementRef<HTMLDivElement>;
+    @ViewChild('navbarToggler', { static: false }) private readonly navbarTogglerElementRef: ElementRef<HTMLButtonElement>;
 
     public readonly locales: IClientLocale[] = environment.locales;
 
@@ -102,7 +135,7 @@ export class AppComponent implements OnInit {
         });
     }
 
-    public changeNavbarTogglerIconTriggerState (): void {
+    public async changeNavbarTogglerIconTriggerState (): Promise<void> {
         this.navbarTogglerIconTriggerState = this.navbarTogglerIconTriggerState === 'collapsed' ? 'expanded' : 'collapsed';
     }
 

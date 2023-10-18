@@ -79,6 +79,7 @@
         "@angular-devkit/build-angular": "^15.2.3",
         "@angular/cli": "~15.2.3",
         "@angular/compiler-cli": "^15.2.0",
+        "@angular/localize": "^15.2.0",
         "@nestjs/cli": "^10.1.18",
         "@nestjs/schematics": "^10.0.2",
         "@nestjs/testing": "^10.2.6",
@@ -123,10 +124,10 @@
         "rootDir": "server/src",
         "testRegex": ".*\\.spec\\.ts$",
         "transform": {
-            "^.+\\.(t|j)s$": "ts-jest"
+        "^.+\\.(t|j)s$": "ts-jest"
         },
         "collectCoverageFrom": [
-            "**/*.(t|j)s"
+        "**/*.(t|j)s"
         ],
         "coverageDirectory": "../coverage",
         "testEnvironment": "node"

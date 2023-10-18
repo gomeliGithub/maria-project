@@ -1,10 +1,15 @@
-<nav class="navbar navbar-expand-sm navbar-light w-100 sticky-top" style="background-color: #e3f2fd;">
+<nav class="navbar navbar-expand-sm navbar-light w-100 fixed-top" style="background-color: transparent;" #navbar
+    [@navbar-animation]="navbarAnimationState"
+    [ngClass]="{ 'bg-gradient': navbarAnimationState === 'scrolled' }"
+>
     <div class="container-fluid">
-        <a class="navbar-brand" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <a class="navbar-brand" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" 
+            [ngClass]="{ 'text-white': navbarAnimationState === 'static' }"
+        >
             <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
             Mashulik
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" 
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" #navbarToggler
             aria-expanded="false" aria-label="Toggle navigation"
             [@navbar-toggler-icon-trigger]="navbarTogglerIconTriggerState"
             (click)="changeNavbarTogglerIconTriggerState()"
@@ -16,32 +21,43 @@
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                    <a class="nav-link active" aria-current="page" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" 
+                        (click)="navbarTogglerClick()"
+                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' }"
+                    >
                         {{ 'PAGETITLES.HOME' | translate }}
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" routerLink="/gallery" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                    <a class="nav-link" routerLink="/gallery" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" 
+                        (click)="navbarTogglerClick()"
+                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' }"
+                    >
                         {{ 'PAGETITLES.GALLERY' | translate }}
                     </a>
                 </li>
                 <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item">
-                    <a class="nav-link" routerLink="/adminPanel" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                    <a class="nav-link" routerLink="/adminPanel" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" 
+                        (click)="navbarTogglerClick()"
+                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' }"
+                    >
                         {{ 'PAGETITLES.ADMINPANEL' | translate }}
                     </a>
                 </li>
                 <li class="nav-item dropdown">
-                    <button class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" 
+                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' }"
+                    >
                         {{ 'CLIENTMENU.TITLE' | translate }}
                     </button>
                     <ul class="dropdown-menu">
                         <li *ngIf="!activeClientLogin">
-                            <a class="dropdown-item" routerLink="/signUp" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                            <a class="dropdown-item" routerLink="/signUp" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="navbarTogglerClick()">
                                 {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
                             </a>
                         </li>
                         <li *ngIf="!activeClientLogin">
-                            <a class="dropdown-item" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                            <a class="dropdown-item" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="navbarTogglerClick()">
                                 {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
                             </a>
                         </li>
@@ -53,18 +69,23 @@
                     </ul>
                 </li>
             </ul>
-            <div class="navbar-text">
+            <div class="navbar-text" [ngClass]="{ 'me-3': !activeClientLogin }">
                 <span *ngIf="activeClientLogin; else noActiveClientBlock">
-                    <span class="text-success fw-bold">{{activeClientLogin}}</span>
-                    <small class="d-block">{{activeClientFullName}}</small>
+                    <span class="fw-bold" 
+                        [ngClass]="{ 'text-success': navbarAnimationState === 'scrolled', 'text-info': navbarAnimationState === 'static' }"
+                    >{{activeClientLogin}}</span>
+                    <small class="d-block" [ngClass]="{ 'text-white': navbarAnimationState === 'static' }">{{activeClientFullName}}</small>
                 </span>
                 <ng-template #noActiveClientBlock>  
                     <span class="text-warning">{{ 'CLIENTMENU.NONSIGNINTEXT' | translate }}</span>
                 </ng-template>
             </div>
-            <ul *ngIf="activeClientLogin" class="navbar-nav ms-2">
+            <ul *ngIf="activeClientLogin" class="navbar-nav ms-2 me-3">
                 <li class="nav-item dropdown">
-                    <button type="button" class="nav-link dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" #changeClientLocaleButton>
+                    <button type="button" class="nav-link dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        [ngClass]="{ 'text-info': navbarAnimationState === 'static' }"
+                        #changeClientLocaleButton
+                    >
                         {{ activeClientLocale }}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
