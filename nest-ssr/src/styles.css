@@ -7,22 +7,16 @@ body {
     width: 100%;
 }
 
-@media (max-width: 767px) {
-    html {
-        font-size: 10px;
-    }
-
-    body {
-        font-size: 10px;
-    }
-}
-
 .vh-70 {
     height: 70vh !important;
 }
 
 .vw-80 {
     width: 80vw !important;
+}
+
+.vw-30 {
+    width: 30vw !important;
 }
 
 .w-60 {
@@ -41,6 +35,11 @@ app-home, app-gallery, app-client, app-admin-panel, app-not-found {
     width: 100% !important;
     margin-bottom: 12rem !important;
     position: relative !important;
+}
+
+app-home {
+    height: 100% !important;
+    margin-bottom: auto !important;
 }
 
 app-gallery, app-admin-panel {

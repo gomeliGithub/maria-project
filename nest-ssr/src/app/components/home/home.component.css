@@ -10,33 +10,40 @@
     height: 6px!important;
 }
 
-@media (max-width: 575px) {
+@media (max-width: 576px) {
     .imagePhotographyTypesGroup {
         flex-direction: column !important;
     }
 
     .imagesContainer {
         margin-left: 1rem !important;
+        margin-top: 1rem !important;
     }
 
-    .imageOneContainer {
-        height: 50%!important;
+    #aboutContainer {
+        flex-direction: column !important;
     }
-}
 
-#aboutImage {
-    height: 100%;
-    width: 30vw;
-}
-
-#aboutText {
-    width: 50vw;
-}
-
-#emptyContainer {
-    height: 20vh;
+    #aboutImage {
+        height: 85%!important;
+    }
 }
 
 .linkButtonContainer {
     display: none;
+}
+
+#portfolioContent {
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin-bottom: 12rem !important;
+}
+
+.section {
+    scroll-snap-align: start;
 }

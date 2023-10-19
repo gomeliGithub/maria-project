@@ -35,12 +35,12 @@ import { IClientLocale } from 'types/global';
         ]),
         trigger('top-bar-animation', [
             state('collapsed', style({ transform: 'rotate(0)' })),
-            state('expanded', style({ transform: 'rotate(45deg)', transformOrigin: '10% 20%' })),
+            state('expanded', style({ transform: 'rotate(45deg)', transformOrigin: '10% 10%' })),
             transition('collapsed => expanded', [
-                animate('0.2s ease', style({ transform: 'rotate(45deg)', transformOrigin: '10% 20%' }))
+                animate('0.2s ease', style({ transform: 'rotate(45deg)', transformOrigin: '10% 10%' }))
             ]),
             transition('expanded => collapsed', [
-                animate('0.2s ease', style({ transform: 'rotate(0)', transformOrigin: '10% 20%' }))
+                animate('0.2s ease', style({ transform: 'rotate(0)', transformOrigin: '10% 10%' }))
             ])
         ]),
         trigger('middle-bar-animation', [
@@ -55,12 +55,12 @@ import { IClientLocale } from 'types/global';
         ]),
         trigger('bottom-bar-animation', [
             state('collapsed', style({ transform: 'rotate(0)' })),
-            state('expanded', style({ transform: 'rotate(-45deg)', transformOrigin: '0 50%' })),
+            state('expanded', style({ transform: 'rotate(-45deg)', transformOrigin: '10% 90%' })),
             transition('collapsed => expanded', [
-                animate('0.2s ease', style({ transform: 'rotate(-45deg)', transformOrigin: '0 50%' }))
+                animate('0.2s ease', style({ transform: 'rotate(-45deg)', transformOrigin: '10% 90%' }))
             ]),
             transition('expanded => collapsed', [
-                animate('0.2s ease', style({ transform: 'rotate(0)', transformOrigin: '0 50%' }))
+                animate('0.2s ease', style({ transform: 'rotate(0)', transformOrigin: '10% 90%' }))
             ])
         ]),
         trigger('navbar-animation', [
