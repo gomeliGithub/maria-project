@@ -10,10 +10,18 @@
     height: 6px!important;
 }
 
-.images {
-    width: 40vw;
-    height: calc(.35 * 100vh);
-    object-fit: cover;
+@media (max-width: 575px) {
+    .imagePhotographyTypesGroup {
+        flex-direction: column !important;
+    }
+
+    .imagesContainer {
+        margin-left: 1rem !important;
+    }
+
+    .imageOneContainer {
+        height: 50%!important;
+    }
 }
 
 #aboutImage {

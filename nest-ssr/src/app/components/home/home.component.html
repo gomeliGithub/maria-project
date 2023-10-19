@@ -24,25 +24,24 @@
     </div>
 </div>
 <div *ngIf="imagePhotographyTypes && imagePhotographyTypes.length !== 0" class="container d-flex flex-column align-items-center" id="portfolioContent">
-    <div class="p-5 mt-3 mb-3">
-        <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
-    </div>
-    <div class="d-flex flex-column align-items-center vh-100">
-        <div *ngFor="let imagePhotographyTypesDataArr of imagePhotographyTypes; let i2 = index" 
-            class="d-flex flex-row justify-content-center align-items-center mb-3 imagePhotographyTypesGroup">
-            <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i = index" class="mb-3 border-0 position-relative"
-                [ngClass]="{ 'me-3': i === 0 && imagePhotographyTypesDataArr.length !== 1 }"
+    <div class="d-flex flex-column align-items-center">
+        <div class="p-5 mt-3 mb-3">
+            <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
+        </div>
+        <div *ngFor="let imagePhotographyTypesDataArr of imagePhotographyTypes" 
+            class="d-flex flex-row justify-content-center align-items-center mb-3 vh-70 imagePhotographyTypesGroup"
+        >
+            <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i = index" class="mb-3 border-0 position-relative h-100 mw-100 me-3 imagesContainer"
                 (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
                 (mouseleave)="stopMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
             >
-                <div class="" [attr.index-number]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
+                <div class="h-100 mw-100" [attr.index-number]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
+                [ngClass]="{ 'imageOneContainer': imagePhotographyTypesDataArr.length === 1 }"
                     (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
                     (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
                     [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
                 >
-                    <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.originalImageName }}" class="img-fluid images"
-                        [ngClass]="{ 'vw-80': imagePhotographyTypesDataArr.length === 1 }"
-                    >
+                    <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.originalImageName }}" class="h-100 mw-100 object-fit-contain images">
                 </div>
                 <div class="position-absolute top-50 start-50 translate-middle w-50 linkButtonContainer">
                     <h5 class="text-center text-primary fw-bold text-break" [ngSwitch]="imagePhotographyTypeData.name">

@@ -96,7 +96,12 @@ export class HomeComponent implements OnInit {
     }
 
     public mouseTriggerAnimationStarted (event: AnimationEvent): void {
-        event;
+        const mouseTriggerElement: HTMLDivElement = event.element as HTMLDivElement;
+        // const indexNumber: number = parseInt(mouseTriggerElement.getAttribute('index-number'), 10);
+
+        const linkButtonContainer: HTMLDivElement = mouseTriggerElement.nextElementSibling as HTMLDivElement;
+
+        if ( event.toState === 'leave' ) linkButtonContainer.style.display = 'none';
     }
 
     public mouseTriggerAnimationDone (event: AnimationEvent): void {
@@ -107,9 +112,8 @@ export class HomeComponent implements OnInit {
 
         if ( event.toState === 'enter') {
             linkButtonContainer.style.display = 'block';
+            
             // this.currentMouseTriggerAnimationsDone[indexNumber] = true;
-
-            // console.log(this.currentMouseTriggerAnimationsDone);
-        } if ( event.toState === 'leave' ) linkButtonContainer.style.display = 'none';
+        }
     }
 }
