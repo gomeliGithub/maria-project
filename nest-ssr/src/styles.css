@@ -40,7 +40,7 @@ app-home, app-gallery, app-client, app-admin-panel, app-not-found {
 app-home {
     height: 100% !important;
     scroll-snap-type: y mandatory !important;
-    scroll-padding-top: 5%;
+    scroll-padding-top: 7vh !important;
     overflow-y: scroll !important;
     position: absolute !important;
     top: 0 !important;
