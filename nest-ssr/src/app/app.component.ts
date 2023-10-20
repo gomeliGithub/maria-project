@@ -86,7 +86,11 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     public onRouterOutlet (component: HomeComponent | GalleryComponent | ClientComponent | AdminPanelComponent | NotFoundComponent): void {
         if ( !(component instanceof HomeComponent) ) this.isHomePage = false;
-        else this.isHomePage = true;
+        else {
+            this.isHomePage = true;
+
+            this.navbarAnimationState = 'scrolled';
+        }
     }
 
     @HostListener("scroll", ["$event"]) private onScroll ($event: any): void {

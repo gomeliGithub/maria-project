@@ -39,7 +39,18 @@ app-home, app-gallery, app-client, app-admin-panel, app-not-found {
 
 app-home {
     height: 100% !important;
-    margin-bottom: auto !important;
+    scroll-snap-type: y mandatory !important;
+    scroll-padding-top: 5%;
+    overflow-y: scroll !important;
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    overflow-x: hidden !important;
 }
 
 app-gallery, app-admin-panel {
