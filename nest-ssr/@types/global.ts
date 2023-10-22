@@ -69,6 +69,17 @@ export interface IFullCompressedImageData {
     count: number;
 }
 
+export interface IGalleryCompressedImagesList {
+    compressedImages: IReducedGalleryCompressedImages;
+    photographyTypeDescription: string;
+}
+
+export interface IReducedGalleryCompressedImages {
+    small: IClientCompressedImage[][];
+    medium: IClientCompressedImage[][];
+    big: IClientCompressedImage[][];
+}
+
 export interface ICompressImageData {
     inputImagePath: string;
     outputDirPath: string;

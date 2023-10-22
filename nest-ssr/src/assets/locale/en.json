@@ -11,10 +11,11 @@
 	"NOIMAGESMESSAGE": "No images yet",
 	"HOMEPAGE": {
 		"HEADERTITLE": "Portfolio",
-		"PHOTOGRAPHYTYPESLINKTEXT": "Works"
+		"PHOTOGRAPHYTYPESLINKTEXT": "View works"
 	},
 	"GALLERYPAGE": {
-		"HEADERTITLE": "Photo gallery"
+		"HEADERTITLE": "Photo gallery",
+		"ORDERBUTTONTEXT": "Order a photo session"
 	},
 	"CLIENTPAGE": {
 		"LOGININVALIDMESSAGE": "Incorrect login",

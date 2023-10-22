@@ -1,27 +1,27 @@
-<div *ngIf="compressedImagesList; else noContentBlock" class="section" id="imagesCarouselContainer">
-    <div class="carousel slide carousel-fade" id="imagesCarousel" data-bs-ride="carousel">
-        <div class="carousel-indicators">
-            <button *ngFor="let imageData of compressedImagesList; let i = index" type="button" 
-                data-bs-target="#imagesCarousel" [attr.data-bs-slide-to]="i" class="bg-dark"
-                [ngClass]="{ 'active': i === 0 }" [attr.aria-current]="i === 0 ? true : null"
-            >
-            </button>
-        </div>
-        <div class="carousel-inner vw-100">
-            <div *ngFor="let imageData of compressedImagesList; let i = index" 
-                class="carousel-item vh-100 vw-100 bg-image" style="background-image: url('/assets/images_thumbnail/home/{{ imageData.name }}')" 
-                [ngClass]="{ 'active': i === 0 }">
-            </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#imagesCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#imagesCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
+<div *ngIf="compressedImagesList; else noContentBlock" class="carousel slide carousel-fade vh-100 vw-100 section" id="imagesCarousel" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button *ngFor="let imageData of compressedImagesList; let i = index" type="button" 
+            data-bs-target="#imagesCarousel" [attr.data-bs-slide-to]="i" class="bg-dark"
+            [ngClass]="{ 'active': i === 0 }" [attr.aria-current]="i === 0 ? true : null"
+        >
         </button>
     </div>
+    <div class="carousel-inner h-100 w-100">
+        <div *ngFor="let imageData of compressedImagesList; let i = index" 
+            class="carousel-item h-100 w-100 mw-100"
+            [ngClass]="{ 'active': i === 0 }"
+        >
+            <img src="/assets/images_thumbnail/home/{{ imageData.name }}" class="w-100 object-fit-cover align-baseline">
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#imagesCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#imagesCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
 </div>
 <div class="p-5 mt-3 section">
     <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
@@ -30,7 +30,8 @@
     <div *ngFor="let imagePhotographyTypesDataArr of imagePhotographyTypes;" 
         class="d-flex flex-row justify-content-center align-items-center vh-70 imagePhotographyTypesGroup section"
     >
-        <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i = index" class="border-0 position-relative h-100 mw-100 me-3 ms-3 imagesContainer"
+        <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i = index" 
+            class="border-0 position-relative h-100 mw-100 me-3 ms-3 imagesContainer"
             (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
             (mouseleave)="stopMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
         >
@@ -39,7 +40,9 @@
                 (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
                 [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
             >
-                <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.originalImageName }}" class="h-100 mw-100 object-fit-contain">
+                <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.originalImageName }}" 
+                    class="h-100 mw-100 object-fit-contain"
+                >
             </div>
             <div class="position-absolute top-50 start-50 translate-middle w-50 linkButtonContainer">
                 <h5 class="text-center text-primary fw-bold text-break" [ngSwitch]="imagePhotographyTypeData.name">
@@ -49,8 +52,11 @@
                     <ng-template ngSwitchCase="family">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.FAMILY' | translate }}</ng-template>
                     <ng-template ngSwitchCase="event">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.EVENT' | translate }}</ng-template>
                 </h5>
-                <a href="#" class="btn btn-outline-info w-100" tabindex="-1" role="button" aria-disabled="true">
-                    {{ 'Смотреть работы' | uppercase }} <i class="bi bi-arrow-right"></i>
+                <a [routerLink]="[ '/gallery', imagePhotographyTypeData.name ]" routerLinkActive="active" 
+                    class="btn btn-outline-info align-items-start justify-content-center icon-link icon-link-hover w-100" 
+                    tabindex="-1" role="button" aria-disabled="true"
+                >
+                    {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate | uppercase }} <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
         </div>

@@ -12,7 +12,8 @@ import { ClientGuard } from './guards/client/client.guard';
 const routes: Routes = [
     { path: 'home', component: HomeComponent },
     { path: '', redirectTo: '/home', pathMatch: 'full' },
-    { path: 'gallery', component: GalleryComponent },
+    { path: 'gallery/:photographyType', component: GalleryComponent },
+    { path: 'gallery', redirectTo: '/gallery/children', pathMatch: 'full' },
     { path: 'adminPanel', component: AdminPanelComponent, canActivate: [ClientGuard] },
     { path: 'sign/:op', component: ClientComponent },
     { path: 'signUp', redirectTo: '/sign/up', pathMatch: 'full' },

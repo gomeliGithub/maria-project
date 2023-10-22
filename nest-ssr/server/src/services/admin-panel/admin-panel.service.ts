@@ -27,6 +27,8 @@ export class AdminPanelService {
         private readonly imagePhotographyTypeModel: typeof ImagePhotographyType
     ) { }
 
+    public staticCompressedImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
+
     public async uploadImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
@@ -218,7 +220,7 @@ export class AdminPanelService {
 
         const compressedImageInstance: ClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
 
-        const imageExists: boolean = await commonServiceRef.checkImageExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
+        const imageExists: boolean = await commonServiceRef.checkFileExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
 
         if ( !compressedImageInstance || !imageExists ) throw new BadRequestException();
 
@@ -231,16 +233,13 @@ export class AdminPanelService {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
-
         const originalImagePath: string = await this.validateImageControlRequests(request, requestBody, activeAdminLogin);
 
-        const compressedImage: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true });
+        const compressedImage: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true }) as unknown as IClientCompressedImage;
 
-        const staticFilesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
+        const homeImagesCount: number = (await fsPromises.readdir(path.join(this.staticCompressedImagesDirPath, 'home'))).length;
 
-        const homeImagesCount: number = (await fsPromises.readdir(path.join(staticFilesDirPath, 'home'))).length;
-
-        if ( homeImagesCount >= 25 ) return 'MAXCOUNT';
+        if ( homeImagesCount >= 15 ) return 'MAXCOUNT';
 
         const displayTargetPage: 'home' | 'gallery' | 'original' = requestBody.adminPanel.displayTargetPage;
 
@@ -261,67 +260,61 @@ export class AdminPanelService {
             else if ( compressedImage.displayedOnGalleryPage ) updateValues.displayedOnGalleryPage = false;
         }
 
-        const staticFilesHomeImagePath: string = path.join(staticFilesDirPath, 'home', compressedImage.name);
-        const staticFilesGalleryImagePath: string = path.join(staticFilesDirPath, 'gallery', compressedImage.name);
+        const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImage.name);
+        const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImage.photographyType, compressedImage.name);
         const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImage.name);
 
-        let oldPath: string = '';
         let newPath: string = '';
 
-        oldPath = await this._getFulfilledAccessPath(compressedImageOriginalPath, staticFilesHomeImagePath, staticFilesGalleryImagePath);
+        const oldPath: string = await this._getFulfilledAccessPath([
+            compressedImageOriginalPath, 
+            staticFilesHomeImagePath, 
+            staticFilesGalleryImagePath
+        ]);
 
         if ( displayTargetPage === 'home' ) newPath = staticFilesHomeImagePath;
         else if ( displayTargetPage === 'gallery' ) newPath = staticFilesGalleryImagePath;
         else if ( displayTargetPage === 'original' ) newPath = compressedImageOriginalPath;
         
-        try {
-            await fsPromises.rename(oldPath, newPath);
-            await this.compressedImageModel.update(updateValues, { where: { originalName: path.basename(originalImagePath) }});
+        await fsPromises.rename(oldPath, newPath);
+        await this.compressedImageModel.update(updateValues, { where: { originalName: path.basename(originalImagePath) }});
 
-            return 'SUCCESS';
-        } catch (error) {
-            console.error (error);
-
-            throw new InternalServerErrorException();
-        }
-    }
-
-    public async validateImageControlRequests (request: IRequest, requestBody: IRequestBody, activeAdminLogin: string): Promise<string> {
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
-        
-        const client: Admin | Member = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false });
-
-        const originalImageName: string = requestBody.adminPanel.originalImageName;
-        const originalImagePath: string = path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName);
-
-        const compressedImages: ClientCompressedImage[] = await commonServiceRef.getCompressedImages({ 
-            client, 
-            clientType: 'admin', 
-            find: { includeFields: [ 'originalName' ] }
-        });
-
-        const compressedImageInstance: ClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
-
-        const imageExists: boolean = await commonServiceRef.checkImageExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
-
-        if ( !compressedImageInstance || !imageExists ) throw new BadRequestException();
-        
-        return originalImagePath;
+        return 'SUCCESS';
     }
 
     public async changeImageData (request: IRequest, requestBody: IRequestBody): Promise<string> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
-
-        await this.validateImageControlRequests(request, requestBody, activeAdminLogin);
+        const originalImagePath: string = await this.validateImageControlRequests(request, requestBody, activeAdminLogin);
 
         const originalImageName: string = requestBody.adminPanel.originalImageName;
 
-        const updateValues: { [x: string]: any } = { };
+        const updateValues: { [ x: string ]: any } = { };
         const { newImagePhotographyType, newImageDescription } = requestBody.adminPanel;
 
-        if ( newImagePhotographyType ) updateValues.photographyType = newImagePhotographyType;
+        if ( newImagePhotographyType ) {
+            updateValues.photographyType = newImagePhotographyType;
+
+            const compressedImage: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true }) as unknown as IClientCompressedImage;
+
+            const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImage.name);
+            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImage.photographyType, compressedImage.name);
+            const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImage.name);
+
+            const currentPath: string = await this._getFulfilledAccessPath([
+                staticFilesHomeImagePath, 
+                staticFilesGalleryImagePath, 
+                compressedImageOriginalPath
+            ]);
+
+            if ( currentPath !== staticFilesHomeImagePath && currentPath !== compressedImageOriginalPath ) {
+                const staticFilesGalleryImageNewPath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', newImagePhotographyType, compressedImage.name);
+        
+                await fsPromises.rename(staticFilesGalleryImagePath, staticFilesGalleryImageNewPath);
+            }
+        }
+
         if ( newImageDescription ) updateValues.imageDescription = newImageDescription;
 
         await this.compressedImageModel.update(updateValues, { where: { originalName: originalImageName } });
@@ -340,47 +333,70 @@ export class AdminPanelService {
 
         const imagePhotographyType: string = requestBody.adminPanel.imagePhotographyType;
 
-        const staticFilesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
-
-        const staticFilesHomeImagePath: string = path.join(staticFilesDirPath, 'home', compressedImage.name);
-        const staticFilesGalleryImagePath: string = path.join(staticFilesDirPath, 'gallery', compressedImage.name);
+        const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImage.name);
+        const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImage.photographyType, compressedImage.name);
         const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImage.name);
 
         let currentPath: string = '';
-        const newPath: string = path.join(staticFilesDirPath, 'home', 'imagePhotographyTypes', compressedImage.name);
+        const newPath: string = path.join(this.staticCompressedImagesDirPath, 'home', 'imagePhotographyTypes', compressedImage.name);
 
-        currentPath = await this._getFulfilledAccessPath(compressedImageOriginalPath, staticFilesHomeImagePath, staticFilesGalleryImagePath);
+        currentPath = await this._getFulfilledAccessPath([
+            compressedImageOriginalPath, 
+            staticFilesHomeImagePath, 
+            staticFilesGalleryImagePath
+        ]);
 
         const currentPhotographyTypeImage: ImagePhotographyType = await this.imagePhotographyTypeModel.findOne({ where: { name: imagePhotographyType } });
 
-        try {
-            if ( currentPhotographyTypeImage && currentPhotographyTypeImage.originalImageName && path.extname(currentPhotographyTypeImage.originalImageName) !== '' ) {
-                await fsPromises.unlink(path.join(staticFilesDirPath, 'home', 'imagePhotographyTypes', currentPhotographyTypeImage.originalImageName));
-            }
-
-            await fsPromises.copyFile(currentPath, newPath);
-            await this.imagePhotographyTypeModel.update({ originalImageName: compressedImage.name }, { where: { name: imagePhotographyType }});
-
-            return 'SUCCESS';
-        } catch (error) {
-            console.error(error);
-
-            throw new InternalServerErrorException();
+        if ( currentPhotographyTypeImage && currentPhotographyTypeImage.originalImageName && path.extname(currentPhotographyTypeImage.originalImageName) !== '' ) {
+            await fsPromises.unlink(path.join(this.staticCompressedImagesDirPath, 'home', 'imagePhotographyTypes', currentPhotographyTypeImage.originalImageName));
         }
+
+        await fsPromises.copyFile(currentPath, newPath);
+        await this.imagePhotographyTypeModel.update({ originalImageName: compressedImage.name }, { where: { name: imagePhotographyType }});
+
+        return 'SUCCESS';
     }
 
-    private async _getFulfilledAccessPath (firstPath: string, secondPath: string, thirdPath: string): Promise<string> {
-        const accessResults = await Promise.allSettled([
-            fsPromises.access(firstPath, fsPromises.constants.F_OK),
-            fsPromises.access(secondPath, fsPromises.constants.F_OK),
-            fsPromises.access(thirdPath, fsPromises.constants.F_OK)
-        ]);
+    public async validateImageControlRequests (request: IRequest, requestBody: IRequestBody, activeAdminLogin: string): Promise<string> {
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        
+        const client: Admin | Member = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false });
+
+        const originalImageName: string = requestBody.adminPanel.originalImageName;
+        const originalImagePath: string = path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName);
+
+        const compressedImages: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({
+            client,
+            clientType: 'admin',
+            find: { includeFields: [ 'name', 'originalName', 'photographyType', 'displayedOnGalleryPage' ] }
+        }) as unknown as IClientCompressedImage[];
+
+        const compressedImageInstance: IClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
+
+        const imageExists: boolean = await commonServiceRef.checkFileExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
+
+        if ( !compressedImageInstance || !imageExists ) throw new BadRequestException();
+        if ( compressedImageInstance.displayedOnGalleryPage && (requestBody.adminPanel.displayTargetPage || requestBody.adminPanel.newImagePhotographyType) ) { 
+            const galleryImagePaths: string[] = this.appService.imagePhotographyTypes.map(photographyType => {
+                return path.join(this.staticCompressedImagesDirPath, 'gallery', photographyType, compressedImageInstance.name);
+            });
+
+            const existingPath: string = await this._getFulfilledAccessPath(galleryImagePaths);
+            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageInstance.photographyType, compressedImageInstance.name);
+
+            if ( existingPath !== staticFilesGalleryImagePath ) throw new InternalServerErrorException();
+        }
+        
+        return originalImagePath;
+    }
+
+    private async _getFulfilledAccessPath (paths: string[]): Promise<string> {
+        const accessResults = await Promise.allSettled(paths.map(path => fsPromises.access(path, fsPromises.constants.F_OK)));
 
         let fulfilledPath: string = null;
 
-        if ( accessResults[0].status === 'fulfilled' ) fulfilledPath = firstPath;
-        else if ( accessResults[1].status === 'fulfilled' ) fulfilledPath = secondPath;
-        else if ( accessResults[2].status === 'fulfilled' ) fulfilledPath = thirdPath;
+        accessResults.forEach((result, index) => result.status === 'fulfilled' ? fulfilledPath = paths[index] : null);
 
         return fulfilledPath;
     }

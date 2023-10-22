@@ -134,35 +134,33 @@ export class ImageControlService {
         return targetPathParts.dir + path.sep + targetPathParts.name + postfix + targetPathParts.ext;
     }
 
-    public async createImageDirs (options: ICreateImageDirsOptions): Promise<void> {
-        try {
-            await fsPromises.access(options.originalImages.dirPath, fsPromises.constants.F_OK);
-        } catch {
-            await fsPromises.mkdir(options.originalImages.dirPath);
+    public async createImageDirs (options?: ICreateImageDirsOptions): Promise<void> {
+        if ( options ) {
+            if ( !(await this.checkFileExists(options.originalImages.dirPath)) ) await fsPromises.mkdir(options.originalImages.dirPath);
+            if ( !(await this.checkFileExists(options.originalImages.clientDirPath)) ) await fsPromises.mkdir(options.originalImages.clientDirPath);
+            if ( !(await this.checkFileExists(options.compressedImages.dirPath)) ) await fsPromises.mkdir(options.compressedImages.dirPath);
+            if ( !(await this.checkFileExists(options.compressedImages.clientDirPath)) ) await fsPromises.mkdir(options.compressedImages.clientDirPath);
         }
 
-        try {
-            await fsPromises.access(options.originalImages.clientDirPath, fsPromises.constants.F_OK);
-        } catch {
-            await fsPromises.mkdir(options.originalImages.clientDirPath);
-        }
+        const staticFilesImagesFullDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_full');
+        const staticFilesGalleryImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail', 'gallery');
+        const staticFilesHomeImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail', 'home', 'imagePhotographyTypes');
 
-        try {
-            await fsPromises.access(options.compressedImages.dirPath, fsPromises.constants.F_OK);
-        } catch {
-            await fsPromises.mkdir(options.compressedImages.dirPath);
-        }
+        if ( !(await this.checkFileExists(staticFilesImagesFullDirPath)) ) await fsPromises.mkdir(staticFilesImagesFullDirPath);
+        if ( !(await this.checkFileExists(staticFilesGalleryImagesDirPath)) ) await fsPromises.mkdir(staticFilesGalleryImagesDirPath, { recursive: true });
+        if ( !(await this.checkFileExists(staticFilesHomeImagesDirPath)) ) await fsPromises.mkdir(staticFilesHomeImagesDirPath, { recursive: true });
 
-        try {
-            await fsPromises.access(options.compressedImages.clientDirPath, fsPromises.constants.F_OK);
-        } catch {
-            await fsPromises.mkdir(options.compressedImages.clientDirPath);
+        for ( const photographyType of this.appService.imagePhotographyTypes ) {
+            const photographyTypeDirDirPath: string = path.join(staticFilesGalleryImagesDirPath, photographyType);
+            const photographyTypeDirIsExists: boolean = await this.checkFileExists(photographyTypeDirDirPath);
+
+            if ( !photographyTypeDirIsExists ) await fsPromises.mkdir(photographyTypeDirDirPath);
         }
     }
 
-    public async checkImageExists (imagePath: string): Promise<boolean> {
+    public async checkFileExists (filePath: string): Promise<boolean> {
         try {
-            await fsPromises.access(imagePath, fsPromises.constants.F_OK);
+            await fsPromises.access(filePath, fsPromises.constants.F_OK);
 
             return true;
         } catch { 
@@ -188,21 +186,5 @@ export class ImageControlService {
         } catch { 
             return false;
         }
-    }
-
-    public endianness (): 'big' | 'little' {
-        const ab = Buffer.alloc(2);
-        const ta16 = new Uint16Array(ab.buffer);
-
-        ta16[0] = 511;
-
-        console.log("нулевой=" + ab[0] + " первый=" + ab[1]);
-
-        if ( ab[1] === 1 ) return 'big';
-        else return 'little';
-    }
-
-    public imageAnalyzer (): void {
-
     }
 }

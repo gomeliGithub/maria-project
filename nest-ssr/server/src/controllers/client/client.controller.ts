@@ -9,7 +9,7 @@ import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 import { CommonService } from 'server/src/services/common/common.service';
 
-import { IRequest, IRequestBody } from 'types/global';
+import { IGalleryCompressedImagesList, IRequest, IRequestBody } from 'types/global';
 import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
 
 @Controller('/client')
@@ -20,16 +20,20 @@ export class ClientController {
     ) { }
 
     @Get('/getCompressedImagesList/:imagesType')
-    async getCompressedImagesList (@Param('imagesType') imagesType: string): Promise<string[] | IClientCompressedImage[]> {
-        const thumbnailImagesDirPaths: string[] = [ 'home', 'gallery' ];
+    public async getCompressedImagesList (@Param('imagesType') imagesType: string): Promise<IGalleryCompressedImagesList | IClientCompressedImage[]> {
+        const thumbnailImagesDirPaths: string[] = [ 'home' ].concat(this.appService.imagePhotographyTypes);
 
         if ( !thumbnailImagesDirPaths.includes(imagesType.substring(1)) ) throw new BadRequestException();
+
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+        await commonServiceRef.createImageDirs();
         
-        return this.clientService.getCompressedImagesList(imagesType.substring(1) as 'home' | 'gallery');
+        return this.clientService.getCompressedImagesList(imagesType.substring(1) as 'home' | string);
     }
 
     @Get('/getImagePhotographyTypesData/:targetPage')
-    async getImagePhotographyTypesData (@Param('targetPage') targetPage: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[]> {
+    public async getImagePhotographyTypesData (@Param('targetPage') targetPage: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[]> {
         targetPage = targetPage.substring(1);
         
         if ( !targetPage || ( targetPage !== 'home' && targetPage !== 'admin' ) ) throw new BadRequestException();
@@ -43,7 +47,7 @@ export class ClientController {
 
     @Post('/changeLocale')
     @ClientTypes('admin', 'member')
-    async changeLocale (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string> {
+    public async changeLocale (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string> {
         if ( !requestBody.sign.newLocale || typeof requestBody.sign.newLocale !== 'string' ) throw new BadRequestException();
 
         const locales: string[] = [ 'ru', 'en' ];

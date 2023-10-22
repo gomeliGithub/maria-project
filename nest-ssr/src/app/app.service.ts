@@ -14,6 +14,9 @@ import { IModalCreateOptions } from 'types/options';
     providedIn: 'root'
 })
 export class AppService {
+    public isPlatformBrowser: boolean;
+    public isPlatformServer: boolean;
+
     constructor (
         @Inject(PLATFORM_ID) private readonly platformId: string,
         
@@ -21,14 +24,17 @@ export class AppService {
         private readonly platformTitle: Title,
         private readonly router: Router,
         private readonly translateService: TranslateService
-    ) { }
+    ) { 
+        this.isPlatformBrowser = isPlatformBrowser(platformId);
+        this.isPlatformServer = isPlatformServer(platformId);
+    }
 
     public checkIsPlatformBrowser (): boolean {
-        return isPlatformBrowser(this.platformId);
+        return this.isPlatformBrowser;
     }
 
     public checkIsPlatformServer (): boolean {
-        return isPlatformServer(this.platformId);
+        return this.isPlatformServer;
     }
 
     public setMetaTag (property: string, content: string): void {
@@ -55,7 +61,7 @@ export class AppService {
     }
 
     public createRequestHeaders (): HttpHeaders {
-        if ( this.checkIsPlatformBrowser() ) {
+        if ( this.isPlatformBrowser ) {
             const token: string | null = localStorage.getItem('access_token');
 
             const headers = new HttpHeaders().set('Authorization', token ? `Bearer ${token}` : "");
@@ -127,9 +133,9 @@ export class AppService {
         return componentRef;
     }
 
-    public getTranslations<asyncParameter extends boolean = false> (keys: string, async?: asyncParameter): asyncParameter extends true ? Observable<string> : string;
-    public getTranslations<asyncParameter extends boolean = false> (keys: string[], async?: asyncParameter): asyncParameter extends true ? Observable<string[]> : string[];
-    public getTranslations(keys: string | string[], async = false): Observable<string | string[]> | string | string[] {
+    public getTranslations <asyncParameter extends boolean = false> (keys: string, async?: asyncParameter): asyncParameter extends true ? Observable<string> : string;
+    public getTranslations <asyncParameter extends boolean = false> (keys: string[], async?: asyncParameter): asyncParameter extends true ? Observable<string[]> : string[];
+    public getTranslations (keys: string | string[], async = false): Observable<string | string[]> | string | string[] {
         if (async) return this.translateService.get(keys).pipe(map(translations => typeof translations === 'object' ? Object.entries(translations).map(keyValueArr => keyValueArr[1]) : translations)) as Observable<string | string[]>;
         else return this.translateService.instant(keys);
     }

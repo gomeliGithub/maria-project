@@ -29,6 +29,16 @@ import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
                 animate('0.3s 100ms ease-out')
             ])
         ]),
+        trigger('link-button-animation', [
+            state('enter', style({ display: 'block' })),
+            state('leave', style({ display: 'none' })),
+            transition('enter => leave', [
+                animate('0.2s', style({ display: 'none' }))
+            ]),
+            transition('leave => enter', [
+                animate('0.2s', style({ display: 'block' }))
+            ])
+        ])
     ]
 })
 export class HomeComponent implements OnInit {
@@ -38,8 +48,6 @@ export class HomeComponent implements OnInit {
     ) { }
     
     public currentMouseTriggerStates: string[] = [];
-    public linkButtonVisuallyHiddenStates: boolean[] = [];
-    public currentMouseTriggerAnimationsDone: boolean[] = [];
 
     @ViewChild(ModalComponent) modalComponent: ModalComponent
     @ViewChild('appModal', { read: ViewContainerRef, static: false })
@@ -70,8 +78,6 @@ export class HomeComponent implements OnInit {
                     this.flatImagePhotographyTypes = imagePhotographyTypesData.flat();
                     this.flatImagePhotographyTypes.forEach(() => {
                         this.currentMouseTriggerStates.push('leave');
-                        this.linkButtonVisuallyHiddenStates.push(true);
-                        this.currentMouseTriggerAnimationsDone.push(false);
                     });
 
                     this.imagePhotographyTypes = nullable ? null : imagePhotographyTypesData;
@@ -83,12 +89,10 @@ export class HomeComponent implements OnInit {
 
     public startMouseTriggerAnimation (index: number): void {
         this.currentMouseTriggerStates[index] = this.currentMouseTriggerStates[index] === 'enter' ? 'leave' : 'enter';
-        this.linkButtonVisuallyHiddenStates[index] = !this.linkButtonVisuallyHiddenStates[index] ? true : false;
     }
 
     public stopMouseTriggerAnimation (index: number): void {
         this.currentMouseTriggerStates[index] = this.currentMouseTriggerStates[index] === 'leave' ? 'enter' : 'leave';
-        this.linkButtonVisuallyHiddenStates[index] = this.linkButtonVisuallyHiddenStates[index] ? false : true;
     }
 
     public setCurrentMouseTriggerStateIndex (name: string): number { 

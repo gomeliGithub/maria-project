@@ -57,7 +57,7 @@ export class CommonService {
         return signServiceRef.getActiveClient(request, options);
     }
 
-    public async createImageDirs (options: ICreateImageDirsOptions): Promise<void> {
+    public async createImageDirs (options?: ICreateImageDirsOptions): Promise<void> {
         const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
 
         return imageControlServiceRef.createImageDirs(options);
@@ -75,10 +75,10 @@ export class CommonService {
         return imageControlServiceRef.get(options);
     }
 
-    public async checkImageExists (imagePath: string): Promise<boolean> {
+    public async checkFileExists (filePath: string): Promise<boolean> {
         const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
 
-        return imageControlServiceRef.checkImageExists(imagePath);
+        return imageControlServiceRef.checkFileExists(filePath);
     }
 
     public async deleteImage (request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
@@ -87,9 +87,15 @@ export class CommonService {
         return imageControlServiceRef.deleteImage(request, imagePath, clientLogin);
     }
 
-    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin'): Promise<IImagePhotographyType[][] | IImagePhotographyType[]> {
+    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home'): Promise<IImagePhotographyType[][]>
+    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'admin'): Promise<IImagePhotographyType[]>
+    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin'): Promise<IImagePhotographyType[][] | IImagePhotographyType[]>
+    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType>
+    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin' | 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType>
+    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin' | 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType> {
         const clientServiceRef = await this.appService.getServiceRef(ClientModule, ClientService);
 
-        return clientServiceRef.getImagePhotographyTypesData(requiredFields, targetPage);
+        if ( targetPage === 'gallery' ) return clientServiceRef.getImagePhotographyTypesData(requiredFields, targetPage, photographyTypeName);
+        else return clientServiceRef.getImagePhotographyTypesData(requiredFields, targetPage);
     }
 }

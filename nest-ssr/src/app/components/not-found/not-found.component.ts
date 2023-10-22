@@ -11,6 +11,6 @@ export class NotFoundComponent implements OnInit {
     constructor (private readonly appService: AppService) { }
     
     ngOnInit (): void {
-        this.appService.getTranslations('PAGETITLES.NOTFOUND', true).subscribe(translation => this.appService.setTitle(translation));
+        if ( this.appService.checkIsPlatformBrowser() ) this.appService.getTranslations('PAGETITLES.NOTFOUND', true).subscribe(translation => this.appService.setTitle(translation));
     }
 }

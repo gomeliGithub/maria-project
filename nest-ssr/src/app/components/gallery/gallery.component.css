@@ -1,0 +1,39 @@
+@media (max-width: 576px) {
+    #titleHeaderContainer {
+        padding: 0.5rem !important;
+    }
+
+    #titleHeader {
+        font-size: 1.25rem !important;
+    }
+
+    .smallSizedImagesContainer {
+        width: 70vw !important;
+    }
+
+    .mediumSizedImagesContainer {
+        width: 90vw !important;
+    }
+
+    .bigSizedImagesContainer {
+        width: 100vw !important;
+    }
+
+    .smallSizedImagesContainer, .mediumSizedImagesContainer, .bigSizedImagesContainer {
+        flex-wrap: wrap !important;
+    }
+
+    .smallSizedImagesContainer img {
+        width: 35% !important;
+        flex: 1 1 auto !important;
+    }
+
+    .mediumSizedImagesContainer img {
+        width: 40% !important;
+        flex: 1 1 auto !important;
+    }
+
+    .bigSizedImagesContainer img {
+        width: 85% !important;
+    }
+}

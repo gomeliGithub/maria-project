@@ -1,10 +1,10 @@
-import { NgModule, PLATFORM_ID } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -17,8 +17,6 @@ import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
-
-import { MissingTranslationService } from './missingTranslationService';
 
 import { AppService } from './app.service';
 
@@ -42,9 +40,8 @@ import { environment } from '../environments/environment';
             loader: {
                 provide: TranslateLoader,
                 useFactory: HttpLoaderFactory,
-                deps: [ HttpClient, PLATFORM_ID ],
+                deps: [ HttpClient ],
             },
-            missingTranslationHandler: { provide: MissingTranslationHandler, useClass: MissingTranslationService },
             defaultLanguage: environment.defaultLocale,
             useDefaultLang: true
         }),

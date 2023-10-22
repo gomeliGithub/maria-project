@@ -11,10 +11,11 @@
 	"NOIMAGESMESSAGE": "Изображений пока нет",
 	"HOMEPAGE": {
 		"HEADERTITLE": "Портфолио",
-		"PHOTOGRAPHYTYPESLINKTEXT": "Работы"
+		"PHOTOGRAPHYTYPESLINKTEXT": "Смотреть работы"
 	},
 	"GALLERYPAGE": {
-		"HEADERTITLE": "Галерея фото"
+		"HEADERTITLE": "Галерея фото",
+		"ORDERBUTTONTEXT": "Заказать фотосессию"
 	},
 	"CLIENTPAGE": {
 		"LOGININVALIDMESSAGE": "Некорректный логин",

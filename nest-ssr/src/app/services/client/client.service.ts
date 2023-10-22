@@ -10,7 +10,7 @@ import { ModalComponent } from '../../components/modal/modal.component';
 
 import { AppService } from '../../app.service';
 
-import { IClientBrowser } from 'types/global';
+import { IClientBrowser, IGalleryCompressedImagesList } from 'types/global';
 import { IClientSignData } from 'types/sign';
 import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
 
@@ -77,11 +77,11 @@ export class ClientService {
     }
 
     public getCompressedImagesList (imagesType: 'home'): Observable<IClientCompressedImage[]>
-    public getCompressedImagesList (imagesType: 'gallery'): Observable<string[]>
-    public getCompressedImagesList (imagesType: 'home' | 'gallery'): Observable<string[] | IClientCompressedImage[]> {
-        return this.http.get(`/api/client/getCompressedImagesList/:${ imagesType }`).pipe<string[] | IClientCompressedImage[]>(imagesList => {
+    public getCompressedImagesList (imagesType: string): Observable<IGalleryCompressedImagesList>
+    public getCompressedImagesList (imagesType: 'home' | string): Observable<IGalleryCompressedImagesList | IClientCompressedImage[]> {
+        return this.http.get(`/api/client/getCompressedImagesList/:${ imagesType }`).pipe<IGalleryCompressedImagesList | IClientCompressedImage[]>(imagesList => {
             if ( imagesType === 'home' ) return imagesList as Observable<IClientCompressedImage[]>;
-            else if ( imagesType === 'gallery' ) return imagesList as Observable<string[]>;
+            else return imagesList as Observable<IGalleryCompressedImagesList>;
         });
     }
 

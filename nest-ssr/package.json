@@ -38,6 +38,7 @@
         "@nestjs/platform-express": "^10.2.6",
         "@nestjs/schedule": "^3.0.4",
         "@nestjs/sequelize": "^10.0.0",
+        "@nguniversal/common": "^15.2.1",
         "@nguniversal/express-engine": "^15.2.1",
         "@ngx-translate/core": "^15.0.0",
         "@ngx-translate/http-loader": "^8.0.0",
@@ -124,10 +125,10 @@
         "rootDir": "server/src",
         "testRegex": ".*\\.spec\\.ts$",
         "transform": {
-        "^.+\\.(t|j)s$": "ts-jest"
+            "^.+\\.(t|j)s$": "ts-jest"
         },
         "collectCoverageFrom": [
-        "**/*.(t|j)s"
+            "**/*.(t|j)s"
         ],
         "coverageDirectory": "../coverage",
         "testEnvironment": "node"

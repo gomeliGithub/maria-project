@@ -39,3 +39,33 @@
 #aboutSection {
     margin-bottom: 12rem !important;
 }
+
+@media screen and (max-width: 576px) {
+    .carousel-item img {
+        min-height: 300px;
+    }
+}
+
+@media screen and (min-width: 576px) {
+    .carousel-item img {
+        max-height: 390px;
+    }
+}
+
+@media screen and (min-width: 735px) {
+    .carousel-item img {
+        max-height: 620px;
+    }
+}
+
+@media screen and (min-width: 960px) {
+    .carousel-item img {
+        max-height: 700px;
+    }
+}
+
+@media screen and (min-width: 1400px) {
+    .carousel-item img {
+        max-height: 950px;
+    }
+}

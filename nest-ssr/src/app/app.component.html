@@ -21,40 +21,40 @@
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" routerLink="/" routerLinkActive="active" (click)="navbarTogglerClick()"
+                    <a class="nav-link active" aria-current="page" routerLink="/" routerLinkActive="active"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
                         {{ 'PAGETITLES.HOME' | translate }}
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" routerLink="/gallery" routerLinkActive="active" (click)="navbarTogglerClick()"
+                    <a class="nav-link" routerLink="/gallery" routerLinkActive="active"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
                         {{ 'PAGETITLES.GALLERY' | translate }}
                     </a>
                 </li>
                 <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item">
-                    <a class="nav-link" routerLink="/adminPanel" routerLinkActive="active" (click)="navbarTogglerClick()"
+                    <a class="nav-link" routerLink="/adminPanel" routerLinkActive="active"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
                         {{ 'PAGETITLES.ADMINPANEL' | translate }}
                     </a>
                 </li>
                 <li class="nav-item dropdown">
-                    <button class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" 
-                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
+                    <button class="nav-link dropdown-toggle" type="button" id="clientMenuButton" data-bs-toggle="dropdown" aria-expanded="false" 
+                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }" (click)="clientMenuClick($event)"
                     >
                         {{ 'CLIENTMENU.TITLE' | translate }}
                     </button>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu" aria-labelledby="clientMenuButton">
                         <li *ngIf="!activeClientLogin">
-                            <a class="dropdown-item" routerLink="/signUp" routerLinkActive="active" (click)="navbarTogglerClick()">
+                            <a class="dropdown-item" routerLink="/signUp" routerLinkActive="active">
                                 {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
                             </a>
                         </li>
                         <li *ngIf="!activeClientLogin">
-                            <a class="dropdown-item" routerLink="/signIn" routerLinkActive="active" (click)="navbarTogglerClick()">
+                            <a class="dropdown-item" routerLink="/signIn" routerLinkActive="active">
                                 {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
                             </a>
                         </li>
@@ -97,7 +97,7 @@
 </nav>
 <router-outlet (activate)='onRouterOutlet($event)' #routerOutlet></router-outlet>
 <ng-template #appModal></ng-template>
-<footer class="footer mt-auto w-100 fixed-bottom text-center text-white" style="background-color: #f1f1f1;">
+<footer class="flex-grow-0 flex-shrink-1 w-100 text-center text-white" style="background-color: #f1f1f1;">
     <div class="container pt-3">
         <section class="mb-3">
             <a class="btn btn-link btn-floating btn-lg text-dark m-1" href="https://www.instagram.com/burtseva__maria" role="button" data-mdb-ripple-color="dark">

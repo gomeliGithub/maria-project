@@ -2,15 +2,12 @@ import { Component, ComponentRef, ElementRef, HostListener, OnInit, ViewChild, V
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { Observable, map } from 'rxjs';
-
 import { ModalComponent } from '../modal/modal.component';
 
 import { AppService } from '../../app.service';
 import { AdminPanelService } from '../../services/admin-panel/admin-panel.service';
 import { ClientService } from '../../services/client/client.service';
 
-import { IFullCompressedImageData } from 'types/global';
 import { IModalRef } from 'types/options';
 import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
 
@@ -73,8 +70,6 @@ export class AdminPanelComponent implements OnInit {
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
     private _imageFile: File;
-    
-    public getFullCompressedImagesDataResult: Observable<IFullCompressedImageData>;
 
     public fullCompressedImagesList: IClientCompressedImage[];
     public fullCompressedImagesListCount: number;
@@ -88,7 +83,7 @@ export class AdminPanelComponent implements OnInit {
         if ( this.appService.checkIsPlatformBrowser() ) {
             this.appService.getTranslations('PAGETITLES.ADMINPANEL', true).subscribe(translation => this.appService.setTitle(translation));
 
-            this.adminPanelService.getFullCompressedImagesData().pipe<IFullCompressedImageData>(imagesList => this.getFullCompressedImagesDataResult = imagesList).pipe(map(imagesList => imagesList)).subscribe({
+            this.adminPanelService.getFullCompressedImagesData().subscribe({
                 next: imagesList => {
                     this.fullCompressedImagesList = imagesList.imagesList;
                     this.fullCompressedImagesListCount = imagesList.count;

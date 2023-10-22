@@ -100,13 +100,21 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     @HostListener('document:mousedown', ['$event'])
     public onGlobalClick (event: any): void {
-        if ( !this.navbarElementRef.nativeElement.contains(event.target) ) { 
-            if ( !this.navbarTogglerElementRef.nativeElement.classList.contains('collapsed') ) this.navbarTogglerClick();
+        if ( !this.navbarElementRef.nativeElement.contains(event.target) ) {
+            if ( !this.navbarTogglerElementRef.nativeElement.classList.contains('collapsed') ) this.navbarTogglerElementRef.nativeElement.click();
         }
     }
 
-    public navbarTogglerClick (): void {
-        this.navbarTogglerElementRef.nativeElement.click();
+    public async clientMenuClick (event: any): Promise<void> {
+        const button: HTMLButtonElement = event.target as HTMLButtonElement;
+
+        if ( !button.classList.contains('show') ) {
+            const bootstrap = await import('bootstrap');
+            
+            const menu = new bootstrap.Dropdown(this.document.getElementById('clientMenuButton'));
+
+            menu.toggle();
+        }
     }
 
     public isHomePage: boolean = true;
@@ -151,7 +159,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.navbarTogglerElementRef.nativeElement.classList.add('collapsed');
     }
 
-    public async changeNavbarTogglerIconTriggerState (): Promise<void> {
+    public changeNavbarTogglerIconTriggerState (): void {
         this.navbarTogglerIconTriggerState = this.navbarTogglerIconTriggerState === 'collapsed' ? 'expanded' : 'collapsed';
     }
 

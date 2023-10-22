@@ -1,12 +1,27 @@
-<div class="p-3" id="galleryContainer">
-    <h1 class="display-6 text-center">{{ 'GALLERYPAGE.HEADERTITLE' | translate }}</h1>
-    <div *ngIf="compressedImagesList; else noContentBlock" class="h-50 w-25" id="galleryImages">
-        <img *ngFor="let imagePath of compressedImagesList" src="/assets/images_thumbnail/gallery/{{imagePath}}" class="img-thumbnail">
+<h1 class="display-4 text-center">{{ 'GALLERYPAGE.HEADERTITLE' | translate }}</h1>
+<div class="p-5" id="titleHeaderContainer">
+    <div class="text-bg-danger text-center p-3 h-100 rounded">
+        <h1 class="display-6" id="titleHeader">{{ photographyTypeDescription }}</h1>
     </div>
-    <ng-template #noContentBlock>
-        <div class="noContentBlock text-center text-info fs-4 p-4">
-            <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
-        </div>
-    </ng-template>
+</div> 
+<div class="text-center w-100">
+    <button type="button" class="btn btn-outline-success btn-lg">{{ 'GALLERYPAGE.ORDERBUTTONTEXT' | translate }}</button>
+    <hr class="border-3 mt-5 w-100"/>
 </div>
+<div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-column align-items-center justify-content-center vw-80 p-3" id="galleryImages">
+    <div *ngFor="let imageDataArr of compressedImagesList.small" class="d-flex flex-row justify-content-center smallSizedImagesContainer">
+        <img *ngFor="let imageData of imageDataArr" src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-thumbnail w-25">
+    </div>
+    <div *ngFor="let imageDataArr of compressedImagesList.medium" class="d-flex flex-row justify-content-center mediumSizedImagesContainer">
+        <img *ngFor="let imageData of imageDataArr" src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-thumbnail w-50">
+    </div>
+    <div *ngFor="let imageDataArr of compressedImagesList.big" class="d-flex flex-row justify-content-center bigSizedImagesContainer">
+        <img *ngFor="let imageData of imageDataArr" src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-thumbnail w-75">
+    </div>
+</div>
+<ng-template #noContentBlock>
+    <div class="noContentBlock text-center text-info fs-4 p-4">
+        <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
+    </div>
+</ng-template>
 <ng-template #appModal></ng-template>
