@@ -135,15 +135,15 @@ export class ClientService {
             const bigSizedCompressedImages: IClientCompressedImage[] = compressedImages.filter(compressedImage => compressedImage.viewSizeType === 'big');
 
             for (let i = 0; i < smallSizedCompressedImages.length; i += 4 ) {
-                reducedCompressedImages.small.push(compressedImages.slice(i, i + 4));
+                reducedCompressedImages.small.push(smallSizedCompressedImages.slice(i, i + 4));
             }
 
             for (let i = 0; i < mediumSizedCompressedImages.length; i += 2 ) {
-                reducedCompressedImages.medium.push(compressedImages.slice(i, i + 2));
+                reducedCompressedImages.medium.push(mediumSizedCompressedImages.slice(i, i + 2));
             }
 
             for (let i = 0; i < bigSizedCompressedImages.length; i += 1 ) {
-                reducedCompressedImages.big.push(compressedImages.slice(i, i + 1));
+                reducedCompressedImages.big.push(bigSizedCompressedImages.slice(i, i + 1));
             }
 
             galleryCompressedImagesList = {
