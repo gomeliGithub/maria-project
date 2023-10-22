@@ -10,13 +10,112 @@
 </div>
 <div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-column align-items-center justify-content-center vw-80 p-3" id="galleryImages">
     <div *ngFor="let imageDataArr of compressedImagesList.small" class="d-flex flex-row justify-content-center smallSizedImagesContainer">
-        <img *ngFor="let imageData of imageDataArr" src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-thumbnail w-25">
+        <ng-template ngFor let-imageData [ngForOf]="imageDataArr">
+            <div class="d-flex flex-row position-relative h-auto w-25"
+                (mouseenter)="startLinkContainerAnimation(
+                    setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
+                    imageData.viewSizeType
+                )"
+                (mouseleave)="startLinkContainerAnimation(
+                    setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
+                    imageData.viewSizeType
+                )"
+            >
+                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-thumbnail h-100">
+                <div class="text-center position-absolute top-100 start-50 w-100 downloadOriginalImageLinkContainer"
+                    [@link-container-animation]="smallLinkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]"
+                    (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(
+                        imageData.name, imageData.viewSizeType), 
+                        imageData.viewSizeType
+                    )"
+                    (@link-container-animation.done)="linkContainerAnimationDone($event, setCurrentLinkContainerAnimationStateIndex(
+                        imageData.name, imageData.viewSizeType), 
+                        imageData.viewSizeType
+                    )"
+                    [ngStyle]="{ 
+                        'display': smallLinkContainerAnimationDisplayValues[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]
+                    }"
+                >
+                    <a href="/api/client/downloadOriginalImage/:{{ imageData.name }}" class="btn btn-secondary btn-sm" 
+                        tabindex="-1" role="button" aria-disabled="true"
+                    >
+                        {{ 'GALLERYPAGE.DOWNLOADORIGINALIMAGEBUTTONTEXT' | translate }}
+                    </a>
+                </div>
+            </div>
+        </ng-template>
     </div>
     <div *ngFor="let imageDataArr of compressedImagesList.medium" class="d-flex flex-row justify-content-center mediumSizedImagesContainer">
-        <img *ngFor="let imageData of imageDataArr" src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-thumbnail w-50">
+        <ng-template ngFor let-imageData [ngForOf]="imageDataArr">
+            <div class="d-flex flex-row position-relative h-auto w-50"
+                (mouseenter)="startLinkContainerAnimation(
+                    setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
+                    imageData.viewSizeType
+                )"
+                (mouseleave)="startLinkContainerAnimation(
+                    setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
+                    imageData.viewSizeType
+                )"
+            >
+                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-thumbnail h-100">
+                <div class="text-center position-absolute top-100 start-50 w-100 downloadOriginalImageLinkContainer"
+                    [@link-container-animation]="mediumLinkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]"
+                    (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(
+                        imageData.name, imageData.viewSizeType), 
+                        imageData.viewSizeType
+                    )"
+                    (@link-container-animation.done)="linkContainerAnimationDone($event, setCurrentLinkContainerAnimationStateIndex(
+                        imageData.name, imageData.viewSizeType), 
+                        imageData.viewSizeType
+                    )"
+                    [ngStyle]="{ 
+                        'display': mediumLinkContainerAnimationDisplayValues[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]
+                    }"
+                >
+                    <a href="/api/client/downloadOriginalImage/:{{ imageData.name }}" class="btn btn-secondary btn-sm" 
+                        tabindex="-1" role="button" aria-disabled="true"
+                    >
+                    {{ 'GALLERYPAGE.DOWNLOADORIGINALIMAGEBUTTONTEXT' | translate }}
+                    </a>
+                </div>
+            </div>
+        </ng-template>
     </div>
     <div *ngFor="let imageDataArr of compressedImagesList.big" class="d-flex flex-row justify-content-center bigSizedImagesContainer">
-        <img *ngFor="let imageData of imageDataArr" src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-thumbnail w-75">
+        <ng-template ngFor let-imageData [ngForOf]="imageDataArr">
+            <div class="d-flex flex-row position-relative h-auto w-75"
+                (mouseenter)="startLinkContainerAnimation(
+                    setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
+                    imageData.viewSizeType
+                )"
+                (mouseleave)="startLinkContainerAnimation(
+                    setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
+                    imageData.viewSizeType
+                )"
+            >
+                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-thumbnail h-100">
+                <div class="text-center position-absolute top-100 start-50 w-100 downloadOriginalImageLinkContainer"
+                    [@link-container-animation]="bigLinkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]"
+                    (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(
+                        imageData.name, imageData.viewSizeType), 
+                        imageData.viewSizeType
+                    )"
+                    (@link-container-animation.done)="linkContainerAnimationDone($event, setCurrentLinkContainerAnimationStateIndex(
+                        imageData.name, imageData.viewSizeType), 
+                        imageData.viewSizeType
+                    )"
+                    [ngStyle]="{ 
+                        'display': bigLinkContainerAnimationDisplayValues[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]
+                    }"
+                >
+                    <a href="/api/client/downloadOriginalImage/:{{ imageData.name }}" class="btn btn-secondary btn-sm" 
+                        tabindex="-1" role="button" aria-disabled="true"
+                    >
+                    {{ 'GALLERYPAGE.DOWNLOADORIGINALIMAGEBUTTONTEXT' | translate }}
+                    </a>
+                </div>
+            </div>
+        </ng-template>
     </div>
 </div>
 <ng-template #noContentBlock>

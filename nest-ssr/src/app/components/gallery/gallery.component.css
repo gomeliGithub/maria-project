@@ -1,4 +1,4 @@
-@media (max-width: 576px) {
+@media (max-width: 992px) {
     #titleHeaderContainer {
         padding: 0.5rem !important;
     }
@@ -23,17 +23,24 @@
         flex-wrap: wrap !important;
     }
 
-    .smallSizedImagesContainer img {
+    .smallSizedImagesContainer > div {
         width: 35% !important;
         flex: 1 1 auto !important;
     }
 
-    .mediumSizedImagesContainer img {
+    .mediumSizedImagesContainer > div {
         width: 40% !important;
         flex: 1 1 auto !important;
     }
 
-    .bigSizedImagesContainer img {
+    .bigSizedImagesContainer > div {
         width: 85% !important;
+    }
+
+    .downloadOriginalImageLinkContainer a {
+        width: 80% !important;
+        --bs-btn-padding-y: .25rem; 
+        --bs-btn-padding-x: .5rem; 
+        --bs-btn-font-size: .60rem;
     }
 }

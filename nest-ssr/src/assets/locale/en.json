@@ -15,7 +15,8 @@
 	},
 	"GALLERYPAGE": {
 		"HEADERTITLE": "Photo gallery",
-		"ORDERBUTTONTEXT": "Order a photo session"
+		"ORDERBUTTONTEXT": "Order a photo session",
+		"DOWNLOADORIGINALIMAGEBUTTONTEXT": "Download original"
 	},
 	"CLIENTPAGE": {
 		"LOGININVALIDMESSAGE": "Incorrect login",

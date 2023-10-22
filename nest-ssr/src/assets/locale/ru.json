@@ -15,7 +15,8 @@
 	},
 	"GALLERYPAGE": {
 		"HEADERTITLE": "Галерея фото",
-		"ORDERBUTTONTEXT": "Заказать фотосессию"
+		"ORDERBUTTONTEXT": "Заказать фотосессию",
+		"DOWNLOADORIGINALIMAGEBUTTONTEXT": "Скачать оригинал"
 	},
 	"CLIENTPAGE": {
 		"LOGININVALIDMESSAGE": "Некорректный логин",

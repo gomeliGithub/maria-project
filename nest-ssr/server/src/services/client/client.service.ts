@@ -97,17 +97,13 @@ export class ClientService {
     public async downloadOriginalImage (response: Response, options: IDownloadOriginalImageOptions): Promise<void> {
         if ( options.imagePath ) {
             response.download(options.imagePath);
-
-            return;
         }
 
         if ( options.compressedImageName ) {
-            const compressedImageData: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { name: options.compressedImageName }});
+            const compressedImageData: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { name: options.compressedImageName } });
 
             if ( compressedImageData ) response.download(path.join(compressedImageData.originalDirPath, compressedImageData.originalName));
             else throw new BadRequestException();
-
-            return;
         }
     }
 

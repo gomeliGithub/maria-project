@@ -32,6 +32,13 @@ export class ClientController {
         return this.clientService.getCompressedImagesList(imagesType.substring(1) as 'home' | string);
     }
 
+    @Get('/downloadOriginalImage/:compressedImageName')
+    public async downloadOriginalImage (@Param('compressedImageName') compressedImageName: string, @Res() response: Response): Promise<void> {
+        compressedImageName = compressedImageName.substring(1);
+
+        return this.clientService.downloadOriginalImage(response, { compressedImageName });
+    }
+
     @Get('/getImagePhotographyTypesData/:targetPage')
     public async getImagePhotographyTypesData (@Param('targetPage') targetPage: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[]> {
         targetPage = targetPage.substring(1);
@@ -55,5 +62,5 @@ export class ClientController {
         if ( !locales.includes(requestBody.sign.newLocale) ) throw new BadRequestException();
         
         return this.clientService.changeLocale(request, requestBody.sign.newLocale, response);
-    } 
+    }
 }
