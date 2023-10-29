@@ -19,6 +19,10 @@ body {
     width: 30vw !important;
 }
 
+.h-85 {
+    height: 85% !important;
+}
+
 .w-60 {
     width: 60% !important;
 }

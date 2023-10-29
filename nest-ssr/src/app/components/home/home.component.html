@@ -39,13 +39,15 @@
             (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
             (mouseleave)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
         >
-            <div class="h-100 mw-100" [attr.index-number]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
+            <div class="h-100 mw-100 text-center" [attr.index-number]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
                 (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
                 (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
                 [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
             >
+                <small class="text-body-secondary">{{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i></small>
                 <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.originalImageName }}" 
-                    class="h-100 mw-100 object-fit-contain"
+                    class="h-85 mw-100 object-fit-contain"
+                    [ngClass]="{ 'w-100': imagePhotographyTypesDataArr.length === 1 }"
                 >
             </div>
             <div class="position-absolute top-50 start-50 translate-middle w-50 linkButtonContainer">
