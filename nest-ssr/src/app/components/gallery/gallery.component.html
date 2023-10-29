@@ -11,10 +11,13 @@
     <hr class="border-3 mt-5 w-100"/>
 </div>
 <div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-column align-items-center justify-content-center vw-95" id="galleryImages">
-    <div *ngFor="let imageDataArr of compressedImagesList.small" class="d-flex flex-row justify-content-center mb-2 smallSizedImagesContainer">
+    <div *ngFor="let imageDataArr of compressedImagesList.small" class="d-flex flex-row justify-content-center align-items-center mb-2 smallSizedImagesContainer">
         <ng-template ngFor let-imageData [ngForOf]="imageDataArr" let-i="index">
             <div class="d-flex flex-row position-relative h-auto w-25"
-                [ngClass]="{ 'me-2': i !== imageDataArr.length - 1 }"
+                [ngClass]="{ 
+                    'me-2': i !== imageDataArr.length - 1, 
+                    'twoFirstImageContainer': i === 0 || i === 1 
+                }"
                 (mouseenter)="startLinkContainerAnimation(
                     setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
                     imageData.viewSizeType
@@ -48,10 +51,13 @@
             </div>
         </ng-template>
     </div>
-    <div *ngFor="let imageDataArr of compressedImagesList.medium" class="d-flex flex-row justify-content-center mb-2 mediumSizedImagesContainer">
+    <div *ngFor="let imageDataArr of compressedImagesList.medium" class="d-flex flex-row justify-content-center align-items-center mb-2 mediumSizedImagesContainer">
         <ng-template ngFor let-imageData [ngForOf]="imageDataArr" let-i="index">
             <div class="d-flex flex-row position-relative h-auto w-50"
-                [ngClass]="{ 'me-2': i !== imageDataArr.length - 1 }"
+                [ngClass]="{ 
+                    'me-2': i !== imageDataArr.length - 1,
+                    'twoFirstImageContainer': i === 0 || i === 1
+                }"
                 (mouseenter)="startLinkContainerAnimation(
                     setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
                     imageData.viewSizeType
@@ -85,10 +91,13 @@
             </div>
         </ng-template>
     </div>
-    <div *ngFor="let imageDataArr of compressedImagesList.big" class="d-flex flex-row justify-content-center mb-2 bigSizedImagesContainer">
+    <div *ngFor="let imageDataArr of compressedImagesList.big" class="d-flex flex-row justify-content-center align-items-center mb-2 bigSizedImagesContainer">
         <ng-template ngFor let-imageData [ngForOf]="imageDataArr" let-i="index">
             <div class="d-flex flex-row position-relative h-auto w-75"
-                [ngClass]="{ 'me-2': i !== imageDataArr.length - 1 }"
+                [ngClass]="{ 
+                    'me-2': i !== imageDataArr.length - 1,
+                    'twoFirstImageContainer': i === 0 || i === 1
+                }"
                 (mouseenter)="startLinkContainerAnimation(
                     setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
                     imageData.viewSizeType

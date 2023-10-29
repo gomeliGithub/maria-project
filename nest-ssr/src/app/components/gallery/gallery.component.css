@@ -33,6 +33,14 @@
         width: 85% !important;
     }
 
+    .twoFirstImageContainer {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .twoFirstImageContainer :nth-child(2) {
+        margin-right: 0 !important;
+    }
+
     .downloadOriginalImageLinkContainer a {
         width: 80% !important;
         --bs-btn-padding-y: .25rem; 
