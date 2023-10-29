@@ -10,6 +10,11 @@
     height: 6px!important;
 }
 
+.imagePhotographyTypesGroup {
+    border-width: 10px !important;
+    border-color: gray !important;
+}
+
 @media (max-width: 576px) {
     .imagePhotographyTypesGroup {
         flex-direction: column !important;

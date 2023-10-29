@@ -10,10 +10,11 @@
     >{{ 'GALLERYPAGE.ORDERBUTTONTEXT' | translate }}</button>
     <hr class="border-3 mt-5 w-100"/>
 </div>
-<div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-column align-items-center justify-content-center vw-80 p-3" id="galleryImages">
+<div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-column align-items-center justify-content-center vw-95" id="galleryImages">
     <div *ngFor="let imageDataArr of compressedImagesList.small" class="d-flex flex-row justify-content-center smallSizedImagesContainer">
-        <ng-template ngFor let-imageData [ngForOf]="imageDataArr">
+        <ng-template ngFor let-imageData [ngForOf]="imageDataArr" let-i="index">
             <div class="d-flex flex-row position-relative h-auto w-25"
+                [ngClass]="{ 'me-2': i !== imageDataArr.length - 1 }"
                 (mouseenter)="startLinkContainerAnimation(
                     setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
                     imageData.viewSizeType
@@ -23,7 +24,7 @@
                     imageData.viewSizeType
                 )"
             >
-                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-thumbnail h-100">
+                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-fluid rounded h-100">
                 <div class="text-center position-absolute top-100 start-50 w-100 downloadOriginalImageLinkContainer"
                     [@link-container-animation]="smallLinkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]"
                     (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(
@@ -48,8 +49,9 @@
         </ng-template>
     </div>
     <div *ngFor="let imageDataArr of compressedImagesList.medium" class="d-flex flex-row justify-content-center mediumSizedImagesContainer">
-        <ng-template ngFor let-imageData [ngForOf]="imageDataArr">
+        <ng-template ngFor let-imageData [ngForOf]="imageDataArr" let-i="index">
             <div class="d-flex flex-row position-relative h-auto w-50"
+                [ngClass]="{ 'me-2': i !== imageDataArr.length - 1 }"
                 (mouseenter)="startLinkContainerAnimation(
                     setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
                     imageData.viewSizeType
@@ -59,7 +61,7 @@
                     imageData.viewSizeType
                 )"
             >
-                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-thumbnail h-100">
+                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-fluid rounded h-100">
                 <div class="text-center position-absolute top-100 start-50 w-100 downloadOriginalImageLinkContainer"
                     [@link-container-animation]="mediumLinkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]"
                     (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(
@@ -84,8 +86,9 @@
         </ng-template>
     </div>
     <div *ngFor="let imageDataArr of compressedImagesList.big" class="d-flex flex-row justify-content-center bigSizedImagesContainer">
-        <ng-template ngFor let-imageData [ngForOf]="imageDataArr">
+        <ng-template ngFor let-imageData [ngForOf]="imageDataArr" let-i="index">
             <div class="d-flex flex-row position-relative h-auto w-75"
+                [ngClass]="{ 'me-2': i !== imageDataArr.length - 1 }"
                 (mouseenter)="startLinkContainerAnimation(
                     setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
                     imageData.viewSizeType
@@ -95,7 +98,7 @@
                     imageData.viewSizeType
                 )"
             >
-                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-thumbnail h-100">
+                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-fluid rounded h-100">
                 <div class="text-center position-absolute top-100 start-50 w-100 downloadOriginalImageLinkContainer"
                     [@link-container-animation]="bigLinkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]"
                     (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(

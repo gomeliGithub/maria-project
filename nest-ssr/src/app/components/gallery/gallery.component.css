@@ -1,4 +1,4 @@
-@media (max-width: 992px) {
+@media (max-width: 768px) {
     #titleHeaderContainer {
         padding: 0.5rem !important;
     }
@@ -7,11 +7,7 @@
         font-size: 1.25rem !important;
     }
 
-    .smallSizedImagesContainer {
-        width: 70vw !important;
-    }
-
-    .mediumSizedImagesContainer {
+    .smallSizedImagesContainer, .mediumSizedImagesContainer {
         width: 90vw !important;
     }
 

@@ -27,8 +27,12 @@
     <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
 </div> 
 <ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0">
-    <div *ngFor="let imagePhotographyTypesDataArr of imagePhotographyTypes;" 
-        class="d-flex flex-row justify-content-center align-items-center vh-70 imagePhotographyTypesGroup section"
+    <div *ngFor="let imagePhotographyTypesDataArr of imagePhotographyTypes; let i = index" 
+        class="d-flex flex-row justify-content-center align-items-center vh-70 w-100 imagePhotographyTypesGroup section"
+        [ngClass]="{
+            'border-bottom border-secondary': i !== imagePhotographyTypes.length - 1,
+            'border-top border-secondary': i !== 0 
+        }"
     >
         <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i = index" 
             class="border-0 position-relative h-100 mw-100 me-3 ms-3 imagesContainer"
