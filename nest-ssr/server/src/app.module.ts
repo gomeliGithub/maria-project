@@ -21,9 +21,10 @@ import { AdminPanelModule } from './modules/admin-panel.module';
 import { CommonModule } from './modules/common.module';
 
 import { WebSocketService } from './services/web-socket/web-socket.service';
+import { MailService } from './services/mail/mail.service';
 
 import { JWT_token } from './models/sign.model';
-import { Admin, Member, ClientCompressedImage, ImagePhotographyType } from './models/client.model';
+import { Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder } from './models/client.model';
 
 @Module({
     imports: [
@@ -47,7 +48,7 @@ import { Admin, Member, ClientCompressedImage, ImagePhotographyType } from './mo
                 username: process.env.DB_USERNAME,
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
-                models: [ JWT_token, Admin, Member, ClientCompressedImage, ImagePhotographyType ],
+                models: [ JWT_token, Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder ],
                 autoLoadModels: true,
                 synchronize: true
             })
@@ -76,7 +77,7 @@ import { Admin, Member, ClientCompressedImage, ImagePhotographyType } from './mo
         CommonModule
     ],
     controllers: [AppController],
-    providers: [ AppService, WebSocketService ],
-    exports: [AppService]
+    providers: [ AppService, WebSocketService, MailService ],
+    exports: [ AppService, MailService ]
 })
 export class AppModule {}

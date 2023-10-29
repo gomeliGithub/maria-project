@@ -14,7 +14,7 @@ import { CommonModule } from '../../modules/common.module';
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 
-import { Admin, Member, ClientCompressedImage } from '../../models/client.model';
+import { Admin, ClientCompressedImage } from '../../models/client.model';
 
 import { ICompressImageData, IRequest } from 'types/global';
 import { ICreateImageDirsOptions, IСompressedImageGetOptions } from 'types/options';
@@ -37,10 +37,8 @@ export class ImageControlService {
 
         let compressedImages: ClientCompressedImage[] = null;
 
-        if ( options.client ) {
-            if ( options.clientType === 'admin' ) compressedImages = await (options.client as Admin).$get('compressedImages', findOptions);
-            else if ( options.clientType === 'member' ) compressedImages = await (options.client as Member).$get('compressedImages', findOptions);
-        } else compressedImages = await this.compressedImageModel.findAll(findOptions);
+        if ( options.client ) compressedImages = await options.client.$get('compressedImages', findOptions);
+        else compressedImages = await this.compressedImageModel.findAll(findOptions);
 
         return compressedImages;
     }
@@ -71,7 +69,7 @@ export class ImageControlService {
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin, { rawResult: false });
+        const client: Admin = await commonServiceRef.getClients(request, activeClientLogin, { rawResult: false }) as Admin;
 
         let newCompressedImage: ClientCompressedImage = null;
 
@@ -171,7 +169,7 @@ export class ImageControlService {
     public async deleteImage (request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, { rawResult: false });
+        const client: Admin = await commonServiceRef.getClients(request, clientLogin, { rawResult: false }) as Admin;
         const compressedImage: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { name: path.basename(imagePath) } });
 
         try {

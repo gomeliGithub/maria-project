@@ -4,6 +4,7 @@
 		"HOME": "Главная",
 		"GALLERY": "Галерея",
 		"ADMINPANEL": "Панель администратора",
+		"ADMINPANELORDERSCONTROL": "Управление заказами",
 		"SIGNUP": "Регистрация",
 		"SIGNIN": "Вход",
 		"NOTFOUND": "Не найдено"
@@ -16,7 +17,12 @@
 	"GALLERYPAGE": {
 		"HEADERTITLE": "Галерея фото",
 		"ORDERBUTTONTEXT": "Заказать фотосессию",
-		"DOWNLOADORIGINALIMAGEBUTTONTEXT": "Скачать оригинал"
+		"DOWNLOADORIGINALIMAGEBUTTONTEXT": "Скачать оригинал",
+		"HELPBLOCKS": {
+			"CLIENTPHONENUMBER": "Ваш номер телефона в международном формате.",
+			"COMMENT": "Ваш комментарий или пожелание к заказу."
+		},
+		"CLIENTORDERSUCCESSMESSAGE": "Заказ успешно отправлен. Я с вами свяжусь в ближайшее время"
 	},
 	"CLIENTPAGE": {
 		"LOGININVALIDMESSAGE": "Некорректный логин",
@@ -47,12 +53,20 @@
 	},
 	"LOGINFORM": {
 		"TITLE": "Вход в систему",
-		"LOGINLABELTEXT": "Логин",
-		"PASSWORDLABELTEXT": "Пароль",
-		"FULLNAMELABELTEXT": "Полное имя",
+		"LOGINLABELTEXT": "Логин *",
+		"PASSWORDLABELTEXT": "Пароль *",
+		"FULLNAMELABELTEXT": "Полное имя *",
 		"NOLOGINTEXT": "Не указан логин",
 		"NOPASSWORDTEXT": "Не указан пароль",
 		"CONFIRMBUTTONCAPTIONTEXT": "Войти"
+	},
+	"SENDORDERFORM": {
+		"ORDERTYPETEXT": "Тип заказа *",
+		"CLIENTPHONENUMBERTEXT": "Номер телефона *",
+		"COMMENTTEXT": "Комментарий или пожелание",
+		"ORDERTYPEINVALIDMESSAGE": "Некорректный тип заказа",
+		"CLIENTPHONENUMBERINVALIDMESSAGE": "Некорректный номер телефона",
+		"SUBMITBUTTONTEXT": "Отправить заказ"
 	},
 	"MODAL": {
 		"SUCCESSTITLE": "Успешно",
@@ -74,6 +88,8 @@
 		"BOOLEANTRUETEXT": "Да",
 		"BOOLEANFALSETEXT": "Нет",
 		"NOIMAGESMESSAGE": "Загруженных изображений пока нет",
+		"NOCLIENTORDERSMESSAGE": "Новых заказов пока нет",
+		"NOCLIENTWITHNEWORDERSMESSAGE": "Клиентов с новыми заказами пока нет",
 		"DELETEIMAGESUCCESSMESSAGE": "Изображение успешно удалено",
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Максимальное количество изображений на главной странице",
 		"TABLECAPTION": "Управление изображениями",
@@ -88,6 +104,14 @@
 			"ONHOMEPAGE": "Отображён на главной",
 			"ONGALLERYPAGE": "Отображён на галерее"
 		},
+		"CLIENTORDERSTABLECOLTITLES": {
+			"IMAGEPHOTOGRAPHYTYPE": "Тип съёмки",
+			"TYPE": "Тип заказа",
+			"CLIENTPHONENUMBER": "Номер телефона клиента",
+			"CLIENTCOMMENT": "Дополнительная информация от клиента",
+			"CREATEDDATE": "Дата создания"
+		},
+		"CLIENTORDERSTABLECHANGESTATUSBUTTONTEXT": "Отметить как обработанный",
 		"IMAGECONTROLTEXT": {
 			"TITLE": "Управление",
 			"CHANGEBUTTON": "Изменить тип съёмки или описание",
@@ -110,8 +134,8 @@
 			"CHANGEBUTTON": "Изменить"
 		},
 		"UPLOADIMAGETEXT": {
-			"PHOTOGRAPHYTYPE": "Тип съёмки",
-			"VIEWSIZETYPE": "Размер отображения",
+			"PHOTOGRAPHYTYPE": "Тип съёмки *",
+			"VIEWSIZETYPE": "Размер отображения *",
 			"INVALIDPHOTOGRAPHYTYPE": "Не выбран тип съёмки",
 			"INVALIDVIEWSIZETYPE": "Не выбран размер отображения",
 			"INVALIDSELECTIMAGE": "Не выбрано изображение",
@@ -145,11 +169,18 @@
 		"MEDIUM": "Средний",
 		"BIG": "Большой"
 	},
+	"CLIENTORDERTYPES": {
+		"CONSULTATION": "Консультация",
+		"FULL": "Полный"
+	},
+	"CLIENTORDERSTATUSES": {
+		"NEW": "Новый",
+		"PROCESSED": "Обработан"
+	},
 	"PROGRESSBAR": {
 		"TITLE": "Загрузка изображения..."
 	},
 	"SPINNERTITLES": {
-		"DELETEIMAGE": "Удаление изображения...",
-		"DISPLAYIMAGE": "Отображение..."
+		"PROCESSING": "Обработка..."
 	}
 }

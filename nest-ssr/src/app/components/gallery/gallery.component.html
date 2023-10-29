@@ -5,7 +5,9 @@
     </div>
 </div> 
 <div class="text-center w-100">
-    <button type="button" class="btn btn-outline-success btn-lg">{{ 'GALLERYPAGE.ORDERBUTTONTEXT' | translate }}</button>
+    <button type="button" class="btn btn-outline-success btn-lg" id="orderButton" 
+        (click)="changeSendOrderFormAnimationState()"
+    >{{ 'GALLERYPAGE.ORDERBUTTONTEXT' | translate }}</button>
     <hr class="border-3 mt-5 w-100"/>
 </div>
 <div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-column align-items-center justify-content-center vw-80 p-3" id="galleryImages">
@@ -104,7 +106,7 @@
                         imageData.name, imageData.viewSizeType), 
                         imageData.viewSizeType
                     )"
-                    [ngStyle]="{ 
+                    [ngStyle]="{
                         'display': bigLinkContainerAnimationDisplayValues[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]
                     }"
                 >
@@ -123,4 +125,46 @@
         <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
     </div>
 </ng-template>
+<div class="d-flex flex-column w-50 position-absolute top-50 start-50 visible pe-auto" #sendOrderFormContainer [@send-order-form-animation]="sendOrderFormAnimationState"
+    (@send-order-form-animation.start)="sendOrderFormAnimationStarted($event)"
+    (@send-order-form-animation.done)="sendOrderFormAnimationDone($event)"
+>
+    <button type="button" class="btn-close mb-1 align-self-end" aria-label="Close" (click)="changeSendOrderFormAnimationState()"></button>
+    <form [formGroup]="sendOrderForm" class="" novalidate (submit)="sendOrder()">
+        <div class="form-group form-floating mb-3">
+            <select class="form-control form-select" id="inputType" formControlName="orderType">
+                <option value="consultation" selected>{{ 'CLIENTORDERTYPES.CONSULTATION' | translate }}</option>
+                <option value="full">{{ 'CLIENTORDERTYPES.FULL' | translate }}</option>
+            </select>
+            <label for="inputType" class="form-label text-wrap">{{ 'SENDORDERFORM.ORDERTYPETEXT' | translate }}</label>
+            <div class="alert alert-danger" *ngIf="sendOrderForm.controls['orderType'].invalid && sendOrderForm.controls['orderType'].touched">
+                {{ 'SENDORDERFORM.ORDERTYPEINVALIDMESSAGE' | translate }}
+            </div>
+        </div>
+        <div class="form-group form-floating mb-3">
+            <input type="tel" class="form-control" id="inputPhoneNumber" formControlName="clientPhoneNumber"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip"
+                [attr.data-bs-title]="'GALLERYPAGE.HELPBLOCKS.CLIENTPHONENUMBER' | translate"
+            >
+            <label for="inputPhoneNumber" class="form-label text-wrap">{{ 'SENDORDERFORM.CLIENTPHONENUMBERTEXT' | translate }}</label>
+            <div class="alert alert-danger" *ngIf="sendOrderForm.controls['clientPhoneNumber'].invalid && sendOrderForm.controls['clientPhoneNumber'].touched">
+                {{ 'SENDORDERFORM.CLIENTPHONENUMBERINVALIDMESSAGE' | translate }}
+            </div>
+        </div>
+        <div class="form-group form-floating mb-3">
+            <textarea class="form-control" id="inputComment" rows="8" maxlength="30" formControlName="comment"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip"
+                [attr.data-bs-title]="'GALLERYPAGE.HELPBLOCKS.COMMENT' | translate"
+            ></textarea>
+            <label for="inputComment" class="form-label text-wrap">{{ 'SENDORDERFORM.COMMENTTEXT' | translate }}</label>
+        </div>
+        <div class="form-group text-center">
+            <button class="btn btn-primary" [disabled]="sendOrderForm.invalid">
+                {{ 'SENDORDERFORM.SUBMITBUTTONTEXT' | translate }}
+            </button>
+        </div>
+    </form>
+</div>
 <ng-template #appModal></ng-template>

@@ -49,6 +49,9 @@ export class AppService {
     public imagePhotographyTypes: string[] = [ 'individual', 'children', 'wedding', 'family', 'event' ];
     public imageViewSizeTypes: string[] = [ 'small', 'medium', 'big' ];
 
+    public clientOrderTypes: string[] = [ 'consultation', 'full' ];
+    public clientOrdersStatuses: string[] = [ 'new', 'processed' ];
+
     public async getServiceRef ( module: typeof AdminPanelModule, service: typeof AdminPanelService): Promise<AdminPanelService>
     public async getServiceRef ( module: typeof ClientModule, service: typeof ClientService): Promise<ClientService>
     public async getServiceRef ( module: typeof CommonModule, service: typeof CommonService): Promise<CommonService>

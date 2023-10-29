@@ -1,4 +1,5 @@
-import { Component, ComponentRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, ComponentRef, HostBinding, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
@@ -29,7 +30,21 @@ import { IClientCompressedImage } from 'types/models';
             ]),
             transition('enter => leave', [
                 animate('200ms', style({ opacity: 0, transform: 'translate(-50%, 50%)' }))
+            ])
+        ]),
+        trigger('send-order-form-animation', [
+            state('hide', style({
+                transform: 'translate(-400%, -50%) rotate3d(1, 1, 1, 90deg)'
+            })),
+            state('show', style({
+                transform: 'translate(-50%,-50%) rotate3d(0, 0, 0, 0)'
+            })),
+            transition('hide => show', [
+                animate('0.5s 300ms ease-in', style({ transform: 'translate(-50%,-50%) rotate3d(0, 0, 0, 0)' }))
             ]),
+            transition('show => hide', [
+                animate('0.2s', style({ transform: 'translate(-400%, -50%) rotate3d(1, 1, 1, 90deg)' }))
+            ])
         ])
     ]
 })
@@ -44,12 +59,28 @@ export class GalleryComponent implements OnInit {
         private readonly clientService: ClientService
     ) {
         this.photographyType = this.activateRoute.snapshot.paramMap.get('photographyType');
+
+        this.sendOrderForm = new FormGroup({
+            'orderType': new FormControl("", [ Validators.required, this.orderTypeValidator ]),
+            'clientPhoneNumber': new FormControl("", [ Validators.required, Validators.pattern(/(?:\+|\d)[\d\-\(\) ]{9,}\d/) ]),
+            'comment': new FormControl("", Validators.maxLength(30))
+        });
     }
+    
+    public activeClientIsExists: boolean;
+
+    public sendOrderForm: FormGroup<{
+        orderType: FormControl<string>,
+        clientPhoneNumber: FormControl<string>,
+        comment: FormControl<string>
+    }>;
 
     @ViewChild(ModalComponent) modalComponent: ModalComponent
     @ViewChild('appModal', { read: ViewContainerRef, static: false })
     private readonly modalViewRef: ViewContainerRef;
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
+
+    @HostBinding('className') componentClass: string;
 
     public compressedImagesList: IReducedGalleryCompressedImages;
     public photographyTypeDescription: string;
@@ -68,6 +99,8 @@ export class GalleryComponent implements OnInit {
     public flatMediumCompressedImagesList: IClientCompressedImage[];
     public flatBigCompressedImagesList: IClientCompressedImage[];
 
+    public sendOrderFormAnimationState: string = 'hide';
+
     ngOnInit (): void {
         this.router.events.subscribe((evt) => {
             if ( !(evt instanceof NavigationEnd) ) return;
@@ -80,6 +113,11 @@ export class GalleryComponent implements OnInit {
             this.appService.getTranslations([ 'PAGETITLES.GALLERY', `IMAGEPHOTOGRAPHYTYPESFULLTEXT.${ this.photographyType.toUpperCase() }`], true).subscribe({
                 next: translation => this.appService.setTitle(`${ translation[0] } - ${ translation[1] }`),
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+            });
+
+            import('bootstrap').then(bootstrap => {
+                const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
             });
 
             this.clientService.getCompressedImagesList(this.photographyType).subscribe({
@@ -119,6 +157,23 @@ export class GalleryComponent implements OnInit {
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
         }
+    }
+
+    public orderTypeValidator (control: FormControl<string>): { [ s: string ]: boolean } | null {
+        const clientOrderTypes: string[] = [ 'consultation', 'full' ];
+
+        if ( !clientOrderTypes.includes(control.value) ) {
+            return { 'orderType': true };
+        }
+
+        return null;
+    }
+
+    public sendOrder (): void {
+        this.clientService.sendOrder(this.photographyType, this.sendOrderForm.value, this.modalViewRef, this.modalComponentRef);
+
+        this.sendOrderForm.reset();
+        this.changeSendOrderFormAnimationState();
     }
 
     public setCurrentLinkContainerAnimationStateIndex (name: string, viewSizeType: string): number { 
@@ -163,5 +218,17 @@ export class GalleryComponent implements OnInit {
             case 'medium': { this.mediumLinkContainerAnimationDisplayValues[index] = 'none'; break; }
             case 'big': { this.bigLinkContainerAnimationDisplayValues[index] = 'none'; break; }
         }
+    }
+
+    public changeSendOrderFormAnimationState (): void {
+        this.sendOrderFormAnimationState = this.sendOrderFormAnimationState === 'hide' ? 'show' : 'hide';
+    }
+
+    public sendOrderFormAnimationStarted (event: AnimationEvent): void {
+        if ( event.toState === 'show' ) this.componentClass = 'pointerEventsNone';
+    }
+
+    public sendOrderFormAnimationDone (event: AnimationEvent): void {
+        if ( event.toState === 'hide' ) this.componentClass = '';
     }
 }

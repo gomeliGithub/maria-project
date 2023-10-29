@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ComponentRef, ElementRef, HostListener, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ComponentRef, ElementRef, HostListener, Inject, NgZone, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
 
@@ -78,6 +78,7 @@ import { IClientLocale } from 'types/global';
 export class AppComponent implements OnInit, AfterViewInit {
     constructor (
         @Inject(DOCUMENT) private readonly document: Document,
+        private zone: NgZone,
         
         private readonly appService: AppService,
         private readonly clientService: ClientService,
@@ -85,8 +86,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     ) { }
 
     public onRouterOutlet (component: HomeComponent | GalleryComponent | ClientComponent | AdminPanelComponent | NotFoundComponent): void {
-        if ( !(component instanceof HomeComponent) ) this.isHomePage = false;
-        else {
+        if ( !(component instanceof HomeComponent) ) {
+            this.isHomePage = false;
+
+            if ( component instanceof GalleryComponent ) component.activeClientIsExists = this.activeClientLogin ? true : false;
+        } else {
             this.isHomePage = true;
 
             this.navbarAnimationState = 'scrolled';
@@ -94,18 +98,28 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     @HostListener("scroll", ["$event"]) private onScroll ($event: any): void {
-        if ( $event.srcElement.scrollTop > 100 ) this.navbarAnimationState = 'scrolled';
+        if ( $event.srcElement.scrollTop > 50 ) this.navbarAnimationState = 'scrolled';
         else this.navbarAnimationState = 'static';
     }
 
     @HostListener('document:mousedown', ['$event'])
-    public onGlobalClick (event: any): void {
-        if ( !this.navbarElementRef.nativeElement.contains(event.target) ) {
-            if ( !this.navbarTogglerElementRef.nativeElement.classList.contains('collapsed') ) this.navbarTogglerElementRef.nativeElement.click();
+    public onGlobalClick (event: MouseEvent): void {
+        if ( !this.navbarElementRef.nativeElement.contains(event.target as HTMLElement) ) {
+            if ( !this.navbarTogglerElementRef.nativeElement.classList.contains('collapsed') ) this.navbarTogglerClick(event, true);
         }
     }
 
-    public async clientMenuClick (event: any): Promise<void> {
+    public navbarTogglerClick (event: MouseEvent, navbarTogglerIconAnimation = false): void {
+        import('bootstrap').then(bootstrap => {
+            const navbarToggler = new bootstrap.Collapse(this.document.getElementById('navbarNavDropdown'));
+
+            if ( navbarTogglerIconAnimation ) this.changeNavbarTogglerIconTriggerState();
+            
+            navbarToggler.toggle();
+        });
+    }
+
+    public async clientMenuClick (event: MouseEvent): Promise<void> {
         const button: HTMLButtonElement = event.target as HTMLButtonElement;
 
         if ( !button.classList.contains('show') ) {

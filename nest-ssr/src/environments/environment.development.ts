@@ -1,7 +1,6 @@
 import { IClientLocale } from "types/global";
 
 export const environment = {
-    production: false,
     webSocketServerURL: 'ws://localhost:82',
     locales: [
         { code: 'ru', title: 'Русский' }, 

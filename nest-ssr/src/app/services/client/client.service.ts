@@ -94,6 +94,28 @@ export class ClientService {
         });
     }
 
+    public sendOrder (photographyType: string, sendOrderFormValue: Partial<{
+        orderType: string;
+        clientPhoneNumber: string;
+        comment: string;
+    }>, modalViewRef: ViewContainerRef, modalComponentRef: ComponentRef<ModalComponent>): void {
+        const headers = this.appService.createRequestHeaders();
+
+        const { orderType, clientPhoneNumber, comment } = sendOrderFormValue;
+
+        this.http.post('/api/client/createOrder', {
+            client: {
+                imagePhotographyType: photographyType,
+                orderType,
+                clientPhoneNumber,
+                comment
+            }
+        }, { headers: headers, withCredentials: true }).subscribe({
+            next: () => this.appService.createSuccessModal(modalViewRef, modalComponentRef, this.appService.getTranslations('GALLERYPAGE.CLIENTORDERSUCCESSMESSAGE')),
+            error: () => this.appService.createErrorModal(modalViewRef, modalComponentRef)
+        });
+    }
+
     public signOut (): Observable<void> {
         const headers = this.appService.createRequestHeaders();
 

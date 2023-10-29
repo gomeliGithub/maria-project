@@ -91,10 +91,6 @@ export class HomeComponent implements OnInit {
         this.currentMouseTriggerStates[index] = this.currentMouseTriggerStates[index] === 'enter' ? 'leave' : 'enter';
     }
 
-    public stopMouseTriggerAnimation (index: number): void {
-        this.currentMouseTriggerStates[index] = this.currentMouseTriggerStates[index] === 'leave' ? 'enter' : 'leave';
-    }
-
     public setCurrentMouseTriggerStateIndex (name: string): number { 
         return this.flatImagePhotographyTypes.findIndex(imagePhotographyTypeData => imagePhotographyTypeData.name === name);
     }

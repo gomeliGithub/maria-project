@@ -2,7 +2,7 @@ import { ComponentRef, ViewContainerRef } from "@angular/core";
 
 import { ModalComponent } from "src/app/components/modal/modal.component";
 
-import { Admin, Member } from "server/src/models/client.model";
+import { Admin } from "server/src/models/client.model";
 
 export interface IGetActiveClientOptions {
     includeFields?: string | string[];
@@ -13,6 +13,7 @@ export interface IClientGetOptions {
     includeFields?: string[];
     rawResult?: boolean;
     clientType?: 'admin' | 'member';
+    includeOrders?: boolean;
 }
 
 export interface IDownloadOriginalImageOptions {
@@ -21,8 +22,7 @@ export interface IDownloadOriginalImageOptions {
 }
 
 export interface IСompressedImageGetOptions {
-    client?: Admin | Member; 
-    clientType?: 'admin' | 'member';
+    client?: Admin;
     find?: {
         imageNames?: string[];
         includeFields?: string[];
@@ -59,4 +59,13 @@ export interface ICreateImageDirsOptions {
         dirPath: string;
         clientDirPath: string;
     }
+}
+
+export interface IGetClientOrdersOptions {
+    memberLogin?: string;
+    fromDate?: Date;
+    untilDate?: Date;
+    status?: string;
+    ordersLimit?: number;
+    existsCount?: number;
 }

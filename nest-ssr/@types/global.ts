@@ -31,6 +31,10 @@ export interface IRequestBody {
         imagePhotographyType: string;
         imageViewSizeType: string;
         imageDescription?: string;
+
+        orderType: string;
+        clientPhoneNumber: string;
+        comment?: string;
     },
     adminPanel?: {
         originalImageName: string;
@@ -38,6 +42,9 @@ export interface IRequestBody {
         newImagePhotographyType?: string; 
         newImageDescription?: string;
         imagePhotographyType?: string;
+
+        clientOrderId?: number;
+        clientLogin?: string;
     }
 }
 
@@ -91,6 +98,11 @@ export interface IImageAdditionalData {
     photographyType: string;
     viewSizeType: string;
     description?: string;
+}
+
+export interface IClientOrdersInfoData {
+    login: string;
+    ordersCount: number;
 }
 
 export interface IComponentInfo {

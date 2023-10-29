@@ -1,20 +1,24 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { FindOptions, Op, literal } from 'sequelize';
 
 import * as fs from 'fs';
 import fsPromises from 'fs/promises';
 import path from 'path';
+
+import ms from 'ms';
 
 import { CommonModule } from '../../modules/common.module';
 
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 
-import { Admin, Member, ClientCompressedImage, ImagePhotographyType } from '../../models/client.model';
+import { Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder } from '../../models/client.model';
 
-import { IFullCompressedImageData, IImageAdditionalData, IRequest, IRequestBody} from 'types/global';
+import { IClientOrdersInfoData, IFullCompressedImageData, IImageAdditionalData, IRequest, IRequestBody} from 'types/global';
 import { IImageMeta, IPercentUploadedOptions, IWSMessage, IWebSocketClient } from 'types/web-socket';
-import { IClientCompressedImage } from 'types/models';
+import { IClientCompressedImage, IClientOrder } from 'types/models';
+import { IGetClientOrdersOptions } from 'types/options';
 
 @Injectable()
 export class AdminPanelService {
@@ -24,7 +28,11 @@ export class AdminPanelService {
         @InjectModel(ClientCompressedImage)
         private readonly compressedImageModel: typeof ClientCompressedImage,
         @InjectModel(ImagePhotographyType)
-        private readonly imagePhotographyTypeModel: typeof ImagePhotographyType
+        private readonly imagePhotographyTypeModel: typeof ImagePhotographyType,
+        @InjectModel(ClientOrder)
+        private readonly clientOrderModel: typeof ClientOrder,
+        @InjectModel(Member)
+        private readonly memberModel: typeof Member
     ) { }
 
     public staticCompressedImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
@@ -79,9 +87,9 @@ export class AdminPanelService {
     
         if ( activeUploadsClientNumber > 3 ) return 'PENDING';
 
-        const client: Admin | Member = await commonServiceRef.getClients(request, activeClientLogin, { rawResult: false });
+        const client: Admin = await commonServiceRef.getClients(request, activeClientLogin, { rawResult: false }) as Admin;
 
-        const compressedImages: ClientCompressedImage[] = await commonServiceRef.getCompressedImages({ client, clientType: client.dataValues.type });
+        const compressedImages: ClientCompressedImage[] = await commonServiceRef.getCompressedImages({ client });
         const compressedImage: ClientCompressedImage = compressedImages.length !== 0 ? compressedImages.find(image => image.originalName === path.basename(newOriginalImagePath)) : null;
 
         if ( compressedImage ) return 'FILEEXISTS';
@@ -180,11 +188,10 @@ export class AdminPanelService {
         
         const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
 
-        const client: Admin = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false });
+        const client: Admin = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false }) as Admin;
 
         const compressedImages: ClientCompressedImage[] = await commonServiceRef.getCompressedImages({ 
-            client, 
-            clientType: 'admin', 
+            client,
             find: { 
                 includeFields: [ 
                     'originalName', 
@@ -204,18 +211,84 @@ export class AdminPanelService {
         return imagesList;
     }
 
+    public async getClientOrders (request: IRequest, options: {
+        memberLogin: string,
+        type?: string,
+        fromDate?: Date,
+        untilDate?: Date,
+        status?: string,
+        ordersLimit?: number,
+        existsCount?: number
+    }): Promise<IClientOrdersInfoData[]>
+    public async getClientOrders (request: IRequest, options: {
+        memberLogin?: string,
+        type?: string,
+        fromDate?: Date,
+        untilDate?: Date,
+        status?: string,
+        ordersLimit?: number,
+        existsCount?: number
+    }): Promise<IClientOrder[]>
+    public async getClientOrders (request: IRequest, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoData[] | IClientOrder[]> {
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+        const client: Member = await commonServiceRef.getClients(request, options.memberLogin, { rawResult: false }) as Member;
+
+        if ( !options.existsCount ) options.existsCount = 0;
+
+        const ordersFindOptions: FindOptions<any> = {
+            where: { 
+                status: options.status ?? 'new',
+                createdDate: {
+                    [Op.gte]: options.fromDate ?? Date.now() - ms('7d'),
+                    [Op.lte]: options.untilDate ?? literal('CURRENT_TIMESTAMP')
+                }
+            },
+            attributes: { exclude: [ 'memberLoginId' ] },
+            offset: options.existsCount,
+            limit: options.ordersLimit ?? 2,
+            order: [ [ 'createdDate', 'DESC' ] ],
+            raw: true
+        }
+
+        let clientOrdersInfoData: IClientOrdersInfoData[] = null;
+        let clientOrders: IClientOrder[] = null;
+
+        if ( client ) clientOrders = await client.$get('clientOrders', ordersFindOptions);
+        else {
+            if ( !clientOrdersInfoData ) clientOrdersInfoData = [];
+
+            clientOrdersInfoData = await commonServiceRef.getClientOrdersInfo(request, 'all', options.existsCount);
+        }
+
+        return clientOrdersInfoData ?? clientOrders;
+    }
+
+    public async changeClientOrderStatus (request: IRequest, requestBody: IRequestBody): Promise<void> {
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+        const clientOrder: ClientOrder = await this.clientOrderModel.findByPk(requestBody.adminPanel.clientOrderId);
+
+        if ( !clientOrder ) throw new BadRequestException();
+
+        const client: Member = await commonServiceRef.getClients(request, requestBody.adminPanel.clientLogin, { rawResult: false }) as Member;
+
+        if ( !client || !(await client.$has('clientOrders', clientOrder)) ) throw new BadRequestException();
+
+        await clientOrder.update({ status: 'processed' });
+    }
+
     public async deleteImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
         const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
-        const client: Admin | Member = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false });
+        const client: Admin = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false }) as Admin;
 
         const originalImageName: string = requestBody.adminPanel.originalImageName;
         const originalImagePath: string = path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName);
 
         const compressedImages: ClientCompressedImage[] = await commonServiceRef.getCompressedImages({ 
-            client, 
-            clientType: 'admin', 
+            client,
             find : { includeFields: [ 'originalName' ] }});
 
         const compressedImageInstance: ClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
@@ -361,14 +434,13 @@ export class AdminPanelService {
     public async validateImageControlRequests (request: IRequest, requestBody: IRequestBody, activeAdminLogin: string): Promise<string> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
-        const client: Admin | Member = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false });
+        const client: Admin = await commonServiceRef.getClients(request, activeAdminLogin, { rawResult: false }) as Admin;
 
         const originalImageName: string = requestBody.adminPanel.originalImageName;
         const originalImagePath: string = path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName);
 
         const compressedImages: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({
             client,
-            clientType: 'admin',
             find: { includeFields: [ 'name', 'originalName', 'photographyType', 'displayedOnGalleryPage' ] }
         }) as unknown as IClientCompressedImage[];
 

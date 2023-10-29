@@ -1,66 +1,64 @@
-<div class="d-flex flex-row justify-content-center align-items-center h-100" id="signFormContainer" (submit)="sign()">
-    <form [formGroup]="signForm" class="p-3 w-50 border border-light border-3 rounded" novalidate>
-        <div class="form-group form-floating mb-3">
-            <input type="text" class="form-control" id="inputLogin" formControlName="clientLogin"
-                data-bs-toggle="tooltip" data-bs-placement="top"
-                data-bs-custom-class="custom-tooltip"
-                [attr.data-bs-title]="'CLIENTPAGE.HELPBLOCKS.LOGIN' | translate"
-            >
-            <label for="inputLogin" class="form-label">{{ 'LOGINFORM.LOGINLABELTEXT' | translate }}</label>
-            <div class="alert alert-danger" *ngIf="signForm.controls['clientLogin'].invalid && signForm.controls['clientLogin'].touched">
-                {{ 'CLIENTPAGE.LOGININVALIDMESSAGE' | translate }}
-            </div>
+<form [formGroup]="signForm" class="mt-5 p-3 w-50" novalidate (submit)="sign()">
+    <div class="form-group form-floating mb-3">
+        <input type="text" class="form-control" id="inputLogin" formControlName="clientLogin"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            [attr.data-bs-title]="'CLIENTPAGE.HELPBLOCKS.LOGIN' | translate"
+        >
+        <label for="inputLogin" class="form-label text-wrap">{{ 'LOGINFORM.LOGINLABELTEXT' | translate }}</label>
+        <div class="alert alert-danger" *ngIf="signForm.controls['clientLogin'].invalid && signForm.controls['clientLogin'].touched">
+            {{ 'CLIENTPAGE.LOGININVALIDMESSAGE' | translate }}
         </div>
-        <div class="form-group form-floating mb-3">
-            <input type="password" class="form-control" id="inputPassword" formControlName="clientPassword"
-                data-bs-toggle="tooltip" data-bs-placement="top"
-                data-bs-custom-class="custom-tooltip"
-                [attr.data-bs-title]="'CLIENTPAGE.HELPBLOCKS.PASSWORD' | translate"
-            >
-            <label for="inputPassword" class="form-label">{{ 'LOGINFORM.PASSWORDLABELTEXT' | translate }}</label>
-            <div class="alert alert-danger" *ngIf="signForm.controls['clientPassword'].invalid && signForm.controls['clientPassword'].touched">
-                {{ 'CLIENTPAGE.PASSWORDINVALIDMESSAGE' | translate }}
-            </div>
+    </div>
+    <div class="form-group form-floating mb-3">
+        <input type="password" class="form-control" id="inputPassword" formControlName="clientPassword"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            [attr.data-bs-title]="'CLIENTPAGE.HELPBLOCKS.PASSWORD' | translate"
+        >
+        <label for="inputPassword" class="form-label text-wrap">{{ 'LOGINFORM.PASSWORDLABELTEXT' | translate }}</label>
+        <div class="alert alert-danger" *ngIf="signForm.controls['clientPassword'].invalid && signForm.controls['clientPassword'].touched">
+            {{ 'CLIENTPAGE.PASSWORDINVALIDMESSAGE' | translate }}
         </div>
-        <div *ngIf="signOp === 'up'" class="form-group form-floating mb-3">
-            <input type="text" class="form-control" id="inputFullName" formControlName="clientFullName"
-                data-bs-toggle="tooltip" data-bs-placement="top"
-                data-bs-custom-class="custom-tooltip"
-                [attr.data-bs-title]="'CLIENTPAGE.HELPBLOCKS.FULLNAME' | translate"
-            >
-            <label for="inputFullName" class="form-label">{{ 'LOGINFORM.FULLNAMELABELTEXT' | translate }}</label>
-            <div class="alert alert-danger" *ngIf="signForm.controls['clientFullName'].invalid && signForm.controls['clientFullName'].touched">
-                {{ 'CLIENTPAGE.FULLNAMEINVALIDMESSAGE' | translate }}
-            </div>
+    </div>
+    <div *ngIf="signOp === 'up'" class="form-group form-floating mb-3">
+        <input type="text" class="form-control" id="inputFullName" formControlName="clientFullName"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            [attr.data-bs-title]="'CLIENTPAGE.HELPBLOCKS.FULLNAME' | translate"
+        >
+        <label for="inputFullName" class="form-label text-wrap">{{ 'LOGINFORM.FULLNAMELABELTEXT' | translate }}</label>
+        <div class="alert alert-danger" *ngIf="signForm.controls['clientFullName'].invalid && signForm.controls['clientFullName'].touched">
+            {{ 'CLIENTPAGE.FULLNAMEINVALIDMESSAGE' | translate }}
         </div>
-        <div *ngIf="signOp === 'up'" class="form-group form-floating mb-3">
-            <input type="email" class="form-control" id="inputEmail" formControlName="clientEmail">
-            <label for="inputEmail" class="form-label">Email</label>
-            <div class="alert alert-danger" *ngIf="signForm.controls['clientEmail'].invalid && signForm.controls['clientEmail'].touched">
-                {{ 'CLIENTPAGE.EMAILINVALIDMESSAGE' | translate }}
-            </div>
+    </div>
+    <div *ngIf="signOp === 'up'" class="form-group form-floating mb-3">
+        <input type="email" class="form-control" id="inputEmail" formControlName="clientEmail">
+        <label for="inputEmail" class="form-label text-wrap">Email</label>
+        <div class="alert alert-danger" *ngIf="signForm.controls['clientEmail'].invalid && signForm.controls['clientEmail'].touched">
+            {{ 'CLIENTPAGE.EMAILINVALIDMESSAGE' | translate }}
         </div>
-        <div class="form-group text-center">
-            <button class="btn btn-primary" [disabled]="signForm.invalid">
-                {{signOp === 'up' ? 'Зарегистрироваться': 'Войти'}} 
-            </button>
-            <div class="mt-2">
-                <span *ngIf="signOp === 'up'; else signInSpan" class="fw-bold">
-                    {{ 'CLIENTPAGE.ACCOUNTHAVEMESSAGES.HAVE' | translate }}
-                    (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                        {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
+    </div>
+    <div class="form-group d-flex flex-column flex-wrap justify-content-center align-content-center">
+        <button class="btn btn-primary" [disabled]="signForm.invalid">
+            {{signOp === 'up' ? 'CLIENTMENU.SIGNUPTEXT': 'CLIENTMENU.SIGNINTEXT' | translate }} 
+        </button>
+        <div class="mt-2 text-center">
+            <span *ngIf="signOp === 'up'; else signInSpan" class="fw-bold">
+                {{ 'CLIENTPAGE.ACCOUNTHAVEMESSAGES.HAVE' | translate }}
+                (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                    {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
+                </a>)
+            </span>
+            <ng-template #signInSpan>  
+                <span class="fw-bold">
+                    {{ 'CLIENTPAGE.ACCOUNTHAVEMESSAGES.HAVENT' | translate }} 
+                    (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" routerLink="/signUp" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                        {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
                     </a>)
                 </span>
-                <ng-template #signInSpan>  
-                    <span class="fw-bold">
-                        {{ 'CLIENTPAGE.ACCOUNTHAVEMESSAGES.HAVENT' | translate }} 
-                        (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" routerLink="/signUp" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                            {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
-                        </a>)
-                    </span>
-                </ng-template>
-            </div>
+            </ng-template>
         </div>
-    </form>
-</div>
+    </div>
+</form>
 <ng-template #appModal></ng-template>

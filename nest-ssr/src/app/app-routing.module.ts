@@ -4,17 +4,19 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
 import { AdminPanelComponent } from './components/admin-panel/admin-panel.component';
+import { AdminPanelOrdersControlComponent } from './components/admin-panel-orders-control/admin-panel-orders-control.component';
 import { ClientComponent } from './components/client/client.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 
 import { ClientGuard } from './guards/client/client.guard';
 
-const routes: Routes = [
+export const routes: Routes = [
     { path: 'home', component: HomeComponent },
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'gallery/:photographyType', component: GalleryComponent },
     { path: 'gallery', redirectTo: '/gallery/children', pathMatch: 'full' },
     { path: 'adminPanel', component: AdminPanelComponent, canActivate: [ClientGuard] },
+    { path: 'adminPanel/ordersControl', component: AdminPanelOrdersControlComponent, canActivate: [ClientGuard] },
     { path: 'sign/:op', component: ClientComponent },
     { path: 'signUp', redirectTo: '/sign/up', pathMatch: 'full' },
     { path: 'signIn', redirectTo: '/sign/in', pathMatch: 'full' },

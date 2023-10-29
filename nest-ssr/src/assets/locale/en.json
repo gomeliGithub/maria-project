@@ -4,6 +4,7 @@
 		"HOME": "Home",
 		"GALLERY": "Gallery",
 		"ADMINPANEL": "Admin panel",
+		"ADMINPANELORDERSCONTROL": "Orders control",
 		"SIGNUP": "Sign up",
 		"SIGNIN": "Sign in",
 		"NOTFOUND": "Not Found"
@@ -16,7 +17,12 @@
 	"GALLERYPAGE": {
 		"HEADERTITLE": "Photo gallery",
 		"ORDERBUTTONTEXT": "Order a photo session",
-		"DOWNLOADORIGINALIMAGEBUTTONTEXT": "Download original"
+		"DOWNLOADORIGINALIMAGEBUTTONTEXT": "Download original",
+		"HELPBLOCKS": {
+			"CLIENTPHONENUMBER": "Your phone number in developing format.",
+			"COMMENT": "Your comment or request for your order."
+		},
+		"CLIENTORDERSUCCESSMESSAGE": "The order has been sent successfully. I will contact you shortly"
 	},
 	"CLIENTPAGE": {
 		"LOGININVALIDMESSAGE": "Incorrect login",
@@ -47,12 +53,20 @@
     },
     "LOGINFORM": {
 		"TITLE": "Sign In",
-        "LOGINLABELTEXT": "Login",
-		"PASSWORDLABELTEXT": "Password",
-		"FULLNAMELABELTEXT": "Full name",
+        "LOGINLABELTEXT": "Login *",
+		"PASSWORDLABELTEXT": "Password *",
+		"FULLNAMELABELTEXT": "Full name *",
 		"NOLOGINTEXT": "Login not specified",
 		"NOPASSWORDTEXT": "Password not specified",
 		"CONFIRMBUTTONCAPTIONTEXT": "Sign In"
+	},
+	"SENDORDERFORM": {
+		"ORDERTYPETEXT": "Order type *",
+		"CLIENTPHONENUMBERTEXT": "Phone number *",
+		"COMMENTTEXT": "Comment or wish",
+		"ORDERTYPEINVALIDMESSAGE": "Incorrect order type",
+		"CLIENTPHONENUMBERINVALIDMESSAGE": "Incorrect phone number",
+		"SUBMITBUTTONTEXT": "Send order"
 	},
 	"MODAL": {
 		"SUCCESSTITLE": "Success",
@@ -75,6 +89,8 @@
 		"BOOLEANTRUETEXT": "Yes",
 		"BOOLEANFALSETEXT": "No",
 		"NOIMAGESMESSAGE": "No images uploaded yet",
+		"NOCLIENTORDERSMESSAGE": "No new orders yet",
+		"NOCLIENTWITHNEWORDERSMESSAGE": "There are no clients with new orders yet",
 		"DELETEIMAGESUCCESSMESSAGE": "Image deleted successfully",
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Maximum number of images on the home page",
 		"TABLECAPTION": "Image management",
@@ -89,6 +105,14 @@
 			"ONHOMEPAGE": "Displayed on Home page",
 			"ONGALLERYPAGE": "Displayed on Gallery page"
 		},
+		"CLIENTORDERSTABLECOLTITLES": {
+			"IMAGEPHOTOGRAPHYTYPE": "Photography type",
+			"TYPE": "Order type",
+			"CLIENTPHONENUMBER": "Client phone number",
+			"CLIENTCOMMENT": "Additional information from the client",
+			"CREATEDDATE": "Created date"
+		},
+		"CLIENTORDERSTABLECHANGESTATUSBUTTONTEXT": "Mark as processed",
 		"IMAGECONTROLTEXT": {
 			"TITLE": "Control",
 			"CHANGEBUTTON": "Change Photography type or description",
@@ -111,8 +135,8 @@
 			"CHANGEBUTTON": "Change"
 		},
 		"UPLOADIMAGETEXT": {
-			"PHOTOGRAPHYTYPE": "Photography type",
-			"VIEWSIZETYPE": "",
+			"PHOTOGRAPHYTYPE": "Photography type *",
+			"VIEWSIZETYPE": "View size type *",
 			"INVALIDPHOTOGRAPHYTYPE": "Photography type not selected",
 			"INVALIDVIEWSIZETYPE": "View size not selected",
 			"INVALIDSELECTIMAGE": "No image selected",
@@ -146,11 +170,18 @@
 		"MEDIUM": "Medium",
 		"BIG": "Big"
 	},
+	"CLIENTORDERTYPES": {
+		"CONSULTATION": "Consultation",
+		"FULL": "Full"
+	},
+	"CLIENTORDERSTATUSES": {
+		"NEW": "New",
+		"PROCESSED": "Processed"
+	},
     "PROGRESSBAR": {
 		"TITLE": "Upload image..."
 	},
 	"SPINNERTITLES": {
-		"DELETEIMAGE": "Deleting an image...",
-		"DISPLAYIMAGE": "Display..."
+		"PROCESSING": "Processing..."
 	}
 }

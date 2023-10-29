@@ -33,7 +33,7 @@
         <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i = index" 
             class="border-0 position-relative h-100 mw-100 me-3 ms-3 imagesContainer"
             (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
-            (mouseleave)="stopMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
+            (mouseleave)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
         >
             <div class="h-100 mw-100" [attr.index-number]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
                 (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"

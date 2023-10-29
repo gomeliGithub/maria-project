@@ -63,4 +63,22 @@ export class ClientController {
         
         return this.clientService.changeLocale(request, requestBody.sign.newLocale, response);
     }
+
+    @Post('/createOrder')
+    @ClientTypes('member')
+    public async createOrder (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
+        const phoneNumberPattern: RegExp = /(?:\+|\d)[\d\-\(\) ]{9,}\d/;
+
+        if ( !requestBody.client || !requestBody.client.imagePhotographyType || !this.appService.imagePhotographyTypes.includes(requestBody.client.imagePhotographyType)
+            || !requestBody.client.orderType || !requestBody.client.clientPhoneNumber
+            || typeof requestBody.client.orderType !== 'string' || requestBody.client.orderType === '' 
+            || !this.appService.clientOrderTypes.includes(requestBody.client.orderType)
+            || !phoneNumberPattern.test(requestBody.client.clientPhoneNumber)
+            || requestBody.client.comment && (typeof requestBody.client.comment !== 'string' 
+                || requestBody.client.comment === '' || requestBody.client.comment.length > 30
+            )
+        ) throw new BadRequestException();
+
+        return this.clientService.createOrder(request, requestBody);
+    }
 }

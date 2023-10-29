@@ -1,11 +1,12 @@
-import { Controller, Get, Req, Post, Body, BadRequestException, Put } from '@nestjs/common';
+import { Controller, Get, Req, Post, Body, BadRequestException, Put, Query } from '@nestjs/common';
 
 import { AppService } from '../../app.service';
 import { AdminPanelService } from '../../services/admin-panel/admin-panel.service';
 
 import { ClientTypes } from '../../decorators/client.types.decorator';
 
-import { IFullCompressedImageData, IRequest, IRequestBody } from 'types/global';
+import { IClientOrdersInfoData, IFullCompressedImageData, IRequest, IRequestBody } from 'types/global';
+import { IClientOrder } from 'types/models';
 
 @Controller('/admin-panel')
 export class AdminPanelController {
@@ -43,6 +44,45 @@ export class AdminPanelController {
     @ClientTypes('admin')
     async getFullCompressedImagesList (@Req() request: IRequest): Promise<IFullCompressedImageData> {
         return this.adminPanelService.getFullCompressedImagesList(request);
+    }
+
+    @Get('/getClientOrders')
+    @ClientTypes('admin')
+    async getClientOrders (@Req() request: IRequest, @Query() options: {}): Promise<IClientOrdersInfoData[] | IClientOrder[]> {
+        const memberLogin: string = options['memberLogin'] ? (options['memberLogin'] as string).trim() : null;
+        const fromDate: Date = options['fromDate'] ? new Date(options['fromDate']) : null;
+        const untilDate: Date = options['untilDate'] ? new Date(options['untilDate']) : null;
+        const status: string = options['status'] ? (options['status'] as string).trim() : null;
+        const ordersLimit: number = options['ordersLimit'] ? parseInt(options['ordersLimit'], 10) : null;
+        const existsCount: number = options['existsCount'] ? parseInt(options['existsCount'], 10) : null;
+
+        if ( memberLogin && memberLogin === ''
+            || fromDate && fromDate.toString() === 'Invalid Date' 
+            || untilDate && untilDate.toString() === 'Invalid Date'
+            || status && (status === '' || !this.appService.clientOrdersStatuses.includes(status))
+            || ordersLimit && (Number.isNaN(ordersLimit) || ordersLimit > 15)
+            || existsCount && Number.isNaN(existsCount)
+        ) throw new BadRequestException();
+
+        return this.adminPanelService.getClientOrders(request, {
+            memberLogin,
+            fromDate,
+            untilDate,
+            status,
+            ordersLimit,
+            existsCount
+        });
+    }
+
+    @Put('/changeClientOrderStatus')
+    @ClientTypes('admin')
+    async changeClientOrderStatus (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
+        if ( !requestBody.adminPanel.clientOrderId || !requestBody.adminPanel.clientLogin
+            || typeof requestBody.adminPanel.clientOrderId !== 'number' 
+            || typeof requestBody.adminPanel.clientLogin !== 'string' || requestBody.adminPanel.clientLogin === ''
+        ) throw new BadRequestException();
+
+        return this.adminPanelService.changeClientOrderStatus(request, requestBody);
     }
 
     @Post('/deleteImage')

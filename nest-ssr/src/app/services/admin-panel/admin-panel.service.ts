@@ -1,5 +1,5 @@
 import { ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { FormControl, FormGroup } from '@angular/forms';
 
 import { Observable, map } from 'rxjs';
@@ -11,8 +11,9 @@ import { WebSocketService } from '../web-socket/web-socket.service';
 
 import { environment } from '../../../environments/environment';
 
-import { IFullCompressedImageData } from 'types/global';
-import { IModalRef } from 'types/options';
+import { IClientOrdersInfoData, IFullCompressedImageData } from 'types/global';
+import { IGetClientOrdersOptions, IModalRef } from 'types/options';
+import { IClientOrder } from 'types/models';
 
 @Injectable({
     providedIn: 'root'
@@ -31,6 +32,63 @@ export class AdminPanelService {
         const headers: HttpHeaders = this.appService.createRequestHeaders();
 
         return this.http.get('/api/admin-panel/getFullCompressedImagesList', { headers, withCredentials: true }).pipe(map(imagesList => imagesList)) as Observable<IFullCompressedImageData>;
+    }
+
+    public getClientOrders (): Observable<IClientOrdersInfoData[]>
+    public getClientOrders (options?: IGetClientOrdersOptions): Observable<IClientOrder[]>
+    public getClientOrders (options?: IGetClientOrdersOptions): Observable<IClientOrdersInfoData[] | IClientOrder[]> {
+        const headers: HttpHeaders = this.appService.createRequestHeaders();
+
+        let params = new HttpParams();
+
+        if ( options ) {
+            params = params.append('memberLogin', options.memberLogin ?? '');
+            params = params.append('fromDate', options.fromDate ? options.fromDate.toDateString() : '');
+            params = params.append('untilDate', options.untilDate ? options.untilDate.toDateString() : '');
+            params = params.append('status', options.status ?? '');
+            params = params.append('existsCount', options.existsCount ?? '');
+            params = params.append('ordersLimit', options.ordersLimit ?? '');
+        }
+
+        return this.http.get<IClientOrdersInfoData[] | IClientOrder[]>('/api/admin-panel/getClientOrders', { params, headers, withCredentials: true }).pipe(map(data => {
+            if ( options ) {
+                data = (data as IClientOrdersInfoData[]).map(clientOrder => {
+                    Object.keys(clientOrder).forEach(field => {
+                        if ( field === 'createdDate') clientOrder[field] = new Date(clientOrder[field]);
+                        if ( field === 'photographyType' ) switch ( clientOrder[field] ) {
+                            case 'individual': { clientOrder[field] = this.appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL'); break; }
+                            case 'children': { clientOrder[field] = this.appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.CHILDREN'); break; }
+                            case 'wedding': { clientOrder[field] = this.appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.WEDDING'); break; }
+                            case 'family': { clientOrder[field] = this.appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.FAMILY'); break; }
+                            case 'event': { clientOrder[field] = this.appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.EVENT'); break; }
+                        }
+                        if ( field === 'type') {
+                            switch ( clientOrder[field] ) {
+                                case 'consultation': { clientOrder[field] = this.appService.getTranslations('CLIENTORDERTYPES.CONSULTATION'); break; }
+                                case 'full': { clientOrder[field] = this.appService.getTranslations('CLIENTORDERTYPES.FULL'); break; }
+                            }
+                        }
+                        if ( field === 'status' ) switch ( clientOrder[field] ) {
+                            case 'new': { clientOrder[field] = this.appService.getTranslations('CLIENTORDERSTATUSES.NEW'); break; }
+                            case 'processed': { clientOrder[field] = this.appService.getTranslations('CLIENTORDERSTATUSES.PROCESSED'); break; }
+                        }
+                    });
+
+                    return clientOrder;
+                });
+            }
+
+            return data;
+        }));
+    }
+
+    public changeClientOrderStatus (clientOrderId: number, clientLogin: string): Observable<void> {
+        const headers: HttpHeaders = this.appService.createRequestHeaders();
+        
+        return this.http.put<void>('/api/admin-panel/changeClientOrderStatus', { adminPanel: {
+            clientOrderId,
+            clientLogin
+        }} , { headers, withCredentials: true });
     }
 
     public uploadImage (formFile: File, uploadImageForm: FormGroup<{

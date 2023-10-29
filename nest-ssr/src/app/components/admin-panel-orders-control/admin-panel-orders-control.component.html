@@ -1,0 +1,57 @@
+<div *ngIf="clientOrdersInfoData" class="d-flex flex-row justify-content-center align-items-center flex-wrap w-75">
+    <div *ngFor="let orderInfoData of clientOrdersInfoData; let i = index" class="" [ngClass]="{ 'me-3': i !== clientOrdersInfoData.length - 1 }">
+        <button type="button" class="btn btn-primary position-relative" [attr.client-login]="orderInfoData.login" (click)="getClientOrders($event)" #getClientOrdersButton>
+            {{ orderInfoData.login }}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ orderInfoData.ordersCount }}
+                <span class="visually-hidden">unprocessing orders</span>
+            </span>
+        </button>
+    </div>
+</div>
+<div *ngIf="clientOrders; else noContentBlock2" class="w-100 table-responsive">
+    <table class="table table-borderless table-hover text-center align-middle">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">{{ 'ADMINPANEL.CLIENTORDERSTABLECOLTITLES.IMAGEPHOTOGRAPHYTYPE' | translate }}</th>
+                <th scope="col">{{ 'ADMINPANEL.CLIENTORDERSTABLECOLTITLES.TYPE' | translate }}</th>
+                <th scope="col">{{ 'ADMINPANEL.CLIENTORDERSTABLECOLTITLES.CLIENTPHONENUMBER' | translate }}</th>
+                <th scope="col">{{ 'ADMINPANEL.CLIENTORDERSTABLECOLTITLES.CLIENTCOMMENT' | translate }}</th>
+                <th scope="col">{{ 'ADMINPANEL.CLIENTORDERSTABLECOLTITLES.CREATEDDATE' | translate }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let clientOrder of clientOrders; let i = index" class="" [attr.order-id]="clientOrder.id" #clientOrder>
+                <th scope="row" class="p-4">{{ i + 1 }}</th>
+                <td class="p-4">{{ clientOrder.photographyType }}</td>
+                <td class="p-4">{{ clientOrder.type }}</td>
+                <td class="w-25 p-4">{{ clientOrder.phoneNumber }}</td>
+                <td class="p-4">{{ clientOrder.comment }}</td>
+                <td class="p-4">{{ clientOrder.createdDate | date:"d/M/yy, H:mm" }}</td>
+                <td class="p-4">
+                    <button class="btn btn-secondary btn-sm" type="button" (click)="changeClientOrderStatus($event)">
+                        {{ 'ADMINPANEL.CLIENTORDERSTABLECHANGESTATUSBUTTONTEXT' | translate }}
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<ng-template #noContentBlock>  
+    <div class="text-center text-danger fs-4 p-4">
+        <span class="fw-bold">{{ 'ADMINPANEL.NOCLIENTWITHNEWORDERSMESSAGE' | translate }}</span>
+    </div>
+</ng-template>
+<ng-template #noContentBlock2>  
+    <div class="text-center text-danger fs-4 p-4">
+        <span class="fw-bold">
+            {{ 'ADMINPANEL.NOCLIENTORDERSMESSAGE' | translate }}
+        </span>
+    </div>
+</ng-template>
+<div class="d-flex align-items-center visually-hidden" [ngClass]="{ 'visually-hidden': spinnerHidden }">
+    <strong class="text-info fs-4" role="status">{{ 'SPINNERTITLES.PROCESSING' | translate }}</strong>
+    <div class="spinner-border text-info ms-auto" aria-hidden="true"></div>
+</div>
+<ng-template #appModal></ng-template>

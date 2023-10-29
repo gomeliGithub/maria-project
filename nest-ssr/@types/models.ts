@@ -55,3 +55,13 @@ export interface IImagePhotographyType {
     description?: string;
     originalImageName?: string;
 }
+
+export interface IClientOrder {
+    id?: number;
+    photographyType: string;
+    type: string;
+    phoneNumber: string;
+    comment?: string;
+    createdDate: Date;
+    status?: string;
+}

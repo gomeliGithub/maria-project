@@ -110,6 +110,7 @@ export class Member extends Model {
     email: string;
 
     @Default(sequelize.literal('CURRENT_TIMESTAMP'))
+    @AllowNull(false)
     @CreatedAt
     @Column({ 
         type: DataType.DATE
@@ -128,8 +129,8 @@ export class Member extends Model {
     })
     lastActiveDate: Date;
 
-    @HasMany(() => ClientCompressedImage)
-    compressedImages: ClientCompressedImage[];
+    @HasMany(() => ClientOrder)
+    clientOrders: ClientOrder[];
 }
 
 @Table({
@@ -214,18 +215,8 @@ export class ClientCompressedImage extends Model {
     })
     adminLoginId: number;
 
-    @ForeignKey(() => Member)
-    @AllowNull(true)
-    @Column({
-        type: DataType.INTEGER
-    })
-    memberLoginId: number;
-
     @BelongsTo(() => Admin)
     admin: Admin;
-
-    @BelongsTo(() => Member)
-    member: Member;
 }
 
 @Table({
@@ -250,4 +241,65 @@ export class ImagePhotographyType extends Model {
         type: DataType.STRING
     })
     originalImageName: string;
+}
+
+@Table({
+    timestamps: false
+})
+export class ClientOrder extends Model {
+    @PrimaryKey
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.BIGINT.UNSIGNED
+    })
+    id: number;
+
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.STRING
+    })
+    photographyType: string;
+
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.STRING
+    })
+    type: string;
+
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.STRING
+    })
+    phoneNumber: string;
+
+    @AllowNull(true)
+    @Column({ 
+        type: DataType.STRING
+    })
+    comment: string;
+
+    @Default(sequelize.literal('CURRENT_TIMESTAMP'))
+    @AllowNull(false)
+    @CreatedAt
+    @Column({ 
+        type: DataType.DATE
+    })
+    createdDate: Date;
+
+    @Default('new')
+    @AllowNull(false)
+    @Column({ 
+        type: DataType.STRING
+    })
+    status: string;
+
+    @ForeignKey(() => Member)
+    @AllowNull(true)
+    @Column({
+        type: DataType.INTEGER
+    })
+    memberLoginId: number;
+
+    @BelongsTo(() => Member)
+    member: Member;
 }

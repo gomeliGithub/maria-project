@@ -59,7 +59,7 @@ export class ClientComponent implements OnInit {
         });
         
         if ( this.appService.checkIsPlatformBrowser() ) {
-            import('bootstrap').then(bootstrap => {
+            if ( this.signOp === 'up' ) import('bootstrap').then(bootstrap => {
                 const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
                 [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
             });

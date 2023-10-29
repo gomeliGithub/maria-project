@@ -23,7 +23,7 @@ body {
     width: 60% !important;
 }
 
-app-home, app-gallery, app-client, app-admin-panel, app-not-found {
+app-home, app-gallery, app-client, app-admin-panel, app-admin-panel-orders-control, app-not-found {
     height: 100% !important;
     width: 100% !important;
     position: relative !important;
@@ -40,12 +40,26 @@ app-home {
     overflow-x: hidden !important;
 }
 
-app-gallery {
+app-gallery, app-admin-panel-orders-control {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
+}
+
+app-admin-panel-orders-control {
+    justify-content: center !important;
+}
+
+app-gallery {
     padding: 1rem;
     height: auto !important;
+}
+
+app-client {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
 
 app-gallery, app-admin-panel {
@@ -58,9 +72,20 @@ app-admin-panel {
     padding: 1rem !important;
 }
 
+textarea {
+    resize: none;
+    height: 80px !important;
+}
+
 input.ng-touched.ng-invalid {
     border: solid red 2px;
 }
 input.ng-touched.ng-valid {
     border: solid green 2px;
+}
+
+.pointerEventsNone {
+    pointer-events: none;
+    overflow-y: hidden;
+    visibility: hidden;
 }

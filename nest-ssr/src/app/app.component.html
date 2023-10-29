@@ -9,7 +9,7 @@
             <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
             Mashulik
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" #navbarToggler
+        <button class="navbar-toggler" id="navbarTogglerButton" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" #navbarToggler
             aria-expanded="false" aria-label="Toggle navigation"
             [@navbar-toggler-icon-trigger]="navbarTogglerIconTriggerState"
             (click)="changeNavbarTogglerIconTriggerState()"
@@ -20,22 +20,22 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" routerLink="/" routerLinkActive="active"
+                <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                    <a class="nav-link active" aria-current="page" routerLink="/" (click)="navbarTogglerClick($event, true)"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
                         {{ 'PAGETITLES.HOME' | translate }}
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="/gallery" routerLinkActive="active"
+                <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                    <a class="nav-link" routerLink="/gallery" (click)="navbarTogglerClick($event, true)"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
                         {{ 'PAGETITLES.GALLERY' | translate }}
                     </a>
                 </li>
-                <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item">
-                    <a class="nav-link" routerLink="/adminPanel" routerLinkActive="active"
+                <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                    <a class="nav-link" routerLink="/adminPanel" (click)="navbarTogglerClick($event, true)"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
                         {{ 'PAGETITLES.ADMINPANEL' | translate }}
@@ -48,13 +48,13 @@
                         {{ 'CLIENTMENU.TITLE' | translate }}
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="clientMenuButton">
-                        <li *ngIf="!activeClientLogin">
-                            <a class="dropdown-item" routerLink="/signUp" routerLinkActive="active">
+                        <li *ngIf="!activeClientLogin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                            <a class="dropdown-item" routerLink="/signUp" (click)="navbarTogglerClick($event, true)">
                                 {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
                             </a>
                         </li>
-                        <li *ngIf="!activeClientLogin">
-                            <a class="dropdown-item" routerLink="/signIn" routerLinkActive="active">
+                        <li *ngIf="!activeClientLogin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                            <a class="dropdown-item" routerLink="/signIn" (click)="navbarTogglerClick($event, true)">
                                 {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
                             </a>
                         </li>

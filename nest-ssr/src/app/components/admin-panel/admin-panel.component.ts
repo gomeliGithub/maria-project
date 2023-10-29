@@ -76,7 +76,6 @@ export class AdminPanelComponent implements OnInit {
 
     public imagePhotographyTypes: IImagePhotographyType[];
 
-    public spinnerTitle: string;
     public spinnerHidden: boolean = true;
 
     ngOnInit (): void {
@@ -188,7 +187,6 @@ export class AdminPanelComponent implements OnInit {
             const originalImageName: string = deleteImageButton.getAttribute('originalImageName');
 
             if ( originalImageName ) {
-                this.spinnerTitle = this.appService.getTranslations('SPINNERTITLES.DELETEIMAGE');
                 this.spinnerHidden = false;
 
                 const headers: HttpHeaders = this.appService.createRequestHeaders();
@@ -215,7 +213,6 @@ export class AdminPanelComponent implements OnInit {
             const displayTargetPage: string = imageButton.getAttribute('targetPage');
 
             if ( originalImageName && displayTargetPage ) {
-                this.spinnerTitle = this.appService.getTranslations('SPINNERTITLES.DISPLAYIMAGE');
                 this.spinnerHidden = false;
 
                 const headers: HttpHeaders = this.appService.createRequestHeaders();
@@ -282,7 +279,6 @@ export class AdminPanelComponent implements OnInit {
             const imagePhotographyType: string = imageButton.getAttribute('imagePhotographyType');
 
             if ( originalImageName && imagePhotographyType ) {
-                this.spinnerTitle = this.appService.getTranslations('SPINNERTITLES.DISPLAYIMAGE');
                 this.spinnerHidden = false;
 
                 const headers: HttpHeaders = this.appService.createRequestHeaders();

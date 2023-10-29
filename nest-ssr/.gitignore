@@ -65,3 +65,4 @@ Thumbs.db
 # Config
 /config
 .env.*
+mail_credentials.ts

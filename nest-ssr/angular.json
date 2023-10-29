@@ -31,9 +31,7 @@
                         ],
                         "scripts": [
                             "node_modules/hammerjs/hammer.min.js",
-                            "node_modules/@popperjs/core/dist/umd/popper.min.js",
-                            "node_modules/bootstrap/dist/js/bootstrap.min.js",
-                            "node_modules/jquery/dist/jquery.min.js"
+                            "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
                         ],
                         "allowedCommonJsDependencies": [
                             "bcryptjs"
@@ -54,7 +52,7 @@
                                 }
                             ],
                             "outputHashing": "all",
-                            "optimization": false,
+                            "optimization": true,
                             "sourceMap": false,
                             "namedChunks": false,
                             "extractLicenses": true,
@@ -114,9 +112,7 @@
                         ],
                         "scripts": [
                             "node_modules/hammerjs/hammer.min.js",
-                            "node_modules/@popperjs/core/dist/umd/popper.min.js",
-                            "node_modules/bootstrap/dist/js/bootstrap.min.js",
-                            "node_modules/jquery/dist/jquery.min.js"
+                            "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
                         ]
                     }
                 },
