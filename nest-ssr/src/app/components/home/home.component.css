@@ -15,9 +15,20 @@
     border-color: gray !important;
 }
 
+#discountsCarousel {
+    background-image: url('/assets/images_full/IMG_3378.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.sectionHorizontalRule {
+    border-width: 15px;
+}
+
 @media (max-width: 768px) {
     .imagePhotographyTypesGroup {
         flex-direction: column !important;
+        margin-bottom: 1rem !important;
     }
 
     .imagesContainer {
@@ -64,31 +75,52 @@
 }
 
 @media screen and (max-width: 576px) {
-    .carousel-item img {
+    #imagesCarousel .carousel-item img {
         min-height: 300px;
+    }
+    #discountsCarousel {
+        min-height: 120px;
     }
 }
 
 @media screen and (min-width: 576px) {
-    .carousel-item img {
+    #imagesCarousel .carousel-item img {
         max-height: 390px;
+    }
+    #discountsCarousel {
+        min-height: 200px;
     }
 }
 
 @media screen and (min-width: 735px) {
-    .carousel-item img {
+    #imagesCarousel .carousel-item img {
         max-height: 620px;
+    }
+    #discountsCarousel {
+        min-height: 200px;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .imagePhotographyTypesGroup {
+        margin-top: 1.5rem!important;
     }
 }
 
 @media screen and (min-width: 960px) {
-    .carousel-item img {
+    #imagesCarousel .carousel-item img {
         max-height: 700px;
+    }
+    #discountsCarousel {
+        min-height: 280px;
     }
 }
 
 @media screen and (min-width: 1400px) {
-    .carousel-item img {
+    #imagesCarousel .carousel-item img {
         max-height: 950px;
+    }
+    #discountsCarousel {
+        min-height: 280px;
     }
 }

@@ -191,7 +191,7 @@ export class ImageControlService {
             await fsPromises.unlink(currentCompressedImagePath);
 
             return true;
-        } catch (error) { console.log(error);
+        } catch {
             return false;
         }
     }

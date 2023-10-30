@@ -23,52 +23,81 @@
         <span class="visually-hidden">Next</span>
     </button>
 </div>
-<div class="p-5 mt-3 section">
-    <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
-</div> 
-<ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0">
-    <div *ngFor="let imagePhotographyTypesDataArr of imagePhotographyTypes; let i = index" 
-        class="d-flex flex-row justify-content-center align-items-center vh-70 w-100 imagePhotographyTypesGroup section"
-        [ngClass]="{
-            'border-bottom border-secondary': i !== imagePhotographyTypes.length - 1,
-            'border-top border-secondary': i !== 0 
-        }"
-    >
-        <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i = index" 
-            class="border-0 position-relative h-100 mw-100 me-3 ms-3 imagesContainer"
-            (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
-            (mouseleave)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
-        >
-            <div class="h-100 mw-100 text-center" [attr.index-number]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
-                (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
-                (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
-                [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
-            >
-                <small class="text-body-secondary">{{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i></small>
-                <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.originalImageName }}" 
-                    class="h-85 mw-100 object-fit-contain"
-                    [ngClass]="{ 'w-100': imagePhotographyTypesDataArr.length === 1 }"
-                >
-            </div>
-            <div class="position-absolute top-50 start-50 translate-middle w-50 linkButtonContainer">
-                <h5 class="text-center text-primary fw-bold text-break" [ngSwitch]="imagePhotographyTypeData.name">
-                    <ng-template ngSwitchCase="individual">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
-                    <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.CHILDREN' | translate }}</ng-template>
-                    <ng-template ngSwitchCase="wedding">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.WEDDING' | translate }}</ng-template>
-                    <ng-template ngSwitchCase="family">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.FAMILY' | translate }}</ng-template>
-                    <ng-template ngSwitchCase="event">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.EVENT' | translate }}</ng-template>
-                </h5>
-                <a [routerLink]="[ '/gallery', imagePhotographyTypeData.name ]" routerLinkActive="active" 
-                    class="btn btn-outline-info align-items-start justify-content-center icon-link icon-link-hover w-100" 
-                    tabindex="-1" role="button" aria-disabled="true"
-                >
-                    {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate | uppercase }} <i class="bi bi-arrow-right"></i>
-                </a>
-            </div>
+<div class="carousel slide w-100 my-5 section" id="discountsCarousel">
+    <div class="carousel-inner h-100 w-100">
+        <div class="carousel-item h-100 w-100 active">
+            <p class="row justify-content-center align-items-center h-100 h1 text-center">First</p>
+        </div>
+        <div class="carousel-item h-100 w-100">
+            <p class="row justify-content-center align-items-center h-100 h1 text-center">Second</p>
+        </div>
+        <div class="carousel-item h-100 w-100">
+            <p class="row justify-content-center align-items-center h-100 h1 text-center">Third</p>
         </div>
     </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#discountsCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#discountsCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+<div class="mt-5 w-100">
+    <hr class="sectionHorizontalRule"/>
+</div>
+<div class="p-5 mt-3 section">
+    <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
+</div>
+<div class="mt-5 w-100">
+    <hr class="w-100 sectionHorizontalRule"/>
+</div>
+<ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0">
+    <ng-template ngFor let-imagePhotographyTypesDataArr [ngForOf]="imagePhotographyTypes" let-i="index">
+        <div class="d-flex flex-row justify-content-center align-items-center vh-100 w-100 imagePhotographyTypesGroup section">
+            <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i2 = index" 
+                class="border-0 position-relative h-100 mw-100 me-3 ms-3 imagesContainer"
+                (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
+                (mouseleave)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
+            >
+                <div class="h-100 mw-100 text-center" [attr.index-number]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
+                    (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
+                    (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
+                    [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
+                >
+                    <small class="text-body-secondary">{{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i></small>
+                    <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.originalImageName }}" 
+                        class="h-85 mw-100 object-fit-contain"
+                        [ngClass]="{ 'w-100': imagePhotographyTypesDataArr.length === 1 }"
+                    >
+                </div>
+                <div class="position-absolute top-50 start-50 translate-middle w-50 linkButtonContainer">
+                    <h5 class="text-center text-primary fw-bold text-break" [ngSwitch]="imagePhotographyTypeData.name">
+                        <ng-template ngSwitchCase="individual">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
+                        <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.CHILDREN' | translate }}</ng-template>
+                        <ng-template ngSwitchCase="wedding">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.WEDDING' | translate }}</ng-template>
+                        <ng-template ngSwitchCase="family">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.FAMILY' | translate }}</ng-template>
+                        <ng-template ngSwitchCase="event">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.EVENT' | translate }}</ng-template>
+                    </h5>
+                    <a [routerLink]="[ '/gallery', imagePhotographyTypeData.name ]" routerLinkActive="active" 
+                        class="btn btn-outline-info align-items-start justify-content-center icon-link icon-link-hover w-100" 
+                        tabindex="-1" role="button" aria-disabled="true"
+                    >
+                        {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate | uppercase }} <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="i !== imagePhotographyTypes.length - 1" class="w-100">
+            <hr class="w-100 sectionHorizontalRule"/>
+        </div>
+    </ng-template>
 </ng-template>
-<div class="d-flex flex-column mt-5 vh-70 section" id="aboutSection">
+<div class="w-100">
+    <hr class="w-100 sectionHorizontalRule"/>
+</div>
+<div class="d-flex flex-column mt-5 vh-100 section" id="aboutSection">
     <div class="d-flex flex-row justify-content-center align-items-center h-100 mw-100" id="aboutContainer">
         <img src="/assets/images_full/1697474336253508.jpg" class="rounded mx-auto d-block object-fit-contain h-100 mw-100" id="aboutImage">
         <div class="d-flex flex-row align-items-center fw-semibold h-100 mw-100 vw-30">

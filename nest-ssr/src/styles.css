@@ -7,10 +7,6 @@ body {
     width: 100%;
 }
 
-.vh-70 {
-    height: 70vh !important;
-}
-
 .vw-95 {
     width: 95vw !important;
 }
@@ -36,12 +32,13 @@ app-home, app-gallery, app-client, app-admin-panel, app-admin-panel-orders-contr
 
 app-home {
     scroll-snap-type: y mandatory !important;
-    scroll-padding-top: 7vh !important;
+    scroll-padding-top: 8vh !important;
     overflow-y: scroll !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     overflow-x: hidden !important;
+    margin-bottom: 1.5rem !important;
 }
 
 app-gallery, app-admin-panel-orders-control {
