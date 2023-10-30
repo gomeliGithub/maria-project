@@ -28,6 +28,8 @@ export class ImageControlService {
         private readonly compressedImageModel: typeof ClientCompressedImage
     ) { }
 
+    public staticCompressedImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
+
     public async get (options: IСompressedImageGetOptions): Promise<ClientCompressedImage[]> {
         const findOptions: AssociationGetOptions = { where: [], raw: true }
 
@@ -170,18 +172,26 @@ export class ImageControlService {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const client: Admin = await commonServiceRef.getClients(request, clientLogin, { rawResult: false }) as Admin;
-        const compressedImage: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { name: path.basename(imagePath) } });
+        const compressedImage: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(imagePath) } });
 
         try {
-            const compressedImageName: string = `${path.basename(imagePath, path.extname(imagePath))}_thumb${ path.extname(imagePath) }`;
+            const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImage.name);
+            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImage.photographyType, compressedImage.name);
+            const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, clientLogin, compressedImage.name);
+
+            const currentCompressedImagePath: string = await commonServiceRef.getFulfilledAccessPath([
+                staticFilesHomeImagePath, 
+                staticFilesGalleryImagePath, 
+                compressedImageOriginalPath
+            ]);
 
             await client.$remove('compressedImages', compressedImage);
             await compressedImage.destroy();
             await fsPromises.unlink(imagePath);
-            await fsPromises.unlink(path.join(this.appService.clientCompressedImagesDir, clientLogin, compressedImageName));
+            await fsPromises.unlink(currentCompressedImagePath);
 
             return true;
-        } catch { 
+        } catch (error) { console.log(error);
             return false;
         }
     }

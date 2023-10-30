@@ -306,7 +306,8 @@ export class AdminPanelService {
 
         const compressedImages: ClientCompressedImage[] = await commonServiceRef.getCompressedImages({ 
             client,
-            find : { includeFields: [ 'originalName' ] }});
+            find : { includeFields: [ 'originalName' ] }
+        });
 
         const compressedImageInstance: ClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
 
@@ -317,6 +318,7 @@ export class AdminPanelService {
         const deleteImageResult: boolean = await commonServiceRef.deleteImage(request, originalImagePath, activeAdminLogin);
 
         if ( deleteImageResult ) return 'SUCCESS';
+        else throw new InternalServerErrorException()
     }
 
     public async changeImageDisplayTarget (request: IRequest, requestBody: IRequestBody): Promise<string> {
@@ -356,7 +358,7 @@ export class AdminPanelService {
 
         let newPath: string = '';
 
-        const oldPath: string = await this._getFulfilledAccessPath([
+        const oldPath: string = await this.getFulfilledAccessPath([
             compressedImageOriginalPath, 
             staticFilesHomeImagePath, 
             staticFilesGalleryImagePath
@@ -392,7 +394,7 @@ export class AdminPanelService {
             const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImage.photographyType, compressedImage.name);
             const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImage.name);
 
-            const currentPath: string = await this._getFulfilledAccessPath([
+            const currentPath: string = await this.getFulfilledAccessPath([
                 staticFilesHomeImagePath, 
                 staticFilesGalleryImagePath, 
                 compressedImageOriginalPath
@@ -430,7 +432,7 @@ export class AdminPanelService {
         let currentPath: string = '';
         const newPath: string = path.join(this.staticCompressedImagesDirPath, 'home', 'imagePhotographyTypes', compressedImage.name);
 
-        currentPath = await this._getFulfilledAccessPath([
+        currentPath = await this.getFulfilledAccessPath([
             compressedImageOriginalPath, 
             staticFilesHomeImagePath, 
             staticFilesGalleryImagePath
@@ -471,7 +473,7 @@ export class AdminPanelService {
                 return path.join(this.staticCompressedImagesDirPath, 'gallery', photographyType, compressedImageInstance.name);
             });
 
-            const existingPath: string = await this._getFulfilledAccessPath(galleryImagePaths);
+            const existingPath: string = await this.getFulfilledAccessPath(galleryImagePaths);
             const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageInstance.photographyType, compressedImageInstance.name);
 
             if ( existingPath !== staticFilesGalleryImagePath ) throw new InternalServerErrorException();
@@ -480,7 +482,7 @@ export class AdminPanelService {
         return originalImagePath;
     }
 
-    private async _getFulfilledAccessPath (paths: string[]): Promise<string> {
+    public async getFulfilledAccessPath (paths: string[]): Promise<string> {
         const accessResults = await Promise.allSettled(paths.map(path => fsPromises.access(path, fsPromises.constants.F_OK)));
 
         let fulfilledPath: string = null;

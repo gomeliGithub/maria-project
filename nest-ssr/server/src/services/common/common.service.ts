@@ -5,11 +5,13 @@ import sharp from 'sharp';
 import { ClientModule } from '../../modules/client.module';
 import { SignModule } from '../../modules/sign.module';
 import { ImageControlModule } from '../../modules/image-control.module';
+import { AdminPanelModule } from '../../modules/admin-panel.module';
 
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 import { SignService } from '../../services/sign/sign.service';
 import { ImageControlService } from '../../services/image-control/image-control.service';
+import { AdminPanelService } from '../admin-panel/admin-panel.service';
 
 import { Admin, Member, ClientCompressedImage } from '../../models/client.model';
 
@@ -91,6 +93,12 @@ export class CommonService {
         const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
 
         return imageControlServiceRef.checkFileExists(filePath);
+    }
+
+    async getFulfilledAccessPath (paths: string[]): Promise<string> {
+        const adminPanelServiceRef = await this.appService.getServiceRef(AdminPanelModule, AdminPanelService);
+
+        return adminPanelServiceRef.getFulfilledAccessPath(paths);
     }
 
     public async deleteImage (request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
