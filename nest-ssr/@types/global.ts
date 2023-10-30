@@ -1,7 +1,7 @@
 import { Request } from "express";
 
 import { IClientSignData } from "./sign";
-import { IClientCompressedImage } from "./models";
+import { IClientCompressedImage, IClientOrder } from "./models";
 
 export interface ICookieSerializeOptions {
     domain?: string;
@@ -101,8 +101,18 @@ export interface IImageAdditionalData {
 }
 
 export interface IClientOrdersInfoData {
+    infoData: IClientOrdersInfoDataArr[];
+    additionalOrdersInfoDataExists: boolean;
+}
+
+export interface IClientOrdersInfoDataArr {
     login: string;
     ordersCount: number;
+}
+
+export interface IClientOrdersData {
+    orders: IClientOrder[];
+    additionalOrdersExists: boolean;
 }
 
 export interface IComponentInfo {

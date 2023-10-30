@@ -1,7 +1,7 @@
 import { ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { Observable, forkJoin, map } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 
 import * as bcryptjs from 'bcryptjs';
@@ -119,7 +119,7 @@ export class ClientService {
     public signOut (): Observable<void> {
         const headers = this.appService.createRequestHeaders();
 
-        return this.http.put('/api/sign/out', { }, { headers: headers, withCredentials: true }).pipe(map((() => this.appService.reloadComponent(true)))) as Observable<void>;
+        return this.http.put<void>('/api/sign/out', { }, { headers: headers, withCredentials: true });
     }
 
     public changeClientLocale (newLocale: string) {

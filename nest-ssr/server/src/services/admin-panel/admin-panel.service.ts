@@ -15,9 +15,9 @@ import { CommonService } from '../common/common.service';
 
 import { Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder } from '../../models/client.model';
 
-import { IClientOrdersInfoData, IFullCompressedImageData, IImageAdditionalData, IRequest, IRequestBody} from 'types/global';
+import { IClientOrdersData, IClientOrdersInfoData, IClientOrdersInfoDataArr, IFullCompressedImageData, IImageAdditionalData, IRequest, IRequestBody} from 'types/global';
 import { IImageMeta, IPercentUploadedOptions, IWSMessage, IWebSocketClient } from 'types/web-socket';
-import { IClientCompressedImage, IClientOrder } from 'types/models';
+import { IClientCompressedImage } from 'types/models';
 import { IGetClientOrdersOptions } from 'types/options';
 
 @Injectable()
@@ -219,7 +219,7 @@ export class AdminPanelService {
         status?: string,
         ordersLimit?: number,
         existsCount?: number
-    }): Promise<IClientOrdersInfoData[]>
+    }): Promise<IClientOrdersInfoData>
     public async getClientOrders (request: IRequest, options: {
         memberLogin?: string,
         type?: string,
@@ -228,17 +228,19 @@ export class AdminPanelService {
         status?: string,
         ordersLimit?: number,
         existsCount?: number
-    }): Promise<IClientOrder[]>
-    public async getClientOrders (request: IRequest, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoData[] | IClientOrder[]> {
+    }): Promise<IClientOrdersData>
+    public async getClientOrders (request: IRequest, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoData | IClientOrdersData> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const client: Member = await commonServiceRef.getClients(request, options.memberLogin, { rawResult: false }) as Member;
 
+        if ( !options.status ) options.status = 'new';
         if ( !options.existsCount ) options.existsCount = 0;
+        if ( !options.ordersLimit ) options.ordersLimit = 2;
 
         const ordersFindOptions: FindOptions<any> = {
             where: { 
-                status: options.status ?? 'new',
+                status: options.status,
                 createdDate: {
                     [Op.gte]: options.fromDate ?? Date.now() - ms('7d'),
                     [Op.lte]: options.untilDate ?? literal('CURRENT_TIMESTAMP')
@@ -246,19 +248,34 @@ export class AdminPanelService {
             },
             attributes: { exclude: [ 'memberLoginId' ] },
             offset: options.existsCount,
-            limit: options.ordersLimit ?? 2,
+            limit: options.ordersLimit,
             order: [ [ 'createdDate', 'DESC' ] ],
             raw: true
         }
 
-        let clientOrdersInfoData: IClientOrdersInfoData[] = null;
-        let clientOrders: IClientOrder[] = null;
+        let clientOrdersInfoData: IClientOrdersInfoData = null;
+        let clientOrders: IClientOrdersData = null;
 
-        if ( client ) clientOrders = await client.$get('clientOrders', ordersFindOptions);
-        else {
-            if ( !clientOrdersInfoData ) clientOrdersInfoData = [];
+        if ( client ) {
+            const orders: ClientOrder[] = await client.$get('clientOrders', ordersFindOptions);
+            const commonOrdersCount: number = await client.$count('clientOrders', { where: { status: options.status }});
 
-            clientOrdersInfoData = await commonServiceRef.getClientOrdersInfo(request, 'all', options.existsCount);
+            clientOrders = {
+                orders: orders,
+                additionalOrdersExists: commonOrdersCount > options.existsCount + orders.length && commonOrdersCount > options.ordersLimit
+            }
+        } else {
+            const infoData: IClientOrdersInfoDataArr[] = await commonServiceRef.getClientOrdersInfo(request, 'all', {
+                status: options.status,
+                existsCount: options.existsCount,
+                ordersLimit: options.ordersLimit
+            });
+            const commonClientsCount: number = await this.memberModel.count();
+
+            clientOrdersInfoData = {
+                infoData: infoData,
+                additionalOrdersInfoDataExists: commonClientsCount > options.existsCount + infoData.length && commonClientsCount > options.ordersLimit 
+            }
         }
 
         return clientOrdersInfoData ?? clientOrders;

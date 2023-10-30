@@ -13,6 +13,7 @@
             aria-expanded="false" aria-label="Toggle navigation"
             [@navbar-toggler-icon-trigger]="navbarTogglerIconTriggerState"
             (click)="changeNavbarTogglerIconTriggerState()"
+            (click)="navbarTogglerClick($event)"
         >
             <span class="icon-bar top-bar d-block mb-1 border-1" [@top-bar-animation]="navbarTogglerIconTriggerState"></span>
             <span class="icon-bar middle-bar d-block mb-1 border-1" [@middle-bar-animation]="navbarTogglerIconTriggerState"></span>
@@ -34,16 +35,28 @@
                         {{ 'PAGETITLES.GALLERY' | translate }}
                     </a>
                 </li>
-                <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                    <a class="nav-link" routerLink="/adminPanel" (click)="navbarTogglerClick($event, true)"
-                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
+                <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item dropdown">
+                    <button class="nav-link dropdown-toggle" type="button" id="adminPanelMenuButton" data-bs-toggle="dropdown" aria-expanded="false" 
+                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }" (click)="menuClick($event, 'adminPanelMenuButton')"
                     >
-                        {{ 'PAGETITLES.ADMINPANEL' | translate }}
-                    </a>
+                    {{ 'PAGETITLES.ADMINPANEL.MAIN' | translate }}
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="adminPanelMenuButton">
+                        <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                            <a class="dropdown-item" routerLink="/adminPanel" (click)="navbarTogglerClick($event, true)">
+                                {{ 'PAGETITLES.ADMINPANEL.IMAGESCONTROL' | translate }}
+                            </a>
+                        </li>
+                        <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                            <a class="dropdown-item" routerLink="/adminPanel/ordersControl" (click)="navbarTogglerClick($event, true)">
+                                {{ 'PAGETITLES.ADMINPANEL.ORDERSCONTROL' | translate }}
+                            </a>
+                        </li>
+                    </ul>
                 </li>
                 <li class="nav-item dropdown">
                     <button class="nav-link dropdown-toggle" type="button" id="clientMenuButton" data-bs-toggle="dropdown" aria-expanded="false" 
-                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }" (click)="clientMenuClick($event)"
+                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }" (click)="menuClick($event, 'clientMenuButton')"
                     >
                         {{ 'CLIENTMENU.TITLE' | translate }}
                     </button>

@@ -3,8 +3,11 @@
 	"PAGETITLES": {
 		"HOME": "Главная",
 		"GALLERY": "Галерея",
-		"ADMINPANEL": "Панель администратора",
-		"ADMINPANELORDERSCONTROL": "Управление заказами",
+		"ADMINPANEL": {
+			"MAIN": "Панель администратора",
+			"IMAGESCONTROL": "Управление фото",
+			"ORDERSCONTROL": "Управление заказами"
+		},
 		"SIGNUP": "Регистрация",
 		"SIGNIN": "Вход",
 		"NOTFOUND": "Не найдено"
@@ -89,7 +92,14 @@
 		"BOOLEANFALSETEXT": "Нет",
 		"NOIMAGESMESSAGE": "Загруженных изображений пока нет",
 		"NOCLIENTORDERSMESSAGE": "Новых заказов пока нет",
-		"NOCLIENTWITHNEWORDERSMESSAGE": "Клиентов с новыми заказами пока нет",
+		"NOCLIENTORDERSMESSAGES": {
+			"NEWORDERS": "Новых заказов пока нет",
+			"PROCESSEDORDERS": "Обработанных заказов пока нет"
+		},
+		"NOCLIENTWITHNEWORDERSMESSAGES": {
+			"NEWORDERS": "Клиентов с новыми заказами пока нет",
+			"PROCESSEDORDERS": "Клиентов с обработанными заказами пока нет"
+		},
 		"DELETEIMAGESUCCESSMESSAGE": "Изображение успешно удалено",
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Максимальное количество изображений на главной странице",
 		"TABLECAPTION": "Управление изображениями",
@@ -112,6 +122,13 @@
 			"CREATEDDATE": "Дата создания"
 		},
 		"CLIENTORDERSTABLECHANGESTATUSBUTTONTEXT": "Отметить как обработанный",
+		"ADDITIONALCLIENTORDERSBUTTONTEXT": "Ещё заказы",
+		"ADDITIONALCLIENTORDERSINFODATABUTTONTEXT": "Ещё клиенты",
+		"CLIENTORDERSTABPANESTEXT": {
+			"NEW": "Новые заказы",
+			"PROCESSED": "Обработанные заказы"
+		},
+		"SELECTEDCLIENTTEXT": "Выбранный клиент: ",
 		"IMAGECONTROLTEXT": {
 			"TITLE": "Управление",
 			"CHANGEBUTTON": "Изменить тип съёмки или описание",

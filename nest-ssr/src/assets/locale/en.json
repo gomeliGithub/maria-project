@@ -3,8 +3,11 @@
 	"PAGETITLES": {
 		"HOME": "Home",
 		"GALLERY": "Gallery",
-		"ADMINPANEL": "Admin panel",
-		"ADMINPANELORDERSCONTROL": "Orders control",
+		"ADMINPANEL": {
+			"MAIN": "Admin panel",
+			"IMAGESCONTROL": "Images control",
+			"ORDERSCONTROL": "Orders control"
+		},
 		"SIGNUP": "Sign up",
 		"SIGNIN": "Sign in",
 		"NOTFOUND": "Not Found"
@@ -89,8 +92,17 @@
 		"BOOLEANTRUETEXT": "Yes",
 		"BOOLEANFALSETEXT": "No",
 		"NOIMAGESMESSAGE": "No images uploaded yet",
+
 		"NOCLIENTORDERSMESSAGE": "No new orders yet",
 		"NOCLIENTWITHNEWORDERSMESSAGE": "There are no clients with new orders yet",
+		"NOCLIENTORDERSMESSAGES": {
+			"NEWORDERS": "No new orders yet",
+			"PROCESSEDORDERS": "No processed orders yet"
+		},
+		"NOCLIENTWITHNEWORDERSMESSAGES": {
+			"NEWORDERS": "No clients with new orders yet",
+			"PROCESSEDORDERS": "No clients with processed orders yet"
+		},
 		"DELETEIMAGESUCCESSMESSAGE": "Image deleted successfully",
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Maximum number of images on the home page",
 		"TABLECAPTION": "Image management",
@@ -113,6 +125,13 @@
 			"CREATEDDATE": "Created date"
 		},
 		"CLIENTORDERSTABLECHANGESTATUSBUTTONTEXT": "Mark as processed",
+		"ADDITIONALCLIENTORDERSBUTTONTEXT": "More orders",
+		"ADDITIONALCLIENTORDERSINFODATABUTTONTEXT": "More clients",
+		"CLIENTORDERSTABPANESTEXT": {
+			"NEW": "New orders",
+			"PROCESSED": "Processed orders"
+		},
+		"SELECTEDCLIENTTEXT": "Selected client: ",
 		"IMAGECONTROLTEXT": {
 			"TITLE": "Control",
 			"CHANGEBUTTON": "Change Photography type or description",

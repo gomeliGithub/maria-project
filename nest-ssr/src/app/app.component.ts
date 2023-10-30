@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ComponentRef, ElementRef, HostListener, Inject, NgZone, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ComponentRef, ElementRef, HostListener, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
 
@@ -78,7 +78,6 @@ import { IClientLocale } from 'types/global';
 export class AppComponent implements OnInit, AfterViewInit {
     constructor (
         @Inject(DOCUMENT) private readonly document: Document,
-        private zone: NgZone,
         
         private readonly appService: AppService,
         private readonly clientService: ClientService,
@@ -119,13 +118,13 @@ export class AppComponent implements OnInit, AfterViewInit {
         });
     }
 
-    public async clientMenuClick (event: MouseEvent): Promise<void> {
+    public async menuClick (event: MouseEvent, menuButtonId: string): Promise<void> {
         const button: HTMLButtonElement = event.target as HTMLButtonElement;
 
         if ( !button.classList.contains('show') ) {
             const bootstrap = await import('bootstrap');
             
-            const menu = new bootstrap.Dropdown(this.document.getElementById('clientMenuButton'));
+            const menu = new bootstrap.Dropdown(this.document.getElementById(menuButtonId));
 
             menu.toggle();
         }
@@ -170,7 +169,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit (): void {
-        this.navbarTogglerElementRef.nativeElement.classList.add('collapsed');
+        // this.navbarTogglerElementRef.nativeElement.classList.add('collapsed');
     }
 
     public changeNavbarTogglerIconTriggerState (): void {
@@ -179,7 +178,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     public signOut (): Subscription {
         return this.clientService.signOut().subscribe({
-            next: response => response,
+            next: () => this.appService.reloadComponent(false, '/'),
             error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations('DEFAULTERRORMESSAGE')) 
         });
     }

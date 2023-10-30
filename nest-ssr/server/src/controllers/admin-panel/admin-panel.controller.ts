@@ -5,8 +5,7 @@ import { AdminPanelService } from '../../services/admin-panel/admin-panel.servic
 
 import { ClientTypes } from '../../decorators/client.types.decorator';
 
-import { IClientOrdersInfoData, IFullCompressedImageData, IRequest, IRequestBody } from 'types/global';
-import { IClientOrder } from 'types/models';
+import { IClientOrdersData, IClientOrdersInfoData, IFullCompressedImageData, IRequest, IRequestBody } from 'types/global';
 
 @Controller('/admin-panel')
 export class AdminPanelController {
@@ -48,7 +47,7 @@ export class AdminPanelController {
 
     @Get('/getClientOrders')
     @ClientTypes('admin')
-    async getClientOrders (@Req() request: IRequest, @Query() options: {}): Promise<IClientOrdersInfoData[] | IClientOrder[]> {
+    async getClientOrders (@Req() request: IRequest, @Query() options: {}): Promise<IClientOrdersInfoData | IClientOrdersData> {
         const memberLogin: string = options['memberLogin'] ? (options['memberLogin'] as string).trim() : null;
         const fromDate: Date = options['fromDate'] ? new Date(options['fromDate']) : null;
         const untilDate: Date = options['untilDate'] ? new Date(options['untilDate']) : null;

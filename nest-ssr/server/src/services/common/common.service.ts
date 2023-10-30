@@ -13,8 +13,8 @@ import { ImageControlService } from '../../services/image-control/image-control.
 
 import { Admin, Member, ClientCompressedImage } from '../../models/client.model';
 
-import { IClient, IClientOrdersInfoData, ICompressImageData, IRequest } from 'types/global';
-import { IClientGetOptions, ICreateImageDirsOptions, IGetActiveClientOptions, IСompressedImageGetOptions } from 'types/options';
+import { IClient, IClientOrdersInfoDataArr, ICompressImageData, IRequest } from 'types/global';
+import { IClientGetOptions, ICreateImageDirsOptions, IGetActiveClientOptions, IGetClientOrdersOptions, IСompressedImageGetOptions } from 'types/options';
 import { IWebSocketClient } from 'types/web-socket';
 import { IImagePhotographyType } from 'types/models';
 
@@ -36,14 +36,14 @@ export class CommonService {
         return clientServiceRef.get(request, loginList, options);
     }
 
-    public async getClientOrdersInfo (request: IRequest, loginList: string, existsCount: number, limitClients?: number): Promise<IClientOrdersInfoData>
-    public async getClientOrdersInfo (request: IRequest, loginList: string[], existsCount: number, limitClients?: number): Promise<IClientOrdersInfoData[]>
-    public async getClientOrdersInfo (request: IRequest, loginList: 'all', existsCount: number, limitClients?: number): Promise<IClientOrdersInfoData[]>
-    public async getClientOrdersInfo (request: IRequest, loginList: string | string[], existsCount: number, limitClients?: number): Promise<IClientOrdersInfoData[]>
-    public async getClientOrdersInfo (request: IRequest, loginList: string | string[], existsCount: number, limitClients: number = 2): Promise<IClientOrdersInfoData | IClientOrdersInfoData[]> {
+    public async getClientOrdersInfo (request: IRequest, loginList: string, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr>
+    public async getClientOrdersInfo (request: IRequest, loginList: string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (request: IRequest, loginList: 'all', options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (request: IRequest, loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (request: IRequest, loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[]> {
         const clientServiceRef = await this.appService.getServiceRef(ClientModule, ClientService);
 
-        return clientServiceRef.getClientOrdersInfo(request, loginList, existsCount, limitClients);
+        return clientServiceRef.getClientOrdersInfo(request, loginList, options);
     }
 
 

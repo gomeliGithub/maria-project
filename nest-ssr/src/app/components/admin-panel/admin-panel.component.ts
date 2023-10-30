@@ -80,7 +80,7 @@ export class AdminPanelComponent implements OnInit {
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
-            this.appService.getTranslations('PAGETITLES.ADMINPANEL', true).subscribe(translation => this.appService.setTitle(translation));
+            this.appService.getTranslations('PAGETITLES.ADMINPANEL.IMAGESCONTROL', true).subscribe(translation => this.appService.setTitle(translation));
 
             this.adminPanelService.getFullCompressedImagesData().subscribe({
                 next: imagesList => {
@@ -95,6 +95,16 @@ export class AdminPanelComponent implements OnInit {
                 error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
             });
         }
+    }
+
+    public tableDropdownToggle (event: MouseEvent): void {
+        const target: HTMLButtonElement = event.target as HTMLButtonElement;
+
+        import('bootstrap').then(bootstrap => {
+            const dropdown = new bootstrap.Dropdown(target);
+
+            dropdown.toggle();
+        });
     }
 
     public fileChange (event: any): void {

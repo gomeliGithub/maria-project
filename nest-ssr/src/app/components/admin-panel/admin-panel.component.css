@@ -1,0 +1,5 @@
+@media (max-width: 768px) {
+    #uploadImageContainer form {
+        width: 100% !important;
+    }
+}

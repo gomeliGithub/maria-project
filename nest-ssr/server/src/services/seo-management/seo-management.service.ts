@@ -10,14 +10,17 @@ import { IComponentInfo } from 'types/global';
 
 @Injectable()
 export class SeoManagementService {
-    constructor (private readonly appService: AppService) { }
+    constructor (
+        private readonly appService: AppService
+    ) { }
 
     public routes = [
         { url: '/home', componentFileName: 'home.component.html' },
         { url: '/', componentFileName: 'home.component.html' },
         { url: '/gallery', componentFileName: 'gallery.component.html'},
         { url: '/adminPanel', componentFileName: 'admin-panel.component.html'},
-        { url: '/adminPanel/seo', componentFileName: 'admin-panel-seo.component.html'},
+        { url: '/adminPanel/imagesControl', componentFileName: 'admin-panel.component.html'},
+        { url: '/adminPanel/ordersControl', componentFileName: 'admin-panel-orders-control.component.html'},
         { url: '/signUp', componentFileName: 'client.component.html'},
         { url: '/signIn', componentFileName: 'client.component.html'}
     ]

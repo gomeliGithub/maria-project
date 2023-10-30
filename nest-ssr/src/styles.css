@@ -66,11 +66,12 @@ app-client {
     align-items: center !important;
 }
 
-app-gallery, app-admin-panel {
+app-gallery, app-admin-panel, app-admin-panel-orders-control {
     margin-top: 3rem !important;
 }
 
 app-admin-panel {
+    height: auto !important;
     display: flex !important;
     flex-direction: column !important;
     padding: 1rem !important;

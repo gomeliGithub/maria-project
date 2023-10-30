@@ -6,7 +6,7 @@ import { ModalComponent } from '../modal/modal.component';
 import { AppService } from '../../app.service';
 import { AdminPanelService } from '../../services/admin-panel/admin-panel.service';
 
-import { IClientOrdersInfoData } from 'types/global';
+import { IClientOrdersInfoDataArr } from 'types/global';
 import { IClientOrder } from 'types/models';
 
 @Component({
@@ -30,23 +30,24 @@ export class AdminPanelOrdersControlComponent implements OnInit, AfterViewChecke
     @ViewChildren('clientOrder', { read: ElementRef<HTMLTableRowElement> }) private readonly clientOrderViewRefs: QueryList<ElementRef<HTMLTableRowElement>>;
     @ViewChildren('getClientOrdersButton', { read: ElementRef<HTMLButtonElement> }) private readonly getClientOrdersButtonViewRefs: QueryList<ElementRef<HTMLButtonElement>>;
 
-    public clientOrdersInfoData: IClientOrdersInfoData[];
+    public clientOrdersInfoData: IClientOrdersInfoDataArr[];
     public clientOrders: IClientOrder[];
+    public additionalOrdersExists: boolean = false;
+    public additionalOrdersInfoDataExists: boolean = false;
 
     public firstSelectClient: boolean = false;
 
+    public prevCurrentSelectedOrdersStatusType: string;
+    public currentSelectedOrdersStatusType: string = 'new';
     public currentSelectedClientLogin: string;
 
     public spinnerHidden: boolean = true;
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
-            this.appService.getTranslations('PAGETITLES.ADMINPANELORDERSCONTROL', true).subscribe(translation => this.appService.setTitle(translation));
+            this.appService.getTranslations('PAGETITLES.ADMINPANEL.ORDERSCONTROL', true).subscribe(translation => this.appService.setTitle(translation));
 
-            this.adminPanelService.getClientOrders().subscribe({
-                next: clientOrdersInfoData => this.clientOrdersInfoData = clientOrdersInfoData && clientOrdersInfoData.length !== 0 ? clientOrdersInfoData : null,
-                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
-            });
+            this.getClientOrdersInfo(true);
         }
     }
 
@@ -58,19 +59,65 @@ export class AdminPanelOrdersControlComponent implements OnInit, AfterViewChecke
         }
     }
 
-    public getClientOrders (event: MouseEvent): void {
-        const target: HTMLDivElement = event.target as HTMLDivElement;
+    public clientOrdersTabClick (event: MouseEvent): void {
+        const target: HTMLButtonElement = event.target as HTMLButtonElement;
+        const ordersType: string = target.getAttribute('orders-status-type');
 
-        const clientLogin: string = target.getAttribute('client-login');
-        const noIsCurrentClientSelected: boolean = this.getClientOrdersButtonViewRefs.some(button => button.nativeElement.getAttribute('client-login') !== clientLogin);
+        this.prevCurrentSelectedOrdersStatusType = this.currentSelectedOrdersStatusType;
+        this.currentSelectedOrdersStatusType = ordersType;
 
-        this.currentSelectedClientLogin = clientLogin;
+        this.additionalOrdersExists = false;
+        this.additionalOrdersInfoDataExists = false;
 
+        this.getClientOrdersInfo(true);
+        this.getClientOrders();
+    }
+
+    public getClientOrdersInfo (existsCountZero = false): void {
         this.adminPanelService.getClientOrders({ 
-            memberLogin: clientLogin,
-            existsCount: noIsCurrentClientSelected ? 0 : this.clientOrderViewRefs.length
+            status: this.currentSelectedOrdersStatusType,
+            ordersLimit: 2,
+            existsCount: existsCountZero || (existsCountZero && this.prevCurrentSelectedOrdersStatusType !== this.currentSelectedOrdersStatusType) ? 0 : this.getClientOrdersButtonViewRefs.length
         }).subscribe({
-            next: clientOrders => this.clientOrders = clientOrders && clientOrders.length !== 0 ? clientOrders : null,
+            next: clientOrdersInfoData => {
+                if ( !this.additionalOrdersInfoDataExists
+                    && (existsCountZero || this.prevCurrentSelectedOrdersStatusType !== this.currentSelectedOrdersStatusType) 
+                ) this.clientOrdersInfoData = clientOrdersInfoData.infoData && clientOrdersInfoData.infoData.length !== 0 ? clientOrdersInfoData.infoData : null;
+                else this.clientOrdersInfoData = this.clientOrdersInfoData.concat(clientOrdersInfoData.infoData);
+
+                this.additionalOrdersInfoDataExists = clientOrdersInfoData.additionalOrdersInfoDataExists;
+            },
+            error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+        });
+    }
+
+    public getClientOrders (event?: MouseEvent, existsCountZero = false): void {
+        const target: HTMLDivElement = event ? event.target as HTMLDivElement : null;
+
+        let clientLogin: string = null;
+
+        if ( existsCountZero ) {
+            clientLogin = target.getAttribute('client-login');
+
+            this.currentSelectedClientLogin = clientLogin;
+        }
+
+        if ( existsCountZero ) this.additionalOrdersExists = false;
+
+        this.adminPanelService.getClientOrders({
+            status: this.currentSelectedOrdersStatusType,
+            memberLogin: existsCountZero ? clientLogin : this.currentSelectedClientLogin,
+            ordersLimit: 2,
+            existsCount: existsCountZero || (existsCountZero && this.prevCurrentSelectedOrdersStatusType !== this.currentSelectedOrdersStatusType) ? 0 : this.clientOrderViewRefs.length
+        }).subscribe({
+            next: clientOrdersData => {
+                if ( !this.additionalOrdersExists
+                    && (existsCountZero || this.prevCurrentSelectedOrdersStatusType !== this.currentSelectedOrdersStatusType) 
+                ) this.clientOrders = clientOrdersData.orders && clientOrdersData.orders.length !== 0 ? clientOrdersData.orders : null;
+                else this.clientOrders = this.clientOrders.concat(clientOrdersData.orders);
+
+                this.additionalOrdersExists = clientOrdersData.additionalOrdersExists;
+            },
             error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
         });
     }

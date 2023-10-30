@@ -11,9 +11,8 @@ import { WebSocketService } from '../web-socket/web-socket.service';
 
 import { environment } from '../../../environments/environment';
 
-import { IClientOrdersInfoData, IFullCompressedImageData } from 'types/global';
+import { IClientOrdersData, IClientOrdersInfoData, IFullCompressedImageData } from 'types/global';
 import { IGetClientOrdersOptions, IModalRef } from 'types/options';
-import { IClientOrder } from 'types/models';
 
 @Injectable({
     providedIn: 'root'
@@ -34,9 +33,22 @@ export class AdminPanelService {
         return this.http.get('/api/admin-panel/getFullCompressedImagesList', { headers, withCredentials: true }).pipe(map(imagesList => imagesList)) as Observable<IFullCompressedImageData>;
     }
 
-    public getClientOrders (): Observable<IClientOrdersInfoData[]>
-    public getClientOrders (options?: IGetClientOrdersOptions): Observable<IClientOrder[]>
-    public getClientOrders (options?: IGetClientOrdersOptions): Observable<IClientOrdersInfoData[] | IClientOrder[]> {
+    public getClientOrders (options: {
+        fromDate?: Date,
+        untilDate?: Date,
+        status?: string,
+        ordersLimit?: number,
+        existsCount?: number
+    }): Observable<IClientOrdersInfoData>
+    public getClientOrders (options?: {
+        memberLogin: string,
+        fromDate?: Date,
+        untilDate?: Date,
+        status?: string,
+        ordersLimit?: number,
+        existsCount?: number
+    }): Observable<IClientOrdersData>
+    public getClientOrders (options?: IGetClientOrdersOptions): Observable<IClientOrdersInfoData | IClientOrdersData> {
         const headers: HttpHeaders = this.appService.createRequestHeaders();
 
         let params = new HttpParams();
@@ -50,9 +62,9 @@ export class AdminPanelService {
             params = params.append('ordersLimit', options.ordersLimit ?? '');
         }
 
-        return this.http.get<IClientOrdersInfoData[] | IClientOrder[]>('/api/admin-panel/getClientOrders', { params, headers, withCredentials: true }).pipe(map(data => {
-            if ( options ) {
-                data = (data as IClientOrdersInfoData[]).map(clientOrder => {
+        return this.http.get<IClientOrdersInfoData | IClientOrdersData>('/api/admin-panel/getClientOrders', { params, headers, withCredentials: true }).pipe(map(data => {
+            if ( options.memberLogin ) {
+                (data as IClientOrdersData).orders = (data as IClientOrdersData).orders.map(clientOrder => {
                     Object.keys(clientOrder).forEach(field => {
                         if ( field === 'createdDate') clientOrder[field] = new Date(clientOrder[field]);
                         if ( field === 'photographyType' ) switch ( clientOrder[field] ) {

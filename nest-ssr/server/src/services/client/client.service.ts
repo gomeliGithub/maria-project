@@ -18,8 +18,8 @@ import { MailService } from '../mail/mail.service';
 
 import { Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder } from '../../models/client.model';
 
-import { IClient, IClientOrdersInfoData, ICookieSerializeOptions, IGalleryCompressedImagesList, IReducedGalleryCompressedImages, IRequest, IRequestBody } from 'types/global';
-import { IClientGetOptions, IDownloadOriginalImageOptions } from 'types/options';
+import { IClient, IClientOrdersInfoDataArr, ICookieSerializeOptions, IGalleryCompressedImagesList, IReducedGalleryCompressedImages, IRequest, IRequestBody } from 'types/global';
+import { IClientGetOptions, IDownloadOriginalImageOptions, IGetClientOrdersOptions } from 'types/options';
 import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
 
 @Injectable()
@@ -99,18 +99,18 @@ export class ClientService {
         return clients;
     }
 
-    public async getClientOrdersInfo (request: IRequest, loginList: string, existsCount: number, limitClients?: number): Promise<IClientOrdersInfoData>
-    public async getClientOrdersInfo (request: IRequest, loginList: string[], existsCount: number, limitClients?: number): Promise<IClientOrdersInfoData[]>
-    public async getClientOrdersInfo (request: IRequest, loginList: 'all', existsCount: number, limitClients?: number): Promise<IClientOrdersInfoData[]>
-    public async getClientOrdersInfo (request: IRequest, loginList: string | string[], existsCount: number, limitClients?: number): Promise<IClientOrdersInfoData[]>
-    public async getClientOrdersInfo (request: IRequest, loginList: string | string[], existsCount: number, limitClients: number = 2): Promise<IClientOrdersInfoData | IClientOrdersInfoData[]> {
+    public async getClientOrdersInfo (request: IRequest, loginList: string, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr>
+    public async getClientOrdersInfo (request: IRequest, loginList: string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (request: IRequest, loginList: 'all', options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (request: IRequest, loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (request: IRequest, loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[]> {
         const getOrdersOptions: FindOptions<any> = {
-            offset: existsCount,
-            limit: limitClients, 
+            offset: options.existsCount,
+            limit: options.ordersLimit, 
             raw: false
         }
 
-        let clientsOrdersInfoData: IClientOrdersInfoData | IClientOrdersInfoData[] = null;
+        let clientsOrdersInfoData: IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[] = null;
 
         if ( loginList === 'all' ) {
             const clients: Member[] = await this.memberModel.findAll(getOrdersOptions);
@@ -119,9 +119,9 @@ export class ClientService {
                 if ( !clientsOrdersInfoData ) clientsOrdersInfoData = [];
 
                 try {
-                    (clientsOrdersInfoData as IClientOrdersInfoData[]).push({
+                    (clientsOrdersInfoData as IClientOrdersInfoDataArr[]).push({
                         login: client.dataValues.login,
-                        ordersCount: await client.$count('clientOrders', { where: { status: 'new' } })
+                        ordersCount: await client.$count('clientOrders', { where: { status: options.status } })
                     });
                 } catch { }
             }
@@ -131,8 +131,8 @@ export class ClientService {
             try {
                 clientsOrdersInfoData = {
                     login: loginList,
-                    ordersCount: await client.$count('clientOrders', { where: { status: 'new' } })
-                } as IClientOrdersInfoData;
+                    ordersCount: await client.$count('clientOrders', { where: { status: options.status } })
+                } as IClientOrdersInfoDataArr;
             } catch { }
         } else if ( Array.isArray(loginList) ) {
             for ( const login of loginList ) {
@@ -141,9 +141,9 @@ export class ClientService {
                 if ( !clientsOrdersInfoData ) clientsOrdersInfoData = [];
 
                 try {
-                    (clientsOrdersInfoData as IClientOrdersInfoData[]).push({
+                    (clientsOrdersInfoData as IClientOrdersInfoDataArr[]).push({
                         login,
-                        ordersCount: await client.$count('clientOrders', { where: { status: 'new' } })
+                        ordersCount: await client.$count('clientOrders', { where: { status: options.status } })
                     });
                 } catch { }
             }
