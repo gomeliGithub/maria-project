@@ -7,6 +7,10 @@ body {
     width: 100%;
 }
 
+.vh-85 {
+    height: 85vh !important;
+}
+
 .vw-95 {
     width: 95vw !important;
 }

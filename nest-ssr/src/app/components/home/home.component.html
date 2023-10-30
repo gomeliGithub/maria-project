@@ -44,18 +44,20 @@
         <span class="visually-hidden">Next</span>
     </button>
 </div>
-<div class="mt-5 w-100">
+<div class="w-100">
     <hr class="sectionHorizontalRule"/>
 </div>
 <div class="p-5 mt-3 section">
     <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
 </div>
-<div class="mt-5 w-100">
+<div class="w-100">
     <hr class="w-100 sectionHorizontalRule"/>
 </div>
 <ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0">
     <ng-template ngFor let-imagePhotographyTypesDataArr [ngForOf]="imagePhotographyTypes" let-i="index">
-        <div class="d-flex flex-row justify-content-center align-items-center vh-100 w-100 imagePhotographyTypesGroup section">
+        <div class="d-flex flex-row justify-content-center align-items-center vh-100 w-100 imagePhotographyTypesGroup section"
+            [ngClass]="{ 'vh-85': imagePhotographyTypesDataArr.length === 1 }"
+        >
             <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i2 = index" 
                 class="border-0 position-relative h-100 mw-100 me-3 ms-3 imagesContainer"
                 (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
@@ -97,8 +99,8 @@
 <div class="w-100">
     <hr class="w-100 sectionHorizontalRule"/>
 </div>
-<div class="d-flex flex-column mt-5 vh-100 section" id="aboutSection">
-    <div class="d-flex flex-row justify-content-center align-items-center h-100 mw-100" id="aboutContainer">
+<div class="d-flex flex-column mt-5 vh-85 section" id="aboutSection">
+    <div class="d-flex flex-row justify-content-center align-items-center h-85 mw-100" id="aboutContainer">
         <img src="/assets/images_full/1697474336253508.jpg" class="rounded mx-auto d-block object-fit-contain h-100 mw-100" id="aboutImage">
         <div class="d-flex flex-row align-items-center fw-semibold h-100 mw-100 vw-30">
             <p class="text-center w-100">Просто текст!!!!</p>

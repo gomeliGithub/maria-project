@@ -67,7 +67,7 @@
 }
 
 .section {
-    scroll-snap-align: start !important;
+    scroll-snap-align: center !important;
 }
 
 #aboutSection {
