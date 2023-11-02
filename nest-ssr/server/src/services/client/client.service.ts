@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
@@ -115,9 +115,14 @@ export class ClientService {
         if ( loginList === 'all' ) {
             const clients: Member[] = await this.memberModel.findAll(getOrdersOptions);
 
-            for ( const client of clients ) {
-                if ( !clientsOrdersInfoData ) clientsOrdersInfoData = [];
+            if ( !clientsOrdersInfoData ) clientsOrdersInfoData = [];
 
+            if ( options.existsCount === 0 ) (clientsOrdersInfoData as IClientOrdersInfoDataArr[]).push({
+                login: 'guest',
+                ordersCount: await this.clientOrderModel.count({ where: { status: options.status } })
+            });
+
+            for ( const client of clients ) {
                 try {
                     (clientsOrdersInfoData as IClientOrdersInfoDataArr[]).push({
                         login: client.dataValues.login,
@@ -287,6 +292,8 @@ export class ClientService {
         let { imagePhotographyType, orderType } = requestBody.client;
         const { clientPhoneNumber, comment } = requestBody.client;
 
+        if ( orderType === 'full' && !client ) throw new UnauthorizedException();
+
         const dateNow: Date = new Date();
 
         const id: number = parseInt(`${ dateNow.getFullYear() }${ dateNow.getMonth() }${ dateNow.getHours() }${ dateNow.getMinutes() }${ dateNow.getSeconds() }`, 10);
@@ -303,10 +310,10 @@ export class ClientService {
             comment: comment
         });
 
-        await client.$add('clientOrders', newOrder);
+        if ( client ) await client.$add('clientOrders', newOrder);
 
         ////////////////////////////////////////////////////////////// SEND EMAIL //////////////////////////////////////////////////////////////
-
+        
         switch ( imagePhotographyType ) {
             case 'individual': { imagePhotographyType = "Индивидуальная съёмка"; break; }
             case 'children': { imagePhotographyType = "Детская съёмка"; break; }
@@ -320,12 +327,27 @@ export class ClientService {
             case 'full': { orderType = "Полноценный заказ"; break; }
         }
 
-        const mailBody: string = `Тестовое письмо получено успешно. ${ imagePhotographyType }  - ${ orderType } - ${ clientPhoneNumber } - ${ comment }`;
+        const mailBody: string = `
+            <div>
+                <div>
+                    <p>Тип съёмки - <span>${ imagePhotographyType }</span></p>
+                </div>
+                <div>
+                    <p>Тип заказа - <span>${ orderType }</span></p>
+                </div>
+                <div>
+                    <p>Номер телефона клиента - <span>${ clientPhoneNumber }</span></p>
+                </div>
+                <div>
+                <p>Дополнительная информация от клиента - <span>${ comment }</span></p>
+                </div>
+            </div>
+        `;
 
         await this.mailService.sendEmail('irina01041971@mail.ru', 'Новый заказ', mailBody);
-
+        
         ////////////////////////////////////////////////////////////// SEND EMAIL //////////////////////////////////////////////////////////////
 
-        await commonServiceRef.registerClientLastActivityTime(client);
+        if ( client ) await commonServiceRef.registerClientLastActivityTime(client);
     }
 }

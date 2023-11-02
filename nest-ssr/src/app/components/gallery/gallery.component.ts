@@ -102,7 +102,7 @@ export class GalleryComponent implements OnInit {
     public sendOrderFormAnimationState: string = 'hide';
 
     ngOnInit (): void {
-        this.router.events.subscribe((evt) => {
+        this.router.events.subscribe(evt => {
             if ( !(evt instanceof NavigationEnd) ) return;
             else this.url = evt.url;
             
@@ -229,6 +229,10 @@ export class GalleryComponent implements OnInit {
     }
 
     public sendOrderFormAnimationDone (event: AnimationEvent): void {
-        if ( event.toState === 'hide' ) this.componentClass = '';
+        if ( event.toState === 'hide' ) {
+            this.componentClass = '';
+
+            this.sendOrderForm.reset();
+        }
     }
 }

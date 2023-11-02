@@ -155,48 +155,65 @@
     <strong class="text-info fs-4" role="status">{{ 'SPINNERTITLES.PROCESSING' | translate }}</strong>
     <div class="spinner-border text-info ms-auto" aria-hidden="true"></div>
 </div>
-<div class="d-flex flex-row justify-content-center" id="uploadImageContainer">
-    <form [formGroup]="uploadImageForm" class="p-3 w-50 border border-light border-3 rounded" novalidate (submit)="uploadImage()">
-        <div class="form-group form-floating mb-3">
-            <select class="form-control form-select" id="inputPhotographyType" formControlName="imagePhotographyType">
-                <option value="individual" selected>{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</option>
-                <option value="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</option>
-                <option value="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</option>
-                <option value="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</option>
-                <option value="event">{{ 'IMAGEPHOTOGRAPHYTYPES.EVENT' | translate }}</option>
-            </select>
-            <label for="inputPhotographyType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.PHOTOGRAPHYTYPE' | translate }}</label>
-            <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imagePhotographyType'].invalid && uploadImageForm.controls['imagePhotographyType'].touched">
-                {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDPHOTOGRAPHYTYPE' | translate }}
-            </div>
-        </div>
-        <div class="form-group form-floating mb-3">
-            <select class="form-control form-select" id="inputViewSizeType" formControlName="imageViewSizeType">
-                <option value="small" selected>{{ 'IMAGEVIEWSIZETYPES.SMALL' | translate }}</option>
-                <option value="medium">{{ 'IMAGEVIEWSIZETYPES.MEDIUM' | translate }}</option>
-                <option value="big">{{ 'IMAGEVIEWSIZETYPES.BIG' | translate }}</option>
-            </select>
-            <label for="inputViewSizeType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.VIEWSIZETYPE' | translate }}</label>
-            <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imageViewSizeType'].invalid && uploadImageForm.controls['imageViewSizeType'].touched">
-                {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDVIEWSIZETYPE' | translate }}
-            </div>
-        </div>
-        <div class="form-group mb-3">
-            <input type="file" class="form-control" id="inputImage" (change)="fileChange($event)" formControlName="image">
-            <div class="alert alert-danger" *ngIf="uploadImageForm.controls['image'].invalid && uploadImageForm.controls['image'].touched">
-                {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDSELECTIMAGE' | translate }}
-            </div>
-        </div>
-        <div class="form-group form-floating mb-3">
-            <input type="text" class="form-control" id="inputImageDescription" formControlName="imageDescription">
-            <label for="inputImageDescription" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.DESCRIPTION' | translate }}</label>
-        </div>
-        <div class="form-group text-center">
-            <button class="btn btn-primary" [disabled]="uploadImageForm.invalid">
+<div class="accordion accordion-flush" id="uploadImageAccordion">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne"
+                aria-controls="flush-collapseOne"
+                [attr.aria-expanded]="uploadImageAccordionIsOpen"
+                (click)="uploadImageAccordionTogglerClick()"
+            >
                 {{ 'ADMINPANEL.UPLOADIMAGETEXT.BUTTON' | translate }}
             </button>
+        </h2>
+        <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#uploadImageAccordion">
+            <div class="accordion-body">
+                <div class="d-flex flex-row justify-content-center" id="uploadImageContainer">
+                    <form [formGroup]="uploadImageForm" class="p-3 w-50" novalidate (submit)="uploadImage()">
+                        <div class="form-group form-floating mb-3">
+                            <select class="form-control form-select" id="inputPhotographyType" formControlName="imagePhotographyType">
+                                <option value="individual" selected>{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</option>
+                                <option value="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</option>
+                                <option value="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</option>
+                                <option value="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</option>
+                                <option value="event">{{ 'IMAGEPHOTOGRAPHYTYPES.EVENT' | translate }}</option>
+                            </select>
+                            <label for="inputPhotographyType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.PHOTOGRAPHYTYPE' | translate }}</label>
+                            <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imagePhotographyType'].invalid && uploadImageForm.controls['imagePhotographyType'].touched">
+                                {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDPHOTOGRAPHYTYPE' | translate }}
+                            </div>
+                        </div>
+                        <div class="form-group form-floating mb-3">
+                            <select class="form-control form-select" id="inputViewSizeType" formControlName="imageViewSizeType">
+                                <option value="small" selected>{{ 'IMAGEVIEWSIZETYPES.SMALL' | translate }}</option>
+                                <option value="medium">{{ 'IMAGEVIEWSIZETYPES.MEDIUM' | translate }}</option>
+                                <option value="big">{{ 'IMAGEVIEWSIZETYPES.BIG' | translate }}</option>
+                            </select>
+                            <label for="inputViewSizeType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.VIEWSIZETYPE' | translate }}</label>
+                            <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imageViewSizeType'].invalid && uploadImageForm.controls['imageViewSizeType'].touched">
+                                {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDVIEWSIZETYPE' | translate }}
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <input type="file" class="form-control" id="inputImage" (change)="fileChange($event)" formControlName="image">
+                            <div class="alert alert-danger" *ngIf="uploadImageForm.controls['image'].invalid && uploadImageForm.controls['image'].touched">
+                                {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDSELECTIMAGE' | translate }}
+                            </div>
+                        </div>
+                        <div class="form-group form-floating mb-3">
+                            <input type="text" class="form-control" id="inputImageDescription" formControlName="imageDescription">
+                            <label for="inputImageDescription" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.DESCRIPTION' | translate }}</label>
+                        </div>
+                        <div class="form-group text-center">
+                            <button class="btn btn-primary" [disabled]="uploadImageForm.invalid">
+                                {{ 'ADMINPANEL.UPLOADIMAGETEXT.BUTTON' | translate }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    </form>
+    </div>
 </div>
 <div *ngIf="imagePhotographyTypes && imagePhotographyTypes.length !== 0" id="photographyTypesImages">
     <div class="table-responsive">
@@ -220,7 +237,9 @@
                     </td>
                     <td>
                         <ng-template [ngIf]="imagePhotographyTypeData.description && imagePhotographyTypeData.description !== ''" [ngIfElse]="noTextIcon">
-                            {{ imagePhotographyTypeData.description }}
+                            <input type="text" class="form-control" [value]="imagePhotographyTypeData.description" [textContent]="imagePhotographyTypeData.description"
+                                [attr.photography-type-name]="imagePhotographyTypeData.name" #imagePhotographyTypeDescription
+                            >
                         </ng-template>
                         <ng-template #noTextIcon>
                             <i class="bi bi-dash-lg text-black"></i>
@@ -233,6 +252,11 @@
                         <ng-template #noTextIcon>
                             <i class="bi bi-dash-lg text-black"></i>
                         </ng-template>
+                    </td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm" type="button" [attr.photography-type-name]="imagePhotographyTypeData.name" (click)="changePhotographyTypeDescription($event)">
+                            {{ 'ADMINPANEL.CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTON' | translate }}
+                        </button>
                     </td>
                 </tr>
             </tbody>

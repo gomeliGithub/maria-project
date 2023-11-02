@@ -65,7 +65,6 @@ export class ClientController {
     }
 
     @Post('/createOrder')
-    @ClientTypes('member')
     public async createOrder (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
         const phoneNumberPattern: RegExp = /(?:\+|\d)[\d\-\(\) ]{9,}\d/;
 

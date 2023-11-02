@@ -48,6 +48,7 @@ export class AdminPanelController {
     @Get('/getClientOrders')
     @ClientTypes('admin')
     async getClientOrders (@Req() request: IRequest, @Query() options: {}): Promise<IClientOrdersInfoData | IClientOrdersData> {
+        const getInfoData: string = options['getInfoData'] ? options['getInfoData'] : null;
         const memberLogin: string = options['memberLogin'] ? (options['memberLogin'] as string).trim() : null;
         const fromDate: Date = options['fromDate'] ? new Date(options['fromDate']) : null;
         const untilDate: Date = options['untilDate'] ? new Date(options['untilDate']) : null;
@@ -55,7 +56,8 @@ export class AdminPanelController {
         const ordersLimit: number = options['ordersLimit'] ? parseInt(options['ordersLimit'], 10) : null;
         const existsCount: number = options['existsCount'] ? parseInt(options['existsCount'], 10) : null;
 
-        if ( memberLogin && memberLogin === ''
+        if ( getInfoData && getInfoData !== 'true' && getInfoData !== 'false'
+            || memberLogin && memberLogin === ''
             || fromDate && fromDate.toString() === 'Invalid Date' 
             || untilDate && untilDate.toString() === 'Invalid Date'
             || status && (status === '' || !this.appService.clientOrdersStatuses.includes(status))
@@ -64,6 +66,7 @@ export class AdminPanelController {
         ) throw new BadRequestException();
 
         return this.adminPanelService.getClientOrders(request, {
+            getInfoData,
             memberLogin,
             fromDate,
             untilDate,
@@ -76,9 +79,9 @@ export class AdminPanelController {
     @Put('/changeClientOrderStatus')
     @ClientTypes('admin')
     async changeClientOrderStatus (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
-        if ( !requestBody.adminPanel.clientOrderId || !requestBody.adminPanel.clientLogin
+        if ( !requestBody.adminPanel.clientOrderId
             || typeof requestBody.adminPanel.clientOrderId !== 'number' 
-            || typeof requestBody.adminPanel.clientLogin !== 'string' || requestBody.adminPanel.clientLogin === ''
+            || requestBody.adminPanel.clientLogin && (typeof requestBody.adminPanel.clientLogin !== 'string' || requestBody.adminPanel.clientLogin === '')
         ) throw new BadRequestException();
 
         return this.adminPanelService.changeClientOrderStatus(request, requestBody);
@@ -133,5 +136,18 @@ export class AdminPanelController {
         ) throw new BadRequestException();
 
         return this.adminPanelService.setPhotographyTypeImage(request, requestBody);
+    }
+
+    @Post('/changePhotographyTypeDescription')
+    @ClientTypes('admin')
+    async changePhotographyTypeDescription (@Body() requestBody: IRequestBody): Promise<void> {
+        if ( !requestBody.adminPanel || !requestBody.adminPanel.photographyTypeName || !requestBody.adminPanel.photographyTypeNewDescription
+            || typeof requestBody.adminPanel.photographyTypeName !== 'string' 
+            || !this.appService.imagePhotographyTypes.includes(requestBody.adminPanel.photographyTypeName)
+            || typeof requestBody.adminPanel.photographyTypeNewDescription !== 'string' 
+            || requestBody.adminPanel.photographyTypeNewDescription.length > 40
+        ) throw new BadRequestException();
+
+        this.adminPanelService.changePhotographyTypeDescription(requestBody);
     }
 }

@@ -212,7 +212,7 @@ export class AdminPanelService {
     }
 
     public async getClientOrders (request: IRequest, options: {
-        memberLogin: string,
+        getInfoData: string,
         type?: string,
         fromDate?: Date,
         untilDate?: Date,
@@ -221,7 +221,8 @@ export class AdminPanelService {
         existsCount?: number
     }): Promise<IClientOrdersInfoData>
     public async getClientOrders (request: IRequest, options: {
-        memberLogin?: string,
+        getInfoData?: string,
+        memberLogin: string,
         type?: string,
         fromDate?: Date,
         untilDate?: Date,
@@ -256,9 +257,17 @@ export class AdminPanelService {
         let clientOrdersInfoData: IClientOrdersInfoData = null;
         let clientOrders: IClientOrdersData = null;
 
-        if ( client ) {
-            const orders: ClientOrder[] = await client.$get('clientOrders', ordersFindOptions);
-            const commonOrdersCount: number = await client.$count('clientOrders', { where: { status: options.status }});
+        if ( !options.getInfoData || options.getInfoData === 'false' ) {
+            let orders: ClientOrder[] = null;
+            let commonOrdersCount: number = null;
+
+            if ( client ) {
+                orders = await client.$get('clientOrders', ordersFindOptions);
+                commonOrdersCount = await client.$count('clientOrders', { where: { status: options.status } });
+            } else {
+                orders = await this.clientOrderModel.findAll(ordersFindOptions);
+                commonOrdersCount = await this.clientOrderModel.count({ where: { status: options.status } });
+            }
 
             clientOrders = {
                 orders: orders,
@@ -290,7 +299,9 @@ export class AdminPanelService {
 
         const client: Member = await commonServiceRef.getClients(request, requestBody.adminPanel.clientLogin, { rawResult: false }) as Member;
 
-        if ( !client || !(await client.$has('clientOrders', clientOrder)) ) throw new BadRequestException();
+        if ( client ) {
+            if ( !(await client.$has('clientOrders', clientOrder)) ) throw new BadRequestException();
+        }
 
         await clientOrder.update({ status: 'processed' });
     }
@@ -448,6 +459,14 @@ export class AdminPanelService {
         await this.imagePhotographyTypeModel.update({ originalImageName: compressedImage.name }, { where: { name: imagePhotographyType }});
 
         return 'SUCCESS';
+    }
+    
+    public async changePhotographyTypeDescription (requestBody: IRequestBody): Promise<void> {
+        const { photographyTypeName, photographyTypeNewDescription } = requestBody.adminPanel;
+
+        const imagePhotographyType: ImagePhotographyType = await this.imagePhotographyTypeModel.findByPk(photographyTypeName);
+
+        await imagePhotographyType.update({ description: photographyTypeNewDescription });
     }
 
     public async validateImageControlRequests (request: IRequest, requestBody: IRequestBody, activeAdminLogin: string): Promise<string> {

@@ -18,6 +18,7 @@ import { ClientService } from './services/client/client.service';
 import { environment } from '../environments/environment';
 
 import { IClientLocale } from 'types/global';
+import { Dropdown } from 'bootstrap';
 
 @Component({
     selector: 'app-root',
@@ -88,6 +89,8 @@ export class AppComponent implements OnInit, AfterViewInit {
         if ( !(component instanceof HomeComponent) ) {
             this.isHomePage = false;
 
+            this.navbarTogglerClick(true);
+
             if ( component instanceof GalleryComponent ) component.activeClientIsExists = this.activeClientLogin ? true : false;
         } else {
             this.isHomePage = true;
@@ -104,34 +107,45 @@ export class AppComponent implements OnInit, AfterViewInit {
     @HostListener('document:mousedown', ['$event'])
     public onGlobalClick (event: MouseEvent): void {
         if ( !this.navbarElementRef.nativeElement.contains(event.target as HTMLElement) ) {
-            if ( !this.navbarTogglerElementRef.nativeElement.classList.contains('collapsed') ) this.navbarTogglerClick(event, true);
+            if ( !this.navbarTogglerElementRef.nativeElement.getAttribute('aria-expanded') === true ) this.navbarTogglerClick(true);
         }
     }
 
-    public navbarTogglerClick (event: MouseEvent, navbarTogglerIconAnimation = false): void {
-        import('bootstrap').then(bootstrap => {
-            const navbarToggler = new bootstrap.Collapse(this.document.getElementById('navbarNavDropdown'));
+    public navbarTogglerClick (animationStart = false): void {
+        if ( animationStart ) this.changeNavbarTogglerIconTriggerState();
 
-            if ( navbarTogglerIconAnimation ) this.changeNavbarTogglerIconTriggerState();
-            
-            navbarToggler.toggle();
-        });
+        this.navbarIsOpen = this.navbarIsOpen ? false : true;
     }
 
-    public async menuClick (event: MouseEvent, menuButtonId: string): Promise<void> {
-        const button: HTMLButtonElement = event.target as HTMLButtonElement;
+    public async menuMove (menuButtonId: string, show: boolean): Promise<void> {
+        let button: HTMLButtonElement = null;
 
-        if ( !button.classList.contains('show') ) {
+        switch ( menuButtonId ) {
+            case 'adminPanelMenuButton': { if ( this.adminPanelMenuButtonViewRef ) button = this.adminPanelMenuButtonViewRef.nativeElement; break; }
+            case 'clientMenuButton': { button = this.clientMenuButtonViewRef.nativeElement; break; }
+            case 'dropdownMenuButton': { if ( this.changeClientLocaleButtonViewRef ) button = this.changeClientLocaleButtonViewRef.nativeElement; break; }
+        }
+
+        if ( button ) {
             const bootstrap = await import('bootstrap');
             
-            const menu = new bootstrap.Dropdown(this.document.getElementById(menuButtonId));
+            const menu = new bootstrap.Dropdown(button);
 
-            menu.toggle();
+            if ( show ) {
+                const dropdownElementList: Dropdown[] = Array.from(document.querySelectorAll(`.dropdown-toggle:not(#${ menuButtonId })`))
+                .map(dropdownToggleEl => new bootstrap.Dropdown(dropdownToggleEl));
+
+                if ( dropdownElementList ) dropdownElementList.forEach(dropdownToggleEl => dropdownToggleEl.hide());
+
+                menu.show();
+            }
+            else menu.hide();
         }
     }
 
     public isHomePage: boolean = true;
 
+    public navbarIsOpen: boolean = false;
     public navbarTogglerIconTriggerState: string = 'collapsed';
     public navbarAnimationState: string = 'static';
 
@@ -140,6 +154,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     private readonly modalViewRef: ViewContainerRef;
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
+    @ViewChild('adminPanelMenuButton', { static: false }) private readonly adminPanelMenuButtonViewRef: ElementRef<HTMLButtonElement>;
+    @ViewChild('clientMenuButton', { static: false }) private readonly clientMenuButtonViewRef: ElementRef<HTMLButtonElement>;
     @ViewChild('changeClientLocaleButton', { static: false }) private readonly changeClientLocaleButtonViewRef: ElementRef<HTMLButtonElement>;
     @ViewChild('navbar', { static: false }) private readonly navbarElementRef: ElementRef<HTMLDivElement>;
     @ViewChild('navbarToggler', { static: false }) private readonly navbarTogglerElementRef: ElementRef<HTMLButtonElement>;

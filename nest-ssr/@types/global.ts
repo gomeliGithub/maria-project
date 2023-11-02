@@ -45,6 +45,9 @@ export interface IRequestBody {
 
         clientOrderId?: number;
         clientLogin?: string;
+
+        photographyTypeName?: string;
+        photographyTypeNewDescription?: string;
     }
 }
 

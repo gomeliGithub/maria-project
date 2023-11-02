@@ -1,4 +1,4 @@
-import { Component, ComponentRef, ElementRef, HostListener, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, ComponentRef, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
@@ -61,6 +61,9 @@ export class AdminPanelComponent implements OnInit {
        }
     }
 
+    @ViewChildren('imagePhotographyTypeDescription', { read: ElementRef<HTMLInputElement> }) 
+    private readonly imagePhotographyTypeDescriptionViewRefs: QueryList<ElementRef<HTMLInputElement>>;
+
     public changeImageDataFormHidden: boolean = true;
     public changingOriginalImageName: string;
 
@@ -68,6 +71,8 @@ export class AdminPanelComponent implements OnInit {
     @ViewChild('appModal', { read: ViewContainerRef, static: false })
     private readonly modalViewRef: ViewContainerRef;
     private readonly modalComponentRef: ComponentRef<ModalComponent>;
+
+    public uploadImageAccordionIsOpen: boolean = false;
 
     private _imageFile: File;
 
@@ -105,6 +110,10 @@ export class AdminPanelComponent implements OnInit {
 
             dropdown.toggle();
         });
+    }
+
+    public uploadImageAccordionTogglerClick (): void {
+        this.uploadImageAccordionIsOpen = this.uploadImageAccordionIsOpen ? false : true;
     }
 
     public fileChange (event: any): void {
@@ -307,6 +316,39 @@ export class AdminPanelComponent implements OnInit {
                         this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
                     }
                 });
+            }
+        }
+    }
+
+    public changePhotographyTypeDescription (event: MouseEvent): void {
+        const target: HTMLButtonElement = event.target as HTMLButtonElement;
+
+        if ( target ) {
+            const photographyTypeName: string = target.getAttribute('photography-type-name');
+
+            if ( photographyTypeName ) {
+                const photographyTypeNewDescription: string = this.imagePhotographyTypeDescriptionViewRefs.find(imagePhotographyTypeDescription => {
+                    return imagePhotographyTypeDescription.nativeElement.getAttribute('photography-type-name') === photographyTypeName;
+                }).nativeElement.value;
+
+                if ( photographyTypeNewDescription.length <= 40 ) {
+                    this.spinnerHidden = false;
+                    
+                    const headers: HttpHeaders = this.appService.createRequestHeaders();
+
+                    this.http.post<void>('/api/admin-panel/changePhotographyTypeDescription', {
+                        adminPanel: { photographyTypeName, photographyTypeNewDescription }
+                    }, { headers, withCredentials: true }).subscribe({
+                        next: () => window.location.reload(),
+                        error: () => {
+                            this.spinnerHidden = true;
+                            
+                            this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+                        }
+                    });
+                } else this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, 
+                    this.appService.getTranslations('ADMINPANEL.CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTONINVALIDMESSSAGE')
+                );
             }
         }
     }

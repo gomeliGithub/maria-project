@@ -104,6 +104,8 @@
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Максимальное количество изображений на главной странице",
 		"TABLECAPTION": "Управление изображениями",
 		"SECONDTABLECAPTION": "Изображения для типов съёмок",
+		"CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTON": "Изменить описание",
+		"CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTONINVALIDMESSSAGE": "Максимум 40 символов.",
 		"TABLECOLTITLES": {
 			"ORIGINALNAME": "Оригинальное имя",
 			"ORIGINALSIZE": "Размер оригинального изображения",
@@ -122,6 +124,7 @@
 			"CREATEDDATE": "Дата создания"
 		},
 		"CLIENTORDERSTABLECHANGESTATUSBUTTONTEXT": "Отметить как обработанный",
+		"GUESTLOGINTEXT": "Гость",
 		"ADDITIONALCLIENTORDERSBUTTONTEXT": "Ещё заказы",
 		"ADDITIONALCLIENTORDERSINFODATABUTTONTEXT": "Ещё клиенты",
 		"CLIENTORDERSTABPANESTEXT": {

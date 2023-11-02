@@ -34,6 +34,7 @@ export class AdminPanelService {
     }
 
     public getClientOrders (options: {
+        getInfoData: string,
         fromDate?: Date,
         untilDate?: Date,
         status?: string,
@@ -41,6 +42,7 @@ export class AdminPanelService {
         existsCount?: number
     }): Observable<IClientOrdersInfoData>
     public getClientOrders (options?: {
+        getInfoData?: string,
         memberLogin: string,
         fromDate?: Date,
         untilDate?: Date,
@@ -54,6 +56,7 @@ export class AdminPanelService {
         let params = new HttpParams();
 
         if ( options ) {
+            params = params.append('getInfoData', options.getInfoData ?? '');
             params = params.append('memberLogin', options.memberLogin ?? '');
             params = params.append('fromDate', options.fromDate ? options.fromDate.toDateString() : '');
             params = params.append('untilDate', options.untilDate ? options.untilDate.toDateString() : '');
@@ -63,7 +66,7 @@ export class AdminPanelService {
         }
 
         return this.http.get<IClientOrdersInfoData | IClientOrdersData>('/api/admin-panel/getClientOrders', { params, headers, withCredentials: true }).pipe(map(data => {
-            if ( options.memberLogin ) {
+            if ( !options.getInfoData || options.getInfoData === 'false' ) {
                 (data as IClientOrdersData).orders = (data as IClientOrdersData).orders.map(clientOrder => {
                     Object.keys(clientOrder).forEach(field => {
                         if ( field === 'createdDate') clientOrder[field] = new Date(clientOrder[field]);
@@ -87,6 +90,16 @@ export class AdminPanelService {
                     });
 
                     return clientOrder;
+                });
+            } else {
+                (data as IClientOrdersInfoData).infoData = (data as IClientOrdersInfoData).infoData.map(clientOrderInfoData => {
+                    Object.keys(clientOrderInfoData).forEach(field => {
+                        if ( field === 'login' && clientOrderInfoData[field] === 'guest' ) {
+                            clientOrderInfoData[field] = this.appService.getTranslations('ADMINPANEL.GUESTLOGINTEXT');
+                        }
+                    });
+
+                    return clientOrderInfoData;
                 });
             }
 

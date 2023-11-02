@@ -12,3 +12,7 @@
     height: 2px;
     background-color: #888;
 }
+
+.nav-item.dropdown .nav-link:focus-visible  {
+    box-shadow: none;
+}

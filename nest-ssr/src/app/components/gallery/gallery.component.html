@@ -146,7 +146,7 @@
         <div class="form-group form-floating mb-3">
             <select class="form-control form-select" id="inputType" formControlName="orderType">
                 <option value="consultation" selected>{{ 'CLIENTORDERTYPES.CONSULTATION' | translate }}</option>
-                <option value="full">{{ 'CLIENTORDERTYPES.FULL' | translate }}</option>
+                <option value="full" [attr.disabled]="!activeClientIsExists">{{ 'CLIENTORDERTYPES.FULL' | translate }}</option>
             </select>
             <label for="inputType" class="form-label text-wrap">{{ 'SENDORDERFORM.ORDERTYPETEXT' | translate }}</label>
             <div class="alert alert-danger" *ngIf="sendOrderForm.controls['orderType'].invalid && sendOrderForm.controls['orderType'].touched">

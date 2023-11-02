@@ -107,6 +107,8 @@
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Maximum number of images on the home page",
 		"TABLECAPTION": "Image management",
 		"SECONDTABLECAPTION": "Images for photography types",
+		"CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTON": "Change description",
+		"CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTONINVALIDMESSSAGE": "Maximum 40 characters.",
 		"TABLECOLTITLES": {
 			"ORIGINALNAME": "Original name",
 			"ORIGINALSIZE": "Original image size",
@@ -125,6 +127,7 @@
 			"CREATEDDATE": "Created date"
 		},
 		"CLIENTORDERSTABLECHANGESTATUSBUTTONTEXT": "Mark as processed",
+		"GUESTLOGINTEXT": "Guest",
 		"ADDITIONALCLIENTORDERSBUTTONTEXT": "More orders",
 		"ADDITIONALCLIENTORDERSINFODATABUTTONTEXT": "More clients",
 		"CLIENTORDERSTABPANESTEXT": {

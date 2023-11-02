@@ -74,7 +74,8 @@ export class AdminPanelOrdersControlComponent implements OnInit, AfterViewChecke
     }
 
     public getClientOrdersInfo (existsCountZero = false): void {
-        this.adminPanelService.getClientOrders({ 
+        this.adminPanelService.getClientOrders({
+            getInfoData: 'true',
             status: this.currentSelectedOrdersStatusType,
             ordersLimit: 2,
             existsCount: existsCountZero || (existsCountZero && this.prevCurrentSelectedOrdersStatusType !== this.currentSelectedOrdersStatusType) ? 0 : this.getClientOrdersButtonViewRefs.length
@@ -104,11 +105,19 @@ export class AdminPanelOrdersControlComponent implements OnInit, AfterViewChecke
 
         if ( existsCountZero ) this.additionalOrdersExists = false;
 
+        let existsCount: number = null;
+
+        if ( existsCountZero || (existsCountZero && this.prevCurrentSelectedOrdersStatusType !== this.currentSelectedOrdersStatusType)
+            || this.prevCurrentSelectedOrdersStatusType !== this.currentSelectedOrdersStatusType
+        ) existsCount = 0;
+        else existsCount = this.clientOrderViewRefs.length;
+
         this.adminPanelService.getClientOrders({
+            getInfoData: 'false',
             status: this.currentSelectedOrdersStatusType,
             memberLogin: existsCountZero ? clientLogin : this.currentSelectedClientLogin,
             ordersLimit: 2,
-            existsCount: existsCountZero || (existsCountZero && this.prevCurrentSelectedOrdersStatusType !== this.currentSelectedOrdersStatusType) ? 0 : this.clientOrderViewRefs.length
+            existsCount
         }).subscribe({
             next: clientOrdersData => {
                 if ( !this.additionalOrdersExists

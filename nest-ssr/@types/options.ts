@@ -62,6 +62,7 @@ export interface ICreateImageDirsOptions {
 }
 
 export interface IGetClientOrdersOptions {
+    getInfoData?: string;
     memberLogin?: string;
     fromDate?: Date;
     untilDate?: Date;

@@ -60,31 +60,30 @@ export class HomeComponent implements OnInit {
     public flatImagePhotographyTypes: IImagePhotographyType[];
 
     ngOnInit (): void {
-        if ( this.appService.checkIsPlatformBrowser() ) {
-            this.appService.getTranslations('PAGETITLES.HOME', true).subscribe({
-                next: translation => this.appService.setTitle(translation),
-                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
-            });
+        this.appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => this.appService.setTitle(translation));
 
-            this.clientService.getCompressedImagesList('home').subscribe({
-                next: imagesList => imagesList.length !== 0 ? this.compressedImagesList = imagesList : this.compressedImagesList = null,
-                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
-            });
+        this.clientService.getCompressedImagesList('home').subscribe(imagesList => this.compressedImagesList = imagesList);
+        
+        this.clientService.getImagePhotographyTypesData('home').subscribe({
+            next: imagePhotographyTypesData => {
+                this.imagePhotographyTypes = imagePhotographyTypesData;
 
-            this.clientService.getImagePhotographyTypesData('home').subscribe({
-                next: imagePhotographyTypesData => {
-                    const nullable: boolean = imagePhotographyTypesData.some(imagePhotographyTypesDataArr => imagePhotographyTypesDataArr.some(imagePhotographyTypeData => !imagePhotographyTypeData.originalImageName ));
+                this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
+                this.flatImagePhotographyTypes.forEach(() => {
+                    this.currentMouseTriggerStates.push('leave');
+                });
 
-                    this.flatImagePhotographyTypes = imagePhotographyTypesData.flat();
-                    this.flatImagePhotographyTypes.forEach(() => {
-                        this.currentMouseTriggerStates.push('leave');
-                    });
+                /*const nullable: boolean = imagePhotographyTypesData.some(imagePhotographyTypesDataArr => imagePhotographyTypesDataArr.some(imagePhotographyTypeData => !imagePhotographyTypeData.originalImageName ));
 
-                    this.imagePhotographyTypes = nullable ? null : imagePhotographyTypesData;
-                },
-                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
-            });
-        }
+                this.flatImagePhotographyTypes = imagePhotographyTypesData.flat();
+                this.flatImagePhotographyTypes.forEach(() => {
+                    this.currentMouseTriggerStates.push('leave');
+                });
+
+                this.imagePhotographyTypes = nullable ? null : imagePhotographyTypesData;*/
+            },
+            // error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+        });
     }
 
     public startMouseTriggerAnimation (index: number): void {
