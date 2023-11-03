@@ -1,7 +1,4 @@
-import { AfterViewChecked, Component, ComponentRef, ElementRef, OnInit, QueryList, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-
-import { ModalComponent } from '../modal/modal.component';
+import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
 
 import { AppService } from '../../app.service';
 import { AdminPanelService } from '../../services/admin-panel/admin-panel.service';
@@ -14,18 +11,11 @@ import { IClientOrder } from 'types/models';
     templateUrl: './admin-panel-orders-control.component.html',
     styleUrls: ['./admin-panel-orders-control.component.css']
 })
-export class AdminPanelOrdersControlComponent implements OnInit, AfterViewChecked {
+export class AdminPanelOrdersControlComponent implements OnInit {
     constructor (
-        private readonly http: HttpClient,
-
         private readonly appService: AppService,
         private readonly adminPanelService: AdminPanelService
     ) { }
-
-    @ViewChild(ModalComponent) modalWindowComponent: ModalComponent
-    @ViewChild('appModal', { read: ViewContainerRef, static: false })
-    private readonly modalViewRef: ViewContainerRef;
-    private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
     @ViewChildren('clientOrder', { read: ElementRef<HTMLTableRowElement> }) private readonly clientOrderViewRefs: QueryList<ElementRef<HTMLTableRowElement>>;
     @ViewChildren('getClientOrdersButton', { read: ElementRef<HTMLButtonElement> }) private readonly getClientOrdersButtonViewRefs: QueryList<ElementRef<HTMLButtonElement>>;
@@ -34,8 +24,6 @@ export class AdminPanelOrdersControlComponent implements OnInit, AfterViewChecke
     public clientOrders: IClientOrder[];
     public additionalOrdersExists: boolean = false;
     public additionalOrdersInfoDataExists: boolean = false;
-
-    public firstSelectClient: boolean = false;
 
     public prevCurrentSelectedOrdersStatusType: string;
     public currentSelectedOrdersStatusType: string = 'new';
@@ -51,14 +39,6 @@ export class AdminPanelOrdersControlComponent implements OnInit, AfterViewChecke
         }
     }
 
-    ngAfterViewChecked (): void {
-        if ( !this.firstSelectClient && this.getClientOrdersButtonViewRefs.first ) {
-            this.getClientOrdersButtonViewRefs.first.nativeElement.click();
-
-            this.firstSelectClient = true;
-        }
-    }
-
     public clientOrdersTabClick (event: MouseEvent): void {
         const target: HTMLButtonElement = event.target as HTMLButtonElement;
         const ordersType: string = target.getAttribute('orders-status-type');
@@ -70,7 +50,6 @@ export class AdminPanelOrdersControlComponent implements OnInit, AfterViewChecke
         this.additionalOrdersInfoDataExists = false;
 
         this.getClientOrdersInfo(true);
-        this.getClientOrders();
     }
 
     public getClientOrdersInfo (existsCountZero = false): void {
@@ -88,7 +67,7 @@ export class AdminPanelOrdersControlComponent implements OnInit, AfterViewChecke
 
                 this.additionalOrdersInfoDataExists = clientOrdersInfoData.additionalOrdersInfoDataExists;
             },
-            error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+            error: () => this.appService.createErrorModal()
         });
     }
 
@@ -98,9 +77,9 @@ export class AdminPanelOrdersControlComponent implements OnInit, AfterViewChecke
         let clientLogin: string = null;
 
         if ( existsCountZero ) {
-            clientLogin = target.getAttribute('client-login');
+            clientLogin = target.getAttribute('client-login'); debugger;
 
-            this.currentSelectedClientLogin = clientLogin;
+            this.currentSelectedClientLogin = clientLogin !== 'guest' ? clientLogin : this.appService.getTranslations('ADMINPANEL.GUESTLOGINTEXT');
         }
 
         if ( existsCountZero ) this.additionalOrdersExists = false;
@@ -127,25 +106,7 @@ export class AdminPanelOrdersControlComponent implements OnInit, AfterViewChecke
 
                 this.additionalOrdersExists = clientOrdersData.additionalOrdersExists;
             },
-            error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
-        });
-    }
-
-    public changeClientOrderStatus (event: MouseEvent): void {
-        const target: HTMLTableCellElement = event.target as HTMLTableCellElement;
-        const targetRow: HTMLTableRowElement = target.parentElement.parentElement as HTMLTableRowElement;
-
-        const clientOrderId: number = parseInt(targetRow.getAttribute('order-id'), 10);
-
-        this.spinnerHidden = false;
-
-        this.adminPanelService.changeClientOrderStatus(clientOrderId, this.currentSelectedClientLogin).subscribe({
-            next: () => window.location.reload(),
-            error: () => {
-                this.spinnerHidden = true;
-
-                this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
-            }
+            error: () => this.appService.createErrorModal()
         });
     }
 }

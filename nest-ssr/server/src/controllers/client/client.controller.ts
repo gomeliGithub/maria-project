@@ -45,7 +45,7 @@ export class ClientController {
         
         if ( !targetPage || ( targetPage !== 'home' && targetPage !== 'admin' ) ) throw new BadRequestException();
 
-        const requiredFields: string[] = targetPage === 'home' ? [ 'name', 'originalImageName' ] : [ 'name', 'description', 'originalImageName' ];
+        const requiredFields: string[] = targetPage === 'home' ? [ 'name', 'compressedImageName' ] : [ 'name', 'description', 'compressedImageName' ];
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 

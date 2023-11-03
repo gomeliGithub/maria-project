@@ -53,7 +53,7 @@ export interface IJWT_token {
 export interface IImagePhotographyType {
     name: string;
     description?: string;
-    originalImageName?: string;
+    compressedImageName?: string;
 }
 
 export interface IClientOrder {

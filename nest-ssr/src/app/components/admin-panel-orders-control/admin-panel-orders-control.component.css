@@ -1,0 +1,3 @@
+:host ::ng-deep .tab-content, :host ::ng-deep .tab-pane {
+    width: 100%;
+}

@@ -1,9 +1,7 @@
-import { Component, ComponentRef, HostBinding, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, HostBinding, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-
-import { ModalComponent } from '../modal/modal.component';
 
 import { AppService } from '../../../app/app.service';
 import { ClientService } from '../../services/client/client.service';
@@ -75,11 +73,6 @@ export class GalleryComponent implements OnInit {
         comment: FormControl<string>
     }>;
 
-    @ViewChild(ModalComponent) modalComponent: ModalComponent
-    @ViewChild('appModal', { read: ViewContainerRef, static: false })
-    private readonly modalViewRef: ViewContainerRef;
-    private readonly modalComponentRef: ComponentRef<ModalComponent>;
-
     @HostBinding('className') componentClass: string;
 
     public compressedImagesList: IReducedGalleryCompressedImages;
@@ -112,12 +105,7 @@ export class GalleryComponent implements OnInit {
         if ( this.appService.checkIsPlatformBrowser() ) {
             this.appService.getTranslations([ 'PAGETITLES.GALLERY', `IMAGEPHOTOGRAPHYTYPESFULLTEXT.${ this.photographyType.toUpperCase() }`], true).subscribe({
                 next: translation => this.appService.setTitle(`${ translation[0] } - ${ translation[1] }`),
-                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
-            });
-
-            import('bootstrap').then(bootstrap => {
-                const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+                error: () => this.appService.createErrorModal()
             });
 
             this.clientService.getCompressedImagesList(this.photographyType).subscribe({
@@ -154,7 +142,7 @@ export class GalleryComponent implements OnInit {
 
                     this.photographyTypeDescription = data.photographyTypeDescription ? data.photographyTypeDescription : null;
                 },
-                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+                error: () => this.appService.createErrorModal()
             });
         }
     }
@@ -170,7 +158,7 @@ export class GalleryComponent implements OnInit {
     }
 
     public sendOrder (): void {
-        this.clientService.sendOrder(this.photographyType, this.sendOrderForm.value, this.modalViewRef, this.modalComponentRef);
+        this.clientService.sendOrder(this.photographyType, this.sendOrderForm.value);
 
         this.sendOrderForm.reset();
         this.changeSendOrderFormAnimationState();

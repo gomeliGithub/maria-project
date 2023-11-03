@@ -106,7 +106,7 @@
 		"DELETEIMAGESUCCESSMESSAGE": "Image deleted successfully",
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Maximum number of images on the home page",
 		"TABLECAPTION": "Image management",
-		"SECONDTABLECAPTION": "Images for photography types",
+		"SECONDTABLECAPTION": "Manage data for photography types",
 		"CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTON": "Change description",
 		"CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTONINVALIDMESSSAGE": "Maximum 40 characters.",
 		"TABLECOLTITLES": {
@@ -117,7 +117,8 @@
 			"IMAGEPHOTOGRAPHYTYPEDESCRIPTION": "Image description",
 			"UPLOADAT": "Upload at",
 			"ONHOMEPAGE": "Displayed on Home page",
-			"ONGALLERYPAGE": "Displayed on Gallery page"
+			"ONGALLERYPAGE": "Displayed on Gallery page",
+			"IMAGEPHOTOGRAPHYTYPECOMPRESSEDIMAGENAME": "Compressed image name"
 		},
 		"CLIENTORDERSTABLECOLTITLES": {
 			"IMAGEPHOTOGRAPHYTYPE": "Photography type",

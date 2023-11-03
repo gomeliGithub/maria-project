@@ -3,6 +3,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -47,7 +48,8 @@ import { environment } from '../environments/environment';
         }),
         AppRoutingModule,
         AdminPanelModule,
-        ClientModule
+        ClientModule,
+        NgbModule
     ],
     providers: [AppService],
     bootstrap: [AppComponent]

@@ -103,7 +103,7 @@
 		"DELETEIMAGESUCCESSMESSAGE": "Изображение успешно удалено",
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Максимальное количество изображений на главной странице",
 		"TABLECAPTION": "Управление изображениями",
-		"SECONDTABLECAPTION": "Изображения для типов съёмок",
+		"SECONDTABLECAPTION": "Управление данными для типов съёмок",
 		"CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTON": "Изменить описание",
 		"CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTONINVALIDMESSSAGE": "Максимум 40 символов.",
 		"TABLECOLTITLES": {
@@ -114,7 +114,8 @@
 			"IMAGEPHOTOGRAPHYTYPEDESCRIPTION": "Описание фото",
 			"UPLOADAT": "Загружен",
 			"ONHOMEPAGE": "Отображён на главной",
-			"ONGALLERYPAGE": "Отображён на галерее"
+			"ONGALLERYPAGE": "Отображён на галерее",
+			"IMAGEPHOTOGRAPHYTYPECOMPRESSEDIMAGENAME": "Имя сжатого изображения"
 		},
 		"CLIENTORDERSTABLECOLTITLES": {
 			"IMAGEPHOTOGRAPHYTYPE": "Тип съёмки",

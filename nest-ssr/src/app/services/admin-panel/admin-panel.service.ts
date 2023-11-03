@@ -1,10 +1,8 @@
-import { ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { FormControl, FormGroup } from '@angular/forms';
 
 import { Observable, map } from 'rxjs';
-
-import { ModalComponent } from '../../components/modal/modal.component';
 
 import { AppService } from '../../app.service';
 import { WebSocketService } from '../web-socket/web-socket.service';
@@ -12,7 +10,7 @@ import { WebSocketService } from '../web-socket/web-socket.service';
 import { environment } from '../../../environments/environment';
 
 import { IClientOrdersData, IClientOrdersInfoData, IFullCompressedImageData } from 'types/global';
-import { IGetClientOrdersOptions, IModalRef } from 'types/options';
+import { IGetClientOrdersOptions } from 'types/options';
 
 @Injectable({
     providedIn: 'root'
@@ -91,18 +89,8 @@ export class AdminPanelService {
 
                     return clientOrder;
                 });
-            } else {
-                (data as IClientOrdersInfoData).infoData = (data as IClientOrdersInfoData).infoData.map(clientOrderInfoData => {
-                    Object.keys(clientOrderInfoData).forEach(field => {
-                        if ( field === 'login' && clientOrderInfoData[field] === 'guest' ) {
-                            clientOrderInfoData[field] = this.appService.getTranslations('ADMINPANEL.GUESTLOGINTEXT');
-                        }
-                    });
-
-                    return clientOrderInfoData;
-                });
             }
-
+            
             return data;
         }));
     }
@@ -121,7 +109,7 @@ export class AdminPanelService {
         imageViewSizeType: FormControl<string>;
         image: FormControl<FileList>;
         imageDescription: FormControl<string>;
-    }>, newClientId: number, modalRef: IModalRef): void {
+    }>, newClientId: number): void {
         const reader = new FileReader();
 
         reader.onload = event => {
@@ -133,22 +121,22 @@ export class AdminPanelService {
                 slicedImageData.push(fileData.slice(i, i + 100000));
             } 
 
-            this.webSocketService.on(this._socketServerHost, uploadImageForm, slicedImageData, newClientId, modalRef);
+            this.webSocketService.on(this._socketServerHost, uploadImageForm, slicedImageData, newClientId);
         }
 
         reader.readAsArrayBuffer(formFile);
     }
 
-    public switchImageControlResponses (responseText: string, modalViewRef: ViewContainerRef, modalComponentRef: ComponentRef<ModalComponent>): void {
+    public switchImageControlResponses (responseText: string): void {
         switch ( responseText ) {
             case 'SUCCESS': { window.location.reload(); break; }
             case 'MAXCOUNT': {
-                this.appService.createWarningModal(modalViewRef, modalComponentRef, this.appService.getTranslations('ADMINPANEL.MAXCOUNTONHOMEPAGEMESSAGE')); 
+                this.appService.createWarningModal(this.appService.getTranslations('ADMINPANEL.MAXCOUNTONHOMEPAGEMESSAGE')); 
 
                 break;
             }
             case 'PENDING': { 
-                this.appService.createWarningModal(modalViewRef, modalComponentRef, this.appService.getTranslations('UPLOADIMAGERESPONSES.PENDING')); 
+                this.appService.createWarningModal(this.appService.getTranslations('UPLOADIMAGERESPONSES.PENDING')); 
                     
                 break; 
             }

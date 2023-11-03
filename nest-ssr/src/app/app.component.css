@@ -13,6 +13,10 @@
     background-color: #888;
 }
 
+:host ::ng-deep #navbarNavDropdown ul {
+    width: fit-content;
+}
+
 .nav-item.dropdown .nav-link:focus-visible  {
     box-shadow: none;
 }

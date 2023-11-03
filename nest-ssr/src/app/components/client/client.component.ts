@@ -1,8 +1,6 @@
-import { Component, ComponentRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-
-import { ModalComponent } from '../modal/modal.component';
 
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
@@ -34,11 +32,6 @@ export class ClientComponent implements OnInit {
         this.signForm = new FormGroup(formControls);
     }
 
-    @ViewChild(ModalComponent) modalComponent: ModalComponent
-    @ViewChild('appModal', { read: ViewContainerRef, static: false })
-    private readonly modalViewRef: ViewContainerRef;
-    private readonly modalComponentRef: ComponentRef<ModalComponent>;
-
     public signForm: FormGroup<{
         clientLogin: FormControl<string>;
         clientPassword: FormControl<string>;
@@ -59,14 +52,9 @@ export class ClientComponent implements OnInit {
         });
         
         if ( this.appService.checkIsPlatformBrowser() ) {
-            if ( this.signOp === 'up' ) import('bootstrap').then(bootstrap => {
-                const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-            });
-
             this.appService.getTranslations(`PAGETITLES.${ this.signOp === 'up' ? 'SIGNUP' : 'SIGNIN' }`, true).subscribe({
                 next: translation => this.appService.setTitle(translation),
-                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+                error: () => this.appService.createErrorModal()
             });
         }
     }
@@ -80,6 +68,6 @@ export class ClientComponent implements OnInit {
     }
 
     public sign (): void {
-        return this.clientService.sign(this.modalViewRef, this.modalComponentRef, this.signForm.value, this.signOp);
+        return this.clientService.sign(this.signForm.value, this.signOp);
     }
 }

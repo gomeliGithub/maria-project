@@ -1,13 +1,23 @@
-#imagesCarousel .carousel-control-prev-icon {
+:host ::ng-deep #imagesCarousel .carousel-inner {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+:host ::ng-deep #imagesCarousel .carousel-control-prev-icon {
     background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23fff" class="bi bi-caret-left" viewBox="0 0 16 16"><path d="M10 12.796V3.204L4.519 8 10 12.796zm-.659.753-5.48-4.796a1 1 0 0 1 0-1.506l5.48-4.796A1 1 0 0 1 11 3.204v9.592a1 1 0 0 1-1.659.753z"/></svg>');
 }
 
-#imagesCarousel .carousel-control-next-icon {
+:host ::ng-deep #imagesCarousel .carousel-control-next-icon {
     background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23fff" class="bi bi-caret-right" viewBox="0 0 16 16"><path d="M6 12.796V3.204L11.481 8 6 12.796zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753z"/></svg>');
 }
 
-#imagesCarousel .carousel-indicators button {
+:host ::ng-deep #imagesCarousel .carousel-indicators button {
     height: 6px!important;
+}
+
+:host ::ng-deep #discountsCarousel .carousel-inner,
+:host ::ng-deep #discountsCarousel .carousel-inner .carousel-item {
+    height: 100% !important;
 }
 
 .imagePhotographyTypesGroup {
@@ -15,7 +25,7 @@
     border-color: gray !important;
 }
 
-#discountsCarousel {
+:host ::ng-deep #discountsCarousel {
     background-image: url('/assets/images_full/IMG_3378.jpg');
     background-size: cover;
     background-position: center;
@@ -62,28 +72,28 @@
 }
 
 @media screen and (max-width: 576px) {
-    #imagesCarousel .carousel-item img {
+    :host ::ng-deep #imagesCarousel .carousel-item img {
         min-height: 300px;
     }
-    #discountsCarousel {
+    :host ::ng-deep #discountsCarousel {
         min-height: 120px;
     }
 }
 
 @media screen and (min-width: 576px) {
-    #imagesCarousel .carousel-item img {
+    :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 390px;
     }
-    #discountsCarousel {
+    :host ::ng-deep #discountsCarousel {
         min-height: 200px;
     }
 }
 
 @media screen and (min-width: 735px) {
-    #imagesCarousel .carousel-item img {
+    :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 620px;
     }
-    #discountsCarousel {
+    :host ::ng-deep #discountsCarousel {
         min-height: 200px;
     }
 }
@@ -95,19 +105,19 @@
 }
 
 @media screen and (min-width: 960px) {
-    #imagesCarousel .carousel-item img {
-        max-height: 700px;
+    :host ::ng-deep #imagesCarousel .carousel-item img {
+        max-height: 710px;
     }
-    #discountsCarousel {
+    :host ::ng-deep #discountsCarousel {
         min-height: 280px;
     }
 }
 
 @media screen and (min-width: 1400px) {
-    #imagesCarousel .carousel-item img {
+    :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 950px;
     }
-    #discountsCarousel {
+    :host ::ng-deep #discountsCarousel {
         min-height: 280px;
     }
 }

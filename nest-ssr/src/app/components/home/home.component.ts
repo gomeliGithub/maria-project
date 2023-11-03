@@ -1,7 +1,5 @@
-import { Component, ComponentRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-
-import { ModalComponent } from '../modal/modal.component';
 
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
@@ -46,13 +44,10 @@ export class HomeComponent implements OnInit {
         private readonly appService: AppService,
         private readonly clientService: ClientService
     ) { }
+
+    public val: number = 23;
     
     public currentMouseTriggerStates: string[] = [];
-
-    @ViewChild(ModalComponent) modalComponent: ModalComponent
-    @ViewChild('appModal', { read: ViewContainerRef, static: false })
-    private readonly modalViewRef: ViewContainerRef;
-    private readonly modalComponentRef: ComponentRef<ModalComponent>;
 
     public compressedImagesList: IClientCompressedImage[];
 
@@ -60,30 +55,23 @@ export class HomeComponent implements OnInit {
     public flatImagePhotographyTypes: IImagePhotographyType[];
 
     ngOnInit (): void {
-        this.appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => this.appService.setTitle(translation));
+        if ( this.appService.checkIsPlatformBrowser() ) {
+            this.appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => this.appService.setTitle(translation));
 
-        this.clientService.getCompressedImagesList('home').subscribe(imagesList => this.compressedImagesList = imagesList);
-        
-        this.clientService.getImagePhotographyTypesData('home').subscribe({
-            next: imagePhotographyTypesData => {
-                this.imagePhotographyTypes = imagePhotographyTypesData;
+            this.clientService.getCompressedImagesList('home').subscribe(imagesList => this.compressedImagesList = imagesList);
+            
+            this.clientService.getImagePhotographyTypesData('home').subscribe({
+                next: imagePhotographyTypesData => {
+                    this.imagePhotographyTypes = imagePhotographyTypesData;
 
-                this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
-                this.flatImagePhotographyTypes.forEach(() => {
-                    this.currentMouseTriggerStates.push('leave');
-                });
-
-                /*const nullable: boolean = imagePhotographyTypesData.some(imagePhotographyTypesDataArr => imagePhotographyTypesDataArr.some(imagePhotographyTypeData => !imagePhotographyTypeData.originalImageName ));
-
-                this.flatImagePhotographyTypes = imagePhotographyTypesData.flat();
-                this.flatImagePhotographyTypes.forEach(() => {
-                    this.currentMouseTriggerStates.push('leave');
-                });
-
-                this.imagePhotographyTypes = nullable ? null : imagePhotographyTypesData;*/
-            },
-            // error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
-        });
+                    this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
+                    this.flatImagePhotographyTypes.forEach(() => {
+                        this.currentMouseTriggerStates.push('leave');
+                    });
+                },
+                error: () => this.appService.createErrorModal()
+            });
+        }
     }
 
     public startMouseTriggerAnimation (index: number): void {

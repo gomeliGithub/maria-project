@@ -1,16 +1,17 @@
-import { AfterViewInit, Component, ComponentRef, ElementRef, HostListener, Inject, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, ElementRef, HostListener, Inject, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
-
 import { TranslateService } from '@ngx-translate/core';
+
 import { Subscription } from 'rxjs';
 
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
 import { ClientComponent } from './components/client/client.component';
 import { AdminPanelComponent } from './components/admin-panel/admin-panel.component';
+import { AdminPanelOrdersControlComponent } from './components/admin-panel-orders-control/admin-panel-orders-control.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
-import { ModalComponent } from './components/modal/modal.component';
 
 import { AppService } from './app.service';
 import { ClientService } from './services/client/client.service';
@@ -18,7 +19,6 @@ import { ClientService } from './services/client/client.service';
 import { environment } from '../environments/environment';
 
 import { IClientLocale } from 'types/global';
-import { Dropdown } from 'bootstrap';
 
 @Component({
     selector: 'app-root',
@@ -76,7 +76,7 @@ import { Dropdown } from 'bootstrap';
         ])
     ]
 })
-export class AppComponent implements OnInit, AfterViewInit {
+export class AppComponent implements OnInit {
     constructor (
         @Inject(DOCUMENT) private readonly document: Document,
         
@@ -85,77 +85,14 @@ export class AppComponent implements OnInit, AfterViewInit {
         private readonly translateService: TranslateService
     ) { }
 
-    public onRouterOutlet (component: HomeComponent | GalleryComponent | ClientComponent | AdminPanelComponent | NotFoundComponent): void {
-        if ( !(component instanceof HomeComponent) ) {
-            this.isHomePage = false;
-
-            this.navbarTogglerClick(true);
-
-            if ( component instanceof GalleryComponent ) component.activeClientIsExists = this.activeClientLogin ? true : false;
-        } else {
-            this.isHomePage = true;
-
-            this.navbarAnimationState = 'scrolled';
-        }
-    }
-
-    @HostListener("scroll", ["$event"]) private onScroll ($event: any): void {
-        if ( $event.srcElement.scrollTop > 50 ) this.navbarAnimationState = 'scrolled';
-        else this.navbarAnimationState = 'static';
-    }
-
-    @HostListener('document:mousedown', ['$event'])
-    public onGlobalClick (event: MouseEvent): void {
-        if ( !this.navbarElementRef.nativeElement.contains(event.target as HTMLElement) ) {
-            if ( !this.navbarTogglerElementRef.nativeElement.getAttribute('aria-expanded') === true ) this.navbarTogglerClick(true);
-        }
-    }
-
-    public navbarTogglerClick (animationStart = false): void {
-        if ( animationStart ) this.changeNavbarTogglerIconTriggerState();
-
-        this.navbarIsOpen = this.navbarIsOpen ? false : true;
-    }
-
-    public async menuMove (menuButtonId: string, show: boolean): Promise<void> {
-        let button: HTMLButtonElement = null;
-
-        switch ( menuButtonId ) {
-            case 'adminPanelMenuButton': { if ( this.adminPanelMenuButtonViewRef ) button = this.adminPanelMenuButtonViewRef.nativeElement; break; }
-            case 'clientMenuButton': { button = this.clientMenuButtonViewRef.nativeElement; break; }
-            case 'dropdownMenuButton': { if ( this.changeClientLocaleButtonViewRef ) button = this.changeClientLocaleButtonViewRef.nativeElement; break; }
-        }
-
-        if ( button ) {
-            const bootstrap = await import('bootstrap');
-            
-            const menu = new bootstrap.Dropdown(button);
-
-            if ( show ) {
-                const dropdownElementList: Dropdown[] = Array.from(document.querySelectorAll(`.dropdown-toggle:not(#${ menuButtonId })`))
-                .map(dropdownToggleEl => new bootstrap.Dropdown(dropdownToggleEl));
-
-                if ( dropdownElementList ) dropdownElementList.forEach(dropdownToggleEl => dropdownToggleEl.hide());
-
-                menu.show();
-            }
-            else menu.hide();
-        }
-    }
-
     public isHomePage: boolean = true;
 
-    public navbarIsOpen: boolean = false;
+    public navbarIsCollapsed: boolean = true;
     public navbarTogglerIconTriggerState: string = 'collapsed';
     public navbarAnimationState: string = 'static';
 
-    @ViewChild(ModalComponent) modalComponent: ModalComponent
-    @ViewChild('appModal', { read: ViewContainerRef, static: false })
-    private readonly modalViewRef: ViewContainerRef;
-    private readonly modalComponentRef: ComponentRef<ModalComponent>;
+    @ViewChildren(NgbDropdown) dropdowns: QueryList<NgbDropdown>;
 
-    @ViewChild('adminPanelMenuButton', { static: false }) private readonly adminPanelMenuButtonViewRef: ElementRef<HTMLButtonElement>;
-    @ViewChild('clientMenuButton', { static: false }) private readonly clientMenuButtonViewRef: ElementRef<HTMLButtonElement>;
     @ViewChild('changeClientLocaleButton', { static: false }) private readonly changeClientLocaleButtonViewRef: ElementRef<HTMLButtonElement>;
     @ViewChild('navbar', { static: false }) private readonly navbarElementRef: ElementRef<HTMLDivElement>;
     @ViewChild('navbarToggler', { static: false }) private readonly navbarTogglerElementRef: ElementRef<HTMLButtonElement>;
@@ -180,12 +117,48 @@ export class AppComponent implements OnInit, AfterViewInit {
 
                 this.document.documentElement.lang = this.activeClientLocale ?? environment.defaultLocale;
             },
-            error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+            error: () => this.appService.createErrorModal()
         });
     }
 
-    ngAfterViewInit (): void {
-        // this.navbarTogglerElementRef.nativeElement.classList.add('collapsed');
+    public onRouterOutlet (component: HomeComponent | GalleryComponent | ClientComponent | AdminPanelComponent | AdminPanelOrdersControlComponent | NotFoundComponent): void {
+        if ( !this.navbarIsCollapsed ) this.navbarTogglerClick(true);
+
+        if ( !(component instanceof HomeComponent) ) {
+            this.isHomePage = false;
+
+            if ( component instanceof GalleryComponent ) component.activeClientIsExists = this.activeClientLogin ? true : false;
+        } else {
+            this.isHomePage = true;
+
+            this.navbarAnimationState = 'scrolled';
+        }
+    }
+
+    @HostListener("scroll", ["$event"]) private onScroll ($event: any): void {
+        if ( $event.srcElement.scrollTop > 50 ) this.navbarAnimationState = 'scrolled';
+        else this.navbarAnimationState = 'static';
+    }
+
+    @HostListener('document:mousedown', ['$event'])
+    public onGlobalClick (event: MouseEvent): void {
+        if ( !this.navbarElementRef.nativeElement.contains(event.target as HTMLElement) ) {
+            if ( !this.navbarIsCollapsed ) this.navbarTogglerClick(true);
+        }
+    }
+
+    public navbarTogglerClick (animationStart = false): void {
+        if ( animationStart ) this.changeNavbarTogglerIconTriggerState();
+
+        this.navbarIsCollapsed = !this.navbarIsCollapsed;
+    }
+
+    public menuMove (open: boolean, hoveredDropdown?: NgbDropdown): void {
+        if ( open ) {
+            this.dropdowns.toArray().forEach(el => el.close());
+    
+            hoveredDropdown.open();
+        } else hoveredDropdown ? hoveredDropdown.close() : this.dropdowns.toArray().forEach(el => el.close());
     }
 
     public changeNavbarTogglerIconTriggerState (): void {
@@ -195,7 +168,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     public signOut (): Subscription {
         return this.clientService.signOut().subscribe({
             next: () => this.appService.reloadComponent(false, '/'),
-            error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations('DEFAULTERRORMESSAGE')) 
+            error: () => this.appService.createErrorModal(this.appService.getTranslations('DEFAULTERRORMESSAGE')) 
         });
     }
 
@@ -212,7 +185,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
                 this.changeClientLocaleButtonViewRef.nativeElement.textContent = newLocale;
             },
-            error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+            error: () => this.appService.createErrorModal()
         });
     }
 }

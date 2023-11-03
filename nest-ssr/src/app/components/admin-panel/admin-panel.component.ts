@@ -1,14 +1,12 @@
-import { Component, ComponentRef, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core';
+import { Component, ElementRef, HostBinding, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-
-import { ModalComponent } from '../modal/modal.component';
 
 import { AppService } from '../../app.service';
 import { AdminPanelService } from '../../services/admin-panel/admin-panel.service';
 import { ClientService } from '../../services/client/client.service';
+import { WebSocketService } from '../../services/web-socket/web-socket.service';
 
-import { IModalRef } from 'types/options';
 import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
 
 @Component({
@@ -22,7 +20,8 @@ export class AdminPanelComponent implements OnInit {
 
         private readonly appService: AppService,
         private readonly adminPanelService: AdminPanelService,
-        private readonly clientService: ClientService
+        private readonly clientService: ClientService,
+        private readonly webSocketService: WebSocketService
     ) {
         this.uploadImageForm = new FormGroup({
             'imagePhotographyType': new FormControl("", [ Validators.required, this.imagePhotographyTypeValidator ]),
@@ -56,9 +55,12 @@ export class AdminPanelComponent implements OnInit {
     @HostListener('document:mousedown', [ '$event' ])
     public onGlobalClick (event): void {
        if ( !this.changeImageDataContainerViewRef.nativeElement.contains(event.target) ) {
-            // clicked outside => close dropdown list
             this.changeImageDataFormHidden = true;
-       }
+        }
+    }
+
+    @HostBinding('className') public get componentClassValue (): string {
+        return this.webSocketService.componentClass;
     }
 
     @ViewChildren('imagePhotographyTypeDescription', { read: ElementRef<HTMLInputElement> }) 
@@ -66,13 +68,6 @@ export class AdminPanelComponent implements OnInit {
 
     public changeImageDataFormHidden: boolean = true;
     public changingOriginalImageName: string;
-
-    @ViewChild(ModalComponent) modalWindowComponent: ModalComponent
-    @ViewChild('appModal', { read: ViewContainerRef, static: false })
-    private readonly modalViewRef: ViewContainerRef;
-    private readonly modalComponentRef: ComponentRef<ModalComponent>;
-
-    public uploadImageAccordionIsOpen: boolean = false;
 
     private _imageFile: File;
 
@@ -92,28 +87,22 @@ export class AdminPanelComponent implements OnInit {
                     this.fullCompressedImagesList = imagesList.imagesList;
                     this.fullCompressedImagesListCount = imagesList.count;
                 },
-                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+                error: () => this.appService.createErrorModal()
             });
 
             this.clientService.getImagePhotographyTypesData('admin').subscribe({
                 next: imagePhotographyTypesData => this.imagePhotographyTypes = imagePhotographyTypesData.length !== 0 ? imagePhotographyTypesData : null,
-                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+                error: () => this.appService.createErrorModal()
             });
         }
     }
 
-    public tableDropdownToggle (event: MouseEvent): void {
-        const target: HTMLButtonElement = event.target as HTMLButtonElement;
-
-        import('bootstrap').then(bootstrap => {
-            const dropdown = new bootstrap.Dropdown(target);
-
-            dropdown.toggle();
-        });
+    public get progressBarVisible (): boolean {
+        return this.webSocketService.progressBarVisible;
     }
 
-    public uploadImageAccordionTogglerClick (): void {
-        this.uploadImageAccordionIsOpen = this.uploadImageAccordionIsOpen ? false : true;
+    public get progressBarValue (): number {
+        return this.webSocketService.progressBarValue;
     }
 
     public fileChange (event: any): void {
@@ -166,11 +155,6 @@ export class AdminPanelComponent implements OnInit {
         }); 
 
         if ( this._imageFile ) {
-            const modalRef: IModalRef = {
-                modalViewRef: this.modalViewRef,
-                modalComponentRef: this.modalComponentRef
-            }
-        
             const newClientId: number = Math.random();
 
             const headers: HttpHeaders = this.appService.createRequestHeaders();
@@ -186,17 +170,17 @@ export class AdminPanelComponent implements OnInit {
             }, { headers, responseType: 'text', withCredentials: true }).subscribe({
                 next: result => {
                     switch ( result ) {
-                        case 'START': { this.adminPanelService.uploadImage(this._imageFile, this.uploadImageForm, newClientId, modalRef); break; }
-                        case 'PENDING': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
-                        case 'FILEEXISTS': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
-                        case 'MAXCOUNT': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
-                        case 'MAXSIZE': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
-                        case 'MAXNAMELENGTH': { this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
+                        case 'START': { this.adminPanelService.uploadImage(this._imageFile, this.uploadImageForm, newClientId); break; }
+                        case 'PENDING': { this.appService.createWarningModal(this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
+                        case 'FILEEXISTS': { this.appService.createWarningModal(this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
+                        case 'MAXCOUNT': { this.appService.createWarningModal(this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
+                        case 'MAXSIZE': { this.appService.createWarningModal(this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
+                        case 'MAXNAMELENGTH': { this.appService.createWarningModal(this.appService.getTranslations(`UPLOADIMAGERESPONSES.${ result }`)); break; }
                     }
                 },
-                error: () => this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef)
+                error: () => this.appService.createErrorModal()
             });
-        } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+        } else this.appService.createErrorModal();
     }
 
     public deleteImage (event: MouseEvent) {
@@ -213,15 +197,15 @@ export class AdminPanelComponent implements OnInit {
                 this.http.post('/api/admin-panel/deleteImage', { 
                     adminPanel: { originalImageName }
                 }, { headers, responseType: 'text', withCredentials: true }).subscribe({
-                    next: responseText => this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef),
+                    next: responseText => this.adminPanelService.switchImageControlResponses(responseText),
                     error: () => {
                         this.spinnerHidden = true;
 
-                        this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+                        this.appService.createErrorModal();
                     }
                 });
             }
-        } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+        } else this.appService.createErrorModal();
     }
 
     public changeImageDisplayTarget (event: MouseEvent) {
@@ -239,15 +223,15 @@ export class AdminPanelComponent implements OnInit {
                 this.http.post('/api/admin-panel/changeImageDisplayTarget', {
                     adminPanel: { originalImageName, displayTargetPage }
                 }, { headers, responseType: 'text', withCredentials: true }).subscribe({
-                    next: responseText => this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef),
+                    next: responseText => this.adminPanelService.switchImageControlResponses(responseText),
                     error: () => {
                         this.spinnerHidden = true;
                         
-                        this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+                        this.appService.createErrorModal();
                     }
                 });
             }
-        } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+        } else this.appService.createErrorModal();
     }
 
     public changeImageData (): void {
@@ -267,17 +251,17 @@ export class AdminPanelComponent implements OnInit {
                     this.changeImageDataFormHidden = true;
                     this.spinnerHidden = true;
 
-                    this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef);
+                    this.adminPanelService.switchImageControlResponses(responseText);
 
                     this.changeImageDataForm.reset();
                 },
                 error: () => {
                     this.spinnerHidden = true;
 
-                    this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+                    this.appService.createErrorModal();
                 }
             });
-        } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+        } else this.appService.createErrorModal();
     }
 
     public changeImageFormActivate (event: MouseEvent): void {
@@ -287,7 +271,7 @@ export class AdminPanelComponent implements OnInit {
             this.changeImageDataFormHidden = false;
 
             this.changingOriginalImageName = imageButton.getAttribute('originalImageName');
-        } else this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+        } else this.appService.createErrorModal();
     }
 
     public setPhotographyTypeImage (event: MouseEvent): void {
@@ -308,12 +292,12 @@ export class AdminPanelComponent implements OnInit {
                     next: responseText => {
                         this.spinnerHidden = true;
     
-                        this.adminPanelService.switchImageControlResponses(responseText, this.modalViewRef, this.modalComponentRef);
+                        this.adminPanelService.switchImageControlResponses(responseText);
                     },
                     error: () => {
                         this.spinnerHidden = true;
                         
-                        this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+                        this.appService.createErrorModal();
                     }
                 });
             }
@@ -343,12 +327,10 @@ export class AdminPanelComponent implements OnInit {
                         error: () => {
                             this.spinnerHidden = true;
                             
-                            this.appService.createErrorModal(this.modalViewRef, this.modalComponentRef);
+                            this.appService.createErrorModal();
                         }
                     });
-                } else this.appService.createWarningModal(this.modalViewRef, this.modalComponentRef, 
-                    this.appService.getTranslations('ADMINPANEL.CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTONINVALIDMESSSAGE')
-                );
+                } else this.appService.createWarningModal(this.appService.getTranslations('ADMINPANEL.CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTONINVALIDMESSSAGE'));
             }
         }
     }

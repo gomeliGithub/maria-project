@@ -4,10 +4,12 @@
         "outDir": "./out-tsc/app-server",
         "module": "ES2022",
         "types": [
-            "node"
+            "node",
+            "@angular/localize"
         ],
         "emitDecoratorMetadata": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "removeComments": true
     },
     "files": ["src/main.server.ts", "server.ts"],
     "angularCompilerOptions": {

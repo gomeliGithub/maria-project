@@ -1,34 +1,29 @@
-<div class="modal fade" id="modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true" (hidden.bs.modal)="destroyModal()">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="modalLabel">{{title}}</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div [ngSwitch]="type" class="modal-body">
-                <div *ngSwitchCase="'successModal'">
-                    <p class="text-success">
-                        {{body}}
-                    </p>
-                </div>
-                <div *ngSwitchCase="'warningModal'">
-                    <p class="text-warning">
-                        {{body}}
-                    </p>
-                </div>
-                <div *ngSwitchCase="'errorModal'">
-                    <p class="text-danger">
-                        {{body}}
-                    </p>
-                </div>
-                <div *ngSwitchCase="'progressBar'" class="progress d-block" id="progressBar" role="progressbar" aria-label="Example with label" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-bar" style="width: 0%"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button *ngIf="closeButton" type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="destroyModal()">{{closeButtonCaption}}</button>
-                <button *ngIf="confirmButton" type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="destroyModal()">{{confirmButtonCaption}}</button>
-            </div>
-        </div>
+<div class="modal-header">
+    <h1 class="modal-title fs-5" id="modalLabel">{{ title }}</h1>
+    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss()"></button>
+</div>
+<div [ngSwitch]="type" class="modal-body">
+    <div *ngSwitchCase="'successModal'">
+        <p class="text-success">
+            {{ body }}
+        </p>
     </div>
+    <div *ngSwitchCase="'warningModal'">
+        <p class="text-warning">
+            {{ body }}
+        </p>
+    </div>
+    <div *ngSwitchCase="'errorModal'">
+        <p class="text-danger">
+            {{ body }}
+        </p>
+    </div>
+</div>
+<div class="modal-footer">
+    <button *ngIf="closeButton" type="button" class="btn btn-secondary" (click)="activeModal.dismiss()">
+        {{ closeButtonCaption }}
+    </button>
+    <button *ngIf="confirmButton" type="button" class="btn btn-primary" (click)="activeModal.dismiss()">
+        {{ confirmButtonCaption }}
+    </button>
 </div>

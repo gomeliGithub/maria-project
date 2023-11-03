@@ -1,7 +1,3 @@
-import { ComponentRef, ViewContainerRef } from "@angular/core";
-
-import { ModalComponent } from "src/app/components/modal/modal.component";
-
 import { Admin } from "server/src/models/client.model";
 
 export interface IGetActiveClientOptions {
@@ -43,11 +39,6 @@ export interface IModalCreateOptions {
 
     closeButtonListener?: Function;
     confirmButtonListener?: Function;
-}
-
-export interface IModalRef {
-    modalViewRef: ViewContainerRef;
-    modalComponentRef: ComponentRef<ModalComponent>;
 }
 
 export interface ICreateImageDirsOptions {

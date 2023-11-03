@@ -1,5 +1,13 @@
 @media (max-width: 768px) {
-    #uploadImageContainer form {
+    :host ::ng-deep #uploadImageAccordion {
         width: 100% !important;
     }
+}
+
+:host ::ng-deep .imagePhotographyTypeDescriptionAccordion .accordion-button {
+    padding: 0.2rem 1rem;
+}
+
+:host ::ng-deep #uploadImageAccordion .accordion-body {
+    padding: 1.2rem !important;
 }

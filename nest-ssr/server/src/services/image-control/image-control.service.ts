@@ -14,7 +14,7 @@ import { CommonModule } from '../../modules/common.module';
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 
-import { Admin, ClientCompressedImage } from '../../models/client.model';
+import { Admin, ClientCompressedImage, ImagePhotographyType } from '../../models/client.model';
 
 import { ICompressImageData, IRequest } from 'types/global';
 import { ICreateImageDirsOptions, IСompressedImageGetOptions } from 'types/options';
@@ -25,13 +25,19 @@ export class ImageControlService {
         private readonly appService: AppService,
 
         @InjectModel(ClientCompressedImage) 
-        private readonly compressedImageModel: typeof ClientCompressedImage
+        private readonly compressedImageModel: typeof ClientCompressedImage,
+        @InjectModel(ImagePhotographyType)
+        private readonly imagePhotographyTypeModel: typeof ImagePhotographyType
     ) { }
 
     public staticCompressedImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
 
     public async get (options: IСompressedImageGetOptions): Promise<ClientCompressedImage[]> {
-        const findOptions: AssociationGetOptions = { where: [], raw: true }
+        const findOptions: AssociationGetOptions = { 
+            where: [],
+            order: [ [ 'uploadDate', 'DESC' ] ],
+            raw: true
+        }
 
         if ( options && options.find && options.find.imageNames ) findOptions.where = { name: options.find.imageNames };
         if ( options && options.find && options.find.includeFields ) findOptions.attributes = options.find.includeFields;
@@ -187,6 +193,7 @@ export class ImageControlService {
 
             await client.$remove('compressedImages', compressedImage);
             await compressedImage.destroy();
+            await this.imagePhotographyTypeModel.update({ compressedImageName: null }, { where: { compressedImageName: compressedImage.name } });
             await fsPromises.unlink(imagePath);
             await fsPromises.unlink(currentCompressedImagePath);
 

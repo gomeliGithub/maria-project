@@ -27,6 +27,10 @@ body {
     width: 60% !important;
 }
 
+app-root a.nav-link, app-root a.dropdown-item {
+    cursor: pointer;
+}
+
 app-home, app-gallery, app-client, app-admin-panel, app-admin-panel-orders-control, app-not-found {
     height: 100% !important;
     width: 100% !important;
@@ -80,7 +84,7 @@ app-admin-panel {
 
 textarea {
     resize: none;
-    height: 80px !important;
+    height: 100px !important;
 }
 
 input.ng-touched.ng-invalid {
@@ -94,4 +98,17 @@ input.ng-touched.ng-valid {
     pointer-events: none;
     overflow-y: hidden;
     visibility: hidden;
+}
+
+.pointerEventsNone2 {
+    pointer-events: none;
+    overflow-y: hidden;
+}
+
+ngb-accordion .accordion-button {
+    box-shadow: none !important;
+}
+
+ngb-accordion .accordion-body {
+    padding: 0 !important;
 }

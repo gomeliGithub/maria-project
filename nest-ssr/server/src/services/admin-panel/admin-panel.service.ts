@@ -451,12 +451,12 @@ export class AdminPanelService {
 
         const currentPhotographyTypeImage: ImagePhotographyType = await this.imagePhotographyTypeModel.findOne({ where: { name: imagePhotographyType } });
 
-        if ( currentPhotographyTypeImage && currentPhotographyTypeImage.originalImageName && path.extname(currentPhotographyTypeImage.originalImageName) !== '' ) {
-            await fsPromises.unlink(path.join(this.staticCompressedImagesDirPath, 'home', 'imagePhotographyTypes', currentPhotographyTypeImage.originalImageName));
+        if ( currentPhotographyTypeImage && currentPhotographyTypeImage.compressedImageName && path.extname(currentPhotographyTypeImage.compressedImageName) !== '' ) {
+            await fsPromises.unlink(path.join(this.staticCompressedImagesDirPath, 'home', 'imagePhotographyTypes', currentPhotographyTypeImage.compressedImageName));
         }
 
         await fsPromises.copyFile(currentPath, newPath);
-        await this.imagePhotographyTypeModel.update({ originalImageName: compressedImage.name }, { where: { name: imagePhotographyType }});
+        await this.imagePhotographyTypeModel.update({ compressedImageName: compressedImage.name }, { where: { name: imagePhotographyType }});
 
         return 'SUCCESS';
     }

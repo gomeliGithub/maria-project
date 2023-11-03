@@ -1,12 +1,12 @@
 <nav class="navbar navbar-expand-sm navbar-light w-100 fixed-top" style="background-color: transparent;" #navbar
     [@navbar-animation]="navbarAnimationState"
     [ngClass]="{ 'bg-gradient': navbarAnimationState === 'scrolled' }"
-    (mouseleave)="menuMove('adminPanelMenuButton', false)"
-    (mouseleave)="menuMove('clientMenuButton', false)"
-    (mouseleave)="menuMove('dropdownMenuButton', false)"
+    (mouseleave)="menuMove(false)"
+    (mouseleave)="menuMove(false)"
+    (mouseleave)="menuMove(false)"
 >
     <div class="container-fluid">
-        <a class="navbar-brand" routerLink="/" routerLinkActive="active"
+        <a class="navbar-brand" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" routerLink="/"
             [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
         >
             <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
@@ -18,13 +18,13 @@
             (click)="changeNavbarTogglerIconTriggerState()"
             (click)="navbarTogglerClick()"
 
-            [attr.aria-expanded]="navbarIsOpen"
+            [attr.aria-expanded]="!navbarIsCollapsed"
         >
             <span class="icon-bar top-bar d-block mb-1 border-1" [@top-bar-animation]="navbarTogglerIconTriggerState"></span>
             <span class="icon-bar middle-bar d-block mb-1 border-1" [@middle-bar-animation]="navbarTogglerIconTriggerState"></span>
             <span class="icon-bar bottom-bar d-block border-1" [@bottom-bar-animation]="navbarTogglerIconTriggerState"></span>
         </button>
-        <div class="navbar-collapse collapse" id="navbarNavDropdown" [ngClass]="{ 'show': navbarIsOpen }">
+        <div class="navbar-collapse collapse" id="navbarNavDropdown" [ngbCollapse]="navbarIsCollapsed">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                     <a class="nav-link active" aria-current="page" routerLink="/"
@@ -40,48 +40,48 @@
                         {{ 'PAGETITLES.GALLERY' | translate }}
                     </a>
                 </li>
-                <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item dropdown">
+                <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item" ngbDropdown display="dynamic" #adminPanelMenu="ngbDropdown">
                     <button class="nav-link dropdown-toggle" type="button" id="adminPanelMenuButton" data-bs-toggle="dropdown" aria-expanded="false" 
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }" 
-                        (mouseenter)="menuMove('adminPanelMenuButton', true)"
-                        #adminPanelMenuButton
+                        ngbDropdownToggle
+                        (mouseenter)="menuMove(true, adminPanelMenu)"
                     >
                     {{ 'PAGETITLES.ADMINPANEL.MAIN' | translate }}
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="adminPanelMenuButton" (mouseleave)="menuMove('clientMenuButton', false)">
+                    <ul class="dropdown-menu" aria-labelledby="adminPanelMenuButton" ngbDropdownMenu (mouseleave)="menuMove(false, adminPanelMenu)">
                         <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                            <a class="dropdown-item" routerLink="/adminPanel">
+                            <a class="" ngbDropdownItem routerLink="/adminPanel">
                                 {{ 'PAGETITLES.ADMINPANEL.IMAGESCONTROL' | translate }}
                             </a>
                         </li>
                         <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                            <a class="dropdown-item" routerLink="/adminPanel/ordersControl">
+                            <a class="" ngbDropdownItem routerLink="/adminPanel/ordersControl">
                                 {{ 'PAGETITLES.ADMINPANEL.ORDERSCONTROL' | translate }}
                             </a>
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item dropdown">
+                <li class="nav-item" ngbDropdown display="dynamic" #clientMenu="ngbDropdown">
                     <button class="nav-link dropdown-toggle" type="button" id="clientMenuButton" data-bs-toggle="dropdown" aria-expanded="false" 
-                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }" 
-                        (mouseenter)="menuMove('clientMenuButton', true)"
-                        #clientMenuButton
+                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
+                        ngbDropdownToggle
+                        (mouseenter)="menuMove(true, clientMenu)"
                     >
                         {{ 'CLIENTMENU.TITLE' | translate }}
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="clientMenuButton" (mouseleave)="menuMove('clientMenuButton', false)">
+                    <ul class="dropdown-menu" aria-labelledby="clientMenuButton" ngbDropdownMenu (mouseleave)="menuMove(false, clientMenu)">
                         <li *ngIf="!activeClientLogin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                            <a class="dropdown-item" routerLink="/signUp">
+                            <a class="" ngbDropdownItem routerLink="/signUp">
                                 {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
                             </a>
                         </li>
                         <li *ngIf="!activeClientLogin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                            <a class="dropdown-item" routerLink="/signIn">
+                            <a class="" ngbDropdownItem routerLink="/signIn">
                                 {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
                             </a>
                         </li>
                         <li *ngIf="activeClientLogin">
-                            <button type="button" class="dropdown-item" (click)="signOut()">
+                            <button type="button" class="" ngbDropdownItem (click)="signOut()">
                                 {{ 'CLIENTMENU.SIGNOUTTEXT' | translate }}
                             </button>
                         </li>
@@ -100,17 +100,18 @@
                 </ng-template>
             </div>
             <ul *ngIf="activeClientLogin" class="navbar-nav ms-2 me-3">
-                <li class="nav-item dropdown">
+                <li class="nav-item" ngbDropdown display="dynamic" #changeClientLocaleMenu="ngbDropdown">
                     <button type="button" class="nav-link dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         [ngClass]="{ 'text-info': navbarAnimationState === 'static' }"
-                        (mouseenter)="menuMove('dropdownMenuButton', true)"
+                        ngbDropdownToggle
+                        (mouseenter)="menuMove(true, changeClientLocaleMenu)"
                         #changeClientLocaleButton
                     >
                         {{ activeClientLocale }}
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton" (mouseleave)="menuMove('dropdownMenuButton', false)">
+                    <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu aria-labelledby="dropdownMenuButton" (mouseleave)="menuMove(false, changeClientLocaleMenu)">
                         <li *ngFor="let locale of locales">
-                            <button type="button" class="dropdown-item" id={{locale.code}} (click)="changeClientLocale($event)">{{locale.code}} ({{locale.title}})</button>
+                            <button type="button" class="" ngbDropdownItem id={{locale.code}} (click)="changeClientLocale($event)">{{locale.code}} ({{locale.title}})</button>
                         </li>
                     </ul>
                 </li>
@@ -118,7 +119,7 @@
         </div>
     </div>
 </nav>
-<router-outlet (activate)='onRouterOutlet($event)' #routerOutlet></router-outlet>
+<router-outlet (activate)="onRouterOutlet($event)" #routerOutlet></router-outlet>
 <ng-template #appModal></ng-template>
 <footer class="flex-grow-0 flex-shrink-1 w-100 text-center text-white" style="background-color: #f1f1f1;">
     <div class="container pt-3">

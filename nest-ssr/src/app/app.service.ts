@@ -1,8 +1,9 @@
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { ComponentRef, Inject, Injectable, PLATFORM_ID, ViewContainerRef } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { Observable, map } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
@@ -23,7 +24,8 @@ export class AppService {
         private readonly meta: Meta, 
         private readonly platformTitle: Title,
         private readonly router: Router,
-        private readonly translateService: TranslateService
+        private readonly translateService: TranslateService,
+        private modalService: NgbModal
     ) { 
         this.isPlatformBrowser = isPlatformBrowser(platformId);
         this.isPlatformServer = isPlatformServer(platformId);
@@ -70,28 +72,31 @@ export class AppService {
         } return null;
     }
 
-    public createModalInstance (viewRef: ViewContainerRef, createOptions: IModalCreateOptions): ComponentRef<ModalComponent> {
-        viewRef.clear();
+    public createModalInstance (createOptions: IModalCreateOptions): NgbModalRef{
+        const modalRef: NgbModalRef = this.modalService.open(ModalComponent, {
+            backdrop: 'static',
+            size: 'lg', 
+            keyboard: false, 
+            centered: true
+        });
 
-        const modalComponent = viewRef.createComponent(ModalComponent);
+        modalRef.componentInstance.title = createOptions.title;
+        modalRef.componentInstance.type = createOptions.type;
+        modalRef.componentInstance.body = createOptions.body;
 
-        modalComponent.instance.title = createOptions.title;
-        modalComponent.instance.type = createOptions.type;
-        modalComponent.instance.body = createOptions.body;
+        modalRef.componentInstance.closeButton = createOptions.closeButton ? createOptions.closeButton : false;
+        modalRef.componentInstance.closeButtonCaption = createOptions.closeButtonCaption ? createOptions.closeButtonCaption : undefined;
 
-        modalComponent.instance.closeButton = createOptions.closeButton ? createOptions.closeButton : false;
-        modalComponent.instance.closeButtonCaption = createOptions.closeButtonCaption ? createOptions.closeButtonCaption : undefined;
+        modalRef.componentInstance.confirmButton = createOptions.confirmButton;
+        modalRef.componentInstance.confirmButtonCaption = createOptions.confirmButtonCaption;
 
-        modalComponent.instance.confirmButton = createOptions.confirmButton;
-        modalComponent.instance.confirmButtonCaption = createOptions.confirmButtonCaption;
+        modalRef.componentInstance.closeButtonListener = createOptions.closeButtonListener ? createOptions.closeButtonListener : undefined;
+        modalRef.componentInstance.confirmButtonListener = createOptions.confirmButtonListener ? createOptions.confirmButtonListener : undefined
 
-        modalComponent.instance.closeButtonListener = createOptions.closeButtonListener ? createOptions.closeButtonListener : undefined;
-        modalComponent.instance.confirmButtonListener = createOptions.confirmButtonListener ? createOptions.confirmButtonListener : undefined;
-
-        return modalComponent;
+        return modalRef;
     }
 
-    public createSuccessModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): ComponentRef<ModalComponent> {
+    public createSuccessModal (bodyText: string): NgbModalRef {
         const createOptions: IModalCreateOptions = {
             title: this.getTranslations('MODAL.SUCCESSTITLE'),
             type: 'successModal',
@@ -99,13 +104,11 @@ export class AppService {
             closeButton: false,
             confirmButtonCaption: this.getTranslations('MODAL.BUTTONS.CONFIRMCAPTIONTEXT')
         }
-            
-        componentRef = this.createModalInstance(viewRef, createOptions);
 
-        return componentRef;
+        return this.createModalInstance(createOptions);
     }
 
-    public createWarningModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText: string): ComponentRef<ModalComponent> {
+    public createWarningModal (bodyText: string): NgbModalRef {
         const createOptions: IModalCreateOptions = {
             title: this.getTranslations('MODAL.WARNINGTITLE'),
             type: 'warningModal',
@@ -113,13 +116,11 @@ export class AppService {
             closeButton: false,
             confirmButtonCaption: this.getTranslations('MODAL.BUTTONS.CONFIRMCAPTIONTEXT')
         }
-            
-        componentRef = this.createModalInstance(viewRef, createOptions);
 
-        return componentRef;
+        return this.createModalInstance(createOptions);
     }
 
-    public createErrorModal (viewRef: ViewContainerRef, componentRef: ComponentRef<ModalComponent>, bodyText?: string): ComponentRef<ModalComponent> {
+    public createErrorModal (bodyText?: string): NgbModalRef {
         const mWCreateOptions: IModalCreateOptions = {
             title: this.getTranslations('MODAL.ERRORTITLE'),
             type: 'errorModal',
@@ -127,10 +128,9 @@ export class AppService {
             closeButton: false,
             confirmButtonCaption: this.getTranslations('MODAL.BUTTONS.CONFIRMCAPTIONTEXT')
         }
-            
-        componentRef = this.createModalInstance(viewRef, mWCreateOptions);
 
-        return componentRef;
+        return this.createModalInstance(mWCreateOptions);
+
     }
 
     public getTranslations <asyncParameter extends boolean = false> (keys: string, async?: asyncParameter): asyncParameter extends true ? Observable<string> : string;

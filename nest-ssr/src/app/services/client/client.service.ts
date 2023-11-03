@@ -1,12 +1,10 @@
-import { ComponentRef, Injectable, ViewContainerRef } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable, forkJoin } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 
 import * as bcryptjs from 'bcryptjs';
-
-import { ModalComponent } from '../../components/modal/modal.component';
 
 import { AppService } from '../../app.service';
 
@@ -31,7 +29,7 @@ export class ClientService {
         ).pipe(activeClient => activeClient as Observable<IClientBrowser>);
     }
 
-    public sign (modalViewRef: ViewContainerRef, modalComponentRef: ComponentRef<ModalComponent>, signFormValue: Partial<{
+    public sign (signFormValue: Partial<{
         clientLogin: string;
         clientPassword: string;
         clientFullName: string;
@@ -57,7 +55,7 @@ export class ClientService {
                     sign: { clientData }
                 }, { headers, withCredentials: true }).subscribe({
                     next: () => this.appService.reloadComponent(false, '/signIn'),
-                    error: () => this.appService.createErrorModal(modalViewRef, modalComponentRef)
+                    error: () => this.appService.createErrorModal()
                 });
             } else this.http.put('/api/sign/in', { 
                 sign: { clientData }
@@ -67,7 +65,7 @@ export class ClientService {
 
                     this.appService.reloadComponent(false, '');
                 },
-                error: () => this.appService.createErrorModal(modalViewRef, modalComponentRef)
+                error: () => this.appService.createErrorModal()
             });
         });
     }
@@ -98,7 +96,7 @@ export class ClientService {
         orderType: string;
         clientPhoneNumber: string;
         comment: string;
-    }>, modalViewRef: ViewContainerRef, modalComponentRef: ComponentRef<ModalComponent>): void {
+    }>): void {
         const headers = this.appService.createRequestHeaders();
 
         const { orderType, clientPhoneNumber, comment } = sendOrderFormValue;
@@ -111,8 +109,8 @@ export class ClientService {
                 comment
             }
         }, { headers: headers, withCredentials: true }).subscribe({
-            next: () => this.appService.createSuccessModal(modalViewRef, modalComponentRef, this.appService.getTranslations('GALLERYPAGE.CLIENTORDERSUCCESSMESSAGE')),
-            error: () => this.appService.createErrorModal(modalViewRef, modalComponentRef)
+            next: () => this.appService.createSuccessModal(this.appService.getTranslations('GALLERYPAGE.CLIENTORDERSUCCESSMESSAGE')),
+            error: () => this.appService.createErrorModal()
         });
     }
 

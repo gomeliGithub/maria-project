@@ -240,7 +240,7 @@ export class ImagePhotographyType extends Model {
     @Column({ 
         type: DataType.STRING
     })
-    originalImageName: string;
+    compressedImageName: string;
 }
 
 @Table({

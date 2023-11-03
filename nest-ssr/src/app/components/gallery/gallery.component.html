@@ -155,9 +155,9 @@
         </div>
         <div class="form-group form-floating mb-3">
             <input type="tel" class="form-control" id="inputPhoneNumber" formControlName="clientPhoneNumber"
-                data-bs-toggle="tooltip" data-bs-placement="top"
-                data-bs-custom-class="custom-tooltip"
-                [attr.data-bs-title]="'GALLERYPAGE.HELPBLOCKS.CLIENTPHONENUMBER' | translate"
+                placement="top"
+                tooltipClass="custom-tooltip"
+                [ngbTooltip]="'GALLERYPAGE.HELPBLOCKS.CLIENTPHONENUMBER' | translate"
             >
             <label for="inputPhoneNumber" class="form-label text-wrap">{{ 'SENDORDERFORM.CLIENTPHONENUMBERTEXT' | translate }}</label>
             <div class="alert alert-danger" *ngIf="sendOrderForm.controls['clientPhoneNumber'].invalid && sendOrderForm.controls['clientPhoneNumber'].touched">
@@ -166,9 +166,9 @@
         </div>
         <div class="form-group form-floating mb-3">
             <textarea class="form-control" id="inputComment" rows="8" maxlength="30" formControlName="comment"
-                data-bs-toggle="tooltip" data-bs-placement="top"
-                data-bs-custom-class="custom-tooltip"
-                [attr.data-bs-title]="'GALLERYPAGE.HELPBLOCKS.COMMENT' | translate"
+                placement="top"
+                tooltipClass="custom-tooltip"
+                [ngbTooltip]="'GALLERYPAGE.HELPBLOCKS.COMMENT' | translate"
             ></textarea>
             <label for="inputComment" class="form-label text-wrap">{{ 'SENDORDERFORM.COMMENTTEXT' | translate }}</label>
         </div>

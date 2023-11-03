@@ -1,12 +1,8 @@
-import { ComponentRef, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 
-import { ModalComponent } from '../../components/modal/modal.component';
-
 import { AppService } from '../../app.service';
-import { ModalService } from '../modal/modal.service';
 
-import { IModalRef } from 'types/options';
 import { IWSMessage } from 'types/web-socket';
 
 @Injectable({
@@ -14,42 +10,35 @@ import { IWSMessage } from 'types/web-socket';
 })
 export class WebSocketService {
     constructor (
-        private readonly appService: AppService,
-        private readonly modalService: ModalService
+        private readonly appService: AppService
     ) { }
 
-    private _connection: WebSocket | null;
+    private _connection: WebSocket;
 
     private _keepAliveTimer: any;
 
     private _currentChunkNumber: number;
     private _slicedImageData: ArrayBuffer[];
 
-    private _modal: ComponentRef<ModalComponent>;
-    private _progressElement: HTMLDivElement;
+    public progressBarVisible: boolean = false;
+    public progressBarValue: number = 0;
+    public componentClass: string;
 
     public on (host: string, uploadImageForm: FormGroup<{
         imagePhotographyType: FormControl<string>;
         imageViewSizeType: FormControl<string>;
         image: FormControl<FileList>;
         imageDescription: FormControl<string>;
-    }>, slicedImageData: ArrayBuffer[], newClientId: number, modalRef: IModalRef): void {
+    }>, slicedImageData: ArrayBuffer[], newClientId: number): void {
         this._connection = new WebSocket(host + `/:${newClientId}`);
-
-        this._modal = this.appService.createModalInstance(modalRef.modalViewRef, {
-            title: this.appService.getTranslations('PROGRESSBAR.TITLE'),
-            type: 'progressBar',
-            confirmButton: false
-        });
-
-        this._modal.onDestroy(() => this._connection ? this._connection.close() : null);
 
         this._connection.onopen = () => {
             this._keepAliveTimer = setInterval(() => {
                 this.send('KEEP_ME_ALIVE');
             }, 5000);
-            
-            this._progressElement = document.getElementById('progressBar') as HTMLDivElement;
+
+            this.progressBarVisible = true;
+            this.componentClass = 'pointerEventsNone2';
 
             this.sendImage(slicedImageData, 0);
         };
@@ -62,32 +51,33 @@ export class WebSocketService {
                     this._clearUploadImageData(uploadImageForm);
 
                     setTimeout(() => {
-                        this.modalService.changeProgressBar(this._progressElement, 0)
+                        this.progressBarValue = 0;
+                        this.progressBarVisible = false;
+                        this.componentClass = '';
 
-                        this._modal.instance.hideModal().then(() => {
-                            this._modal.destroy();
+                        this._connection.close();
 
-                            this.appService.createErrorModal(modalRef.modalViewRef, modalRef.modalComponentRef);
-                        });
+                        this.appService.createErrorModal();
                     }, 2000);
                 } else if ( message.text === 'FINISH' ) {
-                    this.modalService.changeProgressBar(this._progressElement, message.percentUploaded);
+                    this._connection.close();
+
+                    this.progressBarValue = message.percentUploaded;
 
                     this._clearUploadImageData(uploadImageForm);
 
                     setTimeout(() => {
-                        this.modalService.changeProgressBar(this._progressElement, 0);
+                        this.progressBarValue = 0;
 
-                        this._modal.instance.hideModal().then(() => {
-                            this._modal.destroy();
+                        this.progressBarVisible = false;
+                        this.componentClass = '';
 
-                            this.appService.createSuccessModal(modalRef.modalViewRef, modalRef.modalComponentRef, this.appService.getTranslations('UPLOADIMAGERESPONSES.FINISH'));
+                        this.appService.createSuccessModal(this.appService.getTranslations('UPLOADIMAGERESPONSES.FINISH'));
 
-                            window.location.reload();
-                        });
+                        window.location.reload();
                     }, 1000);
                 } else if ( message.text === 'SUCCESS' ) {
-                    this.modalService.changeProgressBar(this._progressElement, message.percentUploaded);
+                    this.progressBarValue = message.percentUploaded;
 
                     this.sendImage(this._slicedImageData, this._currentChunkNumber += 1);
                 }

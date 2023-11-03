@@ -30,8 +30,7 @@
                             "src/styles.css"
                         ],
                         "scripts": [
-                            "node_modules/hammerjs/hammer.min.js",
-                            "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+                            "node_modules/hammerjs/hammer.min.js"
                         ],
                         "allowedCommonJsDependencies": [
                             "bcryptjs"
@@ -47,8 +46,8 @@
                                 },
                                 {
                                     "type": "anyComponentStyle",
-                                    "maximumWarning": "2kb",
-                                    "maximumError": "4kb"
+                                    "maximumWarning": "4kb",
+                                    "maximumError": "8kb"
                                 }
                             ],
                             "outputHashing": "all",
@@ -111,8 +110,7 @@
                             "src/styles.css"
                         ],
                         "scripts": [
-                            "node_modules/hammerjs/hammer.min.js",
-                            "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+                            "node_modules/hammerjs/hammer.min.js"
                         ]
                     }
                 },
@@ -141,7 +139,7 @@
                     "configurations": {
                         "production": {
                             "outputHashing": "media",
-                            "optimization": false
+                            "optimization": true
                         },
                         "development": {
                             "optimization": false,

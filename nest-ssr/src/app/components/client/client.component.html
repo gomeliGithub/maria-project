@@ -1,31 +1,37 @@
 <form [formGroup]="signForm" class="mt-5 p-3 w-50" novalidate (submit)="sign()">
     <div class="form-group form-floating mb-3">
         <input type="text" class="form-control" id="inputLogin" formControlName="clientLogin"
-            data-bs-toggle="tooltip" data-bs-placement="top"
-            data-bs-custom-class="custom-tooltip"
-            [attr.data-bs-title]="'CLIENTPAGE.HELPBLOCKS.LOGIN' | translate"
+            placement="top"
+            tooltipClass="custom-tooltip"
+            [ngbTooltip]="'CLIENTPAGE.HELPBLOCKS.LOGIN' | translate"
+            [disableTooltip]="signOp === 'in'"
         >
-        <label for="inputLogin" class="form-label text-wrap">{{ 'LOGINFORM.LOGINLABELTEXT' | translate }}</label>
+        <label for="inputLogin" class="form-label text-wrap">
+            {{ signOp === 'up' ? ('LOGINFORM.LOGINLABELTEXT' | translate) : ('LOGINFORM.LOGINLABELTEXT' | translate | replace:' *':'') }}
+        </label>
         <div class="alert alert-danger" *ngIf="signForm.controls['clientLogin'].invalid && signForm.controls['clientLogin'].touched">
             {{ 'CLIENTPAGE.LOGININVALIDMESSAGE' | translate }}
         </div>
     </div>
     <div class="form-group form-floating mb-3">
         <input type="password" class="form-control" id="inputPassword" formControlName="clientPassword"
-            data-bs-toggle="tooltip" data-bs-placement="top"
-            data-bs-custom-class="custom-tooltip"
-            [attr.data-bs-title]="'CLIENTPAGE.HELPBLOCKS.PASSWORD' | translate"
+            placement="top"
+            tooltipClass="custom-tooltip"
+            [ngbTooltip]="'CLIENTPAGE.HELPBLOCKS.PASSWORD' | translate"
+            [disableTooltip]="signOp === 'in'"
         >
-        <label for="inputPassword" class="form-label text-wrap">{{ 'LOGINFORM.PASSWORDLABELTEXT' | translate }}</label>
+        <label for="inputPassword" class="form-label text-wrap">
+            {{ signOp === 'up' ? ('LOGINFORM.PASSWORDLABELTEXT' | translate) : ('LOGINFORM.PASSWORDLABELTEXT' | translate | replace:' *':'') }}
+        </label>
         <div class="alert alert-danger" *ngIf="signForm.controls['clientPassword'].invalid && signForm.controls['clientPassword'].touched">
             {{ 'CLIENTPAGE.PASSWORDINVALIDMESSAGE' | translate }}
         </div>
     </div>
     <div *ngIf="signOp === 'up'" class="form-group form-floating mb-3">
         <input type="text" class="form-control" id="inputFullName" formControlName="clientFullName"
-            data-bs-toggle="tooltip" data-bs-placement="top"
-            data-bs-custom-class="custom-tooltip"
-            [attr.data-bs-title]="'CLIENTPAGE.HELPBLOCKS.FULLNAME' | translate"
+            placement="top"
+            tooltipClass="custom-tooltip"
+            [ngbTooltip]="'CLIENTPAGE.HELPBLOCKS.FULLNAME' | translate"
         >
         <label for="inputFullName" class="form-label text-wrap">{{ 'LOGINFORM.FULLNAMELABELTEXT' | translate }}</label>
         <div class="alert alert-danger" *ngIf="signForm.controls['clientFullName'].invalid && signForm.controls['clientFullName'].touched">

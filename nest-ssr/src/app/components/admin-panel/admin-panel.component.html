@@ -53,58 +53,78 @@
                     {{ compressedImage.displayedOnGalleryPage | boolean }}
                 </td>
                 <td>
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" (click)="tableDropdownToggle($event)">
+                    <div class="" ngbDropdown display="dynamic">
+                        <button class="btn btn-secondary" type="button" ngbDropdownToggle>
                             {{ 'ADMINPANEL.IMAGECONTROLTEXT.TITLE' | translate }}
                         </button>
-                        <ul class="dropdown-menu border-0 bg-transparent">
+                        <ul class="dropdown-menu border-0 bg-transparent" ngbDropdownMenu>
                             <li class="text-bg-secondary rounded">
-                                <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" (click)="changeImageFormActivate($event)">
+                                <button class="btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" ngbDropdownItem 
+                                    (click)="changeImageFormActivate($event)"
+                                >
                                     {{ 'ADMINPANEL.IMAGECONTROLTEXT.CHANGEBUTTON' | translate }}
                                 </button>
                             </li>
                             <li class="text-bg-danger rounded">
-                                <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" (click)="deleteImage($event)">
+                                <button class="btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" ngbDropdownItem 
+                                    (click)="deleteImage($event)"
+                                >
                                     {{ 'ADMINPANEL.IMAGECONTROLTEXT.DELETEBUTTON' | translate }}
                                 </button>
                             </li>
                             <li *ngIf="compressedImage.displayedOnHomePage === 0" class="text-bg-warning rounded">
-                                <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'home'" (click)="changeImageDisplayTarget($event)">
+                                <button class="btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'home'" 
+                                    ngbDropdownItem (click)="changeImageDisplayTarget($event)"
+                                >
                                     {{ 'ADMINPANEL.IMAGECONTROLTEXT.MOVETOHOMEPAGEBUTTON' | translate }}
                                 </button>
                             </li>
                             <li *ngIf="compressedImage.displayedOnGalleryPage === 0" class="text-bg-warning rounded">
-                                <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'gallery'" (click)="changeImageDisplayTarget($event)">
+                                <button class=" btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'gallery'" 
+                                    ngbDropdownItem (click)="changeImageDisplayTarget($event)"
+                                >
                                     {{ 'ADMINPANEL.IMAGECONTROLTEXT.MOVETOGALLERYPAGEBUTTON' | translate }}
                                 </button>
                             </li>
                             <li *ngIf="compressedImage.displayedOnHomePage === 1 || compressedImage.displayedOnGalleryPage === 1" class="text-bg-warning rounded">                            
-                                <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'original'" (click)="changeImageDisplayTarget($event)">
+                                <button class="btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'original'" 
+                                    ngbDropdownItem (click)="changeImageDisplayTarget($event)"
+                                >
                                     {{ 'ADMINPANEL.IMAGECONTROLTEXT.MOVETOARCHIVEBUTTON' | translate }}
                                 </button>
                             </li>
                             <li class="text-bg-secondary rounded">
-                                <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.imagePhotographyType]="'individual'" (click)="setPhotographyTypeImage($event)">
+                                <button class="btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" 
+                                    [attr.imagePhotographyType]="'individual'" ngbDropdownItem (click)="setPhotographyTypeImage($event)"
+                                >
                                     {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.INDIVIDUALBUTTONTEXT' | translate }}
                                 </button>
                             </li>
                             <li class="text-bg-secondary rounded">
-                                <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.imagePhotographyType]="'children'" (click)="setPhotographyTypeImage($event)">
+                                <button class="btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" 
+                                    [attr.imagePhotographyType]="'children'" ngbDropdownItem (click)="setPhotographyTypeImage($event)"
+                                >
                                     {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.CHILDRENBUTTONTEXT' | translate }}
                                 </button>
                             </li>
                             <li class="text-bg-secondary rounded">
-                                <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.imagePhotographyType]="'wedding'" (click)="setPhotographyTypeImage($event)">
+                                <button class="btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" 
+                                    [attr.imagePhotographyType]="'wedding'" ngbDropdownItem (click)="setPhotographyTypeImage($event)"
+                                >
                                     {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.WEDDINGBUTTONTEXT' | translate }}
                                 </button>
                             </li>
                             <li class="text-bg-secondary rounded">
-                                <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.imagePhotographyType]="'family'" (click)="setPhotographyTypeImage($event)">
+                                <button class="btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" 
+                                    [attr.imagePhotographyType]="'family'" ngbDropdownItem (click)="setPhotographyTypeImage($event)"
+                                >
                                     {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.FAMILYBUTTONTEXT' | translate }}
                                 </button>
                             </li>
                             <li class="text-bg-secondary rounded">
-                                <button class="dropdown-item btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.imagePhotographyType]="'event'" (click)="setPhotographyTypeImage($event)">
+                                <button class="btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" 
+                                    [attr.imagePhotographyType]="'event'" ngbDropdownItem (click)="setPhotographyTypeImage($event)"
+                                >
                                     {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.EVENTBUTTONTEXT' | translate }}
                                 </button>
                             </li>
@@ -155,66 +175,54 @@
     <strong class="text-info fs-4" role="status">{{ 'SPINNERTITLES.PROCESSING' | translate }}</strong>
     <div class="spinner-border text-info ms-auto" aria-hidden="true"></div>
 </div>
-<div class="accordion accordion-flush" id="uploadImageAccordion">
-    <div class="accordion-item">
-        <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne"
-                aria-controls="flush-collapseOne"
-                [attr.aria-expanded]="uploadImageAccordionIsOpen"
-                (click)="uploadImageAccordionTogglerClick()"
-            >
-                {{ 'ADMINPANEL.UPLOADIMAGETEXT.BUTTON' | translate }}
-            </button>
-        </h2>
-        <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#uploadImageAccordion">
-            <div class="accordion-body">
-                <div class="d-flex flex-row justify-content-center" id="uploadImageContainer">
-                    <form [formGroup]="uploadImageForm" class="p-3 w-50" novalidate (submit)="uploadImage()">
-                        <div class="form-group form-floating mb-3">
-                            <select class="form-control form-select" id="inputPhotographyType" formControlName="imagePhotographyType">
-                                <option value="individual" selected>{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</option>
-                                <option value="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</option>
-                                <option value="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</option>
-                                <option value="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</option>
-                                <option value="event">{{ 'IMAGEPHOTOGRAPHYTYPES.EVENT' | translate }}</option>
-                            </select>
-                            <label for="inputPhotographyType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.PHOTOGRAPHYTYPE' | translate }}</label>
-                            <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imagePhotographyType'].invalid && uploadImageForm.controls['imagePhotographyType'].touched">
-                                {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDPHOTOGRAPHYTYPE' | translate }}
-                            </div>
-                        </div>
-                        <div class="form-group form-floating mb-3">
-                            <select class="form-control form-select" id="inputViewSizeType" formControlName="imageViewSizeType">
-                                <option value="small" selected>{{ 'IMAGEVIEWSIZETYPES.SMALL' | translate }}</option>
-                                <option value="medium">{{ 'IMAGEVIEWSIZETYPES.MEDIUM' | translate }}</option>
-                                <option value="big">{{ 'IMAGEVIEWSIZETYPES.BIG' | translate }}</option>
-                            </select>
-                            <label for="inputViewSizeType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.VIEWSIZETYPE' | translate }}</label>
-                            <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imageViewSizeType'].invalid && uploadImageForm.controls['imageViewSizeType'].touched">
-                                {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDVIEWSIZETYPE' | translate }}
-                            </div>
-                        </div>
-                        <div class="form-group mb-3">
-                            <input type="file" class="form-control" id="inputImage" (change)="fileChange($event)" formControlName="image">
-                            <div class="alert alert-danger" *ngIf="uploadImageForm.controls['image'].invalid && uploadImageForm.controls['image'].touched">
-                                {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDSELECTIMAGE' | translate }}
-                            </div>
-                        </div>
-                        <div class="form-group form-floating mb-3">
-                            <input type="text" class="form-control" id="inputImageDescription" formControlName="imageDescription">
-                            <label for="inputImageDescription" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.DESCRIPTION' | translate }}</label>
-                        </div>
-                        <div class="form-group text-center">
-                            <button class="btn btn-primary" [disabled]="uploadImageForm.invalid">
-                                {{ 'ADMINPANEL.UPLOADIMAGETEXT.BUTTON' | translate }}
-                            </button>
-                        </div>
-                    </form>
+<ngb-accordion class="align-self-center my-4 w-50" id="uploadImageAccordion">
+    <ngb-panel [title]="'ADMINPANEL.UPLOADIMAGETEXT.BUTTON' | translate">
+        <ng-template ngbPanelContent>
+
+            <form [formGroup]="uploadImageForm" class="" novalidate (submit)="uploadImage()">
+                <div class="form-group form-floating mb-3">
+                    <select class="form-control form-select" id="inputPhotographyType" formControlName="imagePhotographyType">
+                        <option value="individual" selected>{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</option>
+                        <option value="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</option>
+                        <option value="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</option>
+                        <option value="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</option>
+                        <option value="event">{{ 'IMAGEPHOTOGRAPHYTYPES.EVENT' | translate }}</option>
+                    </select>
+                    <label for="inputPhotographyType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.PHOTOGRAPHYTYPE' | translate }}</label>
+                    <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imagePhotographyType'].invalid && uploadImageForm.controls['imagePhotographyType'].touched">
+                            {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDPHOTOGRAPHYTYPE' | translate }}
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
+                <div class="form-group form-floating mb-3">
+                    <select class="form-control form-select" id="inputViewSizeType" formControlName="imageViewSizeType">
+                        <option value="small" selected>{{ 'IMAGEVIEWSIZETYPES.SMALL' | translate }}</option>
+                        <option value="medium">{{ 'IMAGEVIEWSIZETYPES.MEDIUM' | translate }}</option>
+                        <option value="big">{{ 'IMAGEVIEWSIZETYPES.BIG' | translate }}</option>
+                    </select>
+                    <label for="inputViewSizeType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.VIEWSIZETYPE' | translate }}</label>
+                    <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imageViewSizeType'].invalid && uploadImageForm.controls['imageViewSizeType'].touched">
+                        {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDVIEWSIZETYPE' | translate }}
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <input type="file" class="form-control" id="inputImage" (change)="fileChange($event)" formControlName="image">
+                    <div class="alert alert-danger" *ngIf="uploadImageForm.controls['image'].invalid && uploadImageForm.controls['image'].touched">
+                        {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDSELECTIMAGE' | translate }}
+                    </div>
+                </div>
+                <div class="form-group form-floating mb-3">
+                    <input type="text" class="form-control" id="inputImageDescription" formControlName="imageDescription">
+                    <label for="inputImageDescription" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.DESCRIPTION' | translate }}</label>
+                </div>
+                <div class="form-group text-center">
+                    <button class="btn btn-primary" [disabled]="uploadImageForm.invalid">
+                        {{ 'ADMINPANEL.UPLOADIMAGETEXT.BUTTON' | translate }}
+                    </button>
+                </div>
+            </form>
+        </ng-template>
+    </ngb-panel>
+</ngb-accordion>
 <div *ngIf="imagePhotographyTypes && imagePhotographyTypes.length !== 0" id="photographyTypesImages">
     <div class="table-responsive">
         <table class="table caption-top table-borderless table-hover text-center align-middle">
@@ -223,7 +231,7 @@
                 <tr>
                     <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPE' | translate }}</th>
                     <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPEDESCRIPTION' | translate }}</th>
-                    <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALNAME' | translate }}</th>
+                    <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPECOMPRESSEDIMAGENAME' | translate }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -236,25 +244,28 @@
                         <ng-template ngSwitchCase="event">{{ 'IMAGEPHOTOGRAPHYTYPES.EVENT' | translate }}</ng-template>
                     </td>
                     <td>
-                        <ng-template [ngIf]="imagePhotographyTypeData.description && imagePhotographyTypeData.description !== ''" [ngIfElse]="noTextIcon">
-                            <input type="text" class="form-control" [value]="imagePhotographyTypeData.description" [textContent]="imagePhotographyTypeData.description"
-                                [attr.photography-type-name]="imagePhotographyTypeData.name" #imagePhotographyTypeDescription
-                            >
+                        <ngb-accordion class="imagePhotographyTypeDescriptionAccordion">
+                            <ngb-panel class="">
+                                <ng-template ngbPanelContent>
+                                    <textarea class="form-control" [value]="imagePhotographyTypeData.description"
+                                        [attr.photography-type-name]="imagePhotographyTypeData.name" #imagePhotographyTypeDescription
+                                    >
+                                        {{ imagePhotographyTypeData.description }}
+                                    </textarea>
+                                </ng-template>
+                             </ngb-panel>
+                        </ngb-accordion>
+                    </td>
+                    <td>
+                        <ng-template [ngIf]="imagePhotographyTypeData.compressedImageName && imagePhotographyTypeData.compressedImageName !== ''" [ngIfElse]="noTextIcon">
+                            {{ imagePhotographyTypeData.compressedImageName }}
                         </ng-template>
                         <ng-template #noTextIcon>
                             <i class="bi bi-dash-lg text-black"></i>
                         </ng-template>
                     </td>
                     <td>
-                        <ng-template [ngIf]="imagePhotographyTypeData.originalImageName && imagePhotographyTypeData.originalImageName !== ''" [ngIfElse]="noTextIcon">
-                            {{ imagePhotographyTypeData.originalImageName }}
-                        </ng-template>
-                        <ng-template #noTextIcon>
-                            <i class="bi bi-dash-lg text-black"></i>
-                        </ng-template>
-                    </td>
-                    <td>
-                        <button class="btn btn-secondary btn-sm" type="button" [attr.photography-type-name]="imagePhotographyTypeData.name" (click)="changePhotographyTypeDescription($event)">
+                        <button class="btn btn-info btn-sm" type="button" [attr.photography-type-name]="imagePhotographyTypeData.name" (click)="changePhotographyTypeDescription($event)">
                             {{ 'ADMINPANEL.CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTON' | translate }}
                         </button>
                     </td>
@@ -264,3 +275,9 @@
     </div>
 </div>
 <ng-template #appModal></ng-template>
+<div class="text-bg-secondary position-absolute top-50 start-50 translate-middle p-3 rounded w-75"
+    [ngClass]="{ 'visually-hidden': !progressBarVisible }"
+>
+    <span class="fw-semibold">{{ 'PROGRESSBAR.TITLE' | translate }}</span>
+    <ngb-progressbar [showValue]="true" type="primary" [value]="progressBarValue" [max]="100" height="1.5rem" class="mt-3 w-100"></ngb-progressbar>
+</div>
