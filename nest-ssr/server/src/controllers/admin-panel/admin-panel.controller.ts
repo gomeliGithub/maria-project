@@ -122,6 +122,10 @@ export class AdminPanelController {
             || ( requestBody.adminPanel.newImageDescription && ( 
                 typeof requestBody.adminPanel.newImageDescription !== 'string' || requestBody.adminPanel.newImageDescription.length > 20
             ))
+            || ( requestBody.adminPanel.newImageViewSizeType && (
+                typeof requestBody.adminPanel.newImageViewSizeType !== 'string' 
+                || !this.appService.imageViewSizeTypes.includes(requestBody.adminPanel.newImageViewSizeType)
+            ))
         ) throw new BadRequestException();
 
         return this.adminPanelService.changeImageData(request, requestBody);

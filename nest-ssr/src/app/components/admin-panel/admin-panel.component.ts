@@ -31,9 +31,9 @@ export class AdminPanelComponent implements OnInit {
         });
 
         this.changeImageDataForm = new FormGroup({
-            'newImagePhotographyType': new FormControl("", [ Validators.nullValidator, this.imagePhotographyTypeValidator ]),
-            'newImageViewSizeType': new FormControl("", [ Validators.nullValidator, this.imageViewSizeTypeValidator ]),
-            'newImageDescription': new FormControl("", Validators.maxLength(20)) 
+            'newImagePhotographyType': new FormControl(""),
+            'newImageViewSizeType': new FormControl(""),
+            'newImageDescription': new FormControl("")
         });
     }
 
@@ -136,13 +136,40 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public imageViewSizeTypeValidator (control: FormControl<string>): { [ s: string ]: boolean } | null {
-        const imageViewSizeTypes: string[] = [ 'small', 'medium', 'big' ];
+        const imageViewSizeTypes: string[] = [ 'medium', 'big' ];
 
         if ( !imageViewSizeTypes.includes(control.value) ) {
             return { 'imageViewSizeType': true, 'newImageViewSizeType': true };
         }
 
         return null;
+    }
+
+    public controlPhotographyTypeChange () {
+        const control: FormControl<string> = <FormControl>this.changeImageDataForm.get('newImagePhotographyType');
+
+        if ( control.value ) control.setValidators([ Validators.required, this.imagePhotographyTypeValidator ])
+        else control.setValidators(null);
+    
+        control.updateValueAndValidity();
+    }
+
+    public controlViewSizeTypeChange () {
+        const control: FormControl<string> = <FormControl>this.changeImageDataForm.get('newImageViewSizeType');
+
+        if ( control.value ) control.setValidators([ Validators.required, this.imageViewSizeTypeValidator ])
+        else control.setValidators(null);
+    
+        control.updateValueAndValidity();
+    }
+
+    public controlImageDescriptionChange () {
+        const control: FormControl<string> = <FormControl>this.changeImageDataForm.get('newImageDescription');
+
+        if ( control.value ) control.setValidators([ Validators.required, Validators.maxLength(20) ])
+        else control.setValidators(null);
+    
+        control.updateValueAndValidity();
     }
 
     public uploadImage (): void {
@@ -235,7 +262,7 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public changeImageData (): void {
-        const { newImagePhotographyType, newImageDescription } = this.changeImageDataForm.value;
+        const { newImagePhotographyType, newImageDescription, newImageViewSizeType } = this.changeImageDataForm.value;
 
         const originalImageName: string = this.changingOriginalImageName;
 
@@ -245,7 +272,7 @@ export class AdminPanelComponent implements OnInit {
             const headers: HttpHeaders = this.appService.createRequestHeaders();
 
             this.http.put('/api/admin-panel/changeImageData', {
-                adminPanel: { originalImageName, newImagePhotographyType, newImageDescription }
+                adminPanel: { originalImageName, newImagePhotographyType, newImageDescription, newImageViewSizeType }
             }, { responseType: 'text', headers, withCredentials: true }).subscribe({
                 next: responseText => {
                     this.changeImageDataFormHidden = true;

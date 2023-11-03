@@ -42,6 +42,7 @@ export interface IRequestBody {
         newImagePhotographyType?: string; 
         newImageDescription?: string;
         imagePhotographyType?: string;
+        newImageViewSizeType?: string;
 
         clientOrderId?: number;
         clientLogin?: string;

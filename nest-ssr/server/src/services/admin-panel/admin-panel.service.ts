@@ -394,7 +394,7 @@ export class AdminPanelService {
         const originalImageName: string = requestBody.adminPanel.originalImageName;
 
         const updateValues: { [ x: string ]: any } = { };
-        const { newImagePhotographyType, newImageDescription } = requestBody.adminPanel;
+        const { newImagePhotographyType, newImageDescription, newImageViewSizeType } = requestBody.adminPanel;
 
         if ( newImagePhotographyType ) {
             updateValues.photographyType = newImagePhotographyType;
@@ -419,6 +419,7 @@ export class AdminPanelService {
         }
 
         if ( newImageDescription ) updateValues.imageDescription = newImageDescription;
+        if ( newImageViewSizeType ) updateValues.viewSizeType = newImageViewSizeType;
 
         await this.compressedImageModel.update(updateValues, { where: { originalName: originalImageName } });
 

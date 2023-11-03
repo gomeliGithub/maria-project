@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-sm navbar-light w-100 fixed-top" style="background-color: transparent;" #navbar
+<nav class="navbar navbar-expand-md navbar-light w-100 fixed-top" style="background-color: transparent;" #navbar
     [@navbar-animation]="navbarAnimationState"
     [ngClass]="{ 'bg-gradient': navbarAnimationState === 'scrolled' }"
     (mouseleave)="menuMove(false)"
@@ -12,8 +12,7 @@
             <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
             Mashulik
         </a>
-        <button class="navbar-toggler" id="navbarTogglerButton" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" #navbarToggler
-            aria-label="Toggle navigation"
+        <button class="navbar-toggler" id="navbarTogglerButton" type="button" aria-controls="navbarNavDropdown" #navbarToggler
             [@navbar-toggler-icon-trigger]="navbarTogglerIconTriggerState"
             (click)="changeNavbarTogglerIconTriggerState()"
             (click)="navbarTogglerClick()"
@@ -41,7 +40,7 @@
                     </a>
                 </li>
                 <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item" ngbDropdown display="dynamic" #adminPanelMenu="ngbDropdown">
-                    <button class="nav-link dropdown-toggle" type="button" id="adminPanelMenuButton" data-bs-toggle="dropdown" aria-expanded="false" 
+                    <button class="nav-link" type="button" id="adminPanelMenuButton"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }" 
                         ngbDropdownToggle
                         (mouseenter)="menuMove(true, adminPanelMenu)"
@@ -62,7 +61,7 @@
                     </ul>
                 </li>
                 <li class="nav-item" ngbDropdown display="dynamic" #clientMenu="ngbDropdown">
-                    <button class="nav-link dropdown-toggle" type="button" id="clientMenuButton" data-bs-toggle="dropdown" aria-expanded="false" 
+                    <button class="nav-link" type="button" id="clientMenuButton"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                         ngbDropdownToggle
                         (mouseenter)="menuMove(true, clientMenu)"
@@ -101,7 +100,7 @@
             </div>
             <ul *ngIf="activeClientLogin" class="navbar-nav ms-2 me-3">
                 <li class="nav-item" ngbDropdown display="dynamic" #changeClientLocaleMenu="ngbDropdown">
-                    <button type="button" class="nav-link dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    <button type="button" class="nav-link" id="dropdownMenuButton"
                         [ngClass]="{ 'text-info': navbarAnimationState === 'static' }"
                         ngbDropdownToggle
                         (mouseenter)="menuMove(true, changeClientLocaleMenu)"

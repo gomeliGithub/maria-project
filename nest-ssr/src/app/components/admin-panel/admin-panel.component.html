@@ -1,4 +1,4 @@
-<div class="table-responsive" id="listContainer">
+<div class="table-responsive vh-50" id="listContainer">
     <table *ngIf="fullCompressedImagesListCount !== 0; else noContentBlock" class="table caption-top table-borderless table-hover text-center align-middle">
         <caption>{{ 'ADMINPANEL.TABLECAPTION' | translate }}</caption>
         <thead>
@@ -140,10 +140,12 @@
         </div>
     </ng-template>
 </div>
-<div class="d-flex flex-row justify-content-center" id="changeImageDataContainer" [ngClass]="{ 'visually-hidden': changeImageDataFormHidden }" #changeImageDataContainer>
-    <form [formGroup]="changeImageDataForm" novalidate (submit)="changeImageData()">
+<div class="d-flex flex-row align-self-center w-50" id="changeImageDataContainer" [ngClass]="{ 'visually-hidden': changeImageDataFormHidden }" #changeImageDataContainer>
+    <form [formGroup]="changeImageDataForm" class="w-100" novalidate (submit)="changeImageData()">
         <div class="form-group form-floating mb-3">
-            <select class="form-control form-select" id="inputChangePhotographyType" formControlName="newImagePhotographyType">
+            <select class="form-control form-select" id="inputChangePhotographyType" formControlName="newImagePhotographyType" 
+                (change)="controlPhotographyTypeChange()"
+            >
                 <option value="individual" selected>{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</option>
                 <option value="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</option>
                 <option value="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</option>
@@ -153,15 +155,16 @@
             <label for="inputChangePhotographyType" class="form-label">{{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.PHOTOGRAPHYTYPE' | translate }}</label>
         </div>
         <div class="form-group form-floating mb-3">
-            <select class="form-control form-select" id="inputChangeViewSizeType" formControlName="newImageViewSizeType">
-                <option value="small" selected>{{ 'IMAGEVIEWSIZETYPES.SMALL' | translate }}</option>
-                <option value="medium">{{ 'IMAGEVIEWSIZETYPES.MEDIUM' | translate }}</option>
+            <select class="form-control form-select" id="inputChangeViewSizeType" formControlName="newImageViewSizeType" 
+                (change)="controlViewSizeTypeChange()"
+            >
+                <option value="medium" selected>{{ 'IMAGEVIEWSIZETYPES.MEDIUM' | translate }}</option>
                 <option value="big">{{ 'IMAGEVIEWSIZETYPES.BIG' | translate }}</option>
             </select>
             <label for="inputChangeViewSizeType" class="form-label">{{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.VIEWSIZETYPE' | translate }}</label>
         </div>
         <div class="form-group form-floating mb-3">
-            <input type="text" class="form-control" id="inputChangeImageDescription" formControlName="newImageDescription">
+            <input type="text" class="form-control" id="inputChangeImageDescription" formControlName="newImageDescription" (change)="controlImageDescriptionChange()">
             <label for="inputChangeImageDescription" class="form-label">{{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.DESCRIPTION' | translate }}</label>
         </div>
         <div class="form-group text-center">
@@ -178,7 +181,6 @@
 <ngb-accordion class="align-self-center my-4 w-50" id="uploadImageAccordion">
     <ngb-panel [title]="'ADMINPANEL.UPLOADIMAGETEXT.BUTTON' | translate">
         <ng-template ngbPanelContent>
-
             <form [formGroup]="uploadImageForm" class="" novalidate (submit)="uploadImage()">
                 <div class="form-group form-floating mb-3">
                     <select class="form-control form-select" id="inputPhotographyType" formControlName="imagePhotographyType">
@@ -195,8 +197,7 @@
                 </div>
                 <div class="form-group form-floating mb-3">
                     <select class="form-control form-select" id="inputViewSizeType" formControlName="imageViewSizeType">
-                        <option value="small" selected>{{ 'IMAGEVIEWSIZETYPES.SMALL' | translate }}</option>
-                        <option value="medium">{{ 'IMAGEVIEWSIZETYPES.MEDIUM' | translate }}</option>
+                        <option value="medium" selected>{{ 'IMAGEVIEWSIZETYPES.MEDIUM' | translate }}</option>
                         <option value="big">{{ 'IMAGEVIEWSIZETYPES.BIG' | translate }}</option>
                     </select>
                     <label for="inputViewSizeType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.VIEWSIZETYPE' | translate }}</label>

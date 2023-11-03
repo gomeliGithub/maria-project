@@ -23,6 +23,10 @@ body {
     height: 85% !important;
 }
 
+.vh-50 {
+    height: 50vh !important;
+}
+
 .w-60 {
     width: 60% !important;
 }

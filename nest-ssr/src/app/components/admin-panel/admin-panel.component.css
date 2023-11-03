@@ -1,5 +1,5 @@
 @media (max-width: 768px) {
-    :host ::ng-deep #uploadImageAccordion {
+    :host ::ng-deep #uploadImageAccordion, :host ::ng-deep #changeImageDataContainer {
         width: 100% !important;
     }
 }
