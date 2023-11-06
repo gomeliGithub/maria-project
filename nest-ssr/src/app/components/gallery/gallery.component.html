@@ -10,50 +10,10 @@
     >{{ 'GALLERYPAGE.ORDERBUTTONTEXT' | translate }}</button>
     <hr class="border-3 mt-5 w-100"/>
 </div>
-<div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-column align-items-center justify-content-center vw-95" id="galleryImages">
-    <div *ngFor="let imageDataArr of compressedImagesList.small" class="d-flex flex-row justify-content-center align-items-center mb-2 smallSizedImagesContainer">
+<div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-column align-items-center justify-content-center vw-80" id="galleryImages">
+    <div *ngFor="let imageDataArr of compressedImagesList.medium" class="d-flex flex-row justify-content-center mb-2 mediumSizedImagesContainer">
         <ng-template ngFor let-imageData [ngForOf]="imageDataArr" let-i="index">
             <div class="d-flex flex-row justify-content-center position-relative h-auto w-25"
-                [ngClass]="{ 
-                    'me-2': i !== imageDataArr.length - 1, 
-                    'twoFirstImageContainer': i === 0 || i === 1 
-                }"
-                (mouseenter)="startLinkContainerAnimation(
-                    setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
-                    imageData.viewSizeType
-                )"
-                (mouseleave)="startLinkContainerAnimation(
-                    setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
-                    imageData.viewSizeType
-                )"
-            >
-                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-fluid rounded h-100">
-                <div class="text-center position-absolute top-100 start-50 w-100 downloadOriginalImageLinkContainer"
-                    [@link-container-animation]="smallLinkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]"
-                    (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(
-                        imageData.name, imageData.viewSizeType), 
-                        imageData.viewSizeType
-                    )"
-                    (@link-container-animation.done)="linkContainerAnimationDone($event, setCurrentLinkContainerAnimationStateIndex(
-                        imageData.name, imageData.viewSizeType), 
-                        imageData.viewSizeType
-                    )"
-                    [ngStyle]="{ 
-                        'display': smallLinkContainerAnimationDisplayValues[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]
-                    }"
-                >
-                    <a href="/api/client/downloadOriginalImage/:{{ imageData.name }}" class="btn btn-secondary btn-sm" 
-                        tabindex="-1" role="button" aria-disabled="true"
-                    >
-                        {{ 'GALLERYPAGE.DOWNLOADORIGINALIMAGEBUTTONTEXT' | translate }}
-                    </a>
-                </div>
-            </div>
-        </ng-template>
-    </div>
-    <div *ngFor="let imageDataArr of compressedImagesList.medium" class="d-flex flex-row justify-content-center align-items-center mb-2 mediumSizedImagesContainer">
-        <ng-template ngFor let-imageData [ngForOf]="imageDataArr" let-i="index">
-            <div class="d-flex flex-row justify-content-center position-relative h-auto w-50"
                 [ngClass]="{ 
                     'me-2': i !== imageDataArr.length - 1,
                     'twoFirstImageContainer': i === 0 || i === 1
@@ -137,6 +97,11 @@
         <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
     </div>
 </ng-template>
+<div class="m-3">
+    <button type="button" class="btn btn-outline-secondary btn-lg" id="toggleBigGalleryButton" (click)="toggleBigGallery()">
+        {{ !bigGalleryIsHide ? ('GALLERYPAGE.MEDIUMGALLERYBUTTONTEXT' | translate) : ('GALLERYPAGE.BIGGALLERYBUTTONTEXT' | translate) }}
+    </button>
+</div>
 <div class="d-flex flex-column w-50 position-absolute top-50 start-50 visible pe-auto" #sendOrderFormContainer [@send-order-form-animation]="sendOrderFormAnimationState"
     (@send-order-form-animation.start)="sendOrderFormAnimationStarted($event)"
     (@send-order-form-animation.done)="sendOrderFormAnimationDone($event)"
@@ -146,7 +111,7 @@
         <div class="form-group form-floating mb-3">
             <select class="form-control form-select" id="inputType" formControlName="orderType">
                 <option value="consultation" selected>{{ 'CLIENTORDERTYPES.CONSULTATION' | translate }}</option>
-                <option value="full" [attr.disabled]="!activeClientIsExists">{{ 'CLIENTORDERTYPES.FULL' | translate }}</option>
+                <option value="full" [attr.disabled]="!activeClientIsExists || activeClientType === 'admin'">{{ 'CLIENTORDERTYPES.FULL' | translate }}</option>
             </select>
             <label for="inputType" class="form-label text-wrap">{{ 'SENDORDERFORM.ORDERTYPETEXT' | translate }}</label>
             <div class="alert alert-danger" *ngIf="sendOrderForm.controls['orderType'].invalid && sendOrderForm.controls['orderType'].touched">
@@ -179,4 +144,3 @@
         </div>
     </form>
 </div>
-<ng-template #appModal></ng-template>

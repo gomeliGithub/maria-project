@@ -12,7 +12,7 @@
             <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
             Mashulik
         </a>
-        <button class="navbar-toggler" id="navbarTogglerButton" type="button" aria-controls="navbarNavDropdown" #navbarToggler
+        <button class="navbar-toggler" id="navbarTogglerButton" type="button" aria-controls="navbarNavDropdown"
             [@navbar-toggler-icon-trigger]="navbarTogglerIconTriggerState"
             (click)="changeNavbarTogglerIconTriggerState()"
             (click)="navbarTogglerClick()"
@@ -119,7 +119,6 @@
     </div>
 </nav>
 <router-outlet (activate)="onRouterOutlet($event)" #routerOutlet></router-outlet>
-<ng-template #appModal></ng-template>
 <footer class="flex-grow-0 flex-shrink-1 w-100 text-center text-white" style="background-color: #f1f1f1;">
     <div class="container pt-3">
         <section class="mb-3">

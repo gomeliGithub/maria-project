@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, Res } from '@nestjs/common';
 import { Response } from 'express';
 
 import { ClientTypes } from 'server/src/decorators/client.types.decorator';
@@ -20,16 +20,18 @@ export class ClientController {
     ) { }
 
     @Get('/getCompressedImagesList/:imagesType')
-    public async getCompressedImagesList (@Param('imagesType') imagesType: string): Promise<IGalleryCompressedImagesList | IClientCompressedImage[]> {
+    public async getCompressedImagesList (@Param('imagesType') imagesType: string, @Query('imageViewSize') imageViewSize: string): Promise<IGalleryCompressedImagesList | IClientCompressedImage[]> {
         const thumbnailImagesDirPaths: string[] = [ 'home' ].concat(this.appService.imagePhotographyTypes);
 
-        if ( !thumbnailImagesDirPaths.includes(imagesType.substring(1)) ) throw new BadRequestException();
+        imagesType = imagesType.substring(1);
+
+        if ( !thumbnailImagesDirPaths.includes(imagesType) || imageViewSize === '' ) throw new BadRequestException();
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         await commonServiceRef.createImageDirs();
         
-        return this.clientService.getCompressedImagesList(imagesType.substring(1) as 'home' | string);
+        return this.clientService.getCompressedImagesList(imagesType as 'home' | string, imageViewSize as 'medium' | 'big');
     }
 
     @Get('/downloadOriginalImage/:compressedImageName')

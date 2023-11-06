@@ -74,10 +74,12 @@ export class ClientService {
         return this.http.get('/api/sign/getBcryptHashSaltrounds', { responseType: 'text', withCredentials: true });
     }
 
-    public getCompressedImagesList (imagesType: 'home'): Observable<IClientCompressedImage[]>
-    public getCompressedImagesList (imagesType: string): Observable<IGalleryCompressedImagesList>
-    public getCompressedImagesList (imagesType: 'home' | string): Observable<IGalleryCompressedImagesList | IClientCompressedImage[]> {
-        return this.http.get(`/api/client/getCompressedImagesList/:${ imagesType }`).pipe<IGalleryCompressedImagesList | IClientCompressedImage[]>(imagesList => {
+    public getCompressedImagesList (imagesType: 'home', imageViewSize?: 'medium' | 'big'): Observable<IClientCompressedImage[]>
+    public getCompressedImagesList (imagesType: string, imageViewSize?: 'medium' | 'big'): Observable<IGalleryCompressedImagesList>
+    public getCompressedImagesList (imagesType: 'home' | string, imageViewSize?: 'medium' | 'big'): Observable<IGalleryCompressedImagesList | IClientCompressedImage[]> {
+        return this.http.get(`/api/client/getCompressedImagesList/:${ imagesType }`, { params: {
+            imageViewSize
+        }}).pipe<IGalleryCompressedImagesList | IClientCompressedImage[]>(imagesList => {
             if ( imagesType === 'home' ) return imagesList as Observable<IClientCompressedImage[]>;
             else return imagesList as Observable<IGalleryCompressedImagesList>;
         });

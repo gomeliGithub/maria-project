@@ -95,7 +95,6 @@ export class AppComponent implements OnInit {
 
     @ViewChild('changeClientLocaleButton', { static: false }) private readonly changeClientLocaleButtonViewRef: ElementRef<HTMLButtonElement>;
     @ViewChild('navbar', { static: false }) private readonly navbarElementRef: ElementRef<HTMLDivElement>;
-    @ViewChild('navbarToggler', { static: false }) private readonly navbarTogglerElementRef: ElementRef<HTMLButtonElement>;
 
     public readonly locales: IClientLocale[] = environment.locales;
 
@@ -127,7 +126,10 @@ export class AppComponent implements OnInit {
         if ( !(component instanceof HomeComponent) ) {
             this.isHomePage = false;
 
-            if ( component instanceof GalleryComponent ) component.activeClientIsExists = this.activeClientLogin ? true : false;
+            if ( component instanceof GalleryComponent ) {
+                component.activeClientIsExists = this.activeClientLogin ? true : false;
+                component.activeClientType = this.activeClientType;
+            }
         } else {
             this.isHomePage = true;
 
@@ -151,6 +153,9 @@ export class AppComponent implements OnInit {
         if ( animationStart ) this.changeNavbarTogglerIconTriggerState();
 
         this.navbarIsCollapsed = !this.navbarIsCollapsed;
+
+        if ( !this.navbarIsCollapsed ) this.navbarAnimationState = 'scrolled';
+        else this.navbarAnimationState = 'static';
     }
 
     public menuMove (open: boolean, hoveredDropdown?: NgbDropdown): void {

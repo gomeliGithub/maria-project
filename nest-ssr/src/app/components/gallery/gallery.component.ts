@@ -66,6 +66,7 @@ export class GalleryComponent implements OnInit {
     }
     
     public activeClientIsExists: boolean;
+    public activeClientType: string;
 
     public sendOrderForm: FormGroup<{
         orderType: FormControl<string>,
@@ -75,20 +76,21 @@ export class GalleryComponent implements OnInit {
 
     @HostBinding('className') componentClass: string;
 
-    public compressedImagesList: IReducedGalleryCompressedImages;
+    public compressedImagesList: IReducedGalleryCompressedImages = null;
+    public compressedImagesListMedium: IClientCompressedImage[][] = null;
+    public compressedImagesListBig: IClientCompressedImage[][] = null;
     public photographyTypeDescription: string;
 
     public url: string;
 
-    public smallLinkContainerAnimationStates: string[] = [];
+    public bigGalleryIsHide: boolean = true;
+
     public mediumLinkContainerAnimationStates: string[] = [];
     public bigLinkContainerAnimationStates: string[] = [];
 
-    public smallLinkContainerAnimationDisplayValues: string[] = [];
     public mediumLinkContainerAnimationDisplayValues: string[] = [];
     public bigLinkContainerAnimationDisplayValues: string[] = [];
 
-    public flatSmallCompressedImagesList: IClientCompressedImage[];
     public flatMediumCompressedImagesList: IClientCompressedImage[];
     public flatBigCompressedImagesList: IClientCompressedImage[];
 
@@ -108,42 +110,58 @@ export class GalleryComponent implements OnInit {
                 error: () => this.appService.createErrorModal()
             });
 
-            this.clientService.getCompressedImagesList(this.photographyType).subscribe({
-                next: data => {
-                    if ( data.compressedImages.small.length === 0 && data.compressedImages.medium.length === 0 && data.compressedImages.big.length === 0) {
-                        this.compressedImagesList = null;
-                    } else {
-                        this.compressedImagesList = data.compressedImages;
+            this.getCompressedImagesList('medium');
+        }
+    }
 
-                        if ( data.compressedImages.small.length !== 0 ) {
-                            this.flatSmallCompressedImagesList = data.compressedImages.small.flat();
-                            this.flatSmallCompressedImagesList.forEach(() => {
-                                this.smallLinkContainerAnimationStates.push('leave');
-                                this.smallLinkContainerAnimationDisplayValues.push('none');
-                            });
-                        }
+    public getCompressedImagesList (imageViewSize: 'medium' | 'big'): void {
+        if ( imageViewSize === 'medium' && this.compressedImagesListMedium ) {
+            this.compressedImagesList.big = null;
+            this.compressedImagesList.medium = this.compressedImagesListMedium;
+        } else if ( imageViewSize === 'big' && this.compressedImagesListBig ) {
+            this.compressedImagesList.medium = null;
+            this.compressedImagesList.big = this.compressedImagesListBig;
+        }
 
-                        if ( data.compressedImages.medium.length !== 0 ) {
-                            this.flatMediumCompressedImagesList = data.compressedImages.medium.flat();
-                            this.flatMediumCompressedImagesList.forEach(() => {
-                                this.mediumLinkContainerAnimationStates.push('leave');
-                                this.mediumLinkContainerAnimationDisplayValues.push('none');
-                            });
-                        }
+        if ( !this.compressedImagesListMedium || !this.compressedImagesListBig ) this.clientService.getCompressedImagesList(this.photographyType, imageViewSize).subscribe({
+            next: data => {
+                if ( data.compressedImages.medium.length !== 0 || data.compressedImages.big.length !== 0 ) {
+                    this.compressedImagesList = data.compressedImages;
 
-                        if ( data.compressedImages.big.length !== 0 ) {
-                            this.flatBigCompressedImagesList = data.compressedImages.big.flat();
-                            this.flatBigCompressedImagesList.forEach(() => {
-                                this.bigLinkContainerAnimationStates.push('leave');
-                                this.bigLinkContainerAnimationDisplayValues.push('none');
-                            });
-                        }
+                    if ( data.compressedImages.medium.length !== 0 ) {
+                        this.compressedImagesListMedium = data.compressedImages.medium;
+
+                        this.flatMediumCompressedImagesList = data.compressedImages.medium.flat();
+                        this.flatMediumCompressedImagesList.forEach(() => {
+                            this.mediumLinkContainerAnimationStates.push('leave');
+                            this.mediumLinkContainerAnimationDisplayValues.push('none');
+                        });
+                    } else if ( data.compressedImages.big.length !== 0 ) {
+                        this.compressedImagesListBig = data.compressedImages.big;
+
+                        this.flatBigCompressedImagesList = data.compressedImages.big.flat();
+                        this.flatBigCompressedImagesList.forEach(() => {
+                            this.bigLinkContainerAnimationStates.push('leave');
+                            this.bigLinkContainerAnimationDisplayValues.push('none');
+                        });
                     }
+                }
 
-                    this.photographyTypeDescription = data.photographyTypeDescription ? data.photographyTypeDescription : null;
-                },
-                error: () => this.appService.createErrorModal()
-            });
+                this.photographyTypeDescription = data.photographyTypeDescription ? data.photographyTypeDescription : null;
+            },
+            error: () => this.appService.createErrorModal()
+        });
+    }
+
+    public toggleBigGallery (): void {
+        if ( this.bigGalleryIsHide ) {
+            this.getCompressedImagesList('big');
+
+            this.bigGalleryIsHide = false;
+        } else {
+            this.getCompressedImagesList('medium');
+
+            this.bigGalleryIsHide = true;
         }
     }
 
@@ -165,19 +183,12 @@ export class GalleryComponent implements OnInit {
     }
 
     public setCurrentLinkContainerAnimationStateIndex (name: string, viewSizeType: string): number { 
-        if ( viewSizeType === 'small' ) return this.flatSmallCompressedImagesList.findIndex(compressedImageData => compressedImageData.name === name);
         if ( viewSizeType === 'medium' ) return this.flatMediumCompressedImagesList.findIndex(compressedImageData => compressedImageData.name === name);
         if ( viewSizeType === 'big' ) return this.flatBigCompressedImagesList.findIndex(compressedImageData => compressedImageData.name === name);
     }
 
     public startLinkContainerAnimation (index: number, viewSizeType: string): void {
         switch ( viewSizeType ) {
-            case 'small': { 
-                this.smallLinkContainerAnimationStates[index] = this.smallLinkContainerAnimationStates[index] === 'leave' ? 'enter' : 'leave';
-
-                break;
-            }
-
             case 'medium': { 
                 this.mediumLinkContainerAnimationStates[index] = this.mediumLinkContainerAnimationStates[index] === 'leave' ? 'enter' : 'leave';
                 
@@ -194,7 +205,6 @@ export class GalleryComponent implements OnInit {
 
     public linkContainerAnimationStarted (event: AnimationEvent, index: number, viewSizeType: string): void {
         if ( event.toState === 'enter' ) switch ( viewSizeType ) {
-            case 'small': { this.smallLinkContainerAnimationDisplayValues[index] = 'block'; break; }
             case 'medium': { this.mediumLinkContainerAnimationDisplayValues[index] = 'block'; break; }
             case 'big': { this.bigLinkContainerAnimationDisplayValues[index] = 'block'; break; }
         }
@@ -202,7 +212,6 @@ export class GalleryComponent implements OnInit {
 
     public linkContainerAnimationDone (event: AnimationEvent, index: number, viewSizeType: string): void {
         if ( event.toState === 'leave' ) switch ( viewSizeType ) {
-            case 'small': { this.smallLinkContainerAnimationDisplayValues[index] = 'none'; break; }
             case 'medium': { this.mediumLinkContainerAnimationDisplayValues[index] = 'none'; break; }
             case 'big': { this.bigLinkContainerAnimationDisplayValues[index] = 'none'; break; }
         }

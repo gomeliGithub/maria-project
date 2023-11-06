@@ -11,8 +11,8 @@ body {
     height: 85vh !important;
 }
 
-.vw-95 {
-    width: 95vw !important;
+.vw-80 {
+    width: 80vw !important;
 }
 
 .vw-30 {
@@ -75,8 +75,8 @@ app-client {
     align-items: center !important;
 }
 
-app-gallery, app-admin-panel, app-admin-panel-orders-control {
-    margin-top: 3rem !important;
+app-gallery, app-admin-panel, app-admin-panel-orders-control, app-admin-panel-client-orders {
+    margin-top: 5rem !important;
 }
 
 app-admin-panel {
@@ -84,6 +84,23 @@ app-admin-panel {
     display: flex !important;
     flex-direction: column !important;
     padding: 1rem !important;
+}
+
+@media (max-width: 768px) {
+    .btn-outline-secondary {
+        --bs-btn-color: #fff;
+        --bs-btn-bg: #6c757d;
+    }
+
+    .btn-outline-success {
+        --bs-btn-color: #fff;
+        --bs-btn-bg: #198754;
+    }
+
+    .btn-outline-info {
+        --bs-btn-color: #000;
+        --bs-btn-bg: #0dcaf0;
+    }
 }
 
 textarea {

@@ -27,14 +27,14 @@ import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
                 animate('0.3s 100ms ease-out')
             ])
         ]),
-        trigger('link-button-animation', [
-            state('enter', style({ display: 'block' })),
-            state('leave', style({ display: 'none' })),
+        trigger('link-button-container-animation', [
+            state('enter', style({ opacity: 1, transform: 'translate(-50%, -50%) scale(1)' })),
+            state('leave', style({ opacity: 0, transform: 'translate(-50%, -50%) scale(0)' })),
             transition('enter => leave', [
-                animate('0.2s', style({ display: 'none' }))
+                animate('300ms', style({ opacity: 0, transform: 'translate(-50%, -50%) scale(0)' }))
             ]),
             transition('leave => enter', [
-                animate('0.2s', style({ display: 'block' }))
+                animate('0.2s', style({ opacity: 1, transform: 'translate(-50%, -50%) scale(1)' }))
             ])
         ])
     ]
@@ -44,10 +44,9 @@ export class HomeComponent implements OnInit {
         private readonly appService: AppService,
         private readonly clientService: ClientService
     ) { }
-
-    public val: number = 23;
     
     public currentMouseTriggerStates: string[] = [];
+    public currentLinkButtonContainerAnimationStates: string[] = [];
 
     public compressedImagesList: IClientCompressedImage[];
 
@@ -67,6 +66,7 @@ export class HomeComponent implements OnInit {
                     this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
                     this.flatImagePhotographyTypes.forEach(() => {
                         this.currentMouseTriggerStates.push('leave');
+                        this.currentLinkButtonContainerAnimationStates.push('leave');
                     });
                 },
                 error: () => this.appService.createErrorModal()
@@ -84,23 +84,15 @@ export class HomeComponent implements OnInit {
 
     public mouseTriggerAnimationStarted (event: AnimationEvent): void {
         const mouseTriggerElement: HTMLDivElement = event.element as HTMLDivElement;
-        // const indexNumber: number = parseInt(mouseTriggerElement.getAttribute('index-number'), 10);
+        const indexNumber: number = parseInt(mouseTriggerElement.parentElement.getAttribute('mouse-trigger-state-index'), 10);
 
-        const linkButtonContainer: HTMLDivElement = mouseTriggerElement.nextElementSibling as HTMLDivElement;
-
-        if ( event.toState === 'leave' ) linkButtonContainer.style.display = 'none';
+        if ( event.toState === 'leave' ) this.currentLinkButtonContainerAnimationStates[indexNumber] = 'leave';
     }
 
     public mouseTriggerAnimationDone (event: AnimationEvent): void {
         const mouseTriggerElement: HTMLDivElement = event.element as HTMLDivElement;
-        // const indexNumber: number = parseInt(mouseTriggerElement.getAttribute('index-number'), 10);
+        const indexNumber: number = parseInt(mouseTriggerElement.parentElement.getAttribute('mouse-trigger-state-index'), 10);
 
-        const linkButtonContainer: HTMLDivElement = mouseTriggerElement.nextElementSibling as HTMLDivElement;
-
-        if ( event.toState === 'enter') {
-            linkButtonContainer.style.display = 'block';
-            
-            // this.currentMouseTriggerAnimationsDone[indexNumber] = true;
-        }
+        if ( event.toState === 'enter') this.currentLinkButtonContainerAnimationStates[indexNumber] = 'enter';
     }
 }

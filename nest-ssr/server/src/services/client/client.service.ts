@@ -178,10 +178,11 @@ export class ClientService {
         }
     }
 
-    public async getCompressedImagesList (imagesType: 'home' | string): Promise<IGalleryCompressedImagesList | IClientCompressedImage[]> {
+    public async getCompressedImagesList (imagesType: 'home' | string, imageViewSize: 'medium' | 'big'): Promise<IGalleryCompressedImagesList | IClientCompressedImage[]> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const imagesPath: string = imagesType === 'home' ? path.join(this.compressedImagesDirPath, imagesType) : path.join(this.compressedImagesDirPath, 'gallery', imagesType);
+        const imagesPath: string = imagesType === 'home' ? path.join(this.compressedImagesDirPath, imagesType) 
+        : path.join(this.compressedImagesDirPath, 'gallery', imagesType);
         
         const imagesList: string[] = await fsPromises.readdir(imagesPath);
 
@@ -196,30 +197,22 @@ export class ClientService {
 
         if ( imagesType !== 'home' ) {
             const reducedCompressedImages: IReducedGalleryCompressedImages = {
-                small: [],
                 medium: [],
                 big: []
             }
 
-            const smallSizedCompressedImages: IClientCompressedImage[] = compressedImages.filter(compressedImage => compressedImage.viewSizeType === 'small');
             const mediumSizedCompressedImages: IClientCompressedImage[] = compressedImages.filter(compressedImage => compressedImage.viewSizeType === 'medium');
             const bigSizedCompressedImages: IClientCompressedImage[] = compressedImages.filter(compressedImage => compressedImage.viewSizeType === 'big');
 
-            for (let i = 0; i < smallSizedCompressedImages.length; i += 4 ) {
-                reducedCompressedImages.small.push(smallSizedCompressedImages.slice(i, i + 4));
-            }
-
-            for (let i = 0; i < mediumSizedCompressedImages.length; i += 2 ) {
-                reducedCompressedImages.medium.push(mediumSizedCompressedImages.slice(i, i + 2));
-            }
-
-            for (let i = 0; i < bigSizedCompressedImages.length; i += 1 ) {
-                reducedCompressedImages.big.push(bigSizedCompressedImages.slice(i, i + 1));
+            if ( imageViewSize === 'medium' ) for (let i = 0; i < mediumSizedCompressedImages.length; i += 4 ) {
+                reducedCompressedImages.medium.push(mediumSizedCompressedImages.slice(i, i + 4));
+            } else if ( imageViewSize === 'big' ) for (let i = 0; i < bigSizedCompressedImages.length; i += 2 ) {
+                reducedCompressedImages.big.push(bigSizedCompressedImages.slice(i, i + 2));
             }
 
             galleryCompressedImagesList = {
                 compressedImages: reducedCompressedImages, 
-                photographyTypeDescription: (await this.getImagePhotographyTypesData(['name', 'description' ], 'gallery', imagesType)).description
+                photographyTypeDescription: (await this.getImagePhotographyTypesData([ 'name', 'description' ], 'gallery', imagesType)).description
             }
         }
 
@@ -330,16 +323,19 @@ export class ClientService {
         const mailBody: string = `
             <div>
                 <div>
-                    <p>Тип съёмки - <span>${ imagePhotographyType }</span></p>
+                    <p>Тип съёмки - <span style="font-weight: 600;">${ imagePhotographyType }</span></p>
                 </div>
                 <div>
-                    <p>Тип заказа - <span>${ orderType }</span></p>
+                    <p>Тип заказа - <span style="font-weight: 600;">${ orderType }</span></p>
                 </div>
                 <div>
-                    <p>Номер телефона клиента - <span>${ clientPhoneNumber }</span></p>
+                    <p>Номер телефона клиента - <span style="font-weight: 600;">${ clientPhoneNumber }</span></p>
                 </div>
                 <div>
-                <p>Дополнительная информация от клиента - <span>${ comment }</span></p>
+                    <p>Логин клиента - <span style="font-weight: 600;">${ activeClientLogin ?? 'Гость' }</span></p>
+                </div>
+                <div>
+                    <p>Дополнительная информация от клиента - ${ comment }</p>
                 </div>
             </div>
         `;

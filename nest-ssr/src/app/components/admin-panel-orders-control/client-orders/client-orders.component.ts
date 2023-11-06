@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
 
 import { AppService } from '../../../app.service';
 import { AdminPanelService } from '../../../services/admin-panel/admin-panel.service';
@@ -11,13 +11,13 @@ import { IClientOrder } from 'types/models';
   	templateUrl: './client-orders.component.html',
   	styleUrls: ['./client-orders.component.css']
 })
-export class ClientOrdersComponent implements AfterViewChecked {
+export class ClientOrdersComponent {
 	constructor (
 		private readonly appService: AppService,
 		private readonly adminPanelService: AdminPanelService
 	) { }
 
-	public firstSelectClient: boolean = false;
+    public firstSelectClient: boolean = false;
 
 	@Input() public clientOrdersInfoData: IClientOrdersInfoDataArr[];
 	@Input() public prevCurrentSelectedOrdersStatusType: string;
@@ -77,73 +77,15 @@ export class ClientOrdersComponent implements AfterViewChecked {
 		this.spinnerHiddenChange.emit(this.spinnerHidden);
 	}
 
-	@ViewChildren('clientOrder', { read: ElementRef<HTMLTableRowElement> }) private readonly clientOrderViewRefs: QueryList<ElementRef<HTMLTableRowElement>>;
-	@ViewChildren('getClientOrdersButton', { read: ElementRef<HTMLButtonElement> }) private readonly getClientOrdersButtonViewRefs: QueryList<ElementRef<HTMLButtonElement>>;
-	
-	ngAfterViewChecked (): void {
-        if ( !this.firstSelectClient && this.getClientOrdersButtonViewRefs.first ) {
-            this.getClientOrdersButtonViewRefs.first.nativeElement.click();
-
-            this.firstSelectClient = true;
-        }
-    }
+	@ViewChildren('clientOrder', { read: ElementRef<HTMLTableRowElement> }) public readonly clientOrderViewRefs: QueryList<ElementRef<HTMLTableRowElement>>;
+	@ViewChildren('getClientOrdersButton', { read: ElementRef<HTMLButtonElement> }) public readonly getClientOrdersButtonViewRefs: QueryList<ElementRef<HTMLButtonElement>>;
 	
 	public getClientOrdersInfo (existsCountZero = false): void {
-        this.adminPanelService.getClientOrders({
-            getInfoData: 'true',
-            status: this.currentSelectedOrdersStatusType,
-            ordersLimit: 2,
-            existsCount: existsCountZero || (existsCountZero && this.prevCurrentSelectedOrdersStatusType !== this.currentSelectedOrdersStatusType) ? 0 : this.getClientOrdersButtonViewRefs.length
-        }).subscribe({
-            next: clientOrdersInfoData => {
-                if ( !this.additionalOrdersInfoDataExists
-                    && (existsCountZero || this.prevCurrentSelectedOrdersStatusType !== this.currentSelectedOrdersStatusType) 
-                ) this.clientOrdersInfoData = clientOrdersInfoData.infoData && clientOrdersInfoData.infoData.length !== 0 ? clientOrdersInfoData.infoData : null;
-                else this.clientOrdersInfoData = this.clientOrdersInfoData.concat(clientOrdersInfoData.infoData);
-
-                this.additionalOrdersInfoDataExists = clientOrdersInfoData.additionalOrdersInfoDataExists;
-            },
-            error: () => this.appService.createErrorModal()
-        });
+        this.adminPanelService.getClientOrdersInfoData(this, existsCountZero);
     }
 
 	public getClientOrders (event?: MouseEvent, existsCountZero = false): void {
-        const target: HTMLDivElement = event ? event.target as HTMLDivElement : null;
-
-        let clientLogin: string = null;
-
-        if ( existsCountZero ) {
-            clientLogin = target.getAttribute('client-login');
-
-            this.currentSelectedClientLogin = clientLogin !== 'guest' ? clientLogin : this.appService.getTranslations('ADMINPANEL.GUESTLOGINTEXT');
-        }
-
-        if ( existsCountZero ) this.additionalOrdersExists = false;
-
-        let existsCount: number = null;
-
-        if ( existsCountZero || (existsCountZero && this.prevCurrentSelectedOrdersStatusType !== this.currentSelectedOrdersStatusType)
-            || this.prevCurrentSelectedOrdersStatusType !== this.currentSelectedOrdersStatusType
-        ) existsCount = 0;
-        else existsCount = this.clientOrderViewRefs.length;
-
-        this.adminPanelService.getClientOrders({
-            getInfoData: 'false',
-            status: this.currentSelectedOrdersStatusType,
-            memberLogin: existsCountZero ? clientLogin : this.currentSelectedClientLogin,
-            ordersLimit: 2,
-            existsCount
-        }).subscribe({
-            next: clientOrdersData => {
-                if ( !this.additionalOrdersExists
-                    && (existsCountZero || this.prevCurrentSelectedOrdersStatusType !== this.currentSelectedOrdersStatusType) 
-                ) this.clientOrders = clientOrdersData.orders && clientOrdersData.orders.length !== 0 ? clientOrdersData.orders : null;
-                else this.clientOrders = this.clientOrders.concat(clientOrdersData.orders);
-
-                this.additionalOrdersExists = clientOrdersData.additionalOrdersExists;
-            },
-            error: () => this.appService.createErrorModal()
-        });
+        this.adminPanelService.getClientOrdersData(this, event, existsCountZero);
     }
 
 	public changeClientOrderStatus (event: MouseEvent): void {

@@ -21,6 +21,8 @@
 		"HEADERTITLE": "Photo gallery",
 		"ORDERBUTTONTEXT": "Order a photo session",
 		"DOWNLOADORIGINALIMAGEBUTTONTEXT": "Download original",
+		"MEDIUMGALLERYBUTTONTEXT": "Less photo",
+		"BIGGALLERYBUTTONTEXT": "More photo",
 		"HELPBLOCKS": {
 			"CLIENTPHONENUMBER": "Your phone number in developing format.",
 			"COMMENT": "Your comment or request for your order."
@@ -114,10 +116,10 @@
 			"ORIGINALSIZE": "Original image size",
 			"IMAGEPHOTOGRAPHYTYPE": "Photography type",
 			"VIEWSIZETYPE": "View size type",
-			"IMAGEPHOTOGRAPHYTYPEDESCRIPTION": "Image description",
 			"UPLOADAT": "Upload at",
 			"ONHOMEPAGE": "Displayed on Home page",
 			"ONGALLERYPAGE": "Displayed on Gallery page",
+			"IMAGEPHOTOGRAPHYTYPEDESCRIPTION": "Description",
 			"IMAGEPHOTOGRAPHYTYPECOMPRESSEDIMAGENAME": "Compressed image name"
 		},
 		"CLIENTORDERSTABLECOLTITLES": {

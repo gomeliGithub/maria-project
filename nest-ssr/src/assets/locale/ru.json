@@ -21,6 +21,8 @@
 		"HEADERTITLE": "Галерея фото",
 		"ORDERBUTTONTEXT": "Заказать фотосессию",
 		"DOWNLOADORIGINALIMAGEBUTTONTEXT": "Скачать оригинал",
+		"MEDIUMGALLERYBUTTONTEXT": "Меньше фото",
+		"BIGGALLERYBUTTONTEXT": "Больше фото",
 		"HELPBLOCKS": {
 			"CLIENTPHONENUMBER": "Ваш номер телефона в международном формате.",
 			"COMMENT": "Ваш комментарий или пожелание к заказу."
@@ -111,10 +113,10 @@
 			"ORIGINALSIZE": "Размер оригинального изображения",
 			"IMAGEPHOTOGRAPHYTYPE": "Тип съёмки",
 			"VIEWSIZETYPE": "Размер отображения",
-			"IMAGEPHOTOGRAPHYTYPEDESCRIPTION": "Описание фото",
 			"UPLOADAT": "Загружен",
 			"ONHOMEPAGE": "Отображён на главной",
 			"ONGALLERYPAGE": "Отображён на галерее",
+			"IMAGEPHOTOGRAPHYTYPEDESCRIPTION": "Описание",
 			"IMAGEPHOTOGRAPHYTYPECOMPRESSEDIMAGENAME": "Имя сжатого изображения"
 		},
 		"CLIENTORDERSTABLECOLTITLES": {

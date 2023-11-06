@@ -31,12 +31,13 @@
             [ngClass]="{ 'vh-85': imagePhotographyTypesDataArr.length === 1 }"
             [style.backgroundColor]="i % 2 === 0 ? 'rgb(191 179 179)': null"
         >
-            <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i2 = index" 
+            <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i2 = index"
                 class="border-0 position-relative h-100 mw-100 imagesContainer"
                 (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
                 (mouseleave)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
+                [attr.mouse-trigger-state-index]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
             >
-                <div class="h-100 mw-100 text-center" [attr.index-number]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
+                <div class="h-100 mw-100 text-center"
                     (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
                     (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
                     [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
@@ -47,7 +48,9 @@
                         [ngClass]="{ 'w-100': imagePhotographyTypesDataArr.length === 1 }"
                     >
                 </div>
-                <div class="position-absolute top-50 start-50 translate-middle w-50 linkButtonContainer">
+                <div class="position-absolute top-50 start-50 w-50 linkButtonContainer"
+                    [@link-button-container-animation]="currentLinkButtonContainerAnimationStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
+                >
                     <h5 class="text-center text-primary fw-bold text-break" [ngSwitch]="imagePhotographyTypeData.name">
                         <ng-template ngSwitchCase="individual">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
                         <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.CHILDREN' | translate }}</ng-template>

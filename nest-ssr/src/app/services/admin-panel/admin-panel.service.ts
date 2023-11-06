@@ -4,6 +4,8 @@ import { FormControl, FormGroup } from '@angular/forms';
 
 import { Observable, map } from 'rxjs';
 
+import { AdminPanelOrdersControlComponent } from '../../components/admin-panel-orders-control/admin-panel-orders-control.component';
+
 import { AppService } from '../../app.service';
 import { WebSocketService } from '../web-socket/web-socket.service';
 
@@ -11,6 +13,7 @@ import { environment } from '../../../environments/environment';
 
 import { IClientOrdersData, IClientOrdersInfoData, IFullCompressedImageData } from 'types/global';
 import { IGetClientOrdersOptions } from 'types/options';
+import { ClientOrdersComponent } from 'src/app/components/admin-panel-orders-control/client-orders/client-orders.component';
 
 @Injectable({
     providedIn: 'root'
@@ -141,5 +144,75 @@ export class AdminPanelService {
                 break; 
             }
         }
+    }
+
+    public getClientOrdersInfoData (componentThis: AdminPanelOrdersControlComponent | ClientOrdersComponent, existsCountZero = false): void {
+        let existsCount: number = null;
+
+        if ( !componentThis.additionalOrdersInfoDataExists ) existsCount = 0;
+        else existsCount = componentThis.getClientOrdersButtonViewRefs.length;
+
+        if ( existsCountZero ) componentThis.additionalOrdersInfoDataExists = false;
+
+        this.getClientOrders({
+            getInfoData: 'true',
+            status: componentThis.currentSelectedOrdersStatusType,
+            ordersLimit: 2,
+            existsCount: existsCount
+        }).subscribe({
+            next: clientOrdersInfoData => {
+                if ( !componentThis.additionalOrdersInfoDataExists
+                    && (existsCountZero || componentThis.prevCurrentSelectedOrdersStatusType !== componentThis.currentSelectedOrdersStatusType) 
+                ) componentThis.clientOrdersInfoData = clientOrdersInfoData.infoData && clientOrdersInfoData.infoData.length !== 0 ? clientOrdersInfoData.infoData : null;
+                else componentThis.clientOrdersInfoData = componentThis.clientOrdersInfoData.concat(clientOrdersInfoData.infoData);
+
+                componentThis.additionalOrdersInfoDataExists = clientOrdersInfoData.additionalOrdersInfoDataExists;
+            },
+            error: () => this.appService.createErrorModal()
+        });
+    }
+
+    public getClientOrdersData (componentThis: AdminPanelOrdersControlComponent | ClientOrdersComponent, event?: MouseEvent, existsCountZero = false) {
+        const target: HTMLDivElement = event ? event.target as HTMLDivElement : null;
+
+        let clientLogin: string = null;
+
+        if ( existsCountZero ) {
+            clientLogin = target.getAttribute('client-login');
+
+            componentThis.currentSelectedClientLogin = clientLogin !== 'guest' ? clientLogin : this.appService.getTranslations('ADMINPANEL.GUESTLOGINTEXT');
+        }
+
+        if ( !componentThis.currentSelectedClientLogin ) componentThis.currentSelectedClientLogin = this.appService.getTranslations('ADMINPANEL.GUESTLOGINTEXT');
+
+        let memberLogin: string = null;
+        let existsCount: number = null;
+
+        if ( componentThis.currentSelectedClientLogin ) {
+            memberLogin = existsCountZero ? clientLogin : componentThis.currentSelectedClientLogin
+        } else memberLogin = 'guest';
+
+        if ( !componentThis.additionalOrdersExists ) existsCount = 0;
+        else existsCount = componentThis.clientOrderViewRefs.length;
+
+        if ( existsCountZero ) componentThis.additionalOrdersExists = false;
+
+        this.getClientOrders({
+            getInfoData: 'false',
+            status: componentThis.currentSelectedOrdersStatusType,
+            memberLogin,
+            ordersLimit: 2,
+            existsCount
+        }).subscribe({
+            next: clientOrdersData => {
+                if ( !componentThis.additionalOrdersExists
+                    && (existsCountZero || componentThis.prevCurrentSelectedOrdersStatusType !== componentThis.currentSelectedOrdersStatusType) 
+                ) componentThis.clientOrders = clientOrdersData.orders && clientOrdersData.orders.length !== 0 ? clientOrdersData.orders : null;
+                else componentThis.clientOrders = componentThis.clientOrders.concat(clientOrdersData.orders);
+
+                componentThis.additionalOrdersExists = clientOrdersData.additionalOrdersExists;
+            },
+            error: () => this.appService.createErrorModal()
+        });
     }
 }

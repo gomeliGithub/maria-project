@@ -86,7 +86,6 @@ export interface IGalleryCompressedImagesList {
 }
 
 export interface IReducedGalleryCompressedImages {
-    small: IClientCompressedImage[][];
     medium: IClientCompressedImage[][];
     big: IClientCompressedImage[][];
 }
