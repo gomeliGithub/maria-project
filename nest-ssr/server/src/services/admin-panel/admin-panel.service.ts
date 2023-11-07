@@ -270,8 +270,16 @@ export class AdminPanelService {
                 orders = await client.$get('clientOrders', ordersFindOptions);
                 commonOrdersCount = await client.$count('clientOrders', { where: { status: options.status } });
             } else {
+                ordersFindOptions.attributes = null;
+                ordersFindOptions.where['memberLoginId'] = { [Op.eq]: null }
+
                 orders = await this.clientOrderModel.findAll(ordersFindOptions);
-                commonOrdersCount = await this.clientOrderModel.count({ where: { status: options.status } });
+                commonOrdersCount = await this.clientOrderModel.count({ 
+                    where: { 
+                        status: options.status,
+                        memberLoginId: { [Op.eq]: null }
+                    } 
+                });
             }
 
             clientOrders = {
