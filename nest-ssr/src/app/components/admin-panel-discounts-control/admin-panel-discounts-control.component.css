@@ -1,0 +1,26 @@
+:host ::ng-deep #changeDiscountAccordion .accordion-body {
+    padding: 1rem !important;
+}
+
+:host ::ng-deep #changeDiscountAccordion .form-check-input {
+    transform: scale(1.5);
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    #datepickerContainer form div:first-child {
+        margin-bottom: 0.5rem;
+    }
+
+    :host ::ng-deep .changeDiscountButtonsContainer {
+        text-align: center;
+    }
+
+    :host ::ng-deep .changeDiscountButtonsContainer button:first-child {
+        margin-bottom: 0.5rem;
+    }
+
+    :host ::ng-deep .changeDiscountButtonsContainer button:last-child {
+        float: none !important;
+    }
+}

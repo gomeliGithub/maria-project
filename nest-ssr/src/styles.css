@@ -35,7 +35,7 @@ app-root a.nav-link, app-root a.dropdown-item {
     cursor: pointer;
 }
 
-app-home, app-gallery, app-client, app-admin-panel, app-admin-panel-orders-control, app-not-found {
+app-home, app-gallery, app-client, app-admin-panel, app-admin-panel-orders-control, app-admin-panel-discounts-control, app-not-found {
     height: 100% !important;
     width: 100% !important;
     position: relative !important;
@@ -50,16 +50,12 @@ app-home {
     flex-direction: column !important;
     align-items: center !important;
     overflow-x: hidden !important;
-    margin-bottom: 1.5rem !important;
 }
 
-app-gallery, app-admin-panel-orders-control {
+app-gallery, app-admin-panel-orders-control, app-admin-panel-discounts-control {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-}
-
-app-admin-panel-orders-control {
     justify-content: center !important;
 }
 
@@ -75,8 +71,12 @@ app-client {
     align-items: center !important;
 }
 
-app-gallery, app-admin-panel, app-admin-panel-orders-control, app-admin-panel-client-orders {
+app-gallery, app-admin-panel, app-admin-panel-orders-control, app-admin-panel-client-orders, app-admin-panel-discounts-control {
     margin-top: 5rem !important;
+}
+
+app-admin-panel-discounts-control {
+    margin-bottom: 5rem !important;
 }
 
 app-admin-panel {
@@ -97,6 +97,11 @@ app-admin-panel {
         --bs-btn-bg: #198754;
     }
 
+    .btn-outline-danger {
+        --bs-btn-color: #fff;
+        --bs-btn-bg: #dc3545;
+    }
+
     .btn-outline-info {
         --bs-btn-color: #000;
         --bs-btn-bg: #0dcaf0;
@@ -105,7 +110,7 @@ app-admin-panel {
 
 textarea {
     resize: none;
-    height: 100px !important;
+    height: 150px !important;
 }
 
 input.ng-touched.ng-invalid {
@@ -132,4 +137,15 @@ ngb-accordion .accordion-button {
 
 ngb-accordion .accordion-body {
     padding: 0 !important;
+}
+
+.footerHidden {
+    width: 1px!important;
+    height: 1px!important;
+    padding: 0!important;
+    margin: -1px!important;
+    overflow: hidden!important;
+    clip: rect(0,0,0,0)!important;
+    white-space: nowrap!important;
+    border: 0!important;
 }

@@ -10,7 +10,7 @@ import { ClientService } from '../../services/client/client.service';
 import { CommonService } from 'server/src/services/common/common.service';
 
 import { IGalleryCompressedImagesList, IRequest, IRequestBody } from 'types/global';
-import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
+import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
 
 @Controller('/client')
 export class ClientController {
@@ -18,6 +18,15 @@ export class ClientController {
         private readonly appService: AppService,
         private readonly clientService: ClientService
     ) { }
+
+    @Get('/checkCompressedBigImagesIsExists/:photographyType')
+    public async checkCompressedBigImagesIsExists (@Param('photographyType') photographyType: string): Promise<boolean> {
+        photographyType = photographyType.substring(1);
+
+        if ( !this.appService.imagePhotographyTypes.includes(photographyType) ) throw new BadRequestException();
+
+        return this.clientService.checkCompressedBigImagesIsExists(photographyType);
+    }
 
     @Get('/getCompressedImagesList/:imagesType')
     public async getCompressedImagesList (@Param('imagesType') imagesType: string, @Query('imageViewSize') imageViewSize: string): Promise<IGalleryCompressedImagesList | IClientCompressedImage[]> {
@@ -32,6 +41,11 @@ export class ClientController {
         await commonServiceRef.createImageDirs();
         
         return this.clientService.getCompressedImagesList(imagesType as 'home' | string, imageViewSize as 'medium' | 'big');
+    }
+
+    @Get('/getDiscountsData')
+    public async getDiscountsData (): Promise<IDiscount[]> {
+        return this.clientService.getDiscountsData();
     }
 
     @Get('/downloadOriginalImage/:compressedImageName')

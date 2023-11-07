@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 
 import { AnimationEvent } from 'types/global';
-import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
+import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
 
 @Component({
     selector: 'app-home',
@@ -50,14 +50,26 @@ export class HomeComponent implements OnInit {
 
     public compressedImagesList: IClientCompressedImage[];
 
+    public discountsData: IDiscount[];
+
     public imagePhotographyTypes: IImagePhotographyType[][];
     public flatImagePhotographyTypes: IImagePhotographyType[];
+
+    public footerElementRef: ElementRef<HTMLElement>
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
             this.appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => this.appService.setTitle(translation));
 
-            this.clientService.getCompressedImagesList('home').subscribe(imagesList => this.compressedImagesList = imagesList);
+            this.clientService.getCompressedImagesList('home').subscribe({
+                next: imagesList => this.compressedImagesList = imagesList,
+                error: () => this.appService.createErrorModal()
+            });
+
+            this.clientService.getDiscountsData().subscribe({
+                next: discountsData => this.discountsData = discountsData && discountsData.length !== 0 ? discountsData : null,
+                error: () => this.appService.createErrorModal()
+            });
             
             this.clientService.getImagePhotographyTypesData('home').subscribe({
                 next: imagePhotographyTypesData => {
@@ -72,6 +84,12 @@ export class HomeComponent implements OnInit {
                 error: () => this.appService.createErrorModal()
             });
         }
+    }
+
+    @HostListener("scroll", ["$event"]) private onScroll ($event: any): void {
+        if ( $event.srcElement.scrollTop >= $event.srcElement.scrollHeight - 1000 ) {
+            setTimeout(() => this.footerElementRef.nativeElement.classList.remove('footerHidden'), 150)
+        } else setTimeout(() => this.footerElementRef.nativeElement.classList.add('footerHidden'), 150)
     }
 
     public startMouseTriggerAnimation (index: number): void {

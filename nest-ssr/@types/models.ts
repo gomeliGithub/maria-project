@@ -65,3 +65,10 @@ export interface IClientOrder {
     createdDate: Date;
     status?: string;
 }
+
+export interface IDiscount {
+    id?: number;
+    content: string;
+    expirationFromDate?: Date;
+    expirationToDate?: Date;
+}

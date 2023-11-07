@@ -25,6 +25,7 @@ import { MailService } from './services/mail/mail.service';
 
 import { JWT_token } from './models/sign.model';
 import { Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder } from './models/client.model';
+import { Discount } from './models/admin-panel.model';
 
 @Module({
     imports: [
@@ -48,7 +49,7 @@ import { Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder
                 username: process.env.DB_USERNAME,
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
-                models: [ JWT_token, Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder ],
+                models: [ JWT_token, Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder, Discount ],
                 autoLoadModels: true,
                 synchronize: true
             })

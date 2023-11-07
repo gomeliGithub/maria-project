@@ -14,10 +14,11 @@ import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 
 import { Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder } from '../../models/client.model';
+import { Discount } from '../../models/admin-panel.model';
 
 import { IClientOrdersData, IClientOrdersInfoData, IClientOrdersInfoDataArr, IFullCompressedImageData, IImageAdditionalData, IRequest, IRequestBody} from 'types/global';
 import { IImageMeta, IPercentUploadedOptions, IWSMessage, IWebSocketClient } from 'types/web-socket';
-import { IClientCompressedImage } from 'types/models';
+import { IClientCompressedImage, IDiscount } from 'types/models';
 import { IGetClientOrdersOptions } from 'types/options';
 
 @Injectable()
@@ -31,6 +32,8 @@ export class AdminPanelService {
         private readonly imagePhotographyTypeModel: typeof ImagePhotographyType,
         @InjectModel(ClientOrder)
         private readonly clientOrderModel: typeof ClientOrder,
+        @InjectModel(Discount)
+        private readonly discountModel: typeof Discount,
         @InjectModel(Member)
         private readonly memberModel: typeof Member
     ) { }
@@ -236,6 +239,8 @@ export class AdminPanelService {
         const client: Member = await commonServiceRef.getClients(request, options.memberLogin, { rawResult: false }) as Member;
 
         if ( !options.status ) options.status = 'new';
+        if ( !options.fromDate ) options.fromDate = (Date.now() - ms('14d')) as unknown as Date;
+        if ( !options.untilDate ) options.untilDate = literal('CURRENT_TIMESTAMP') as unknown as Date;
         if ( !options.existsCount ) options.existsCount = 0;
         if ( !options.ordersLimit ) options.ordersLimit = 2;
 
@@ -243,8 +248,8 @@ export class AdminPanelService {
             where: { 
                 status: options.status,
                 createdDate: {
-                    [Op.gte]: options.fromDate ?? Date.now() - ms('7d'),
-                    [Op.lte]: options.untilDate ?? literal('CURRENT_TIMESTAMP')
+                    [Op.gte]: options.fromDate,
+                    [Op.lte]: options.untilDate
                 }
             },
             attributes: { exclude: [ 'memberLoginId' ] },
@@ -276,6 +281,8 @@ export class AdminPanelService {
         } else {
             const infoData: IClientOrdersInfoDataArr[] = await commonServiceRef.getClientOrdersInfo(request, 'all', {
                 status: options.status,
+                fromDate: options.fromDate,
+                untilDate: options.untilDate,
                 existsCount: options.existsCount,
                 ordersLimit: options.ordersLimit
             });
@@ -288,6 +295,79 @@ export class AdminPanelService {
         }
 
         return clientOrdersInfoData ?? clientOrders;
+    }
+
+    public async getDiscountsData (requiredFields?: string[]): Promise<IDiscount[]> {
+        const options: FindOptions<any> = {
+            raw: true
+        }
+
+        if ( requiredFields ) options.attributes = requiredFields;
+
+        const dateNow: number = Date.now();
+
+        let discounts: IDiscount[] = await this.discountModel.findAll(options);
+
+        if ( requiredFields ) {
+            discounts = discounts.filter(discountData => discountData.expirationFromDate.getTime() <= dateNow && discountData.expirationToDate.getTime() >= dateNow);
+            discounts.forEach(discountData => {
+                delete discountData.expirationFromDate;
+                delete discountData.expirationToDate;
+            });
+        }
+
+        return discounts;
+    }
+
+    public async createDiscount (requestBody: IRequestBody): Promise<string> {
+        const commonDiscountsCount: number = await this.discountModel.count();
+
+        if ( commonDiscountsCount >= 3 ) return 'MAXCOUNT'; 
+
+        const { discountContent, fromDate, toDate } = requestBody.adminPanel;
+
+        const dateNow: Date = new Date();
+
+        const id: number = parseInt(`${ dateNow.getFullYear() }${ dateNow.getMonth() }${ dateNow.getHours() }${ dateNow.getMinutes() }${ dateNow.getSeconds() }`, 10);
+
+        const discountExists: Discount = await this.discountModel.findByPk(id);
+
+        if ( discountExists ) throw new BadRequestException()
+
+        await this.discountModel.create({
+            id,
+            content: discountContent,
+            expirationFromDate: fromDate,
+            expirationToDate: toDate
+        });
+
+        return 'SUCCESS';
+    }
+
+    public async changeDiscountData (requestBody: IRequestBody): Promise<void> {
+        const { newDiscountContent, newFromDate, newToDate, discountId } = requestBody.adminPanel;
+
+        const discount: Discount = await this.discountModel.findByPk(discountId);
+
+        if ( !discount ) throw new BadRequestException();
+
+        const updateValues: { [x: string]: any } = {};
+
+        if ( newDiscountContent ) updateValues.content = newDiscountContent;
+        if ( newFromDate && newToDate ) {
+            updateValues.expirationFromDate = newFromDate;
+            updateValues.expirationToDate = newToDate;
+        }
+
+        if ( Object.keys(updateValues).length !== 0 ) await discount.update(updateValues);
+    }
+
+    public async deleteDiscount (discountId: number): Promise<void> {
+        const discount: Discount = await this.discountModel.findByPk(discountId);
+
+        if ( !discount ) throw new BadRequestException();
+
+        await discount.destroy();
     }
 
     public async changeClientOrderStatus (request: IRequest, requestBody: IRequestBody): Promise<void> {

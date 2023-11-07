@@ -1,0 +1,166 @@
+<ng-template [ngIf]="discounts" [ngIfElse]="noContentBlock">
+    <div ngbAccordion class="mt-5 w-75" id="changeDiscountAccordion" [closeOthers]="true">
+        <div ngbAccordionItem class="mb-5">
+            <h2 ngbAccordionHeader>
+                <button ngbAccordionButton>
+                    <span class="me-1">{{ 'ADMINPANEL.CREATEDISCOUNTTEXT.BUTTON' | translate }}</span>
+                </button>
+            </h2>
+            <div ngbAccordionCollapse>
+                <div ngbAccordionBody>
+                    <ng-template>
+                        <form [formGroup]="createDiscountForm" class="" novalidate (submit)="createDiscount()">
+                            <div class="form-group form-floating mb-3">
+                                <textarea class="form-control" id="inputDiscountContent" formControlName="discountContent"></textarea>
+                                <label for="inputDiscountContent" class="form-label">{{ 'ADMINPANEL.CREATEDISCOUNTTEXT.CONTENT' | translate }}</label>
+                                <div class="alert alert-danger" 
+                                    *ngIf="createDiscountForm.controls['discountContent'].invalid && createDiscountForm.controls['discountContent'].touched"
+                                >
+                                    {{ 'ADMINPANEL.CREATEDISCOUNTTEXT.INVALIDCONTENT' | translate }}
+                                </div>
+                            </div>
+                            <div class="form-group form-floating mb-3">
+                                <input type="text" class="form-control" id="inputDiscountExpirationDate" readonly formControlName="discountExpirationDate"
+                                    (click)="discountExpirationDateClick()"
+                                >
+                                <label for="inputDiscountExpirationDate" class="form-label">{{ 'ADMINPANEL.CREATEDISCOUNTTEXT.EXPIRATIONDATE' | translate }}</label>
+                                <div class="alert alert-danger" 
+                                    *ngIf="createDiscountForm.controls['discountExpirationDate'].invalid && createDiscountForm.controls['discountExpirationDate'].touched"
+                                >
+                                    {{ 'ADMINPANEL.CREATEDISCOUNTTEXT.INVALIDEXPIRATIONDATE' | translate }}
+                                </div>
+                            </div>
+                            <div class="form-group text-center">
+                                <button class="btn btn-primary" [disabled]="createDiscountForm.invalid">
+                                    {{ 'ADMINPANEL.CREATEDISCOUNTTEXT.BUTTON' | translate }}
+                                </button>
+                            </div>
+                        </form>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+        <div *ngFor="let discount of discounts; let i = index" ngbAccordionItem [destroyOnHide]="true"
+            [ngClass]="{ 'mb-3': i !== discounts.length - 1 }"
+        >
+            <h2 ngbAccordionHeader>
+                <button ngbAccordionButton>{{ 'ADMINPANEL.CHANGEDISCOUNTACCORDIONBUTTONTEXT' | translate }} {{ i + 1 }}</button>
+            </h2>
+            <div ngbAccordionCollapse>
+                <div ngbAccordionBody>
+                    <ng-template>
+                        <div class="d-flex flex-row mb-2">
+                            <input class="form-check-input align-self-center me-2 changeDiscountContentCheckBox" [attr.id]="'changeDiscountContentCheckBox' + i" 
+                                type="checkbox" value=""
+                                (change)="changeDiscountContentCheckBoxChange($event)"
+                                #changeDiscountContentCheckBox
+                            >
+                            <textarea class="form-control changeDiscountContentInput" [attr.id]="'changeDiscountContentInput' + i" 
+                            #changeDiscountContentInput>{{ discount.content }}</textarea>
+                        </div>
+                        <div class="d-flex flex-row mb-3">
+                            <input class="form-check-input align-self-center me-2 changeDiscountExpirationDateCheckBox" 
+                            [attr.id]="'changeDiscountExpirationDateCheckBox' + i"
+                                type="checkbox" value=""
+                                (change)="changeDiscountExpirationDateCheckBoxChange($event)"
+                                #changeDiscountExpirationDateCheckBox
+                            >
+                            <input type="text" class="form-control changeDiscountExpirationDateInput" [attr.id]="'changeDiscountExpirationDateInput' + i"
+                                [value]="(discount.expirationFromDate | date:'yyyy-M-d') + ' - ' + (discount.expirationToDate | date:'yyyy-M-d')"
+                                (click)="changeDiscountExpirationDateClick()"
+                                #changeDiscountExpirationDateInput
+                            />
+                        </div>
+                        <div class="changeDiscountButtonsContainer">
+                            <button type="button" class="btn btn-outline-secondary" [attr.discount-id]="discount.id"
+                                [disabled]="!changeDiscountContentCheckBoxIsChecked && !changeDiscountExpirationDateCheckBoxIsChecked"
+                                (click)="changeDiscountData($event)"
+                            >
+                                {{ 'ADMINPANEL.CHANGEDISCOUNTEXPIRATIONDATECHANGEBUTTONTEXT' | translate }}
+                            </button>
+                            <button class="btn btn-outline-danger float-end" [attr.discount-id]="discount.id" 
+                                (click)="deleteDiscount($event)"
+                            >
+                                {{ 'ADMINPANEL.CHANGEDISCOUNTEXPIRATIONDATEDELETEBUTTON' | translate }}
+                            </button>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #noContentBlock>  
+    <div class="noContentBlock text-center text-danger fs-4 p-4">
+        <span class="fw-bold">{{ 'ADMINPANEL.NODISCOUNTSMESSAGE' | translate }}</span>
+    </div>
+</ng-template>
+<div class="d-flex align-items-center visually-hidden" [ngClass]="{ 'visually-hidden': spinnerHidden }">
+    <strong class="text-info fs-4" role="status">{{ 'SPINNERTITLES.PROCESSING' | translate }}</strong>
+    <div class="spinner-border text-info ms-auto" aria-hidden="true"></div>
+</div>
+<div class="z-2 rounded position-absolute top-50 start-50 translate-middle" id="datepickerContainer"
+    [ngClass]="{ 'visually-hidden': datepickerContainerIsHidden } "
+    [ngStyle]="{
+        'background-color': 'rgb(187 224 249)'
+    }"
+    #datepickerContainer
+>
+    <form class="row row-cols-sm-auto py-4">
+        <div class="col-12 mx-auto">
+            <div class="dp-hidden position-absolute">
+                <div class="input-group">
+                    <input
+                        name="datepicker"
+                        class="form-control"
+                        ngbDatepicker
+                        #datepicker="ngbDatepicker"
+                        [autoClose]="'outside'"
+                        (dateSelect)="onDateSelection($event)"
+                        [displayMonths]="2"
+                        [dayTemplate]="t"
+                        outsideDays="hidden"
+                        [startDate]="fromDate!"
+                        tabindex="-1"
+                    />
+                    <ng-template #t let-date let-focused="focused">
+                        <span
+                            class="custom-day"
+                            [class.focused]="focused"
+                            [class.range]="isRange(date)"
+                            [class.faded]="isHovered(date) || isInside(date)"
+                            (mouseenter)="hoveredDate = date"
+                            (mouseleave)="hoveredDate = null"
+                        >
+                            {{ date.day }}
+                        </span>
+                    </ng-template>
+                </div>
+            </div>
+            <div class="input-group">
+                <input
+                    #dpFromDate
+                    class="form-control"
+                    placeholder="yyyy-mm-dd"
+                    name="dpFromDate"
+                    [value]="formatter.format(fromDate)"
+                    (input)="fromDate = validateInput(fromDate, dpFromDate.value)"
+                />
+                <button class="btn btn-outline-secondary bi bi-calendar3" (click)="datepicker.toggle()" type="button"></button>
+            </div>
+        </div>
+        <div class="col-12 mx-auto">
+            <div class="input-group">
+                <input
+                    #dpToDate
+                    class="form-control"
+                    placeholder="yyyy-mm-dd"
+                    name="dpToDate"
+                    [value]="formatter.format(toDate)"
+                    (input)="toDate = validateInput(toDate, dpToDate.value)"
+                />
+                <button class="btn btn-outline-secondary bi bi-calendar3" (click)="datepicker.toggle()" type="button"></button>
+            </div>
+        </div>
+    </form>
+</div>

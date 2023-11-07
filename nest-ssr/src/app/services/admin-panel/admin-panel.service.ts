@@ -5,6 +5,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Observable, map } from 'rxjs';
 
 import { AdminPanelOrdersControlComponent } from '../../components/admin-panel-orders-control/admin-panel-orders-control.component';
+import { AdminPanelDiscountsControlComponent } from '../../components/admin-panel-discounts-control/admin-panel-discounts-control.component';
 
 import { AppService } from '../../app.service';
 import { WebSocketService } from '../web-socket/web-socket.service';
@@ -14,6 +15,7 @@ import { environment } from '../../../environments/environment';
 import { IClientOrdersData, IClientOrdersInfoData, IFullCompressedImageData } from 'types/global';
 import { IGetClientOrdersOptions } from 'types/options';
 import { ClientOrdersComponent } from 'src/app/components/admin-panel-orders-control/client-orders/client-orders.component';
+import { IDiscount } from 'types/models';
 
 @Injectable({
     providedIn: 'root'
@@ -164,7 +166,7 @@ export class AdminPanelService {
                 if ( !componentThis.additionalOrdersInfoDataExists
                     && (existsCountZero || componentThis.prevCurrentSelectedOrdersStatusType !== componentThis.currentSelectedOrdersStatusType) 
                 ) componentThis.clientOrdersInfoData = clientOrdersInfoData.infoData && clientOrdersInfoData.infoData.length !== 0 ? clientOrdersInfoData.infoData : null;
-                else componentThis.clientOrdersInfoData = componentThis.clientOrdersInfoData.concat(clientOrdersInfoData.infoData);
+                else componentThis.clientOrdersInfoData.push(...clientOrdersInfoData.infoData);
 
                 componentThis.additionalOrdersInfoDataExists = clientOrdersInfoData.additionalOrdersInfoDataExists;
             },
@@ -208,11 +210,85 @@ export class AdminPanelService {
                 if ( !componentThis.additionalOrdersExists
                     && (existsCountZero || componentThis.prevCurrentSelectedOrdersStatusType !== componentThis.currentSelectedOrdersStatusType) 
                 ) componentThis.clientOrders = clientOrdersData.orders && clientOrdersData.orders.length !== 0 ? clientOrdersData.orders : null;
-                else componentThis.clientOrders = componentThis.clientOrders.concat(clientOrdersData.orders);
+                else componentThis.clientOrders.push(...clientOrdersData.orders);
 
                 componentThis.additionalOrdersExists = clientOrdersData.additionalOrdersExists;
             },
             error: () => this.appService.createErrorModal()
+        });
+    }
+
+    public getDiscountsData (): Observable<IDiscount[]> {
+        const headers: HttpHeaders = this.appService.createRequestHeaders();
+
+        return this.http.get<IDiscount[]>('/api/admin-panel/getDiscountsData', { headers, withCredentials: true });
+    }
+
+    public createDiscount (componentThis: AdminPanelDiscountsControlComponent, discountContent: string, fromDate: Date, toDate: Date): void {
+        const headers: HttpHeaders = this.appService.createRequestHeaders();
+
+        componentThis.spinnerHidden = false;
+
+        this.http.post('/api/admin-panel/createDiscount', { 
+            adminPanel: {
+                discountContent,
+                fromDate,
+                toDate
+            }
+        }, { responseType: 'text', headers, withCredentials: true }).subscribe({
+            next: responseText => {
+                if ( responseText === 'MAXCOUNT' ) {
+                    componentThis.spinnerHidden = true;
+
+                    this.appService.createWarningModal(this.appService.getTranslations('ADMINPANEL.CHANGEDISCOUNTMAXCOUNTMESSAGE'));
+                } else if ( responseText === 'SUCCESS' ) window.location.reload();
+            },
+            error: () => {
+                componentThis.spinnerHidden = true;
+
+                this.appService.createErrorModal()
+            }
+        });
+    }
+
+    public changeDiscountData (componentThis: AdminPanelDiscountsControlComponent, newDiscountContent: string, newFromDate: Date, newToDate: Date, discountId: number): void {
+        const headers: HttpHeaders = this.appService.createRequestHeaders();
+
+        componentThis.spinnerHidden = false;
+
+        this.http.put<void>('/api/admin-panel/changeDiscountData', {
+            adminPanel: {
+                newDiscountContent,
+                newFromDate,
+                newToDate,
+                discountId
+            }
+        }, { headers, withCredentials: true }).subscribe({
+            next: () => window.location.reload(),
+            error: () => {
+                componentThis.spinnerHidden = true;
+
+                this.appService.createErrorModal()
+            }
+        });
+    }
+
+    public deleteDiscount (componentThis: AdminPanelDiscountsControlComponent, discountId: number): void {
+        const headers: HttpHeaders = this.appService.createRequestHeaders();
+
+        componentThis.spinnerHidden = false;
+
+        this.http.delete<void>('/api/admin-panel/deleteDiscount', { 
+            params: {
+                discountId
+            }, headers, withCredentials: true
+        }).subscribe({
+            next: () => window.location.reload(),
+            error: () => {
+                componentThis.spinnerHidden = true;
+
+                this.appService.createErrorModal()
+            }
         });
     }
 }

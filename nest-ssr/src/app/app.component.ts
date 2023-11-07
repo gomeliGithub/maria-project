@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Inject, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostBinding, HostListener, Inject, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
@@ -90,11 +90,13 @@ export class AppComponent implements OnInit {
     public navbarIsCollapsed: boolean = true;
     public navbarTogglerIconTriggerState: string = 'collapsed';
     public navbarAnimationState: string = 'static';
+    public prevNavbarAnimationState: string = null;
 
     @ViewChildren(NgbDropdown) dropdowns: QueryList<NgbDropdown>;
 
     @ViewChild('changeClientLocaleButton', { static: false }) private readonly changeClientLocaleButtonViewRef: ElementRef<HTMLButtonElement>;
     @ViewChild('navbar', { static: false }) private readonly navbarElementRef: ElementRef<HTMLDivElement>;
+    @ViewChild('footer', { static: false }) private readonly footerElementRef: ElementRef<HTMLElement>;
 
     public readonly locales: IClientLocale[] = environment.locales;
 
@@ -124,6 +126,8 @@ export class AppComponent implements OnInit {
         if ( !this.navbarIsCollapsed ) this.navbarTogglerClick(true);
 
         if ( !(component instanceof HomeComponent) ) {
+            this.componentClass = false;
+            this.footerElementRef.nativeElement.classList.remove('footerHidden');
             this.isHomePage = false;
 
             if ( component instanceof GalleryComponent ) {
@@ -131,15 +135,22 @@ export class AppComponent implements OnInit {
                 component.activeClientType = this.activeClientType;
             }
         } else {
+            this.componentClass = true;
             this.isHomePage = true;
 
             this.navbarAnimationState = 'scrolled';
+
+            component.footerElementRef = this.footerElementRef;
         }
     }
+
+    @HostBinding('class.overflow-y-hidden') componentClass: boolean;
 
     @HostListener("scroll", ["$event"]) private onScroll ($event: any): void {
         if ( $event.srcElement.scrollTop > 50 ) this.navbarAnimationState = 'scrolled';
         else this.navbarAnimationState = 'static';
+
+        this.prevNavbarAnimationState = null;
     }
 
     @HostListener('document:mousedown', ['$event'])
@@ -153,9 +164,16 @@ export class AppComponent implements OnInit {
         if ( animationStart ) this.changeNavbarTogglerIconTriggerState();
 
         this.navbarIsCollapsed = !this.navbarIsCollapsed;
+        if ( !this.prevNavbarAnimationState ) this.prevNavbarAnimationState = this.navbarAnimationState;
 
-        if ( !this.navbarIsCollapsed ) this.navbarAnimationState = 'scrolled';
-        else this.navbarAnimationState = 'static';
+        if ( !this.isHomePage && this.prevNavbarAnimationState === 'static' ) {
+            if ( !this.navbarIsCollapsed ) this.navbarAnimationState = 'scrolled';
+            else {
+                this.navbarAnimationState = 'static';
+
+                this.prevNavbarAnimationState = null;
+            }
+        }
     }
 
     public menuMove (open: boolean, hoveredDropdown?: NgbDropdown): void {

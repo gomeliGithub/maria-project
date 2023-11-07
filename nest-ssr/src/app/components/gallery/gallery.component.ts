@@ -76,6 +76,7 @@ export class GalleryComponent implements OnInit {
 
     @HostBinding('className') componentClass: string;
 
+    public compressedBigImagesIsExists: boolean = false;
     public compressedImagesList: IReducedGalleryCompressedImages = null;
     public compressedImagesListMedium: IClientCompressedImage[][] = null;
     public compressedImagesListBig: IClientCompressedImage[][] = null;
@@ -107,6 +108,11 @@ export class GalleryComponent implements OnInit {
         if ( this.appService.checkIsPlatformBrowser() ) {
             this.appService.getTranslations([ 'PAGETITLES.GALLERY', `IMAGEPHOTOGRAPHYTYPESFULLTEXT.${ this.photographyType.toUpperCase() }`], true).subscribe({
                 next: translation => this.appService.setTitle(`${ translation[0] } - ${ translation[1] }`),
+                error: () => this.appService.createErrorModal()
+            });
+
+            this.clientService.checkCompressedBigImagesIsExists(this.photographyType).subscribe({
+                next: result => this.compressedBigImagesIsExists = result,
                 error: () => this.appService.createErrorModal()
             });
 

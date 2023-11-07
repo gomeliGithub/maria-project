@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Post, Body, BadRequestException, Put, Query } from '@nestjs/common';
+import { Controller, Get, Req, Post, Body, BadRequestException, Put, Query, Delete } from '@nestjs/common';
 
 import { AppService } from '../../app.service';
 import { AdminPanelService } from '../../services/admin-panel/admin-panel.service';
@@ -6,6 +6,7 @@ import { AdminPanelService } from '../../services/admin-panel/admin-panel.servic
 import { ClientTypes } from '../../decorators/client.types.decorator';
 
 import { IClientOrdersData, IClientOrdersInfoData, IFullCompressedImageData, IRequest, IRequestBody } from 'types/global';
+import { IDiscount } from 'types/models';
 
 @Controller('/admin-panel')
 export class AdminPanelController {
@@ -16,13 +17,13 @@ export class AdminPanelController {
 
     @Get('/checkAccess')
     @ClientTypes('admin')
-    async checkAccess (): Promise<boolean> {
+    public async checkAccess (): Promise<boolean> {
         return true;
     }
 
     @Post('/uploadImage')
     @ClientTypes('admin')
-    async uploadImage (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
+    public async uploadImage (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
         if ( !requestBody.client || !requestBody.client._id || !requestBody.client.uploadImageMeta || !requestBody.client.imagePhotographyType
             || !requestBody.client.imageViewSizeType
             || typeof requestBody.client._id !== 'number' || requestBody.client._id < 0 || requestBody.client._id > 1 
@@ -41,13 +42,13 @@ export class AdminPanelController {
 
     @Get('/getFullCompressedImagesList')
     @ClientTypes('admin')
-    async getFullCompressedImagesList (@Req() request: IRequest): Promise<IFullCompressedImageData> {
+    public async getFullCompressedImagesList (@Req() request: IRequest): Promise<IFullCompressedImageData> {
         return this.adminPanelService.getFullCompressedImagesList(request);
     }
 
     @Get('/getClientOrders')
     @ClientTypes('admin')
-    async getClientOrders (@Req() request: IRequest, @Query() options: {}): Promise<IClientOrdersInfoData | IClientOrdersData> {
+    public async getClientOrders (@Req() request: IRequest, @Query() options: {}): Promise<IClientOrdersInfoData | IClientOrdersData> {
         const getInfoData: string = options['getInfoData'] ? options['getInfoData'] : null;
         const memberLogin: string = options['memberLogin'] ? (options['memberLogin'] as string).trim() : null;
         const fromDate: Date = options['fromDate'] ? new Date(options['fromDate']) : null;
@@ -76,9 +77,52 @@ export class AdminPanelController {
         });
     }
 
+    @Get('/getDiscountsData')
+    @ClientTypes('admin')
+    public async getDiscountsData (): Promise<IDiscount[]> {
+        return this.adminPanelService.getDiscountsData();
+    }
+
+    @Post('/createDiscount')
+    @ClientTypes('admin')
+    public async createDiscount (@Body() requestBody: IRequestBody): Promise<string> {
+        if ( !requestBody.adminPanel || !requestBody.adminPanel.discountContent || !requestBody.adminPanel.fromDate || !requestBody.adminPanel.toDate
+            || typeof requestBody.adminPanel.discountContent !== 'string' || requestBody.adminPanel.discountContent.length > 50
+            || (new Date(requestBody.adminPanel.fromDate) as unknown as string) === 'Invalid Date' 
+            || (new Date(requestBody.adminPanel.toDate) as unknown as string) === 'Invalid Date'
+        ) throw new BadRequestException();
+
+        return this.adminPanelService.createDiscount(requestBody);
+    }
+
+    @Put('/changeDiscountData')
+    @ClientTypes('admin')
+    public async changeDiscountData (@Body() requestBody: IRequestBody): Promise<void> {
+        if ( !requestBody.adminPanel || !requestBody.adminPanel.discountId || typeof requestBody.adminPanel.discountId !== 'number'
+            || requestBody.adminPanel.newDiscountContent && 
+            (typeof requestBody.adminPanel.newDiscountContent !== 'string' || requestBody.adminPanel.newDiscountContent.length > 50)
+            || requestBody.adminPanel.newFromDate &&
+            ((new Date(requestBody.adminPanel.newFromDate) as unknown as string) === 'Invalid Date' )
+            || requestBody.adminPanel.newToDate &&
+            ((new Date(requestBody.adminPanel.newToDate) as unknown as string) === 'Invalid Date')
+        ) throw new BadRequestException();
+
+        return this.adminPanelService.changeDiscountData(requestBody);
+    }
+
+    @Delete('/deleteDiscount')
+    @ClientTypes('admin')
+    public async deleteDiscount (@Query('discountId') discountId: string): Promise<void> {
+        const discountIdNumber: number = parseInt(discountId, 10);
+
+        if ( Number.isNaN(discountIdNumber) ) throw new BadRequestException();
+
+        return this.adminPanelService.deleteDiscount(discountIdNumber);
+    }
+
     @Put('/changeClientOrderStatus')
     @ClientTypes('admin')
-    async changeClientOrderStatus (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
+    public async changeClientOrderStatus (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
         if ( !requestBody.adminPanel.clientOrderId
             || typeof requestBody.adminPanel.clientOrderId !== 'number' 
             || requestBody.adminPanel.clientLogin && (typeof requestBody.adminPanel.clientLogin !== 'string' || requestBody.adminPanel.clientLogin === '')
@@ -89,7 +133,7 @@ export class AdminPanelController {
 
     @Post('/deleteImage')
     @ClientTypes('admin')
-    async deleteImage (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
+    public async deleteImage (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
         if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName 
             || (requestBody.adminPanel.originalImageName && typeof requestBody.adminPanel.originalImageName !== 'string') 
         ) throw new BadRequestException();
@@ -99,7 +143,7 @@ export class AdminPanelController {
     
     @Post('/changeImageDisplayTarget')
     @ClientTypes('admin')
-    async changeImageDisplayTarget (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> { 
+    public async changeImageDisplayTarget (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> { 
         if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName || !requestBody.adminPanel.displayTargetPage
             || (requestBody.adminPanel.originalImageName && typeof requestBody.adminPanel.originalImageName !== 'string') 
             || (requestBody.adminPanel.displayTargetPage && ( 
@@ -113,7 +157,7 @@ export class AdminPanelController {
 
     @Put('/changeImageData')
     @ClientTypes('admin')
-    async changeImageData (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
+    public async changeImageData (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
         if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName || typeof requestBody.adminPanel.originalImageName !== 'string'
             || ( requestBody.adminPanel.newImagePhotographyType && ( 
                 typeof requestBody.adminPanel.newImagePhotographyType !== 'string' 
@@ -133,7 +177,7 @@ export class AdminPanelController {
 
     @Post('/setPhotographyTypeImage')
     @ClientTypes('admin')
-    async setPhotographyTypeImage (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
+    public async setPhotographyTypeImage (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
         if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName || !requestBody.adminPanel.imagePhotographyType
             || typeof requestBody.adminPanel.originalImageName !== 'string' 
             || typeof requestBody.adminPanel.imagePhotographyType !== 'string' || !this.appService.imagePhotographyTypes.includes(requestBody.adminPanel.imagePhotographyType)
@@ -144,7 +188,7 @@ export class AdminPanelController {
 
     @Post('/changePhotographyTypeDescription')
     @ClientTypes('admin')
-    async changePhotographyTypeDescription (@Body() requestBody: IRequestBody): Promise<void> {
+    public async changePhotographyTypeDescription (@Body() requestBody: IRequestBody): Promise<void> {
         if ( !requestBody.adminPanel || !requestBody.adminPanel.photographyTypeName || !requestBody.adminPanel.photographyTypeNewDescription
             || typeof requestBody.adminPanel.photographyTypeName !== 'string' 
             || !this.appService.imagePhotographyTypes.includes(requestBody.adminPanel.photographyTypeName)

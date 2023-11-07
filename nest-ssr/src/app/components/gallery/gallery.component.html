@@ -16,7 +16,8 @@
             <div class="d-flex flex-row justify-content-center position-relative h-auto w-25"
                 [ngClass]="{ 
                     'me-2': i !== imageDataArr.length - 1,
-                    'twoFirstImageContainer': i === 0 || i === 1
+                    'twoFirstImageContainer': i === 0 || i === 1,
+                    'oneLengthImageContainer': imageDataArr.length === 1
                 }"
                 (mouseenter)="startLinkContainerAnimation(
                     setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
@@ -97,7 +98,7 @@
         <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
     </div>
 </ng-template>
-<div class="m-3">
+<div *ngIf="compressedBigImagesIsExists" class="m-3">
     <button type="button" class="btn btn-outline-secondary btn-lg" id="toggleBigGalleryButton" (click)="toggleBigGallery()">
         {{ !bigGalleryIsHide ? ('GALLERYPAGE.MEDIUMGALLERYBUTTONTEXT' | translate) : ('GALLERYPAGE.BIGGALLERYBUTTONTEXT' | translate) }}
     </button>

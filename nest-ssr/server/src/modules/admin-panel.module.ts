@@ -7,8 +7,10 @@ import { SeoManagementService } from '../services/seo-management/seo-management.
 import { AdminPanelController } from '../controllers/admin-panel/admin-panel.controller';
 
 import { ClientCompressedImage, ClientOrder, ImagePhotographyType, Member } from '../models/client.model';
+import { Discount } from '../models/admin-panel.model';
+
 @Module({
-    imports: [ SequelizeModule.forFeature([ ClientCompressedImage, ImagePhotographyType, ClientOrder, Member ]) ],
+    imports: [ SequelizeModule.forFeature([ ClientCompressedImage, ImagePhotographyType, ClientOrder, Discount, Member ]) ],
     providers: [ AppService, AdminPanelService, SeoManagementService ],
     controllers: [AdminPanelController],
     exports: [AdminPanelService]

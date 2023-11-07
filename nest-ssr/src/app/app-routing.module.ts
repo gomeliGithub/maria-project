@@ -5,6 +5,7 @@ import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
 import { AdminPanelComponent } from './components/admin-panel/admin-panel.component';
 import { AdminPanelOrdersControlComponent } from './components/admin-panel-orders-control/admin-panel-orders-control.component';
+import { AdminPanelDiscountsControlComponent } from './components/admin-panel-discounts-control/admin-panel-discounts-control.component';
 import { ClientComponent } from './components/client/client.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 
@@ -18,6 +19,7 @@ const routes: Routes = [
     { path: 'adminPanel/imagesControl', component: AdminPanelComponent, canActivate: [ClientGuard] },
     { path: 'adminPanel', redirectTo: '/adminPanel/imagesControl', pathMatch: 'full' },
     { path: 'adminPanel/ordersControl', component: AdminPanelOrdersControlComponent, canActivate: [ClientGuard] },
+    { path: 'adminPanel/discountsControl', component: AdminPanelDiscountsControlComponent, canActivate: [ClientGuard] },
     { path: 'sign/:op', component: ClientComponent },
     { path: 'signUp', redirectTo: '/sign/up', pathMatch: 'full' },
     { path: 'signIn', redirectTo: '/sign/in', pathMatch: 'full' },

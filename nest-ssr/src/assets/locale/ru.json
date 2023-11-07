@@ -6,7 +6,8 @@
 		"ADMINPANEL": {
 			"MAIN": "Панель администратора",
 			"IMAGESCONTROL": "Управление фото",
-			"ORDERSCONTROL": "Управление заказами"
+			"ORDERSCONTROL": "Управление заказами",
+			"DISCOUNTSCONTROL": "Управление скидками"
 		},
 		"SIGNUP": "Регистрация",
 		"SIGNIN": "Вход",
@@ -14,6 +15,7 @@
 	},
 	"NOIMAGESMESSAGE": "Изображений пока нет",
 	"HOMEPAGE": {
+		"NODISCOUNTSMESSAGE": "Активных скидок пока нет, но скоро появятся, не переживайте",
 		"HEADERTITLE": "Портфолио",
 		"PHOTOGRAPHYTYPESLINKTEXT": "Смотреть работы"
 	},
@@ -102,12 +104,17 @@
 			"NEWORDERS": "Клиентов с новыми заказами пока нет",
 			"PROCESSEDORDERS": "Клиентов с обработанными заказами пока нет"
 		},
+		"NODISCOUNTSMESSAGE": "Скидок пока нет",
 		"DELETEIMAGESUCCESSMESSAGE": "Изображение успешно удалено",
 		"MAXCOUNTONHOMEPAGEMESSAGE": "Максимальное количество изображений на главной странице",
 		"TABLECAPTION": "Управление изображениями",
 		"SECONDTABLECAPTION": "Управление данными для типов съёмок",
 		"CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTON": "Изменить описание",
 		"CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTONINVALIDMESSSAGE": "Максимум 40 символов.",
+		"CHANGEDISCOUNTACCORDIONBUTTONTEXT": "Данные скидки №",
+		"CHANGEDISCOUNTEXPIRATIONDATECHANGEBUTTONTEXT": "Изменить",
+		"CHANGEDISCOUNTEXPIRATIONDATEDELETEBUTTON": "Удалить скидку",
+		"CHANGEDISCOUNTMAXCOUNTMESSAGE": "Максимальное количество скидок 3",
 		"TABLECOLTITLES": {
 			"ORIGINALNAME": "Оригинальное имя",
 			"ORIGINALSIZE": "Размер оригинального изображения",
@@ -164,6 +171,13 @@
 			"INVALIDSELECTIMAGE": "Не выбрано изображение",
 			"DESCRIPTION": "Индивидуальное описание фото",
 			"BUTTON": "Загрузить новое изображение"
+		},
+		"CREATEDISCOUNTTEXT": {
+			"CONTENT": "Содержание *",
+			"EXPIRATIONDATE": "Период действия *",
+			"INVALIDCONTENT": "Не указано содержание, либо количество символов больше 50",
+			"INVALIDEXPIRATIONDATE": "Не выбран период действия",
+			"BUTTON": "Создать скидку"
 		},
 		"IMAGESIZES": {
 			"BYTE": "байт",

@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 
-import sequelize, { FindOptions, NonNullFindOptions } from 'sequelize';
+import sequelize, { CountOptions, FindOptions, NonNullFindOptions, Op } from 'sequelize';
 import ms from 'ms';
 
 import fsPromises from 'fs/promises';
@@ -11,16 +11,19 @@ import path from 'path';
 
 import { CommonModule } from '../../modules/common.module';
 
+import { AdminPanelModule } from 'server/src/modules/admin-panel.module';
+
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 import { JwtControlService } from '../sign/jwt-control.service';
 import { MailService } from '../mail/mail.service';
+import { AdminPanelService } from '../admin-panel/admin-panel.service';
 
 import { Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder } from '../../models/client.model';
 
 import { IClient, IClientOrdersInfoDataArr, ICookieSerializeOptions, IGalleryCompressedImagesList, IReducedGalleryCompressedImages, IRequest, IRequestBody } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions, IGetClientOrdersOptions } from 'types/options';
-import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
+import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
 
 @Injectable()
 export class ClientService {
@@ -110,6 +113,16 @@ export class ClientService {
             raw: false
         }
 
+        const getClientsOrdersCountOptions: CountOptions = {
+            where: { 
+                status: options.status,
+                createdDate: {
+                    [Op.gte]: options.fromDate,
+                    [Op.lte]: options.untilDate
+                }
+            } 
+        }
+
         let clientsOrdersInfoData: IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[] = null;
 
         if ( loginList === 'all' ) {
@@ -117,16 +130,22 @@ export class ClientService {
 
             if ( !clientsOrdersInfoData ) clientsOrdersInfoData = [];
 
-            if ( options.existsCount === 0 ) (clientsOrdersInfoData as IClientOrdersInfoDataArr[]).push({
-                login: 'guest',
-                ordersCount: await this.clientOrderModel.count({ where: { status: options.status } })
-            });
+            if ( options.existsCount === 0 ) {
+                getClientsOrdersCountOptions.where['memberLoginId'] = null;
+
+                (clientsOrdersInfoData as IClientOrdersInfoDataArr[]).push({
+                    login: 'guest',
+                    ordersCount: await this.clientOrderModel.count(getClientsOrdersCountOptions)
+                });
+
+                delete getClientsOrdersCountOptions.where['memberLoginId'];
+            }
 
             for ( const client of clients ) {
                 try {
                     (clientsOrdersInfoData as IClientOrdersInfoDataArr[]).push({
                         login: client.dataValues.login,
-                        ordersCount: await client.$count('clientOrders', { where: { status: options.status } })
+                        ordersCount: await client.$count('clientOrders', getClientsOrdersCountOptions)
                     });
                 } catch { }
             }
@@ -136,7 +155,7 @@ export class ClientService {
             try {
                 clientsOrdersInfoData = {
                     login: loginList,
-                    ordersCount: await client.$count('clientOrders', { where: { status: options.status } })
+                    ordersCount: await client.$count('clientOrders', getClientsOrdersCountOptions)
                 } as IClientOrdersInfoDataArr;
             } catch { }
         } else if ( Array.isArray(loginList) ) {
@@ -148,7 +167,7 @@ export class ClientService {
                 try {
                     (clientsOrdersInfoData as IClientOrdersInfoDataArr[]).push({
                         login,
-                        ordersCount: await client.$count('clientOrders', { where: { status: options.status } })
+                        ordersCount: await client.$count('clientOrders', getClientsOrdersCountOptions)
                     });
                 } catch { }
             }
@@ -176,6 +195,15 @@ export class ClientService {
             if ( compressedImageData ) response.download(path.join(compressedImageData.originalDirPath, compressedImageData.originalName));
             else throw new BadRequestException();
         }
+    }
+
+    public async checkCompressedBigImagesIsExists (photographyType: string): Promise<boolean> {
+        const bigViewSizeCompressedImagesCount: number = await this.compressedImageModel.count({ 
+            where: { photographyType, viewSizeType: 'big' }   
+        });
+
+        if ( bigViewSizeCompressedImagesCount !== 0 ) return true;
+        else return false;
     }
 
     public async getCompressedImagesList (imagesType: 'home' | string, imageViewSize: 'medium' | 'big'): Promise<IGalleryCompressedImagesList | IClientCompressedImage[]> {
@@ -217,6 +245,14 @@ export class ClientService {
         }
 
         return imagesType === 'home' ? compressedImages : galleryCompressedImagesList;
+    }
+
+    public async getDiscountsData (): Promise<IDiscount[]> {
+        const adminPanelRef = await this.appService.getServiceRef(AdminPanelModule, AdminPanelService);
+
+        const requiredFields: string[] = [ 'content', 'expirationFromDate', 'expirationToDate' ];
+
+        return adminPanelRef.getDiscountsData(requiredFields);
     }
 
     public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home'): Promise<IImagePhotographyType[][]>

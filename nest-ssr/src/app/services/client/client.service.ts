@@ -10,7 +10,7 @@ import { AppService } from '../../app.service';
 
 import { IClientBrowser, IGalleryCompressedImagesList } from 'types/global';
 import { IClientSignData } from 'types/sign';
-import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
+import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
 
 @Injectable({
     providedIn: 'root'
@@ -74,6 +74,10 @@ export class ClientService {
         return this.http.get('/api/sign/getBcryptHashSaltrounds', { responseType: 'text', withCredentials: true });
     }
 
+    public checkCompressedBigImagesIsExists (photographyType: string): Observable<boolean> {
+        return this.http.get<boolean>(`/api/client/checkCompressedBigImagesIsExists/:${ photographyType }`);
+    }
+
     public getCompressedImagesList (imagesType: 'home', imageViewSize?: 'medium' | 'big'): Observable<IClientCompressedImage[]>
     public getCompressedImagesList (imagesType: string, imageViewSize?: 'medium' | 'big'): Observable<IGalleryCompressedImagesList>
     public getCompressedImagesList (imagesType: 'home' | string, imageViewSize?: 'medium' | 'big'): Observable<IGalleryCompressedImagesList | IClientCompressedImage[]> {
@@ -92,6 +96,12 @@ export class ClientService {
             if ( targetPage === 'home' ) return data as Observable<IImagePhotographyType[][]>;
             else if ( targetPage === 'admin' ) return data as Observable<IImagePhotographyType[]>;
         });
+    }
+
+    public getDiscountsData (): Observable<IDiscount[]> {
+        const headers: HttpHeaders = this.appService.createRequestHeaders();
+
+        return this.http.get<IDiscount[]>('/api/client/getDiscountsData', { headers, withCredentials: true });
     }
 
     public sendOrder (photographyType: string, sendOrderFormValue: Partial<{

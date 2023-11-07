@@ -49,6 +49,15 @@ export interface IRequestBody {
 
         photographyTypeName?: string;
         photographyTypeNewDescription?: string;
+
+        discountContent?: string; 
+        fromDate?: Date; 
+        toDate?: Date;
+
+        newDiscountContent?: string;
+        newFromDate?: Date;
+        newToDate?: Date;
+        discountId?: number;
     }
 }
 

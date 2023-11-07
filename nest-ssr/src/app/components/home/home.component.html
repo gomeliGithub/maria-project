@@ -1,27 +1,30 @@
 <ngb-carousel *ngIf="compressedImagesList; else noContentBlock" class="carousel carousel-fade vh-100 vw-100 section" id="imagesCarousel"
-    [interval]="3000"
+    [interval]="2000"
+    [showNavigationArrows]="compressedImagesList.length !== 1"
+	[showNavigationIndicators]="compressedImagesList.length !== 1"
 >
     <ng-template ngbSlide *ngFor="let imageData of compressedImagesList; let i = index">
         <img src="/assets/images_thumbnail/home/{{ imageData.name }}" class="h-100 w-100 mw-100 object-fit-cover align-baseline">
     </ng-template>
 </ngb-carousel>
-<ngb-carousel class="carousel w-100 my-5 section" id="discountsCarousel" [interval]="0">
-    <ng-template ngbSlide>
-        <div class="h-100 w-100">
-            <p class="row justify-content-center align-items-center h-100 h1 text-center">First</p>
-        </div>
-    </ng-template>
-    <ng-template ngbSlide>
-        <div class="h-100 w-100">
-            <p class="row justify-content-center align-items-center h-100 h1 text-center">Second</p>
-        </div>
-    </ng-template>
-    <ng-template ngbSlide>
-        <div class="h-100 w-100">
-            <p class="row justify-content-center align-items-center h-100 h1 text-center">Third</p>
+<ngb-carousel *ngIf="discountsData; else noDiscountsDataBlock" class="carousel w-100 my-5 section" id="discountsCarousel" 
+    [interval]="0"
+    [showNavigationArrows]="discountsData.length !== 1"
+	[showNavigationIndicators]="discountsData.length !== 1"
+>
+    <ng-template ngbSlide *ngFor="let discountData of discountsData; let i = index">
+        <div class="h-100 w-100 text-center text-light">
+            <p class="row justify-content-center align-items-center h-100 h1">
+                {{ discountData.content }}
+            </p>
         </div>
     </ng-template>
 </ngb-carousel>
+<ng-template #noDiscountsDataBlock>
+    <div class="text-center text-info fs-4 p-5">
+        <span>{{ 'HOMEPAGE.NODISCOUNTSMESSAGE' | translate }}</span>
+    </div>
+</ng-template>
 <div class="p-5 mt-3 w-100 section">
     <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
 </div>
@@ -82,4 +85,3 @@
         <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
     </div>
 </ng-template>
-<ng-template #appModal></ng-template>
