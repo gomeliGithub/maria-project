@@ -1,45 +1,45 @@
-<ng-template [ngIf]="discounts" [ngIfElse]="noContentBlock">
-    <div ngbAccordion class="mt-5 w-75" id="changeDiscountAccordion" [closeOthers]="true">
-        <div ngbAccordionItem class="mb-5">
-            <h2 ngbAccordionHeader>
-                <button ngbAccordionButton>
-                    <span class="me-1">{{ 'ADMINPANEL.CREATEDISCOUNTTEXT.BUTTON' | translate }}</span>
-                </button>
-            </h2>
-            <div ngbAccordionCollapse>
-                <div ngbAccordionBody>
-                    <ng-template>
-                        <form [formGroup]="createDiscountForm" class="" novalidate (submit)="createDiscount()">
-                            <div class="form-group form-floating mb-3">
-                                <textarea class="form-control" id="inputDiscountContent" formControlName="discountContent"></textarea>
-                                <label for="inputDiscountContent" class="form-label">{{ 'ADMINPANEL.CREATEDISCOUNTTEXT.CONTENT' | translate }}</label>
-                                <div class="alert alert-danger" 
-                                    *ngIf="createDiscountForm.controls['discountContent'].invalid && createDiscountForm.controls['discountContent'].touched"
-                                >
-                                    {{ 'ADMINPANEL.CREATEDISCOUNTTEXT.INVALIDCONTENT' | translate }}
-                                </div>
+<div ngbAccordion class="mt-5 w-75" id="changeDiscountAccordion" [closeOthers]="true">
+    <div ngbAccordionItem class="mb-5">
+        <h2 ngbAccordionHeader>
+            <button ngbAccordionButton>
+                <span class="me-1">{{ 'ADMINPANEL.CREATEDISCOUNTTEXT.BUTTON' | translate }}</span>
+            </button>
+        </h2>
+        <div ngbAccordionCollapse>
+            <div ngbAccordionBody>
+                <ng-template>
+                    <form [formGroup]="createDiscountForm" class="" novalidate (submit)="createDiscount()">
+                        <div class="form-group form-floating mb-3">
+                            <textarea class="form-control" id="inputDiscountContent" formControlName="discountContent"></textarea>
+                            <label for="inputDiscountContent" class="form-label">{{ 'ADMINPANEL.CREATEDISCOUNTTEXT.CONTENT' | translate }}</label>
+                            <div class="alert alert-danger" 
+                                *ngIf="createDiscountForm.controls['discountContent'].invalid && createDiscountForm.controls['discountContent'].touched"
+                            >
+                                {{ 'ADMINPANEL.CREATEDISCOUNTTEXT.INVALIDCONTENT' | translate }}
                             </div>
-                            <div class="form-group form-floating mb-3">
-                                <input type="text" class="form-control" id="inputDiscountExpirationDate" readonly formControlName="discountExpirationDate"
-                                    (click)="discountExpirationDateClick()"
-                                >
-                                <label for="inputDiscountExpirationDate" class="form-label">{{ 'ADMINPANEL.CREATEDISCOUNTTEXT.EXPIRATIONDATE' | translate }}</label>
-                                <div class="alert alert-danger" 
-                                    *ngIf="createDiscountForm.controls['discountExpirationDate'].invalid && createDiscountForm.controls['discountExpirationDate'].touched"
-                                >
-                                    {{ 'ADMINPANEL.CREATEDISCOUNTTEXT.INVALIDEXPIRATIONDATE' | translate }}
-                                </div>
+                        </div>
+                        <div class="form-group form-floating mb-3">
+                            <input type="text" class="form-control" id="inputDiscountExpirationDate" readonly formControlName="discountExpirationDate"
+                                (click)="discountExpirationDateClick()"
+                            >
+                            <label for="inputDiscountExpirationDate" class="form-label">{{ 'ADMINPANEL.CREATEDISCOUNTTEXT.EXPIRATIONDATE' | translate }}</label>
+                            <div class="alert alert-danger" 
+                                *ngIf="createDiscountForm.controls['discountExpirationDate'].invalid && createDiscountForm.controls['discountExpirationDate'].touched"
+                            >
+                                {{ 'ADMINPANEL.CREATEDISCOUNTTEXT.INVALIDEXPIRATIONDATE' | translate }}
                             </div>
-                            <div class="form-group text-center">
-                                <button class="btn btn-primary" [disabled]="createDiscountForm.invalid">
-                                    {{ 'ADMINPANEL.CREATEDISCOUNTTEXT.BUTTON' | translate }}
-                                </button>
-                            </div>
-                        </form>
-                    </ng-template>
-                </div>
+                        </div>
+                        <div class="form-group text-center">
+                            <button class="btn btn-primary" [disabled]="createDiscountForm.invalid">
+                                {{ 'ADMINPANEL.CREATEDISCOUNTTEXT.BUTTON' | translate }}
+                            </button>
+                        </div>
+                    </form>
+                </ng-template>
             </div>
         </div>
+    </div>
+    <ng-template [ngIf]="discounts" [ngIfElse]="noContentBlock">
         <div *ngFor="let discount of discounts; let i = index" ngbAccordionItem [destroyOnHide]="true"
             [ngClass]="{ 'mb-3': i !== discounts.length - 1 }"
         >
@@ -88,8 +88,8 @@
                 </div>
             </div>
         </div>
-    </div>
-</ng-template>
+    </ng-template>
+</div>
 <ng-template #noContentBlock>  
     <div class="noContentBlock text-center text-danger fs-4 p-4">
         <span class="fw-bold">{{ 'ADMINPANEL.NODISCOUNTSMESSAGE' | translate }}</span>

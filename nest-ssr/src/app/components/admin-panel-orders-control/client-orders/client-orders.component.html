@@ -86,3 +86,7 @@
         </span>
     </div>
 </ng-template>
+<div class="d-flex align-items-center visually-hidden" [ngClass]="{ 'visually-hidden': spinnerHidden }">
+    <strong class="text-info fs-4" role="status">{{ 'SPINNERTITLES.PROCESSING' | translate }}</strong>
+    <div class="spinner-border text-info ms-auto" aria-hidden="true"></div>
+</div>

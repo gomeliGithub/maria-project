@@ -198,9 +198,9 @@ export class SignService {
         const passwordValid: boolean = await bcrypt.compare(clientPassword, client.password); 
         
         
-        console.log(clientPassword); 
-        console.log(client.password);
-        console.log(await bcrypt.compare(clientPassword, client.password));
+        // console.log(clientPassword); 
+        // console.log(client.password);
+        // console.log(await bcrypt.compare(clientPassword, client.password));
 
 
         if ( !passwordValid ) throw new UnauthorizedException();

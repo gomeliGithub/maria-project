@@ -191,7 +191,7 @@ export class AdminPanelService {
         let existsCount: number = null;
 
         if ( componentThis.currentSelectedClientLogin ) {
-            memberLogin = existsCountZero ? clientLogin : componentThis.currentSelectedClientLogin
+            memberLogin = existsCountZero ? clientLogin : componentThis.currentSelectedClientLogin === 'Гость' ? 'guest' : componentThis.currentSelectedClientLogin
         } else memberLogin = 'guest';
 
         if ( !componentThis.additionalOrdersExists ) existsCount = 0;

@@ -422,7 +422,7 @@ export class AdminPanelService {
 
         const homeImagesCount: number = (await fsPromises.readdir(path.join(this.staticCompressedImagesDirPath, 'home'))).length;
 
-        if ( homeImagesCount >= 15 ) return 'MAXCOUNT';
+        if ( homeImagesCount >= 10 ) return 'MAXCOUNT';
 
         const displayTargetPage: 'home' | 'gallery' | 'original' = requestBody.adminPanel.displayTargetPage;
 
