@@ -44,7 +44,6 @@ app-home, app-gallery, app-client, app-admin-panel, app-admin-panel-orders-contr
 
 app-home {
     scroll-snap-type: y mandatory !important;
-    scroll-padding-top: 8vh !important;
     overflow-y: scroll !important;
     display: flex !important;
     flex-direction: column !important;
@@ -139,13 +138,11 @@ ngb-accordion .accordion-body {
     padding: 0 !important;
 }
 
+.footer {
+    transition: all 200ms ease;
+}
+
 .footerHidden {
-    width: 1px!important;
-    height: 1px!important;
-    padding: 0!important;
-    margin: -1px!important;
-    overflow: hidden!important;
-    clip: rect(0,0,0,0)!important;
-    white-space: nowrap!important;
-    border: 0!important;
+    visibility: hidden;
+    opacity: 0;
 }

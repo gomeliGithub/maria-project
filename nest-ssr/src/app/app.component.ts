@@ -127,7 +127,7 @@ export class AppComponent implements OnInit {
 
         if ( !(component instanceof HomeComponent) ) {
             this.componentClass = false;
-            this.footerElementRef.nativeElement.classList.remove('footerHidden');
+            this.footerElementRef.nativeElement.classList.remove('footerHidden', 'position-absolute', 'bottom-0');
             this.isHomePage = false;
 
             if ( component instanceof GalleryComponent ) {
@@ -138,6 +138,8 @@ export class AppComponent implements OnInit {
             this.componentClass = true;
             this.isHomePage = true;
 
+            this.footerElementRef.nativeElement.classList.add('position-absolute', 'bottom-0');
+
             this.navbarAnimationState = 'scrolled';
 
             component.footerElementRef = this.footerElementRef;
@@ -146,7 +148,7 @@ export class AppComponent implements OnInit {
 
     @HostBinding('class.overflow-y-hidden') componentClass: boolean;
 
-    @HostListener("scroll", ["$event"]) private onScroll ($event: any): void {
+    @HostListener("scroll", ["$event"]) public onScroll ($event: any): void {
         if ( $event.srcElement.scrollTop > 50 ) this.navbarAnimationState = 'scrolled';
         else this.navbarAnimationState = 'static';
 

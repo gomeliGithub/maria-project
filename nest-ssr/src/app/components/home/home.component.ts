@@ -86,10 +86,10 @@ export class HomeComponent implements OnInit {
         }
     }
 
-    @HostListener("scroll", ["$event"]) private onScroll ($event: any): void {
-        if ( $event.srcElement.scrollTop >= $event.srcElement.scrollHeight - 1000 ) {
-            setTimeout(() => this.footerElementRef.nativeElement.classList.remove('footerHidden'), 200)
-        } else setTimeout(() => this.footerElementRef.nativeElement.classList.add('footerHidden'), 200)
+    @HostListener('scroll', [ '$event' ]) public onScroll ($event: any): void {
+        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 1 ) {
+            this.footerElementRef.nativeElement.classList.remove('footerHidden');
+        } else this.footerElementRef.nativeElement.classList.add('footerHidden');
     }
 
     public startMouseTriggerAnimation (index: number): void {

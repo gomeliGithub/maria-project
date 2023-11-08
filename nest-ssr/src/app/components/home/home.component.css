@@ -44,6 +44,10 @@
         flex-direction: column !important;
     }
 
+    #aboutContainer > div {
+        margin-bottom: 5rem !important;
+    }
+
     #aboutImage {
         height: 85% !important;
     }
@@ -82,7 +86,7 @@
 
 @media screen and (min-width: 768px) {
     .imagePhotographyTypesGroup {
-        margin-top: 1.5rem!important;
+        margin-top: 1.5rem !important;
     }
 }
 

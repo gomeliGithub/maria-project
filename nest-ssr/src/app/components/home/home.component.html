@@ -1,4 +1,4 @@
-<ngb-carousel *ngIf="compressedImagesList; else noContentBlock" class="carousel carousel-fade vh-100 vw-100 section" id="imagesCarousel"
+<ngb-carousel *ngIf="compressedImagesList" class="carousel carousel-fade vh-100 vw-100 section" id="imagesCarousel"
     [interval]="2000"
     [showNavigationArrows]="compressedImagesList.length !== 1"
 	[showNavigationIndicators]="compressedImagesList.length !== 1"
@@ -80,8 +80,3 @@
         </div>
     </div>
 </div>
-<ng-template #noContentBlock>
-    <div class="noContentBlock text-center text-info fs-4 p-4">
-        <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
-    </div>
-</ng-template>
