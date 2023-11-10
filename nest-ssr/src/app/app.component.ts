@@ -11,6 +11,7 @@ import { GalleryComponent } from './components/gallery/gallery.component';
 import { ClientComponent } from './components/client/client.component';
 import { AdminPanelComponent } from './components/admin-panel/admin-panel.component';
 import { AdminPanelOrdersControlComponent } from './components/admin-panel-orders-control/admin-panel-orders-control.component';
+import { AdminPanelDiscountsControlComponent } from './components/admin-panel-discounts-control/admin-panel-discounts-control.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 
 import { AppService } from './app.service';
@@ -122,7 +123,9 @@ export class AppComponent implements OnInit {
         });
     }
 
-    public onRouterOutlet (component: HomeComponent | GalleryComponent | ClientComponent | AdminPanelComponent | AdminPanelOrdersControlComponent | NotFoundComponent): void {
+    public onRouterOutlet (component: HomeComponent | GalleryComponent | ClientComponent | AdminPanelComponent | AdminPanelOrdersControlComponent 
+        | AdminPanelDiscountsControlComponent | NotFoundComponent
+    ): void {
         if ( !this.navbarIsCollapsed ) this.navbarTogglerClick(true);
 
         if ( !(component instanceof HomeComponent) ) {
@@ -148,14 +151,14 @@ export class AppComponent implements OnInit {
 
     @HostBinding('class.overflow-y-hidden') componentClass: boolean;
 
-    @HostListener("scroll", ["$event"]) public onScroll ($event: any): void {
+    @HostListener('scroll', [ '$event' ]) public onScroll ($event: any): void {
         if ( $event.srcElement.scrollTop > 50 ) this.navbarAnimationState = 'scrolled';
         else this.navbarAnimationState = 'static';
 
         this.prevNavbarAnimationState = null;
     }
 
-    @HostListener('document:mousedown', ['$event'])
+    @HostListener('document:mousedown', [ '$event' ])
     public onGlobalClick (event: MouseEvent): void {
         if ( !this.navbarElementRef.nativeElement.contains(event.target as HTMLElement) ) {
             if ( !this.navbarIsCollapsed ) this.navbarTogglerClick(true);

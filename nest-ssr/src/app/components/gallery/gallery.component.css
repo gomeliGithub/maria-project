@@ -2,6 +2,11 @@
     width: 25%;
 }
 
+.downloadOriginalImageLinkContainer {
+    width: 100%;
+    transform: translate(-50%, -100%) !important;
+}
+
 @media (max-width: 768px) {
     #titleHeaderContainer {
         padding: 0.5rem !important;
@@ -46,7 +51,7 @@
     }
 
     .downloadOriginalImageLinkContainer a {
-        width: 80% !important;
+        width: 80%;
         --bs-btn-padding-y: .25rem; 
         --bs-btn-padding-x: .5rem; 
         --bs-btn-font-size: .60rem;
