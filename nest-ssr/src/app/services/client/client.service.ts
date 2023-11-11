@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable, forkJoin } from 'rxjs';
@@ -8,7 +8,7 @@ import * as bcryptjs from 'bcryptjs';
 
 import { AppService } from '../../app.service';
 
-import { IClientBrowser, IGalleryCompressedImagesList } from 'types/global';
+import { IClientBrowser, IGalleryCompressedImagesData } from 'types/global';
 import { IClientSignData } from 'types/sign';
 import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
 
@@ -21,6 +21,22 @@ export class ClientService {
         private readonly http: HttpClient,
         private readonly appService: AppService
     ) { }
+
+    public scrollPageBottomStatusChange: EventEmitter<boolean> = new EventEmitter();
+    public navbarAnimationStateChange: EventEmitter<string> = new EventEmitter();
+    public prevNavbarAnimationStateChange: EventEmitter<string> = new EventEmitter();
+
+    public setScrollPageBottomStatus (value: boolean) {
+        this.scrollPageBottomStatusChange.emit(value);
+    }
+
+    public setNavbarAnimationState (value: string) {
+        this.navbarAnimationStateChange.emit(value);
+    }
+
+    public setPrevNavbarAnimationStateChange (value: string) { 
+        this.prevNavbarAnimationStateChange.emit(value);
+    }
 
     public getActiveClient (): Observable<IClientBrowser> {
         const headers: HttpHeaders = this.appService.createRequestHeaders();
@@ -79,13 +95,14 @@ export class ClientService {
     }
 
     public getCompressedImagesList (imagesType: 'home', imageViewSize?: 'medium' | 'big'): Observable<IClientCompressedImage[]>
-    public getCompressedImagesList (imagesType: string, imageViewSize?: 'medium' | 'big'): Observable<IGalleryCompressedImagesList>
-    public getCompressedImagesList (imagesType: 'home' | string, imageViewSize?: 'medium' | 'big'): Observable<IGalleryCompressedImagesList | IClientCompressedImage[]> {
+    public getCompressedImagesList (imagesType: string, imageViewSize?: 'medium' | 'big', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData>
+    public getCompressedImagesList (imagesType: 'home' | string, imageViewSize?: 'medium' | 'big', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData | IClientCompressedImage[]> {
         return this.http.get(`/api/client/getCompressedImagesList/:${ imagesType }`, { params: {
-            imageViewSize
-        }}).pipe<IGalleryCompressedImagesList | IClientCompressedImage[]>(imagesList => {
+            imageViewSize,
+            imagesExistsCount
+        }}).pipe<IGalleryCompressedImagesData | IClientCompressedImage[]>(imagesList => {
             if ( imagesType === 'home' ) return imagesList as Observable<IClientCompressedImage[]>;
-            else return imagesList as Observable<IGalleryCompressedImagesList>;
+            else return imagesList as Observable<IGalleryCompressedImagesData>;
         });
     }
 

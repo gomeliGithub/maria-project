@@ -22,8 +22,11 @@ export interface IСompressedImageGetOptions {
     find?: {
         imageNames?: string[];
         includeFields?: string[];
+        imageViewSize?: string;
         rawResult?: boolean;
-    }
+    },
+    imagesLimit?: number;
+    imagesExistsCount?: number;
 }
 
 export interface IModalCreateOptions {

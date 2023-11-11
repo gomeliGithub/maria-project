@@ -27,6 +27,7 @@ export class CommonService {
     ) { }
 
     public webSocketClients: IWebSocketClient[] = [];
+    public promisesCache: { [ x: string ]: Promise<any> } = { };
 
     public async getClients (request: IRequest, loginList: string, options?: IClientGetOptions): Promise<Admin | Member>
     public async getClients (request: IRequest, loginList: string[], options?: IClientGetOptions): Promise<Admin[] | Member[]>

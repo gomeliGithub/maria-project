@@ -85,7 +85,7 @@ app-admin-panel {
     padding: 1rem !important;
 }
 
-@media (max-width: 768px) {
+@media only screen and (max-width: 768px) {
     .btn-outline-secondary {
         --bs-btn-color: #fff;
         --bs-btn-bg: #6c757d;

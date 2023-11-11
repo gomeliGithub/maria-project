@@ -107,20 +107,27 @@ export class AppComponent implements OnInit {
     public activeClientFullName: string;
 
     ngOnInit (): void {
-        if ( this.appService.checkIsPlatformBrowser() ) this.clientService.getActiveClient().subscribe({
-            next: activeClient => {
-                this.activeClientLogin = activeClient ? activeClient.login : null;
-                this.activeClientType = activeClient ? activeClient.type : null;
-                this.activeClientFullName = activeClient ? activeClient.fullName : null;
-                this.activeClientLocale = activeClient ? activeClient.locale : null;
+        if ( this.appService.checkIsPlatformBrowser() ) {
+            if ( !this.activeClientLogin && !this.activeClientType && !this.activeClientLocale && !this.activeClientFullName ) {
+                this.clientService.getActiveClient().subscribe({
+                    next: activeClient => {
+                        this.activeClientLogin = activeClient ? activeClient.login : null;
+                        this.activeClientType = activeClient ? activeClient.type : null;
+                        this.activeClientFullName = activeClient ? activeClient.fullName : null;
+                        this.activeClientLocale = activeClient ? activeClient.locale : null;
 
-                if ( this.activeClientLocale ) this.translateService.use(this.activeClientLocale);
-                else this.translateService.use(environment.defaultLocale);
+                        if ( this.activeClientLocale ) this.translateService.use(this.activeClientLocale);
+                        else this.translateService.use(environment.defaultLocale);
 
-                this.document.documentElement.lang = this.activeClientLocale ?? environment.defaultLocale;
-            },
-            error: () => this.appService.createErrorModal()
-        });
+                        this.document.documentElement.lang = this.activeClientLocale ?? environment.defaultLocale;
+                    },
+                    error: () => this.appService.createErrorModal()
+                });
+            }
+
+            this.clientService.navbarAnimationStateChange.subscribe(value => this.navbarAnimationState = value);
+            this.clientService.prevNavbarAnimationStateChange.subscribe(value => this.prevNavbarAnimationState = value);
+        }
     }
 
     public onRouterOutlet (component: HomeComponent | GalleryComponent | ClientComponent | AdminPanelComponent | AdminPanelOrdersControlComponent 
@@ -155,6 +162,10 @@ export class AppComponent implements OnInit {
         if ( $event.srcElement.scrollTop > 50 ) this.navbarAnimationState = 'scrolled';
         else this.navbarAnimationState = 'static';
 
+        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 1 ) {
+            this.clientService.setScrollPageBottomStatus(true);
+        }
+
         this.prevNavbarAnimationState = null;
     }
 
@@ -171,7 +182,7 @@ export class AppComponent implements OnInit {
         this.navbarIsCollapsed = !this.navbarIsCollapsed;
         if ( !this.prevNavbarAnimationState ) this.prevNavbarAnimationState = this.navbarAnimationState;
 
-        if ( !this.isHomePage && this.prevNavbarAnimationState === 'static' ) {
+        if ( this.prevNavbarAnimationState === 'static' ) {
             if ( !this.navbarIsCollapsed ) this.navbarAnimationState = 'scrolled';
             else {
                 this.navbarAnimationState = 'static';

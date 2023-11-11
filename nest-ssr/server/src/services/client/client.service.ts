@@ -21,7 +21,7 @@ import { AdminPanelService } from '../admin-panel/admin-panel.service';
 
 import { Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder } from '../../models/client.model';
 
-import { IClient, IClientOrdersInfoDataArr, ICookieSerializeOptions, IGalleryCompressedImagesList, IReducedGalleryCompressedImages, IRequest, IRequestBody } from 'types/global';
+import { IClient, IClientOrdersInfoDataArr, ICookieSerializeOptions, IGalleryCompressedImagesData, IReducedGalleryCompressedImages, IRequest, IRequestBody } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions, IGetClientOrdersOptions } from 'types/options';
 import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
 
@@ -206,22 +206,26 @@ export class ClientService {
         else return false;
     }
 
-    public async getCompressedImagesList (imagesType: 'home' | string, imageViewSize: 'medium' | 'big'): Promise<IGalleryCompressedImagesList | IClientCompressedImage[]> {
+    public async getCompressedImagesList (imagesType: 'home' | string, imageViewSize: 'medium' | 'big', imagesExistsCount?: number): Promise<IGalleryCompressedImagesData | IClientCompressedImage[]> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const imagesPath: string = imagesType === 'home' ? path.join(this.compressedImagesDirPath, imagesType) 
         : path.join(this.compressedImagesDirPath, 'gallery', imagesType);
-        
+
         const imagesList: string[] = await fsPromises.readdir(imagesPath);
+        const imagesLimit: number = 8;
 
         const compressedImages: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({
             find: {
                 imageNames: imagesList,
-                includeFields: [ 'name', 'photographyType', 'viewSizeType', 'description', 'uploadDate' ]
-            }
+                includeFields: [ 'name', 'photographyType', 'viewSizeType', 'description', 'uploadDate' ],
+                imageViewSize: imagesType !== 'home' ? imageViewSize : null
+            },
+            imagesLimit: imagesType !== 'home' ? imagesLimit : null,
+            imagesExistsCount: imagesType !== 'home' ? imagesExistsCount : null
         }) as unknown as IClientCompressedImage[];
 
-        let galleryCompressedImagesList: IGalleryCompressedImagesList = null;
+        let galleryCompressedImagesList: IGalleryCompressedImagesData = null;
 
         if ( imagesType !== 'home' ) {
             const reducedCompressedImages: IReducedGalleryCompressedImages = {
@@ -229,22 +233,22 @@ export class ClientService {
                 big: []
             }
 
-            const mediumSizedCompressedImages: IClientCompressedImage[] = compressedImages.filter(compressedImage => compressedImage.viewSizeType === 'medium');
-            const bigSizedCompressedImages: IClientCompressedImage[] = compressedImages.filter(compressedImage => compressedImage.viewSizeType === 'big');
-
-            if ( imageViewSize === 'medium' ) for (let i = 0; i < mediumSizedCompressedImages.length; i += 4 ) {
-                reducedCompressedImages.medium.push(mediumSizedCompressedImages.slice(i, i + 4));
-            } else if ( imageViewSize === 'big' ) for (let i = 0; i < bigSizedCompressedImages.length; i += 2 ) {
-                reducedCompressedImages.big.push(bigSizedCompressedImages.slice(i, i + 2));
+            if ( imageViewSize === 'medium' ) for (let i = 0; i < compressedImages.length; i += 4 ) {
+                reducedCompressedImages.medium.push(compressedImages.slice(i, i + 4));
+            } else if ( imageViewSize === 'big' ) for (let i = 0; i < compressedImages.length; i += 2 ) {
+                reducedCompressedImages.big.push(compressedImages.slice(i, i + 2));
             }
+
+            const commonCompressedImagesCount: number = await this.compressedImageModel.count({ where: { name: imagesList, viewSizeType: imageViewSize }});
 
             galleryCompressedImagesList = {
                 compressedImages: reducedCompressedImages, 
-                photographyTypeDescription: (await this.getImagePhotographyTypesData([ 'name', 'description' ], 'gallery', imagesType)).description
+                photographyTypeDescription: (await this.getImagePhotographyTypesData([ 'name', 'description' ], 'gallery', imagesType)).description,
+                additionalImagesExists: commonCompressedImagesCount > imagesExistsCount + compressedImages.length && commonCompressedImagesCount > imagesLimit
             }
         }
 
-        return imagesType === 'home' ? compressedImages : galleryCompressedImagesList;
+        return galleryCompressedImagesList ?? compressedImages;
     }
 
     public async getDiscountsData (): Promise<IDiscount[]> {

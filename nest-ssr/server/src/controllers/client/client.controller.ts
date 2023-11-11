@@ -9,7 +9,7 @@ import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 import { CommonService } from 'server/src/services/common/common.service';
 
-import { IGalleryCompressedImagesList, IRequest, IRequestBody } from 'types/global';
+import { IGalleryCompressedImagesData, IRequest, IRequestBody } from 'types/global';
 import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
 
 @Controller('/client')
@@ -29,18 +29,30 @@ export class ClientController {
     }
 
     @Get('/getCompressedImagesList/:imagesType')
-    public async getCompressedImagesList (@Param('imagesType') imagesType: string, @Query('imageViewSize') imageViewSize: string): Promise<IGalleryCompressedImagesList | IClientCompressedImage[]> {
+    public async getCompressedImagesList (@Param('imagesType') imagesType: string, 
+        @Query('imageViewSize') imageViewSize: string, @Query('imagesExistsCount') imagesExistsCount: string
+    ): Promise<IGalleryCompressedImagesData | IClientCompressedImage[]> {
         const thumbnailImagesDirPaths: string[] = [ 'home' ].concat(this.appService.imagePhotographyTypes);
 
         imagesType = imagesType.substring(1);
 
-        if ( !thumbnailImagesDirPaths.includes(imagesType) || imageViewSize === '' ) throw new BadRequestException();
+        const imagesExistsCountInt: number = parseInt(imagesExistsCount, 10);
+
+        imageViewSize = imageViewSize === 'undefined' || imageViewSize === 'null' ? null : imageViewSize;
+        imagesExistsCount = imagesExistsCount === 'undefined' || imagesExistsCount === 'null' ? null : imagesExistsCount;
+
+        console.log(imageViewSize);
+        console.log(imagesExistsCount);
+
+        if ( !thumbnailImagesDirPaths.includes(imagesType) || imageViewSize && imageViewSize === '' 
+            || imagesExistsCount && Number.isNaN(imagesExistsCountInt) 
+        ) throw new BadRequestException();
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         await commonServiceRef.createImageDirs();
         
-        return this.clientService.getCompressedImagesList(imagesType as 'home' | string, imageViewSize as 'medium' | 'big');
+        return this.clientService.getCompressedImagesList(imagesType as 'home' | string, imageViewSize as 'medium' | 'big', imagesExistsCountInt);
     }
 
     @Get('/getDiscountsData')

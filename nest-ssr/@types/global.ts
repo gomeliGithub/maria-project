@@ -89,9 +89,10 @@ export interface IFullCompressedImageData {
     count: number;
 }
 
-export interface IGalleryCompressedImagesList {
+export interface IGalleryCompressedImagesData {
     compressedImages: IReducedGalleryCompressedImages;
     photographyTypeDescription: string;
+    additionalImagesExists: boolean;
 }
 
 export interface IReducedGalleryCompressedImages {

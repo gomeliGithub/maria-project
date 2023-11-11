@@ -10,7 +10,7 @@
     >{{ 'GALLERYPAGE.ORDERBUTTONTEXT' | translate }}</button>
     <hr class="border-3 mt-5 w-100"/>
 </div>
-<div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-column align-items-center justify-content-center vw-80" id="galleryImages">
+<div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-column align-items-center justify-content-center mt-5 vw-80" id="galleryImages">
     <div *ngFor="let imageDataArr of compressedImagesList.medium" class="d-flex flex-row justify-content-center mb-2 mediumSizedImagesContainer">
         <ng-template ngFor let-imageData [ngForOf]="imageDataArr" let-i="index">
             <div class="d-flex flex-row justify-content-center position-relative h-auto"
@@ -28,6 +28,7 @@
                     imageData.viewSizeType
                 )"
                 @images-animation
+                #imageContainer
             >
                 <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-fluid rounded h-100">
                 <div class="text-center position-absolute top-100 start-50 z-1 downloadOriginalImageLinkContainer"

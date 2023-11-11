@@ -87,6 +87,11 @@ export class HomeComponent implements OnInit {
     }
 
     @HostListener('scroll', [ '$event' ]) public onScroll ($event: any): void {
+        if ( $event.srcElement.scrollTop > 50 ) this.clientService.setNavbarAnimationState('scrolled');
+        else this.clientService.setNavbarAnimationState('static');
+
+        this.clientService.setPrevNavbarAnimationStateChange(null);
+
         if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 1 ) {
             this.footerElementRef.nativeElement.classList.remove('footerHidden');
         } else this.footerElementRef.nativeElement.classList.add('footerHidden');

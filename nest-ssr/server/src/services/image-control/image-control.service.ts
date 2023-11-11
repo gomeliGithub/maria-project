@@ -33,14 +33,17 @@ export class ImageControlService {
     public staticCompressedImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
 
     public async get (options: IСompressedImageGetOptions): Promise<ClientCompressedImage[]> {
-        const findOptions: AssociationGetOptions = { 
+        const findOptions: AssociationGetOptions = {
             where: [],
             order: [ [ 'uploadDate', 'DESC' ] ],
+            limit: options.imagesLimit,
+            offset: options.imagesExistsCount,
             raw: true
         }
 
         if ( options && options.find && options.find.imageNames ) findOptions.where = { name: options.find.imageNames };
         if ( options && options.find && options.find.includeFields ) findOptions.attributes = options.find.includeFields;
+        if ( options && options.find && options.find.imageViewSize ) findOptions.where['viewSizeType'] = options.find.imageViewSize;
         if ( options && options.find && options.hasOwnProperty('rawResult') ) findOptions.raw = options.find.rawResult;
 
         let compressedImages: ClientCompressedImage[] = null;
