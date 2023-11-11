@@ -31,7 +31,7 @@
     background-position: center;
 }
 
-@media only screen and (max-width: 650px) {
+@media screen and (max-width: 650px), screen and (max-device-width: 650px) {
     .imagePhotographyTypesGroup {
         flex-direction: column !important;
     }
@@ -57,7 +57,7 @@
     scroll-snap-align: center !important;
 }
 
-@media only screen and (max-width: 576px) {
+@media screen and (max-width: 576px), screen and (max-device-width: 576px) {
     :host ::ng-deep #imagesCarousel .carousel-item img {
         min-height: 300px;
     }
@@ -66,7 +66,7 @@
     }
 }
 
-@media only screen and (min-width: 576px) {
+@media screen and (min-width: 576px), screen and (min-device-width: 576px) {
     :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 390px;
     }
@@ -75,7 +75,7 @@
     }
 }
 
-@media only screen and (min-width: 735px) {
+@media screen and (min-width: 735px), screen and (min-device-width: 735px) {
     :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 620px;
     }
@@ -84,13 +84,13 @@
     }
 }
 
-@media only screen and (min-width: 768px) {
+@media screen and (min-width: 768px), screen and (min-device-width: 768px) {
     .imagePhotographyTypesGroup {
         margin-top: 1.5rem !important;
     }
 }
 
-@media only screen and (min-width: 960px) {
+@media screen and (min-width: 960px), screen and (min-device-width: 960px) {
     :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 710px;
     }
@@ -99,7 +99,7 @@
     }
 }
 
-@media only screen and (min-width: 1400px) {
+@media screen and (min-width: 1400px), screen and (min-device-width: 1400px) {
     :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 950px;
     }
