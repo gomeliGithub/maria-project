@@ -17,7 +17,8 @@
 	"HOMEPAGE": {
 		"NODISCOUNTSMESSAGE": "Тo active discounts yet, but they will appear soon, don’t worry",
 		"HEADERTITLE": "Portfolio",
-		"PHOTOGRAPHYTYPESLINKTEXT": "View works"
+		"PHOTOGRAPHYTYPESLINKTEXT": "View works",
+		"CURSORCLICKICONTEXT": "Click"
 	},
 	"GALLERYPAGE": {
 		"HEADERTITLE": "Photo gallery",

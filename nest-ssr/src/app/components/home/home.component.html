@@ -38,6 +38,7 @@
                 class="border-0 position-relative h-100 mw-100 imagesContainer"
                 (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
                 (mouseleave)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
+                (click)="startMouseTriggerAnimationClick(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
                 [attr.mouse-trigger-state-index]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
             >
                 <div class="h-100 mw-100 text-center"
@@ -45,7 +46,9 @@
                     (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
                     [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
                 >
-                    <small class="text-body-secondary">{{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i></small>
+                    <small class="text-body-secondary">
+                        {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i>
+                    </small>
                     <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.compressedImageName }}" 
                         class="h-85 mw-100 object-fit-contain"
                         [ngClass]="{ 'w-100': imagePhotographyTypesDataArr.length === 1 }"
@@ -68,6 +71,12 @@
                         {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate | uppercase }} <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
+                <span *ngIf="( isMobileDevice || isTabletDevice ) && cursorIconsDisplayStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
+                    class="position-absolute fs-1 shadow-lg p-3 rounded-pill text-black cursorIcon"
+                >
+                    <small class="fw-semibold fst-italic">{{ 'HOMEPAGE.CURSORCLICKICONTEXT' | translate }}</small>
+                    <i class="bi bi-mouse2-fill"></i>
+                </span>
             </div>
         </div>
     </ng-template>

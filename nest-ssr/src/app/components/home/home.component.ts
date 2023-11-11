@@ -1,6 +1,8 @@
 import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
+import { DeviceDetectorService, DeviceInfo } from 'ngx-device-detector';
+
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 
@@ -40,13 +42,24 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
     ]
 })
 export class HomeComponent implements OnInit {
+    public deviceInfo: DeviceInfo = null;
+
     constructor (
+        private readonly deviceService: DeviceDetectorService,
+
         private readonly appService: AppService,
         private readonly clientService: ClientService
-    ) { }
+    ) {
+        this.setDeviceInfo();
+    }
+
+    public isMobileDevice: boolean;
+    public isTabletDevice: boolean;
+    public isDesktopDevice: boolean;
     
     public currentMouseTriggerStates: string[] = [];
     public currentLinkButtonContainerAnimationStates: string[] = [];
+    public cursorIconsDisplayStates: boolean[] = [];
 
     public compressedImagesList: IClientCompressedImage[];
 
@@ -55,7 +68,7 @@ export class HomeComponent implements OnInit {
     public imagePhotographyTypes: IImagePhotographyType[][];
     public flatImagePhotographyTypes: IImagePhotographyType[];
 
-    public footerElementRef: ElementRef<HTMLElement>
+    public footerElementRef: ElementRef<HTMLElement>;
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
@@ -79,6 +92,8 @@ export class HomeComponent implements OnInit {
                     this.flatImagePhotographyTypes.forEach(() => {
                         this.currentMouseTriggerStates.push('leave');
                         this.currentLinkButtonContainerAnimationStates.push('leave');
+
+                        if ( this.isMobileDevice || this.isTabletDevice ) this.cursorIconsDisplayStates.push(true);
                     });
                 },
                 error: () => this.appService.createErrorModal()
@@ -96,9 +111,26 @@ export class HomeComponent implements OnInit {
             this.footerElementRef.nativeElement.classList.remove('footerHidden');
         } else this.footerElementRef.nativeElement.classList.add('footerHidden');
     }
+    
+    public setDeviceInfo (): void {
+        this.deviceInfo = this.deviceService.getDeviceInfo();
+        
+        this.isMobileDevice = this.deviceService.isMobile();
+        this.isTabletDevice = this.deviceService.isTablet();
+        this.isDesktopDevice = this.deviceService.isDesktop();
+    }
 
     public startMouseTriggerAnimation (index: number): void {
-        this.currentMouseTriggerStates[index] = this.currentMouseTriggerStates[index] === 'enter' ? 'leave' : 'enter';
+        if ( this.isDesktopDevice ) this.currentMouseTriggerStates[index] = this.currentMouseTriggerStates[index] === 'enter' ? 'leave' : 'enter';
+    }
+
+    public startMouseTriggerAnimationClick (index: number): void {
+        if ( this.isMobileDevice || this.isTabletDevice ) {
+            this.currentMouseTriggerStates = this.currentMouseTriggerStates.map((_, i) => {
+                if ( i !== index ) return 'leave';
+                else return this.currentMouseTriggerStates[index] === 'enter' ? 'leave' : 'enter';
+            });
+        }
     }
 
     public setCurrentMouseTriggerStateIndex (name: string): number { 
@@ -110,12 +142,14 @@ export class HomeComponent implements OnInit {
         const indexNumber: number = parseInt(mouseTriggerElement.parentElement.getAttribute('mouse-trigger-state-index'), 10);
 
         if ( event.toState === 'leave' ) this.currentLinkButtonContainerAnimationStates[indexNumber] = 'leave';
+        if ( event.toState === 'enter' ) this.cursorIconsDisplayStates[indexNumber] = false;
     }
 
     public mouseTriggerAnimationDone (event: AnimationEvent): void {
         const mouseTriggerElement: HTMLDivElement = event.element as HTMLDivElement;
         const indexNumber: number = parseInt(mouseTriggerElement.parentElement.getAttribute('mouse-trigger-state-index'), 10);
 
+        if ( event.toState === 'leave' ) this.cursorIconsDisplayStates[indexNumber] = true;
         if ( event.toState === 'enter') this.currentLinkButtonContainerAnimationStates[indexNumber] = 'enter';
     }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import sharp from 'sharp';
 
+import { CommonModule } from '../../modules/common.module';
 import { ClientModule } from '../../modules/client.module';
 import { SignModule } from '../../modules/sign.module';
 import { ImageControlModule } from '../../modules/image-control.module';
@@ -27,7 +28,39 @@ export class CommonService {
     ) { }
 
     public webSocketClients: IWebSocketClient[] = [];
-    public promisesCache: { [ x: string ]: Promise<any> } = { };
+    public promisesCache: { [ x: string ]: { pendingPromises: Promise<any>[], count: number } } = { };
+
+    public async managePromisesCache (key: string, promise: Promise<any>): Promise<any> {
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+        if ( !commonServiceRef.promisesCache[key] ) {
+            commonServiceRef.promisesCache[key] = { 
+                pendingPromises: [],
+                count: 0
+            }
+        }
+
+        if ( commonServiceRef.promisesCache[key].count <= 3 ) {
+            const pendingPromise: Promise<any> = promise;
+
+            commonServiceRef.promisesCache[key].pendingPromises.push(pendingPromise);
+            commonServiceRef.promisesCache[key].count = commonServiceRef.promisesCache[key].count += 1;
+
+            await pendingPromise;
+
+            commonServiceRef.promisesCache[key].pendingPromises = commonServiceRef.promisesCache[key].pendingPromises.filter((_, index) => {
+                return index !== commonServiceRef.promisesCache[key].count - 1;
+            });
+
+            commonServiceRef.promisesCache[key].count = commonServiceRef.promisesCache[key].count -= 1;
+
+            return pendingPromise;
+        } else {
+            const firstPendingPromise: Promise<any> = commonServiceRef.promisesCache[key].pendingPromises[0];
+
+            await firstPendingPromise;
+        }
+    }
 
     public async getClients (request: IRequest, loginList: string, options?: IClientGetOptions): Promise<Admin | Member>
     public async getClients (request: IRequest, loginList: string[], options?: IClientGetOptions): Promise<Admin[] | Member[]>

@@ -104,9 +104,11 @@ export class AdminPanelService {
         } catch { }
     
         const uploadedFilesNumber = (await fsPromises.readdir(originalImagesDirClientPath)).length;
+
+        const TWENTYMB: number = 20000000;
     
         if ( uploadedFilesNumber >= 40 ) return 'MAXCOUNT';
-        else if ( imageMeta.size > 104857600 ) return 'MAXSIZE';
+        else if ( imageMeta.size > TWENTYMB ) return 'MAXSIZE';
         else if ( imageMeta.name.length < 4 ) return 'MAXNAMELENGTH';
     
         const currentChunkNumber: number = 0;
@@ -403,16 +405,16 @@ export class AdminPanelService {
         const originalImageName: string = requestBody.adminPanel.originalImageName;
         const originalImagePath: string = path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName);
 
-        const compressedImages: ClientCompressedImage[] = await commonServiceRef.getCompressedImages({ 
+        const compressedImages: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({
             client,
-            find : { includeFields: [ 'originalName' ] }
-        });
+            find: { includeFields: ['originalName'] }
+        }) as unknown as IClientCompressedImage[];
 
-        const compressedImageInstance: ClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
+        const compressedImage: IClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
 
         const imageExists: boolean = await commonServiceRef.checkFileExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
 
-        if ( !compressedImageInstance || !imageExists ) throw new BadRequestException();
+        if ( !compressedImage || !imageExists ) throw new BadRequestException();
 
         const deleteImageResult: boolean = await commonServiceRef.deleteImage(request, originalImagePath, activeAdminLogin);
 
@@ -466,8 +468,9 @@ export class AdminPanelService {
         if ( displayTargetPage === 'home' ) newPath = staticFilesHomeImagePath;
         else if ( displayTargetPage === 'gallery' ) newPath = staticFilesGalleryImagePath;
         else if ( displayTargetPage === 'original' ) newPath = compressedImageOriginalPath;
-        
-        await fsPromises.rename(oldPath, newPath);
+
+        await commonServiceRef.managePromisesCache('changeImageDisplayTargetRename', fsPromises.rename(oldPath, newPath));
+
         await this.compressedImageModel.update(updateValues, { where: { originalName: path.basename(originalImagePath) }});
 
         return 'SUCCESS';
@@ -501,8 +504,8 @@ export class AdminPanelService {
 
             if ( currentPath !== staticFilesHomeImagePath && currentPath !== compressedImageOriginalPath ) {
                 const staticFilesGalleryImageNewPath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', newImagePhotographyType, compressedImage.name);
-        
-                await fsPromises.rename(staticFilesGalleryImagePath, staticFilesGalleryImageNewPath);
+
+                await commonServiceRef.managePromisesCache('changeImageData', fsPromises.rename(staticFilesGalleryImagePath, staticFilesGalleryImageNewPath));
             }
         }
 

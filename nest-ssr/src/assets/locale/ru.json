@@ -17,7 +17,8 @@
 	"HOMEPAGE": {
 		"NODISCOUNTSMESSAGE": "Активных скидок пока нет, но скоро появятся, не переживайте",
 		"HEADERTITLE": "Портфолио",
-		"PHOTOGRAPHYTYPESLINKTEXT": "Смотреть работы"
+		"PHOTOGRAPHYTYPESLINKTEXT": "Смотреть работы",
+		"CURSORCLICKICONTEXT": "Нажмите"
 	},
 	"GALLERYPAGE": {
 		"HEADERTITLE": "Галерея фото",

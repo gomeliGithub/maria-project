@@ -107,3 +107,15 @@
         min-height: 280px;
     }
 }
+
+@keyframes imagePhotographyTypeCursorAnimation {
+    0%   { transform: scale(2) }
+    50%  { transform: scale(1.5) }
+    100% { transform: scale(1.5) }
+}
+  
+.cursorIcon {
+    left: 30%;
+    top: 40%;
+    animation: imagePhotographyTypeCursorAnimation 1s infinite;
+}

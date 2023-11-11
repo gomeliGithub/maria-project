@@ -212,7 +212,7 @@ export class ClientService {
         const imagesPath: string = imagesType === 'home' ? path.join(this.compressedImagesDirPath, imagesType) 
         : path.join(this.compressedImagesDirPath, 'gallery', imagesType);
 
-        const imagesList: string[] = await fsPromises.readdir(imagesPath);
+        const imagesList: string[] = await commonServiceRef.managePromisesCache('getCompressedImagesList', fsPromises.readdir(imagesPath));
         const imagesLimit: number = 8;
 
         const compressedImages: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({
