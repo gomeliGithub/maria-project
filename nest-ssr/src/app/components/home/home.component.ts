@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
 import { DeviceDetectorService, DeviceInfo } from 'ngx-device-detector';
@@ -41,11 +41,12 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
         ])
     ]
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewChecked {
     public deviceInfo: DeviceInfo = null;
 
     constructor (
         private readonly deviceService: DeviceDetectorService,
+        private readonly _componentElement: ElementRef<HTMLElement>,
 
         private readonly appService: AppService,
         private readonly clientService: ClientService
@@ -56,6 +57,8 @@ export class HomeComponent implements OnInit {
     public isMobileDevice: boolean;
     public isTabletDevice: boolean;
     public isDesktopDevice: boolean;
+
+    public firstScrolledToTop: boolean = false;
     
     public currentMouseTriggerStates: string[] = [];
     public currentLinkButtonContainerAnimationStates: string[] = [];
@@ -97,6 +100,20 @@ export class HomeComponent implements OnInit {
                     });
                 },
                 error: () => this.appService.createErrorModal()
+            });
+        }
+    }
+
+    ngAfterViewChecked (): void {
+        const imagesCarousel = document.getElementById('imagesCarousel');
+
+        if ( imagesCarousel && !this.firstScrolledToTop ) {
+            this.firstScrolledToTop = true;
+
+            this._componentElement.nativeElement.scroll({
+                top: 0,
+                left: 0,
+                behavior: 'auto'
             });
         }
     }

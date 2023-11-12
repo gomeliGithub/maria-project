@@ -31,7 +31,38 @@
     background-position: center;
 }
 
-@media screen and (max-width: 650px), screen and (max-device-width: 650px) {
+@media screen and (max-width: 650px), only screen 
+and (width: 393px) 
+and (height: 852px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 430px) 
+and (height: 932px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 390px) 
+and (height: 844px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 428px) 
+and (height: 926px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 812px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 2),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 667px) 
+and (-webkit-device-pixel-ratio: 2) {
     .imagePhotographyTypesGroup {
         flex-direction: column !important;
     }
@@ -57,7 +88,38 @@
     scroll-snap-align: center !important;
 }
 
-@media screen and (max-width: 576px), screen and (max-device-width: 576px) {
+@media screen and (max-width: 576px), only screen 
+and (width: 393px) 
+and (height: 852px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 430px) 
+and (height: 932px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 390px) 
+and (height: 844px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 428px) 
+and (height: 926px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 812px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 2),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 667px) 
+and (-webkit-device-pixel-ratio: 2) {
     :host ::ng-deep #imagesCarousel .carousel-item img {
         min-height: 300px;
     }
@@ -66,7 +128,7 @@
     }
 }
 
-@media screen and (min-width: 576px), screen and (min-device-width: 576px) {
+@media screen and (min-width: 576px) {
     :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 390px;
     }
@@ -75,7 +137,7 @@
     }
 }
 
-@media screen and (min-width: 735px), screen and (min-device-width: 735px) {
+@media screen and (min-width: 735px) {
     :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 620px;
     }
@@ -84,13 +146,13 @@
     }
 }
 
-@media screen and (min-width: 768px), screen and (min-device-width: 768px) {
+@media screen and (min-width: 768px) {
     .imagePhotographyTypesGroup {
         margin-top: 1.5rem !important;
     }
 }
 
-@media screen and (min-width: 960px), screen and (min-device-width: 960px) {
+@media screen and (min-width: 960px) {
     :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 710px;
     }
@@ -99,7 +161,7 @@
     }
 }
 
-@media screen and (min-width: 1400px), screen and (min-device-width: 1400px) {
+@media screen and (min-width: 1400px) {
     :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 950px;
     }
@@ -109,13 +171,11 @@
 }
 
 @keyframes imagePhotographyTypeCursorAnimation {
-    0%   { transform: scale(2) }
-    50%  { transform: scale(1.5) }
-    100% { transform: scale(1.5) }
+    0%   { transform: translate(-50%, -50%) scale(2) }
+    50%  { transform: translate(-50%, -50%) scale(1.5) }
+    100% { transform: translate(-50%, -50%) scale(1.5) }
 }
   
 .cursorIcon {
-    left: 30%;
-    top: 40%;
     animation: imagePhotographyTypeCursorAnimation 1s infinite;
 }
