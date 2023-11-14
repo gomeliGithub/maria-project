@@ -18,7 +18,17 @@
 		"NODISCOUNTSMESSAGE": "Тo active discounts yet, but they will appear soon, don’t worry",
 		"HEADERTITLE": "Portfolio",
 		"PHOTOGRAPHYTYPESLINKTEXT": "View works",
-		"CURSORCLICKICONTEXT": "Click"
+		"CURSORCLICKICONTEXT": "Click",
+		"SCROLLSNAPITEMRADIOSTEXT": {
+			"MAIN": "Overview",
+			"PART1": "Carousell",
+			"PART2": "Discounts",
+			"PART3": "Portfolio",
+			"PART4": "Portfolio: Part 1",
+			"PART5": "Portfolio: Part 2",
+			"PART6": "Portfolio: Part 3",
+			"PART7": "About me"
+		}
 	},
 	"GALLERYPAGE": {
 		"HEADERTITLE": "Photo gallery",

@@ -1,3 +1,7 @@
+#imagesCarouselContainer {
+    max-height: 100vh !important;
+}
+
 :host ::ng-deep #imagesCarousel .carousel-inner {
     height: 100% !important;
     width: 100% !important;
@@ -21,6 +25,7 @@
 }
 
 .imagePhotographyTypesGroup {
+    max-height: 100vh !important;
     border-width: 10px !important;
     border-color: gray !important;
 }
@@ -29,6 +34,11 @@
     background-image: url('/assets/images_full/1698852851520265.jpg');
     background-size: cover;
     background-position: center;
+}
+
+#aboutSection {
+    max-height: 70vh !important;
+    margin-bottom: 12rem !important;
 }
 
 @media screen and (max-width: 650px), only screen 
@@ -67,6 +77,10 @@ and (-webkit-device-pixel-ratio: 2) {
         flex-direction: column !important;
     }
 
+    .imagePhotographyTypesGroup > div {
+        max-width: 100% !important;
+    }
+
     .linkButtonContainer a {
         align-items: center !important;
     }
@@ -76,7 +90,7 @@ and (-webkit-device-pixel-ratio: 2) {
     }
 
     #aboutContainer > div {
-        margin-bottom: 5rem !important;
+        margin-left: 0 !important;
     }
 
     #aboutImage {
@@ -146,12 +160,6 @@ and (-webkit-device-pixel-ratio: 2) {
     }
 }
 
-@media screen and (min-width: 768px) {
-    .imagePhotographyTypesGroup {
-        margin-top: 1.5rem !important;
-    }
-}
-
 @media screen and (min-width: 960px) {
     :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 710px;
@@ -171,11 +179,28 @@ and (-webkit-device-pixel-ratio: 2) {
 }
 
 @keyframes imagePhotographyTypeCursorAnimation {
-    0%   { transform: translate(-50%, -50%) scale(2) }
-    50%  { transform: translate(-50%, -50%) scale(1.5) }
-    100% { transform: translate(-50%, -50%) scale(1.5) }
+    0%   { transform: translate(-50%, -50%) scale(1.5) }
+    50%  { transform: translate(-50%, -50%) scale(1.2) }
+    100% { transform: translate(-50%, -50%) scale(1.0) }
 }
   
 .cursorIcon {
     animation: imagePhotographyTypeCursorAnimation 1s infinite;
+}
+
+#scrollSnapItemRadiosContainer {
+    right: -300px;
+}
+
+#scrollSnapItemRadiosContainer > div > div:nth-child(2) {
+    width: 4px;
+    opacity: 1;
+}
+
+#scrollSnapItemRadiosContainer > div > div:nth-child(3) {
+    transform: rotate(90deg);
+}
+
+#scrollSnapItemRadiosContainer input[type='radio'] {
+    cursor: pointer;
 }

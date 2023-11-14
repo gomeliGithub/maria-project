@@ -22,7 +22,9 @@
                         "tsConfig": "tsconfig.app.json",
                         "assets": [
                             "src/favicon.ico",
-                            "src/assets"
+                            "src/assets",
+                            "src/robots.txt",
+                            "src/sitemap.xml"
                         ],
                         "styles": [
                             "node_modules/bootstrap/dist/css/bootstrap.min.css",
@@ -52,7 +54,7 @@
                             ],
                             "outputHashing": "all",
                             "optimization": true,
-                            "sourceMap": false,
+                            "sourceMap": true,
                             "namedChunks": false,
                             "extractLicenses": true,
                             "vendorChunk": false
@@ -102,7 +104,9 @@
                         "tsConfig": "tsconfig.spec.json",
                         "assets": [
                             "src/favicon.ico",
-                            "src/assets"
+                            "src/assets",
+                            "src/robots.txt",
+                            "src/sitemap.xml"
                         ],
                         "styles": [
                             "node_modules/bootstrap/dist/css/bootstrap.min.css",

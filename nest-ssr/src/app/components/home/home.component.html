@@ -1,47 +1,56 @@
-<ngb-carousel *ngIf="compressedImagesList" class="carousel carousel-fade vh-100 vw-100 section" id="imagesCarousel"
-    [interval]="2000"
-    [showNavigationArrows]="compressedImagesList.length !== 1"
-	[showNavigationIndicators]="compressedImagesList.length !== 1"
->
-    <ng-template ngbSlide *ngFor="let imageData of compressedImagesList; let i = index">
-        <img src="/assets/images_thumbnail/home/{{ imageData.name }}" class="h-100 w-100 mw-100 object-fit-cover align-baseline">
-    </ng-template>
-</ngb-carousel>
-<ngb-carousel *ngIf="discountsData; else noDiscountsDataBlock" class="carousel w-100 my-5 section" id="discountsCarousel" 
-    [interval]="0"
-    [showNavigationArrows]="discountsData.length !== 1"
-	[showNavigationIndicators]="discountsData.length !== 1"
->
-    <ng-template ngbSlide *ngFor="let discountData of discountsData; let i = index">
-        <div class="h-100 w-100 text-center text-light">
-            <p class="row justify-content-center align-items-center h-100 h1">
-                {{ discountData.content }}
-            </p>
-        </div>
-    </ng-template>
-</ngb-carousel>
+<div class="vw-100 section" id="imagesCarouselContainer" #scrollSnapSection>
+    <ngb-carousel *ngIf="compressedImagesList" class="carousel carousel-fade h-100 w-100" id="imagesCarousel"
+        [interval]="3000"
+        [showNavigationArrows]="compressedImagesList.length !== 1"
+        [showNavigationIndicators]="compressedImagesList.length !== 1"
+    >
+        <ng-template ngbSlide *ngFor="let imageData of compressedImagesList; let i = index">
+            <img src="/assets/images_thumbnail/home/{{ imageData.name }}" class="h-100 w-100 object-fit-cover align-baseline">
+        </ng-template>
+    </ngb-carousel>
+</div>
+<div class="w-100 my-3 section" #scrollSnapSection>
+    <ngb-carousel *ngIf="discountsData; else noDiscountsDataBlock" class="carousel w-100" id="discountsCarousel" 
+        [interval]="0"
+        [showNavigationArrows]="discountsData.length !== 1"
+        [showNavigationIndicators]="discountsData.length !== 1"
+    >
+        <ng-template ngbSlide *ngFor="let discountData of discountsData; let i = index">
+            <div class="h-100 w-100 text-center text-light">
+                <p class="row justify-content-center align-items-center h-100 h1">
+                    {{ discountData.content }}
+                </p>
+            </div>
+        </ng-template>
+    </ngb-carousel>
+</div>
 <ng-template #noDiscountsDataBlock>
     <div class="text-center text-info fw-semibold fs-4 p-5">
         <span>{{ 'HOMEPAGE.NODISCOUNTSMESSAGE' | translate }}</span>
     </div>
 </ng-template>
-<div class="p-5 mt-3 w-100 section">
-    <h1 class="display-6 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
+<div class="p-5 w-100 section" #scrollSnapSection>
+    <h1 class="display-6 shadow-lg rounded-pill p-3 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
 </div>
 <ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0" >
     <ng-template ngFor let-imagePhotographyTypesDataArr [ngForOf]="imagePhotographyTypes" let-i="index">
-        <div class="d-flex flex-row justify-content-center align-items-center py-5 vh-100 w-100 imagePhotographyTypesGroup section"
-            [ngClass]="{ 'vh-85': imagePhotographyTypesDataArr.length === 1 }"
+        <div class="d-flex flex-row justify-content-center align-items-center py-5 px-3 w-100 imagePhotographyTypesGroup section"
             [style.backgroundColor]="i % 2 === 0 ? 'rgb(191 179 179)': null"
+            #scrollSnapSection
         >
             <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i2 = index"
-                class="border-0 position-relative h-100 mw-100 imagesContainer"
+                class="border-0 position-relative h-100"
+                [ngClass]="{
+                    'mw-50': imagePhotographyTypesDataArr.length !== 1,
+                    'mw-100': imagePhotographyTypesDataArr.length === 1,
+                    'me-2': i2 === 0 && imagePhotographyTypesDataArr.length !== 1
+                }"
                 (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
                 (mouseleave)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
                 (click)="startMouseTriggerAnimationClick(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
                 [attr.mouse-trigger-state-index]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
             >
-                <div class="h-100 mw-100 text-center"
+                <div class="d-flex flex-column h-100 text-center"
                     (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
                     (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
                     [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
@@ -50,8 +59,7 @@
                         {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i>
                     </small>
                     <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.compressedImageName }}" 
-                        class="h-85 mw-100 object-fit-contain"
-                        [ngClass]="{ 'w-100': imagePhotographyTypesDataArr.length === 1 }"
+                        class="h-100"
                     >
                 </div>
                 <div class="position-absolute top-50 start-50 w-50 linkButtonContainer"
@@ -72,7 +80,7 @@
                     </a>
                 </div>
                 <span *ngIf="( isMobileDevice || isTabletDevice ) && cursorIconsDisplayStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
-                    class="position-absolute top-50 start-50 fs-2 shadow-lg p-3 rounded-pill text-black cursorIcon"
+                    class="position-absolute top-50 start-50 fs-3 shadow-lg p-3 rounded-pill text-nowrap text-black cursorIcon"
                 >
                     <small class="fw-semibold fst-italic">{{ 'HOMEPAGE.CURSORCLICKICONTEXT' | translate }}</small>
                     <i class="bi bi-mouse2-fill"></i>
@@ -81,11 +89,37 @@
         </div>
     </ng-template>
 </ng-template>
-<div class="d-flex flex-column mt-5 vh-85 section" id="aboutSection">
-    <div class="d-flex flex-row justify-content-center align-items-center h-85 mw-100" id="aboutContainer">
-        <img src="/assets/images_full/1697474336253508.jpg" class="rounded mx-auto d-block object-fit-contain h-100 mw-100" id="aboutImage">
-        <div class="d-flex flex-row align-items-center fw-semibold h-100 mw-100 vw-30">
+<div class="d-flex flex-column mt-3 section" id="aboutSection" #scrollSnapSection>
+    <div class="d-flex flex-row justify-content-center align-items-center h-100" id="aboutContainer">
+        <img src="/assets/images_full/1697474336253508.jpg" class="rounded mx-auto d-block h-100" id="aboutImage">
+        <div class="d-flex flex-row align-items-center fw-semibold ms-4 h-100">
             <p class="text-center w-100">Просто текст!!!!</p>
+        </div>
+    </div>
+</div>
+<div class="position-fixed top-50 translate-middle z-2" id="scrollSnapItemRadiosContainer" 
+    (mouseenter)="startScrollSnapItemRadiosContainerAnimation('enter')"
+    (mouseleave)="startScrollSnapItemRadiosContainerAnimation('leave')"
+    (click)="startScrollSnapItemRadiosContainerAnimationClick()"
+>
+    <div class="position-relative d-flex flex-row-reverse justify-content-center align-items-center text-bg-secondary rounded pe-1"
+        [@scroll-snap-item-radios-container-animation]="currentScrollSnapItemRadiosContainerAnimationState"
+    >
+        <div class="ms-2" 
+            [@scroll-snap-item-radios-embeded-container-animation]="currentScrollSnapItemRadiosEmbededContainerAnimationState"
+        >
+            <div *ngFor="let section of scrollSnapSectionViewRefs; let i = index" class="form-check form-check-reverse"
+                [ngClass]="{ 'mb-2': i <= scrollSnapSectionViewRefs.length - 1 }"
+            >
+                <input class="form-check-input" type="radio" value="" [id]="'defaultCheck' + i" (click)="changeActiveScrollSnapSection($event)" #scrollSnapItemRadio>
+                <label class="form-check-label text-nowrap" [for]="'defaultCheck' + i">
+                    {{ ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate }}
+                </label>
+            </div>
+        </div>
+        <div class="vr"></div>
+        <div class="">
+            <span>{{ 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.MAIN' | translate }}</span>
         </div>
     </div>
 </div>

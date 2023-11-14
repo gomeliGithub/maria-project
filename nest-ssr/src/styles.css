@@ -7,20 +7,16 @@ body {
     width: 100%;
 }
 
-.vh-85 {
-    height: 85vh !important;
-}
-
 .vw-80 {
     width: 80vw !important;
 }
 
-.vw-30 {
-    width: 30vw !important;
+.mw-100 {
+    max-width: 100% !important;
 }
 
-.h-85 {
-    height: 85% !important;
+.mw-50 {
+    max-width: 50% !important;
 }
 
 .vh-50 {
@@ -49,6 +45,8 @@ app-home {
     flex-direction: column !important;
     align-items: center !important;
     overflow-x: hidden !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
 }
 
 app-gallery, app-admin-panel-orders-control, app-admin-panel-discounts-control {

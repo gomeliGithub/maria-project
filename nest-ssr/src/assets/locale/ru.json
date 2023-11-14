@@ -18,7 +18,17 @@
 		"NODISCOUNTSMESSAGE": "Активных скидок пока нет, но скоро появятся, не переживайте",
 		"HEADERTITLE": "Портфолио",
 		"PHOTOGRAPHYTYPESLINKTEXT": "Смотреть работы",
-		"CURSORCLICKICONTEXT": "Нажмите"
+		"CURSORCLICKICONTEXT": "Нажмите",
+		"SCROLLSNAPITEMRADIOSTEXT": {
+			"MAIN": "Обзор",
+			"PART1": "Карусель",
+			"PART2": "Скидки",
+			"PART3": "Портфолио",
+			"PART4": "Портфолио: Часть 1",
+			"PART5": "Портфолио: Часть 2",
+			"PART6": "Портфолио: Часть 3",
+			"PART7": "Обо мне"
+		}
 	},
 	"GALLERYPAGE": {
 		"HEADERTITLE": "Галерея фото",

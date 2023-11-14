@@ -150,8 +150,6 @@ export class AppComponent implements OnInit {
 
             this.footerElementRef.nativeElement.classList.add('position-absolute', 'bottom-0');
 
-            this.navbarAnimationState = 'scrolled';
-
             component.footerElementRef = this.footerElementRef;
         }
     }

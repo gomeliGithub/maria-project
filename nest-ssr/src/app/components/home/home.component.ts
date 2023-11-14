@@ -1,5 +1,5 @@
-import { AfterViewChecked, Component, ElementRef, HostListener, OnInit } from '@angular/core';
-import { animate, state, style, transition, trigger } from '@angular/animations';
+import { AfterViewChecked, Component, ElementRef, HostListener, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { animate, animateChild, query, state, style, transition, trigger } from '@angular/animations';
 
 import { DeviceDetectorService, DeviceInfo } from 'ngx-device-detector';
 
@@ -23,10 +23,10 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
                 opacity: 1
             })),
             transition('enter => leave', [
-                animate('0.3s 100ms ease-out')
+                animate('0.3s 200ms ease')
             ]),
             transition('leave => enter', [
-                animate('0.3s 100ms ease-out')
+                animate('0.3s 200ms ease')
             ])
         ]),
         trigger('link-button-container-animation', [
@@ -38,6 +38,28 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
             transition('leave => enter', [
                 animate('0.2s', style({ opacity: 1, transform: 'translate(-50%, -50%) scale(1)' }))
             ])
+        ]),
+        trigger('scroll-snap-item-radios-container-animation', [
+            state('enter', style({ transform: 'translateX(-12.5em)' })),
+            state('leave', style({ transform: 'translateX(0px)' })),
+            transition('enter => leave', [
+                animate('0.5s ease', style({ transform: 'translateX(0px)' })),
+                query('@scroll-snap-item-radios-embeded-container-animation', [ animateChild() ])
+            ]),
+            transition('leave => enter', [
+                animate('0.8s ease-in', style({ transform: 'translateX(-12.5em)' })),
+                query('@scroll-snap-item-radios-embeded-container-animation', [ animateChild() ])
+            ])
+        ]),
+        trigger('scroll-snap-item-radios-embeded-container-animation', [
+            state('show', style({ opacity: 1 })),
+            state('hide', style({ opacity: 0 })),
+            transition('show => hide', [
+                animate('0.3s ease', style({ opacity: 0 }))
+            ]),
+            transition('hide => show', [
+                animate('0.3s ease', style({ opacity: 1 }))
+            ])
         ])
     ]
 })
@@ -46,7 +68,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
     constructor (
         private readonly deviceService: DeviceDetectorService,
-        private readonly _componentElement: ElementRef<HTMLElement>,
+        private readonly _componentElementRef: ElementRef<HTMLElement>,
 
         private readonly appService: AppService,
         private readonly clientService: ClientService
@@ -54,15 +76,27 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         this.setDeviceInfo();
     }
 
+    @ViewChildren('scrollSnapSection', { read: ElementRef<HTMLDivElement> }) public readonly scrollSnapSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
+    @ViewChildren('scrollSnapItemRadio', { read: ElementRef<HTMLInputElement> }) private readonly scrollSnapItemRadioViewRefs: QueryList<ElementRef<HTMLInputElement>>;
+
     public isMobileDevice: boolean;
     public isTabletDevice: boolean;
     public isDesktopDevice: boolean;
 
-    public firstScrolledToTop: boolean = false;
+    public firstViewChecked: boolean = false;
+    public secondViewChecked: boolean = false;
+
+    public scrollSnapSectionsPosition: { offsetTop: number, offsetHeight: number, offsetTopMod: number, indexNumber: number }[];
+    public currentItem: number;
+
+    public currentActiveScrollSnapSection = { index: null, section: null };
     
     public currentMouseTriggerStates: string[] = [];
     public currentLinkButtonContainerAnimationStates: string[] = [];
     public cursorIconsDisplayStates: boolean[] = [];
+
+    public currentScrollSnapItemRadiosContainerAnimationState: string = 'leave';
+    public currentScrollSnapItemRadiosEmbededContainerAnimationState: string = 'hide';
 
     public compressedImagesList: IClientCompressedImage[];
 
@@ -105,16 +139,24 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     }
 
     ngAfterViewChecked (): void {
-        const imagesCarousel = document.getElementById('imagesCarousel');
+        if ( this.appService.checkIsPlatformBrowser() ) {
+            const imagesCarousel = document.getElementById('imagesCarousel');
 
-        if ( imagesCarousel && !this.firstScrolledToTop ) {
-            this.firstScrolledToTop = true;
+            if ( imagesCarousel && !this.firstViewChecked ) {
+                this.firstViewChecked = true;
 
-            this._componentElement.nativeElement.scroll({
-                top: 0,
-                left: 0,
-                behavior: 'auto'
-            });
+                setTimeout(() => {
+                    this._componentElementRef.nativeElement.scroll({
+                        top: 0,
+                        left: 0,
+                        behavior: 'auto'
+                    });
+
+                    this.getScrollSnapSectionsPosition();
+
+                    this.secondViewChecked = true;
+                }, 100);
+            }
         }
     }
 
@@ -124,9 +166,15 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
         this.clientService.setPrevNavbarAnimationStateChange(null);
 
-        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 1 ) {
+        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 200 ) {
             this.footerElementRef.nativeElement.classList.remove('footerHidden');
         } else this.footerElementRef.nativeElement.classList.add('footerHidden');
+
+        if ( this.secondViewChecked ) this.getActiveScrollSnapSection($event.srcElement);
+    }
+
+    @HostListener('resize', [ '$event' ]) public onResize (): void {
+        this.getScrollSnapSectionsPosition();
     }
     
     public setDeviceInfo (): void {
@@ -135,6 +183,72 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         this.isMobileDevice = this.deviceService.isMobile();
         this.isTabletDevice = this.deviceService.isTablet();
         this.isDesktopDevice = this.deviceService.isDesktop();
+    }
+
+    public getScrollSnapSectionsPosition (): void {
+        this.scrollSnapSectionsPosition = this.scrollSnapSectionViewRefs.toArray().map((section, i) => { 
+            return { 
+                offsetTop: section.nativeElement.offsetTop,
+                offsetHeight: section.nativeElement.offsetHeight,
+                offsetTopMod: section.nativeElement.offsetTop + section.nativeElement.offsetHeight, 
+                indexNumber: i
+            };
+        });
+    }
+
+    public getActiveScrollSnapSection (componentElement: HTMLElement): void {
+        const currentScrollTop: number = componentElement.scrollTop;
+        const currentMiddlePosition: number = currentScrollTop + componentElement.offsetHeight / 2; 
+
+        if ( currentScrollTop === 0 ) {
+            this.currentItem = 0;
+
+            this.setActiveScrollSnapSection();
+        } else for ( let i = 0; i < this.scrollSnapSectionsPosition.length; i++ ) {
+            if ( currentMiddlePosition > this.scrollSnapSectionsPosition[i].offsetTop && 
+                currentMiddlePosition < this.scrollSnapSectionsPosition[i].offsetTopMod
+            ) {
+                this.currentItem = i;
+
+                this.setActiveScrollSnapSection();
+            }
+        }
+    }
+
+    public setActiveScrollSnapSection (): void {
+        const prevActiveRadio = this.scrollSnapItemRadioViewRefs.toArray().find(el => el.nativeElement.checked === true);
+
+        if ( prevActiveRadio ) prevActiveRadio.nativeElement.checked = false;
+        
+        this.scrollSnapItemRadioViewRefs.toArray()[this.currentItem].nativeElement.checked = true;
+
+        this.currentItem = this.currentItem += 1;
+    }
+
+    public changeActiveScrollSnapSection (event: MouseEvent): void {
+        const targetRadio: HTMLInputElement = event.target as HTMLInputElement;
+
+        const scrollSnapSectionPosition = this.scrollSnapSectionsPosition[parseInt(targetRadio.id.replace('defaultCheck', ''), 10)];
+
+        this.scrollSnapSectionViewRefs.toArray()[scrollSnapSectionPosition.indexNumber].nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    public startScrollSnapItemRadiosContainerAnimation (toState: string): void {
+        if ( this.isDesktopDevice ) {
+            this.currentScrollSnapItemRadiosContainerAnimationState = toState;
+
+            if ( toState === 'enter' ) this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'show';
+            else if ( toState === 'leave' ) this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'hide';
+        }
+    }
+
+    public startScrollSnapItemRadiosContainerAnimationClick (): void { 
+        if ( this.isMobileDevice || this.isTabletDevice ) {
+            this.currentScrollSnapItemRadiosContainerAnimationState = this.currentScrollSnapItemRadiosContainerAnimationState === 'enter' ? 'leave' : 'enter';
+
+            if ( this.currentScrollSnapItemRadiosContainerAnimationState === 'enter' ) this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'show';
+            else if ( this.currentScrollSnapItemRadiosContainerAnimationState === 'leave' ) this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'hide';
+        }
     }
 
     public startMouseTriggerAnimation (index: number): void {
