@@ -34,12 +34,12 @@
 </div>
 <ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0" >
     <ng-template ngFor let-imagePhotographyTypesDataArr [ngForOf]="imagePhotographyTypes" let-i="index">
-        <div class="d-flex flex-row justify-content-center align-items-center py-5 px-3 w-100 imagePhotographyTypesGroup section"
+        <div class="d-flex flex-row justify-content-center align-items-center py-5 px-3 w-100 h-100 imagePhotographyTypesGroup section"
             [style.backgroundColor]="i % 2 === 0 ? 'rgb(191 179 179)': null"
             #scrollSnapSection
         >
             <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i2 = index"
-                class="border-0 position-relative h-100"
+                class="border-0 position-relative h-100 w-100"
                 [ngClass]="{
                     'mw-50': imagePhotographyTypesDataArr.length !== 1,
                     'mw-100': imagePhotographyTypesDataArr.length === 1,
@@ -55,8 +55,15 @@
                     (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
                     [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
                 >
-                    <small class="text-body-secondary">
+                    <small class="text-body-secondary" [ngSwitch]="imagePhotographyTypeData.name">
                         {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i>
+                        <span class="fs-5 fw-bold fst-italic">
+                            <ng-template ngSwitchCase="individual"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="children"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.CHILDREN' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="wedding"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.WEDDING' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="family"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.FAMILY' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="event"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.EVENT' | translate }}</ng-template>
+                        </span>
                     </small>
                     <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.compressedImageName }}" 
                         class="h-100"

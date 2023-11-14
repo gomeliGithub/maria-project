@@ -79,6 +79,11 @@ and (-webkit-device-pixel-ratio: 2) {
 
     .imagePhotographyTypesGroup > div {
         max-width: 100% !important;
+        margin-right: 0 !important;
+    }
+
+    .imagePhotographyTypesGroup > div:nth-child(1) {
+        margin-bottom: 1rem!important;
     }
 
     .linkButtonContainer a {
