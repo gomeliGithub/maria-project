@@ -34,7 +34,7 @@
 </div>
 <ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0" >
     <ng-template ngFor let-imagePhotographyTypesDataArr [ngForOf]="imagePhotographyTypes" let-i="index">
-        <div class="d-flex flex-row justify-content-center align-items-center py-5 px-3 w-100 h-100 imagePhotographyTypesGroup section"
+        <div class="d-flex flex-row justify-content-center align-items-center py-5 px-3 w-100 h-100 rounded imagePhotographyTypesGroup section"
             [style.backgroundColor]="i % 2 === 0 ? 'rgb(191 179 179)': null"
             #scrollSnapSection
         >

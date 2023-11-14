@@ -23,10 +23,10 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
                 opacity: 1
             })),
             transition('enter => leave', [
-                animate('0.3s 200ms ease')
+                animate('0.5s 200ms ease')
             ]),
             transition('leave => enter', [
-                animate('0.3s 200ms ease')
+                animate('0.5s 200ms ease')
             ])
         ]),
         trigger('link-button-container-animation', [
