@@ -25,7 +25,6 @@
 }
 
 .imagePhotographyTypesGroup {
-    max-height: 100vh !important;
     border-width: 10px !important;
     border-color: gray !important;
 }
@@ -37,7 +36,7 @@
 }
 
 #aboutSection {
-    max-height: 70vh !important;
+    height: 70% !important;
     margin-bottom: 12rem !important;
 }
 
@@ -174,12 +173,26 @@ and (-webkit-device-pixel-ratio: 2) {
     }
 }
 
+@media screen and (min-width: 1150px) {
+    .oneLengthImagePhotographyTypeGroup {
+        width: fit-content !important;
+        height: 85% !important;
+    }
+}
+
 @media screen and (min-width: 1400px) {
     :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 950px;
     }
     :host ::ng-deep #discountsCarousel {
         min-height: 280px;
+    }
+}
+
+@media screen and (min-width: 1800px) {
+    .imagePhotographyTypesGroup:not(.oneLengthImagePhotographyTypeGroup) {
+        width: fit-content !important;
+        height: 85% !important;
     }
 }
 
