@@ -182,6 +182,10 @@ and (-webkit-device-pixel-ratio: 2) {
         width: fit-content !important;
         max-height: 70% !important;
     }
+
+    .oneLengthImagePhotographyTypeGroup > div > div:nth-child(1) {
+        height: 100% !important;
+    }
 }
 
 @media screen and (min-width: 1400px) {
