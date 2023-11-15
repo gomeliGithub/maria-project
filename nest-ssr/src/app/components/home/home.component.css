@@ -190,9 +190,9 @@ and (-webkit-device-pixel-ratio: 2) {
 }
 
 @keyframes imagePhotographyTypeCursorAnimation {
-    0%   { transform: translate(-50%, -50%) scale(1.5) }
-    50%  { transform: translate(-50%, -50%) scale(1.2) }
-    100% { transform: translate(-50%, -50%) scale(1.0) }
+    0%   { transform: translate(-50%, -30%) scale(1.5) }
+    50%  { transform: translate(-50%, -30%) scale(1.2) }
+    100% { transform: translate(-50%, -30%) scale(1.0) }
 }
   
 .cursorIcon {
