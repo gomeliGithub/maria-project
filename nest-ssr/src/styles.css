@@ -23,6 +23,10 @@ body {
     width: 60% !important;
 }
 
+.w-90 {
+    width: 90% !important;
+}
+
 app-root a.nav-link, app-root a.dropdown-item {
     cursor: pointer;
 }

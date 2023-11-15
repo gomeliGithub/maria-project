@@ -176,7 +176,7 @@ and (-webkit-device-pixel-ratio: 2) {
 @media screen and (min-width: 1150px) {
     .oneLengthImagePhotographyTypeGroup {
         width: fit-content !important;
-        height: 85% !important;
+        height: 70% !important;
     }
 }
 
@@ -186,13 +186,6 @@ and (-webkit-device-pixel-ratio: 2) {
     }
     :host ::ng-deep #discountsCarousel {
         min-height: 280px;
-    }
-}
-
-@media screen and (min-width: 1800px) {
-    .imagePhotographyTypesGroup:not(.oneLengthImagePhotographyTypeGroup) {
-        width: fit-content !important;
-        height: 85% !important;
     }
 }
 
