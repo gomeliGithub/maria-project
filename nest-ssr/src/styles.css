@@ -7,16 +7,16 @@ body {
     width: 100%;
 }
 
-.vw-80 {
-    width: 80vw !important;
-}
-
 .mw-50 {
     max-width: 50% !important;
 }
 
 .w-60 {
     width: 60% !important;
+}
+
+.w-80 {
+    width: 80% !important;
 }
 
 .w-90 {
@@ -165,13 +165,4 @@ ngb-accordion .accordion-button {
 
 ngb-accordion .accordion-body {
     padding: 0 !important;
-}
-
-.footer {
-    transition: all 200ms ease;
-}
-
-.footerHidden {
-    visibility: hidden;
-    opacity: 0;
 }

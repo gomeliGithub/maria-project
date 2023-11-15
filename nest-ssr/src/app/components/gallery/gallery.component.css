@@ -51,12 +51,14 @@ and (-webkit-device-pixel-ratio: 2) {
         width: 90vw !important;
     }
 
-    .bigSizedImagesContainer {
-        width: 100vw !important;
+    .mediumSizedImagesContainer {
+        flex-wrap: wrap !important;
     }
 
-    .mediumSizedImagesContainer, .bigSizedImagesContainer {
-        flex-wrap: wrap !important;
+    .bigSizedImagesContainer {
+        flex-direction: column !important;
+        align-items: center !important;
+        margin-bottom: 0 !important;
     }
 
     .mediumSizedImagesContainer > div {
@@ -66,10 +68,15 @@ and (-webkit-device-pixel-ratio: 2) {
 
     .bigSizedImagesContainer > div {
         width: 85% !important;
+        margin-right: 0 !important;
     }
 
     .twoFirstImageContainer {
         margin-bottom: 0.5rem !important;
+    }
+
+    .bigSizedImagesContainer .twoFirstImageContainer > img {
+        width: 100% !important;
     }
 
     .twoFirstImageContainer:nth-child(2) {
@@ -97,5 +104,15 @@ and (-webkit-device-pixel-ratio: 2) {
 
     .alert {
         transform: scale(.85);
+    }
+}
+
+@media screen and (min-width: 1400px) {
+    .bigSizedImagesContainer {
+        max-height: 723px;
+    }
+
+    .bigSizedImagesContainer > .oneLengthImageContainer > img {
+        object-fit: contain;
     }
 }

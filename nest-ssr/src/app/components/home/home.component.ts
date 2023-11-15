@@ -1,4 +1,5 @@
-import { AfterViewChecked, Component, ElementRef, HostListener, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, HostListener, Inject, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { animate, animateChild, query, state, style, transition, trigger } from '@angular/animations';
 
 import { DeviceDetectorService, DeviceInfo } from 'ngx-device-detector';
@@ -40,14 +41,14 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
             ])
         ]),
         trigger('scroll-snap-item-radios-container-animation', [
-            state('enter', style({ transform: 'translateX(-12.5em)' })),
+            state('enter', style({ transform: 'translateX(-11.5em)' })),
             state('leave', style({ transform: 'translateX(0px)' })),
             transition('enter => leave', [
                 animate('0.5s ease', style({ transform: 'translateX(0px)' })),
                 query('@scroll-snap-item-radios-embeded-container-animation', [ animateChild() ])
             ]),
             transition('leave => enter', [
-                animate('0.8s ease-in', style({ transform: 'translateX(-12.5em)' })),
+                animate('0.8s ease-in', style({ transform: 'translateX(-11.5em)' })),
                 query('@scroll-snap-item-radios-embeded-container-animation', [ animateChild() ])
             ])
         ]),
@@ -67,8 +68,9 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     public deviceInfo: DeviceInfo = null;
 
     constructor (
+        @Inject(DOCUMENT) private readonly _document: Document,
+        
         private readonly deviceService: DeviceDetectorService,
-        private readonly _componentElementRef: ElementRef<HTMLElement>,
 
         private readonly appService: AppService,
         private readonly clientService: ClientService
@@ -105,8 +107,6 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     public imagePhotographyTypes: IImagePhotographyType[][];
     public flatImagePhotographyTypes: IImagePhotographyType[];
 
-    public footerElementRef: ElementRef<HTMLElement>;
-
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
             this.appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => this.appService.setTitle(translation));
@@ -140,22 +140,18 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
     ngAfterViewChecked (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
-            const imagesCarousel = document.getElementById('imagesCarousel');
+            const imagesCarousel = this._document.getElementById('imagesCarousel');
 
             if ( imagesCarousel && !this.firstViewChecked ) {
                 this.firstViewChecked = true;
+            }
 
-                setTimeout(() => {
-                    this._componentElementRef.nativeElement.scroll({
-                        top: 0,
-                        left: 0,
-                        behavior: 'auto'
-                    });
+            if ( this.firstViewChecked && !this.secondViewChecked ) {
+                this.scrollSnapSectionViewRefs.first.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-                    this.getScrollSnapSectionsPosition();
+                this.getScrollSnapSectionsPosition();
 
-                    this.secondViewChecked = true;
-                }, 100);
+                this.secondViewChecked = true;
             }
         }
     }
@@ -166,9 +162,9 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
         this.clientService.setPrevNavbarAnimationStateChange(null);
 
-        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 200 ) {
-            this.footerElementRef.nativeElement.classList.remove('footerHidden');
-        } else this.footerElementRef.nativeElement.classList.add('footerHidden');
+        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 1 ) {
+            this.clientService.setFooterAnimationState('show');
+        } else this.clientService.setFooterAnimationState('hide');
 
         if ( this.secondViewChecked ) this.getActiveScrollSnapSection($event.srcElement);
     }
@@ -242,7 +238,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         }
     }
 
-    public startScrollSnapItemRadiosContainerAnimationClick (): void { 
+    public startScrollSnapItemRadiosContainerAnimationClick (): void {
         if ( this.isMobileDevice || this.isTabletDevice ) {
             this.currentScrollSnapItemRadiosContainerAnimationState = this.currentScrollSnapItemRadiosContainerAnimationState === 'enter' ? 'leave' : 'enter';
 

@@ -62,6 +62,7 @@ export class GalleryComponent implements OnInit {
     constructor (
         private readonly activateRoute: ActivatedRoute,
         private readonly router: Router,
+        private readonly _componentRef: ElementRef<HTMLElement>,
 
         private readonly appService: AppService,
         private readonly clientService: ClientService
@@ -240,6 +241,8 @@ export class GalleryComponent implements OnInit {
 
             this.bigGalleryIsHide = true;
         }
+
+        this._componentRef.nativeElement.scroll({ top: 0, left: 0, behavior: 'smooth' });
 
         this.isToggleBigGallery = true;
 

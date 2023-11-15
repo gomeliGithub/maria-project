@@ -25,11 +25,11 @@
     </ngb-carousel>
 </div>
 <ng-template #noDiscountsDataBlock>
-    <div class="text-center text-info fw-semibold fs-4 p-5">
+    <div class="text-center text-info fw-semibold fs-4 py-3">
         <span>{{ 'HOMEPAGE.NODISCOUNTSMESSAGE' | translate }}</span>
     </div>
 </ng-template>
-<div class="p-5 w-100 section" #scrollSnapSection>
+<div class="py-5 w-100 section" #scrollSnapSection>
     <h1 class="display-6 shadow-lg rounded-pill p-3 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
 </div>
 <ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0" >
@@ -99,7 +99,7 @@
         </div>
     </ng-template>
 </ng-template>
-<div class="d-flex flex-column w-100 mt-3 section" id="aboutSection" #scrollSnapSection>
+<div class="d-flex flex-column w-100 mt-3 mb-3 section" id="aboutSection" #scrollSnapSection>
     <div class="d-flex flex-row justify-content-center align-items-center h-100 w-100" id="aboutContainer">
         <img src="/assets/images_full/1697474336253508.jpg" class="rounded h-100 mw-100" id="aboutImage">
         <div class="d-flex flex-row align-items-center fw-semibold ms-4 h-100">
@@ -110,17 +110,15 @@
 <div class="position-fixed top-50 translate-middle z-2" id="scrollSnapItemRadiosContainer" 
     (mouseenter)="startScrollSnapItemRadiosContainerAnimation('enter')"
     (mouseleave)="startScrollSnapItemRadiosContainerAnimation('leave')"
-    (click)="startScrollSnapItemRadiosContainerAnimationClick()"
 >
     <div class="position-relative d-flex flex-row-reverse justify-content-center align-items-center text-bg-secondary rounded pe-1"
         [@scroll-snap-item-radios-container-animation]="currentScrollSnapItemRadiosContainerAnimationState"
+        (click)="startScrollSnapItemRadiosContainerAnimationClick()"
     >
         <div class="ms-2" 
             [@scroll-snap-item-radios-embeded-container-animation]="currentScrollSnapItemRadiosEmbededContainerAnimationState"
         >
-            <div *ngFor="let section of scrollSnapSectionViewRefs; let i = index" class="form-check form-check-reverse"
-                [ngClass]="{ 'mb-2': i <= scrollSnapSectionViewRefs.length - 1 }"
-            >
+            <div *ngFor="let section of scrollSnapSectionViewRefs; let i = index" class="form-check form-check-reverse">
                 <input class="form-check-input" type="radio" value="" [id]="'defaultCheck' + i" (click)="changeActiveScrollSnapSection($event)" #scrollSnapItemRadio>
                 <label class="form-check-label text-nowrap" [for]="'defaultCheck' + i">
                     {{ ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate }}

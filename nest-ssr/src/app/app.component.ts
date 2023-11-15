@@ -74,6 +74,16 @@ import { IClientLocale } from 'types/global';
             transition('scrolled => static', [
                 animate('200ms', style({ backgroundColor: 'transparent' }))
             ])
+        ]),
+        trigger('footer-animation', [
+            state('hide', style({ position: 'absolute', visibility: 'hidden', opacity: 0 })),
+            state('show', style({ position: 'relative', visibility: 'visible', opacity: 1 })),
+            transition('hide => show', [
+                animate('200ms', style({ visibility: 'visible', opacity: 1 }))
+            ]),
+            transition('show => hide', [
+                animate('200ms', style({ visibility: 'hidden', opacity: 0 }))
+            ])
         ])
     ]
 })
@@ -93,11 +103,12 @@ export class AppComponent implements OnInit {
     public navbarAnimationState: string = 'static';
     public prevNavbarAnimationState: string = null;
 
+    public footerAnimationState: string = 'hide';
+
     @ViewChildren(NgbDropdown) dropdowns: QueryList<NgbDropdown>;
 
     @ViewChild('changeClientLocaleButton', { static: false }) private readonly changeClientLocaleButtonViewRef: ElementRef<HTMLButtonElement>;
     @ViewChild('navbar', { static: false }) private readonly navbarElementRef: ElementRef<HTMLDivElement>;
-    @ViewChild('footer', { static: false }) private readonly footerElementRef: ElementRef<HTMLElement>;
 
     public readonly locales: IClientLocale[] = environment.locales;
 
@@ -127,6 +138,7 @@ export class AppComponent implements OnInit {
 
             this.clientService.navbarAnimationStateChange.subscribe(value => this.navbarAnimationState = value);
             this.clientService.prevNavbarAnimationStateChange.subscribe(value => this.prevNavbarAnimationState = value);
+            this.clientService.footerAnimationStateChange.subscribe(value => this.footerAnimationState = value);
         }
     }
 
@@ -137,7 +149,9 @@ export class AppComponent implements OnInit {
 
         if ( !(component instanceof HomeComponent) ) {
             this.componentClass = false;
-            this.footerElementRef.nativeElement.classList.remove('footerHidden', 'position-absolute', 'bottom-0');
+
+            this.footerAnimationState = 'show';
+
             this.isHomePage = false;
 
             if ( component instanceof GalleryComponent ) {
@@ -147,10 +161,6 @@ export class AppComponent implements OnInit {
         } else {
             this.componentClass = true;
             this.isHomePage = true;
-
-            this.footerElementRef.nativeElement.classList.add('position-absolute', 'bottom-0');
-
-            component.footerElementRef = this.footerElementRef;
         }
     }
 

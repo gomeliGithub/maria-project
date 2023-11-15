@@ -25,18 +25,23 @@ export class ClientService {
     public scrollPageBottomStatusChange: EventEmitter<boolean> = new EventEmitter();
     public navbarAnimationStateChange: EventEmitter<string> = new EventEmitter();
     public prevNavbarAnimationStateChange: EventEmitter<string> = new EventEmitter();
+    public footerAnimationStateChange: EventEmitter<string> = new EventEmitter();
 
-    public setScrollPageBottomStatus (value: boolean) {
+    public setScrollPageBottomStatus (value: boolean): void {
         this.scrollPageBottomStatusChange.emit(value);
     }
 
-    public setNavbarAnimationState (value: string) {
+    public setNavbarAnimationState (value: string): void {
         this.navbarAnimationStateChange.emit(value);
     }
 
-    public setPrevNavbarAnimationStateChange (value: string) { 
+    public setPrevNavbarAnimationStateChange (value: string): void { 
         this.prevNavbarAnimationStateChange.emit(value);
     }
+
+    public setFooterAnimationState (value: string): void {
+        this.footerAnimationStateChange.emit(value);
+    } 
 
     public getActiveClient (): Observable<IClientBrowser> {
         const headers: HttpHeaders = this.appService.createRequestHeaders();
