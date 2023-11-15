@@ -149,7 +149,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
             if ( this.firstViewChecked && !this.secondViewChecked ) {
                 this.scrollSnapSectionViewRefs.first.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-                this.getScrollSnapSectionsPosition();
+                if ( this.isDesktopDevice ) this.getScrollSnapSectionsPosition();
 
                 this.secondViewChecked = true;
             }
@@ -193,6 +193,8 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     }
 
     public getActiveScrollSnapSection (componentElement: HTMLElement): void {
+        if ( this.isMobileDevice || this.isTabletDevice ) this.getScrollSnapSectionsPosition();
+
         const currentScrollTop: number = componentElement.scrollTop;
         const currentMiddlePosition: number = currentScrollTop + componentElement.offsetHeight / 2; 
 
