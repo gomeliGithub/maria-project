@@ -84,7 +84,7 @@ and (-webkit-device-pixel-ratio: 2) {
     .imagePhotographyTypesGroup > div:nth-child(1) {
         margin-bottom: 1rem!important;
     }
-
+    
     .linkButtonContainer a {
         align-items: center !important;
     }
@@ -176,7 +176,7 @@ and (-webkit-device-pixel-ratio: 2) {
 @media screen and (min-width: 1150px) {
     .oneLengthImagePhotographyTypeGroup {
         width: fit-content !important;
-        height: 70% !important;
+        max-height: 70% !important;
     }
 }
 

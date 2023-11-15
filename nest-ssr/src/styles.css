@@ -15,16 +15,16 @@ body {
     max-width: 50% !important;
 }
 
-.vh-50 {
-    height: 50vh !important;
-}
-
 .w-60 {
     width: 60% !important;
 }
 
 .w-90 {
     width: 90% !important;
+}
+
+.h-93 {
+    height: 93% !important;
 }
 
 app-root a.nav-link, app-root a.dropdown-item {
