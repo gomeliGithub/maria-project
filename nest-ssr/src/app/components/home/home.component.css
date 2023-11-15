@@ -29,6 +29,10 @@
     border-color: gray !important;
 }
 
+.imagePhotographyTypesGroup > div > div > small, .imagePhotographyTypesGroup > div > div > span {
+    height: 5% !important;
+}
+
 :host ::ng-deep #discountsCarousel {
     background-image: url('/assets/images_full/1698852851520265.jpg');
     background-size: cover;
@@ -82,7 +86,7 @@ and (-webkit-device-pixel-ratio: 2) {
     }
 
     .imagePhotographyTypesGroup > div:nth-child(1) {
-        margin-bottom: 1rem!important;
+        margin-bottom: 1rem !important;
     }
     
     .linkButtonContainer a {

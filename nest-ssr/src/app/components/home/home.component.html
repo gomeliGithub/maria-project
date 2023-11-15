@@ -51,8 +51,8 @@
                 (click)="startMouseTriggerAnimationClick(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
                 [attr.mouse-trigger-state-index]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
             >
-                <div class="d-flex flex-column h-100 text-center"
-                [ngClass]="{ 'justify-content-end': imagePhotographyTypesDataArr.length !== 1 }"
+                <div class="d-flex flex-column text-center"
+                [ngClass]="{ 'justify-content-end': imagePhotographyTypesDataArr.length === 1 }"
                     (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
                     (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
                     [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
@@ -69,7 +69,7 @@
                         <ng-template ngSwitchCase="event"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.EVENT' | translate }}</ng-template>
                     </span>
                     <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.compressedImageName }}" 
-                        class="h-93"
+                        class="h-90"
                     >
                 </div>
                 <div class="position-absolute top-50 start-50 w-50 linkButtonContainer"
