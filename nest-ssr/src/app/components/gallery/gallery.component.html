@@ -108,9 +108,10 @@
         {{ !bigGalleryIsHide ? ('GALLERYPAGE.MEDIUMGALLERYBUTTONTEXT' | translate) : ('GALLERYPAGE.BIGGALLERYBUTTONTEXT' | translate) }}
     </button>
 </div>
-<div class="d-flex flex-column w-50 position-absolute top-50 start-50 visible pe-auto" #sendOrderFormContainer [@send-order-form-animation]="sendOrderFormAnimationState"
+<div class="d-flex flex-column w-50 position-absolute visible overflow-y-auto pe-auto" [@send-order-form-animation]="sendOrderFormAnimationState"
     (@send-order-form-animation.start)="sendOrderFormAnimationStarted($event)"
     (@send-order-form-animation.done)="sendOrderFormAnimationDone($event)"
+    #sendOrderFormContainer
 >
     <button type="button" class="btn-close mb-1 align-self-end" aria-label="Close" (click)="changeSendOrderFormAnimationState()"></button>
     <form [formGroup]="sendOrderForm" class="" novalidate (submit)="sendOrder()">

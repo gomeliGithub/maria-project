@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostBinding, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostBinding, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
@@ -32,16 +32,16 @@ import { IClientCompressedImage } from 'types/models';
         ]),
         trigger('send-order-form-animation', [
             state('hide', style({
-                transform: 'translate(-400%, -50%) rotate3d(1, 1, 1, 90deg)'
+                transform: 'translate(-400%, 0) rotate3d(1, 1, 1, 90deg)'
             })),
             state('show', style({
-                transform: 'translate(-50%, -50%) rotate3d(0, 0, 0, 0)'
+                transform: 'translate(0, 0) rotate3d(0, 0, 0, 0)'
             })),
             transition('hide => show', [
-                animate('0.5s 300ms ease-in', style({ transform: 'translate(-50%,-50%) rotate3d(0, 0, 0, 0)' }))
+                animate('0.5s 300ms ease-in', style({ transform: 'translate(0, 0) rotate3d(0, 0, 0, 0)' }))
             ]),
             transition('show => hide', [
-                animate('0.2s', style({ transform: 'translate(-400%, -50%) rotate3d(1, 1, 1, 90deg)' }))
+                animate('0.2s', style({ transform: 'translate(-400%, 0) rotate3d(1, 1, 1, 90deg)' }))
             ])
         ]),
         trigger('images-animation', [
@@ -88,6 +88,8 @@ export class GalleryComponent implements OnInit {
     @HostBinding('className') componentClass: string;
 
     @ViewChildren('imageContainer', { read: ElementRef<HTMLDivElement> }) private readonly imageContainerViewRefs: QueryList<ElementRef<HTMLDivElement>>;
+
+    @ViewChild('sendOrderFormContainer', { static: false }) private readonly sendOrderFormContainerViewRef: ElementRef<HTMLDivElement>;
 
     public compressedBigImagesIsExists: boolean = false;
     public compressedImagesList: IReducedGalleryCompressedImages = null;
@@ -314,6 +316,14 @@ export class GalleryComponent implements OnInit {
             this.componentClass = '';
 
             this.sendOrderForm.reset();
+
+            this.sendOrderFormContainerViewRef.nativeElement.classList.remove('position-relative');
+            this.sendOrderFormContainerViewRef.nativeElement.classList.add('position-absolute');
+        }
+
+        if ( event.toState === 'show' ) {
+            this.sendOrderFormContainerViewRef.nativeElement.classList.remove('position-absolute');
+            this.sendOrderFormContainerViewRef.nativeElement.classList.add('position-relative');
         }
     }
 }

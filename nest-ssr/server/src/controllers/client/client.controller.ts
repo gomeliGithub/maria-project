@@ -41,9 +41,6 @@ export class ClientController {
         imageViewSize = imageViewSize === 'undefined' || imageViewSize === 'null' ? null : imageViewSize;
         imagesExistsCount = imagesExistsCount === 'undefined' || imagesExistsCount === 'null' ? null : imagesExistsCount;
 
-        console.log(imageViewSize);
-        console.log(imagesExistsCount);
-
         if ( !thumbnailImagesDirPaths.includes(imagesType) || imageViewSize && imageViewSize === '' 
             || imagesExistsCount && Number.isNaN(imagesExistsCountInt) 
         ) throw new BadRequestException();

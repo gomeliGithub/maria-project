@@ -154,6 +154,10 @@ input.ng-touched.ng-valid {
     visibility: hidden;
 }
 
+.pointerEventsNone > *:not(:last-child) {
+    display: none !important;
+}
+
 .pointerEventsNone2 {
     pointer-events: none;
     overflow-y: hidden;
