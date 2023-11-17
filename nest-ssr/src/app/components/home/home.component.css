@@ -101,14 +101,14 @@ and (-webkit-device-pixel-ratio: 2) {
         flex-direction: column !important;
     }
 
+    #aboutContainer > img {
+        height: auto !important;
+    }
+
     #aboutContainer > div {
         overflow-y: hidden !important;
         margin-left: 0 !important;
         margin-top: 2rem !important;
-    }
-
-    #aboutImage {
-        height: 85% !important;
     }
 }
 

@@ -144,18 +144,16 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     }
 
     ngAfterViewChecked (): void {
-        if ( this.appService.checkIsPlatformBrowser() ) {
-            const imagesCarousel = this._document.getElementById('imagesCarousel');
+        const imagesCarousel = this._document.getElementById('imagesCarousel');
 
-            if ( imagesCarousel && !this.firstViewChecked ) {
-                this.firstViewChecked = true;
-            }
+        if ( imagesCarousel && !this.firstViewChecked ) {
+            this.firstViewChecked = true;
+        }
 
-            if ( this.firstViewChecked && !this.secondViewChecked ) {
-                this.scrollSnapSectionViewRefs.first.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if ( this.firstViewChecked && !this.secondViewChecked ) {
+            this.scrollSnapSectionViewRefs.first.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-                this.secondViewChecked = true;
-            }
+            this.secondViewChecked = true;
         }
     }
 
@@ -165,7 +163,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
         this.clientService.setPrevNavbarAnimationStateChange(null);
 
-        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 500 ) {
+        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 150 ) {
             this.clientService.setFooterAnimationState('show');
         } else this.clientService.setFooterAnimationState('hide');
 
