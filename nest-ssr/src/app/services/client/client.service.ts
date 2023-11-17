@@ -102,22 +102,16 @@ export class ClientService {
     public getCompressedImagesList (imagesType: 'home', imageViewSize?: 'medium' | 'big'): Observable<IClientCompressedImage[]>
     public getCompressedImagesList (imagesType: string, imageViewSize?: 'medium' | 'big', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData>
     public getCompressedImagesList (imagesType: 'home' | string, imageViewSize?: 'medium' | 'big', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData | IClientCompressedImage[]> {
-        return this.http.get(`/api/client/getCompressedImagesList/:${ imagesType }`, { params: {
+        return this.http.get<IGalleryCompressedImagesData | IClientCompressedImage[]>(`/api/client/getCompressedImagesList/:${ imagesType }`, { params: {
             imageViewSize,
             imagesExistsCount
-        }}).pipe<IGalleryCompressedImagesData | IClientCompressedImage[]>(imagesList => {
-            if ( imagesType === 'home' ) return imagesList as Observable<IClientCompressedImage[]>;
-            else return imagesList as Observable<IGalleryCompressedImagesData>;
-        });
+        }});
     }
 
     public getImagePhotographyTypesData (targetPage: 'home'): Observable<IImagePhotographyType[][]>
     public getImagePhotographyTypesData (targetPage: 'admin'): Observable<IImagePhotographyType[]>
     public getImagePhotographyTypesData (targetPage: 'home' | 'admin'): Observable<IImagePhotographyType[][] | IImagePhotographyType[]> {
-        return this.http.get(`/api/client/getImagePhotographyTypesData/:${ targetPage }`).pipe<IImagePhotographyType[][] | IImagePhotographyType[]>(data => {
-            if ( targetPage === 'home' ) return data as Observable<IImagePhotographyType[][]>;
-            else if ( targetPage === 'admin' ) return data as Observable<IImagePhotographyType[]>;
-        });
+        return this.http.get<IImagePhotographyType[][] | IImagePhotographyType[]>(`/api/client/getImagePhotographyTypesData/:${ targetPage }`);
     }
 
     public getDiscountsData (): Observable<IDiscount[]> {

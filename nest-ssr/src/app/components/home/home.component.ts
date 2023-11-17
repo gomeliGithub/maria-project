@@ -1,5 +1,6 @@
-import { AfterViewChecked, Component, ElementRef, HostListener, Inject, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, HostListener, Inject, OnInit, PLATFORM_ID, QueryList, ViewChildren } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { TransferState, makeStateKey } from '@angular/platform-browser';
 import { animate, animateChild, query, state, style, transition, trigger } from '@angular/animations';
 
 import { DeviceDetectorService, DeviceInfo } from 'ngx-device-detector';
@@ -69,6 +70,8 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
     constructor (
         @Inject(DOCUMENT) private readonly _document: Document,
+        @Inject(PLATFORM_ID) private platformId: Object,
+        private readonly transferState: TransferState,
         
         private readonly deviceService: DeviceDetectorService,
 
@@ -77,6 +80,8 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     ) {
         this.setDeviceInfo();
     }
+
+    private readonly SERVER_DATA_KEY = makeStateKey<string>('pageTitle');
 
     @ViewChildren('scrollSnapSection', { read: ElementRef<HTMLDivElement> }) public readonly scrollSnapSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
     @ViewChildren('scrollSnapItemRadio', { read: ElementRef<HTMLInputElement> }) private readonly scrollSnapItemRadioViewRefs: QueryList<ElementRef<HTMLInputElement>>;
@@ -149,8 +154,6 @@ export class HomeComponent implements OnInit, AfterViewChecked {
             if ( this.firstViewChecked && !this.secondViewChecked ) {
                 this.scrollSnapSectionViewRefs.first.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-                if ( this.isDesktopDevice ) this.getScrollSnapSectionsPosition();
-
                 this.secondViewChecked = true;
             }
         }
@@ -162,7 +165,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
         this.clientService.setPrevNavbarAnimationStateChange(null);
 
-        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 1 ) {
+        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 500 ) {
             this.clientService.setFooterAnimationState('show');
         } else this.clientService.setFooterAnimationState('hide');
 
@@ -193,7 +196,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     }
 
     public getActiveScrollSnapSection (componentElement: HTMLElement): void {
-        if ( this.isMobileDevice || this.isTabletDevice ) this.getScrollSnapSectionsPosition();
+        this.getScrollSnapSectionsPosition();
 
         const currentScrollTop: number = componentElement.scrollTop;
         const currentMiddlePosition: number = currentScrollTop + componentElement.offsetHeight / 2; 

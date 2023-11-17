@@ -84,7 +84,7 @@ and (-webkit-device-pixel-ratio: 2) {
         margin-right: 0 !important;
     }
 
-    .imagePhotographyTypesGroup > div:nth-child(1) {
+    .imagePhotographyTypesGroup > div:nth-child(1):not(:last-child) {
         margin-bottom: 1rem !important;
     }
     
@@ -92,12 +92,19 @@ and (-webkit-device-pixel-ratio: 2) {
         align-items: center !important;
     }
 
+    #aboutSection {
+        height: auto !important;
+        margin-bottom: 0 !important;
+    }
+
     #aboutContainer {
         flex-direction: column !important;
     }
 
     #aboutContainer > div {
+        overflow-y: hidden !important;
         margin-left: 0 !important;
+        margin-top: 2rem !important;
     }
 
     #aboutImage {

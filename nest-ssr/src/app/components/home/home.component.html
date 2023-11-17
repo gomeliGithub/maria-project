@@ -35,7 +35,7 @@
 <ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0" >
     <ng-template ngFor let-imagePhotographyTypesDataArr [ngForOf]="imagePhotographyTypes" let-i="index">
         <div class="d-flex flex-row justify-content-center align-items-center py-1 px-3 w-90 h-100 rounded imagePhotographyTypesGroup section"
-        [ngClass]="{ 'oneLengthImagePhotographyTypeGroup': imagePhotographyTypesDataArr.length === 1 }"
+            [ngClass]="{ 'oneLengthImagePhotographyTypeGroup': imagePhotographyTypesDataArr.length === 1 }"
             [style.backgroundColor]="i % 2 === 0 ? 'rgb(191 179 179)': null"
             #scrollSnapSection
         >
@@ -101,9 +101,12 @@
 </ng-template>
 <div class="d-flex flex-column w-100 mt-3 mb-3 section" id="aboutSection" #scrollSnapSection>
     <div class="d-flex flex-row justify-content-center align-items-center h-100 w-100" id="aboutContainer">
-        <img src="/assets/images_full/1697474336253508.jpg" class="rounded h-100 mw-100" id="aboutImage">
-        <div class="d-flex flex-row align-items-center fw-semibold ms-4 h-100">
-            <p class="text-center w-100">Просто текст!!!!</p>
+        <img src="/assets/images_full/1697474336253508.jpg" class="rounded h-100 mw-100 shadow" id="aboutImage">
+        <div class="d-flex flex-column align-items-center h-100 fw-semibold ms-4 overflow-y-auto">
+            <p class="flex-fill text-center w-100 lead">{{ 'HOMEPAGE.ABOUTTEXT.PART1' | translate }}</p>
+            <p class="flex-fill text-center w-100 fs-5"><em class="">{{ 'HOMEPAGE.ABOUTTEXT.PART2' | translate }}</em></p>
+            <p class="flex-fill text-center w-100 fs-5"><em class="">{{ 'HOMEPAGE.ABOUTTEXT.PART3' | translate }}</em></p>
+            <p class="flex-fill text-center w-100 fs-5"><em class="">{{ 'HOMEPAGE.ABOUTTEXT.PART4' | translate }}</em></p>
         </div>
     </div>
 </div>
