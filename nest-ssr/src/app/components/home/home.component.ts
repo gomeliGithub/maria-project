@@ -1,6 +1,5 @@
 import { AfterViewChecked, Component, ElementRef, HostListener, Inject, OnInit, PLATFORM_ID, QueryList, ViewChildren } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { TransferState, makeStateKey } from '@angular/platform-browser';
 import { animate, animateChild, query, state, style, transition, trigger } from '@angular/animations';
 
 import { DeviceDetectorService, DeviceInfo } from 'ngx-device-detector';
@@ -71,7 +70,6 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     constructor (
         @Inject(DOCUMENT) private readonly _document: Document,
         @Inject(PLATFORM_ID) private platformId: Object,
-        private readonly transferState: TransferState,
         
         private readonly deviceService: DeviceDetectorService,
 
@@ -80,8 +78,6 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     ) {
         this.setDeviceInfo();
     }
-
-    private readonly SERVER_DATA_KEY = makeStateKey<string>('pageTitle');
 
     @ViewChildren('scrollSnapSection', { read: ElementRef<HTMLDivElement> }) public readonly scrollSnapSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
     @ViewChildren('scrollSnapItemRadio', { read: ElementRef<HTMLInputElement> }) private readonly scrollSnapItemRadioViewRefs: QueryList<ElementRef<HTMLInputElement>>;
@@ -163,7 +159,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
         this.clientService.setPrevNavbarAnimationStateChange(null);
 
-        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 150 ) {
+        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 1 ) {
             this.clientService.setFooterAnimationState('show');
         } else this.clientService.setFooterAnimationState('hide');
 

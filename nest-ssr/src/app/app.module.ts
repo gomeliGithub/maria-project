@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -20,6 +20,8 @@ import { ModalComponent } from './components/modal/modal.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 
 import { AppService } from './app.service';
+
+import { BrowserStateInterceptor } from './interceptors/browser-state/browser-state.interceptor';
 
 import { environment } from '../environments/environment';
 
@@ -51,7 +53,13 @@ import { environment } from '../environments/environment';
         ClientModule,
         NgbModule
     ],
-    providers: [AppService],
+    providers: [ AppService,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: BrowserStateInterceptor,
+            multi: true
+        }
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }
