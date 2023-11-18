@@ -159,7 +159,9 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
         this.clientService.setPrevNavbarAnimationStateChange(null);
 
-        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 1 ) {
+        const indentation: number = this.isDesktopDevice ? 1 : 150;
+
+        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - indentation ) {
             this.clientService.setFooterAnimationState('show');
         } else this.clientService.setFooterAnimationState('hide');
 

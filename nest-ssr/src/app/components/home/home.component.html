@@ -52,7 +52,7 @@
                 [attr.mouse-trigger-state-index]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
             >
                 <div class="d-flex flex-column text-center"
-                [ngClass]="{ 'justify-content-end': imagePhotographyTypesDataArr.length === 1 }"
+                    [ngClass]="{ 'justify-content-end': imagePhotographyTypesDataArr.length === 1 }"
                     (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
                     (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
                     [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
