@@ -66,7 +66,7 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
             state('visiable', style({ opacity: 1, transform: 'translateY(0px)' })),
             state('unvisiable', style({ opacity: 0, transform: 'translateY(50px)' })),
             transition('unvisiable => visiable', [
-                animate('0.5s 400ms ease', style({ opacity: 1, transform: 'translateY(0px)' }))
+                animate('0.5s 300ms ease', style({ opacity: 1, transform: 'translateY(0px)' }))
             ]),
             transition('visiable => unvisiable', [
                 animate('0.5s ease', style({ opacity: 0, transform: 'translateY(50px)' }))
@@ -266,7 +266,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         const scrollPosition: number = componentElement.scrollTop + componentElement.offsetHeight;
 
         this.scrollSnapVisiableAnimationSectionsPosition.forEach((sectionData, index) => {
-            if ( sectionData.offsetTop <= scrollPosition ) {
+            if ( sectionData.offsetTop + ( sectionData.offsetHeight / 2 ) <= scrollPosition ) {
                 this.startScrollSnapSectionVisiableAnimation(index);
             }
         });
@@ -305,8 +305,6 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     
     public startScrollSnapSectionVisiableAnimation (index: number): void {
         if ( !this.currentScrollSnapSectionVisiableAnimationStates[index].finished ) {
-            this.currentScrollSnapSectionVisiableAnimationStates[index].state = 'unvisiable';
-
             setTimeout(() => {
                 this.currentScrollSnapSectionVisiableAnimationStates[index].state = 'visiable';
                 this.currentScrollSnapSectionVisiableAnimationStates[index].finished = true;
