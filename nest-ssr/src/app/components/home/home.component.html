@@ -36,6 +36,7 @@
     <ng-template ngFor let-imagePhotographyTypesDataArr [ngForOf]="imagePhotographyTypes" let-i="index">
         <div class="d-flex flex-row justify-content-center align-items-center px-3 pb-4 w-100 h-100 imagePhotographyTypesGroup section"
             [ngClass]="{
+                'pt-4': i === imagePhotographyTypes.length - 1,
                 'oneLengthImagePhotographyTypeGroup': imagePhotographyTypesDataArr.length === 1
             }"
             [style.backgroundColor]="'rgb(176 173 172)'"
@@ -80,7 +81,7 @@
                 <div class="position-absolute top-50 start-50 w-50 linkButtonContainer"
                     [@link-button-container-animation]="currentLinkButtonContainerAnimationStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
                 >
-                    <h5 class="text-center text-primary fw-bold text-break" [ngSwitch]="imagePhotographyTypeData.name">
+                    <h5 class="text-center text-break" [ngSwitch]="imagePhotographyTypeData.name">
                         <ng-template ngSwitchCase="individual">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
                         <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.CHILDREN' | translate }}</ng-template>
                         <ng-template ngSwitchCase="wedding">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.WEDDING' | translate }}</ng-template>
@@ -88,10 +89,11 @@
                         <ng-template ngSwitchCase="event">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.EVENT' | translate }}</ng-template>
                     </h5>
                     <a [routerLink]="[ '/gallery', imagePhotographyTypeData.name ]" routerLinkActive="active" 
-                        class="btn btn-outline-info align-items-start justify-content-center icon-link icon-link-hover w-100" 
+                        class="btn btn-outline-light align-items-center justify-content-center icon-link w-100 fs-4" 
                         tabindex="-1" role="button" aria-disabled="true"
                     >
-                        {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate | uppercase }} <i class="bi bi-arrow-right"></i>
+                        <!-- {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate | uppercase }} <i class="bi bi-arrow-right"></i> -->
+                        <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
             </div>
@@ -104,10 +106,12 @@
     #scrollSnapSection
     #scrollSnapVisiableAnimationSection
 >
+    <div class="w-50 mx-auto mt-3">
+        <p class="text-center lead">{{ 'HOMEPAGE.ABOUTTEXT.PART1' | translate }}</p>
+    </div>
     <div class="d-flex flex-row justify-content-center align-items-center h-100 w-100 pb-3" id="aboutContainer">
         <img src="/assets/images_full/1697474336253508.jpg" class="rounded h-100 mw-100 shadow">
         <div class="d-flex flex-column align-items-center h-100 ms-4 overflow-x-auto overflow-y-auto">
-            <p class="flex-fill mt-3 text-center w-100 lead">{{ 'HOMEPAGE.ABOUTTEXT.PART1' | translate }}</p>
             <p class="flex-fill text-start w-100 fs-5">{{ 'HOMEPAGE.ABOUTTEXT.PART2' | translate }}</p>
             <p class="flex-fill text-start w-100 fs-5">{{ 'HOMEPAGE.ABOUTTEXT.PART3' | translate }}</p>
             <p class="flex-fill text-start w-100 fs-5">{{ 'HOMEPAGE.ABOUTTEXT.PART4' | translate }}</p>

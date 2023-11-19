@@ -136,6 +136,11 @@ and (-webkit-device-pixel-ratio: 2) {
         --bs-btn-color: #000;
         --bs-btn-bg: #0dcaf0;
     }
+
+    .btn-outline-light {
+        --bs-btn-color: #000;
+        --bs-btn-bg: #f8f9fa;
+    }
 }
 
 textarea {

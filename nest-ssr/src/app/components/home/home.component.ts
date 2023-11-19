@@ -31,13 +31,13 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
             ])
         ]),
         trigger('link-button-container-animation', [
-            state('enter', style({ opacity: 1, transform: 'translate(-50%, -50%) scale(1)' })),
-            state('leave', style({ opacity: 0, transform: 'translate(-50%, -50%) scale(0)' })),
+            state('enter', style({ opacity: 1, transform: 'translate(-50%, -80%) scale(1)' })),
+            state('leave', style({ opacity: 0, transform: 'translate(-50%, -80%) scale(0)' })),
             transition('enter => leave', [
-                animate('300ms ease', style({ opacity: 0, transform: 'translate(-50%, -50%) scale(0)' }))
+                animate('300ms ease', style({ opacity: 0, transform: 'translate(-50%, -80%) scale(0)' }))
             ]),
             transition('leave => enter', [
-                animate('0.2s 400ms ease', style({ opacity: 1, transform: 'translate(-50%, -50%) scale(1)' }))
+                animate('0.2s 400ms ease', style({ opacity: 1, transform: 'translate(-50%, -80%) scale(1)' }))
             ])
         ]),
         trigger('scroll-snap-item-radios-container-animation', [

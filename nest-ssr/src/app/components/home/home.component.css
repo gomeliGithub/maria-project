@@ -34,8 +34,17 @@
     background-position: center;
 }
 
+.linkButtonContainer > a > i {
+    transform: matrix3d(4, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1) translateY(-0.4rem);
+}
+
 #aboutSection {
     height: 70% !important;
+    scroll-snap-align: start !important;
+}
+
+.section {
+    scroll-snap-align: center !important;
 }
 
 @media screen and (max-width: 650px), only screen 
@@ -86,14 +95,15 @@ and (-webkit-device-pixel-ratio: 2) {
     .oneLengthImagePhotographyTypeGroup > div {
         width: 100% !important;
     }
-    
-    .linkButtonContainer a {
-        align-items: center !important;
-    }
 
     #aboutSection {
         height: auto !important;
         margin-bottom: 0 !important;
+    }
+
+    #aboutSection > div:first-child {
+        width: 100% !important;
+        margin-top: 3.5rem !important;
     }
 
     #aboutContainer {
@@ -109,10 +119,6 @@ and (-webkit-device-pixel-ratio: 2) {
         margin-left: 0 !important;
         margin-top: 2rem !important;
     }
-}
-
-.section {
-    scroll-snap-align: center !important;
 }
 
 @media screen and (max-width: 576px), only screen 

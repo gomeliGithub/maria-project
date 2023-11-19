@@ -63,10 +63,10 @@ export class SignService {
     }
 
     public async signUp (clientData: IClientSignData, isNewAdmin = false): Promise<void> {
-        const clientLogin: string = clientData.login;
+        const clientLogin: string = clientData.login.trim();
         const clientPassword: string = clientData.password;
-        const clientFullName: string = clientData.fullName;
-        const clientEmail: string = clientData.email;
+        const clientFullName: string = clientData.fullName.trim();
+        const clientEmail: string = clientData.email.trim();
 
         const loginPattern: RegExp = /^[a-zA-Z](.[a-zA-Z0-9_-]*)$/;
         const emailPattern: RegExp = /^[^\s()<>@,;:\/]+@\w[\w\.-]+\.[a-z]{2,}$/i;
@@ -102,7 +102,7 @@ export class SignService {
     }
 
     public async signIn (clientSignData: IClientSignData, response: Response): Promise<string> {
-        const clientLogin: string = clientSignData.login;
+        const clientLogin: string = clientSignData.login.trim();
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
