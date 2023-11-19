@@ -28,11 +28,11 @@ export class ClientController {
         return this.clientService.checkCompressedBigImagesIsExists(photographyType);
     }
 
-    @Get('/getCompressedImagesList/:imagesType')
-    public async getCompressedImagesList (@Param('imagesType') imagesType: string, 
+    @Get('/getCompressedImagesData/:imagesType')
+    public async getCompressedImagesData (@Param('imagesType') imagesType: string,
         @Query('imageViewSize') imageViewSize: string, @Query('imagesExistsCount') imagesExistsCount: string
     ): Promise<IGalleryCompressedImagesData | IClientCompressedImage[]> {
-        const thumbnailImagesDirPaths: string[] = [ 'home' ].concat(this.appService.imagePhotographyTypes);
+        const thumbnailImageTypes: string[] = [ 'home' ].concat(this.appService.imagePhotographyTypes);
 
         imagesType = imagesType.substring(1);
 
@@ -41,7 +41,8 @@ export class ClientController {
         imageViewSize = imageViewSize === 'undefined' || imageViewSize === 'null' ? null : imageViewSize;
         imagesExistsCount = imagesExistsCount === 'undefined' || imagesExistsCount === 'null' ? null : imagesExistsCount;
 
-        if ( !thumbnailImagesDirPaths.includes(imagesType) || imageViewSize && imageViewSize === '' 
+        if ( !thumbnailImageTypes.includes(imagesType) 
+            || imageViewSize && !this.appService.imageViewSizeTypes.includes(imageViewSize) 
             || imagesExistsCount && Number.isNaN(imagesExistsCountInt) 
         ) throw new BadRequestException();
 
@@ -49,7 +50,7 @@ export class ClientController {
 
         await commonServiceRef.createImageDirs();
         
-        return this.clientService.getCompressedImagesList(imagesType as 'home' | string, imageViewSize as 'medium' | 'big', imagesExistsCountInt);
+        return this.clientService.getCompressedImagesData(imagesType as 'home' | string, imageViewSize as 'medium' | 'big', imagesExistsCountInt);
     }
 
     @Get('/getDiscountsData')
@@ -72,9 +73,7 @@ export class ClientController {
 
         const requiredFields: string[] = targetPage === 'home' ? [ 'name', 'compressedImageName' ] : [ 'name', 'description', 'compressedImageName' ];
 
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
-
-        return commonServiceRef.getImagePhotographyTypesData(requiredFields, targetPage);
+        return this.clientService.getImagePhotographyTypesData(requiredFields, targetPage);
     }
 
     @Post('/changeLocale')

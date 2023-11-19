@@ -19,6 +19,7 @@ import { generate__secure_fgp } from './sign.generateKeys';
 import { IClient, IRequest, IRequestBody } from 'types/global';
 import { IClientSignData } from 'types/sign';
 import { IGetActiveClientOptions } from 'types/options';
+import { IAdmin, IMember } from 'types/models';
 
 @Injectable()
 export class SignService {
@@ -44,7 +45,7 @@ export class SignService {
             const clientLogin: string = requestBody.sign.clientData.login;
             const clientPassword: string = requestBody.sign.clientData.password;
 
-            await this._signDataValidate(request, clientLogin, clientPassword);
+            await this._signDataValidate(clientLogin, clientPassword);
 
             if ( token ) await this.jwtControlService.addRevokedToken(token);
 
@@ -53,7 +54,7 @@ export class SignService {
             const validatedClient: IClient = await this.jwtControlService.tokenValidate(request, token);
             const clientType: string = validatedClient.type;
 
-            const client: Admin | Member = await commonServiceRef.getClients(request, validatedClient.login, { rawResult: false }) as Admin | Member;
+            const client: Admin | Member = await commonServiceRef.getClients(validatedClient.login, { rawResult: false }) as Admin | Member;
 
             if ( !client ) throw new UnauthorizedException();
 
@@ -61,7 +62,7 @@ export class SignService {
         }
     }
 
-    public async signUp (request: IRequest, clientData: IClientSignData, isNewAdmin = false): Promise<void> {
+    public async signUp (clientData: IClientSignData, isNewAdmin = false): Promise<void> {
         const clientLogin: string = clientData.login;
         const clientPassword: string = clientData.password;
         const clientFullName: string = clientData.fullName;
@@ -75,12 +76,12 @@ export class SignService {
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, {
+        const clientRaw: IAdmin | IMember = await commonServiceRef.getClients(clientLogin, {
             includeFields: [ 'login', 'fullName' ],
             rawResult: true
-        }) as Admin | Member;
+        });
 
-        if ( client ) throw new UnauthorizedException();
+        if ( clientRaw ) throw new UnauthorizedException();
         
         // const clientPasswordHash: string = await bcrypt.hash(clientPassword, process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS);
 
@@ -100,22 +101,22 @@ export class SignService {
         });
     }
 
-    public async signIn (request: IRequest, clientSignData: IClientSignData, response: Response): Promise<string> {
+    public async signIn (clientSignData: IClientSignData, response: Response): Promise<string> {
         const clientLogin: string = clientSignData.login;
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
-        const clientInstance: Admin | Member = await commonServiceRef.getClients(request, clientLogin, {
+        const clientRaw: IAdmin | IMember = await commonServiceRef.getClients(clientLogin, {
             includeFields: [ 'id', 'login', 'fullName', 'type' ],
             rawResult: true
         });
 
         const payload: IClient = {
-            id: clientInstance.id,
-            login: clientInstance.login,
-            type: clientInstance.type as 'admin' | 'member',
+            id: clientRaw.id,
+            login: clientRaw.login,
+            type: clientRaw.type as 'admin' | 'member',
             locale: process.env.CLIENT_DEFAULT_LOCALE,
-            fullName: clientInstance.fullName,
+            fullName: clientRaw.fullName,
             __secure_fgpHash: ""
         }
 
@@ -123,10 +124,10 @@ export class SignService {
 
         payload.__secure_fgpHash = __secure_fgpHash;
 
-        const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, { rawResult: false }) as Admin | Member;
+        const clientInstance: Admin | Member = await commonServiceRef.getClients(clientLogin, { rawResult: false }) as Admin | Member;
 
-        await commonServiceRef.registerClientLastLoginTime(client);
-        await commonServiceRef.registerClientLastActivityTime(client);
+        await commonServiceRef.registerClientLastLoginTime(clientInstance);
+        await commonServiceRef.registerClientLastActivityTime(clientInstance);
 
         const access_token: string = this.jwtService.sign(payload);
 
@@ -155,47 +156,47 @@ export class SignService {
 
         if ( !token || token === '') return null;
 
-        let validatedClient: IClient = null;
+        let validatedClientPayload: IClient = null;
         
         try {
-            validatedClient = await this.jwtControlService.tokenValidate(request, token);
+            validatedClientPayload = await this.jwtControlService.tokenValidate(request, token);
         } catch { }
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        if ( validatedClient ) {
-            const client: Admin | Member = await commonServiceRef.getClients(request, validatedClient.login, { rawResult: false });
+        if ( validatedClientPayload ) {
+            const clientInstance: Admin | Member = await commonServiceRef.getClients(validatedClientPayload.login, { rawResult: false });
 
-            if ( !client ) throw new UnauthorizedException();
+            if ( !clientInstance ) throw new UnauthorizedException();
         }
             
         if ( !options ) options = {};
 
-        if ( validatedClient && options.includeFields ) {
-            if ( typeof options.includeFields === 'string' ) return validatedClient[options.includeFields];
+        if ( validatedClientPayload && options.includeFields ) {
+            if ( typeof options.includeFields === 'string' ) return validatedClientPayload[options.includeFields];
             else if ( Array.isArray(options.includeFields) ) {
                 if ( options.allowedIncludedFields && options.includeFields.some(field => !options.allowedIncludedFields.includes(field)) ) throw new BadRequestException();
 
-                Object.keys(validatedClient).forEach(field => {
-                    !options.includeFields.includes(field) ? delete validatedClient[field] : null;
+                Object.keys(validatedClientPayload).forEach(field => {
+                    !options.includeFields.includes(field) ? delete validatedClientPayload[field] : null;
                 });
             }
         }
 
-        return validatedClient;
+        return validatedClientPayload;
     }
 
-    private async _signDataValidate (request: IRequest, clientLogin: string, clientPassword: string): Promise<void> {
+    private async _signDataValidate (clientLogin: string, clientPassword: string): Promise<void> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const client: Admin | Member = await commonServiceRef.getClients(request, clientLogin, {
+        const clientRaw: IAdmin | IMember = await commonServiceRef.getClients(clientLogin, {
             includeFields: [ 'password' ],
             rawResult: true
-        }) as Admin | Member;
+        });
 
-        if ( !client ) throw new UnauthorizedException();
+        if ( !clientRaw ) throw new UnauthorizedException();
 
-        const passwordValid: boolean = await bcrypt.compare(clientPassword, client.password); 
+        const passwordValid: boolean = await bcrypt.compare(clientPassword, clientRaw.password); 
         
         
         // console.log(clientPassword); 

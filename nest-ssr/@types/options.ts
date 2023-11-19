@@ -20,7 +20,7 @@ export interface IDownloadOriginalImageOptions {
 export interface IСompressedImageGetOptions {
     client?: Admin;
     find?: {
-        imageNames?: string[];
+        imageTitles?: string[];
         includeFields?: string[];
         imageViewSize?: string;
         rawResult?: boolean;

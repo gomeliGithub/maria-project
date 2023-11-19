@@ -23,7 +23,7 @@ import { Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder
 
 import { IClient, IClientOrdersInfoDataArr, ICookieSerializeOptions, IGalleryCompressedImagesData, IReducedGalleryCompressedImages, IRequest, IRequestBody } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions, IGetClientOrdersOptions } from 'types/options';
-import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
+import { IAdmin, IClientCompressedImage, IDiscount, IImagePhotographyType, IMember } from 'types/models';
 
 @Injectable()
 export class ClientService {
@@ -48,11 +48,56 @@ export class ClientService {
 
     public compressedImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
 
-    public async get (request: IRequest, loginList: string, options?: IClientGetOptions): Promise<Admin | Member>
-    public async get (request: IRequest, loginList: string[], options?: IClientGetOptions): Promise<Admin[] | Member[]>
-    public async get (request: IRequest, loginList: 'full', options?: IClientGetOptions): Promise<Member[]>
-    public async get (request: IRequest, loginList: string | string[], options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[]>
-    public async get (request: IRequest, loginList: string | string[], options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[]> {
+    public async get (loginList: string, options?: {
+        includeFields?: string[];
+        rawResult?: false;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<Admin | Member>
+    public async get (loginList: string, options?: {
+        includeFields?: string[];
+        rawResult?: true;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<IAdmin | IMember>
+    public async get (loginList: string[], options?: {
+        includeFields?: string[];
+        rawResult?: false;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<Admin[] | Member[]>
+    public async get (loginList: string[], options?: {
+        includeFields?: string[];
+        rawResult?: true;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<IAdmin[] | IMember[]>
+    public async get (loginList: 'full', options?: {
+        includeFields?: string[];
+        rawResult?: false;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<Member[]>
+    public async get (loginList: 'full', options?: {
+        includeFields?: string[];
+        rawResult?: true;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<IMember[]>
+    public async get (loginList: string | string[], options?: {
+        includeFields?: string[];
+        rawResult?: false;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<Admin | Member | Admin[] | Member[]>
+    public async get (loginList: string | string[], options?: {
+        includeFields?: string[];
+        rawResult?: true;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<IAdmin | IMember | IAdmin[] | IMember[]>
+    public async get (loginList: string | string[], options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[] | IAdmin | IMember | IAdmin[] | IMember[]>
+    public async get (loginList: string | string[], options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[] | IAdmin | IMember | IAdmin[] | IMember[]> {
         const findOptions: NonNullFindOptions = {
             raw: false, 
             where: loginList !== 'full' ? { login: loginList } : null,
@@ -150,7 +195,7 @@ export class ClientService {
                 } catch { }
             }
         } else if ( typeof loginList === 'string' ) {
-            const client: Member = await this.get(request, loginList, { rawResult: false }) as Member;
+            const client: Member = await this.get(loginList, { rawResult: false }) as Member;
 
             try {
                 clientsOrdersInfoData = {
@@ -160,7 +205,7 @@ export class ClientService {
             } catch { }
         } else if ( Array.isArray(loginList) ) {
             for ( const login of loginList ) {
-                const client: Member = await this.get(request, login, { rawResult: false }) as Member;
+                const client: Member = await this.get(login, { rawResult: false }) as Member;
 
                 if ( !clientsOrdersInfoData ) clientsOrdersInfoData = [];
 
@@ -176,23 +221,21 @@ export class ClientService {
         return clientsOrdersInfoData;
     }
 
-    public async registerClientLastActivityTime (client: Admin | Member): Promise<void> {
-        await client.update({ lastActiveDate: sequelize.literal('CURRENT_TIMESTAMP') });
+    public async registerClientLastActivityTime (clientInstance: Admin | Member): Promise<void> {
+        await clientInstance.update({ lastActiveDate: sequelize.literal('CURRENT_TIMESTAMP') });
     }
 
-    public async registerClientLastLoginTime (client: Admin | Member): Promise<void> {
-        await client.update({ lastSignInDate: sequelize.literal('CURRENT_TIMESTAMP') });
+    public async registerClientLastLoginTime (clientInstance: Admin | Member): Promise<void> {
+        await clientInstance.update({ lastSignInDate: sequelize.literal('CURRENT_TIMESTAMP') });
     }
 
     public async downloadOriginalImage (response: Response, options: IDownloadOriginalImageOptions): Promise<void> {
         if ( options.imagePath ) {
             response.download(options.imagePath);
-        }
+        } else if ( options.compressedImageName ) {
+            const compressedImageDataRaw: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { name: options.compressedImageName } }) as unknown as IClientCompressedImage;
 
-        if ( options.compressedImageName ) {
-            const compressedImageData: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { name: options.compressedImageName } });
-
-            if ( compressedImageData ) response.download(path.join(compressedImageData.originalDirPath, compressedImageData.originalName));
+            if ( compressedImageDataRaw ) response.download(path.join(compressedImageDataRaw.originalDirPath, compressedImageDataRaw.originalName));
             else throw new BadRequestException();
         }
     }
@@ -206,49 +249,47 @@ export class ClientService {
         else return false;
     }
 
-    public async getCompressedImagesList (imagesType: 'home' | string, imageViewSize: 'medium' | 'big', imagesExistsCount?: number): Promise<IGalleryCompressedImagesData | IClientCompressedImage[]> {
+    public async getCompressedImagesData (imagesType: 'home' | string, imageViewSize: 'medium' | 'big', imagesExistsCount?: number): Promise<IGalleryCompressedImagesData | IClientCompressedImage[]> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const imagesPath: string = imagesType === 'home' ? path.join(this.compressedImagesDirPath, imagesType) 
-        : path.join(this.compressedImagesDirPath, 'gallery', imagesType);
+        const imagesPath: string = imagesType === 'home' ? path.join(this.compressedImagesDirPath, imagesType) : path.join(this.compressedImagesDirPath, 'gallery', imagesType);
 
-        const imagesList: string[] = await commonServiceRef.managePromisesCache('getCompressedImagesList', fsPromises.readdir(imagesPath));
+        const imagesList: string[] = await commonServiceRef.managePromisesCache('getCompressedImagesData', fsPromises.readdir(imagesPath));
         const imagesLimit: number = 8;
 
-        const compressedImages: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({
+        const compressedImagesRaw: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({
             find: {
-                imageNames: imagesList,
+                imageTitles: imagesList,
                 includeFields: [ 'name', 'photographyType', 'viewSizeType', 'description', 'uploadDate' ],
-                imageViewSize: imagesType !== 'home' ? imageViewSize : null
+                imageViewSize: imagesType !== 'home' ? imageViewSize : null,
+                rawResult: true
             },
             imagesLimit: imagesType !== 'home' ? imagesLimit : null,
             imagesExistsCount: imagesType !== 'home' ? imagesExistsCount : null
-        }) as unknown as IClientCompressedImage[];
-
-        let galleryCompressedImagesList: IGalleryCompressedImagesData = null;
+        });
 
         if ( imagesType !== 'home' ) {
-            const reducedCompressedImages: IReducedGalleryCompressedImages = {
+            const reducedCompressedImagesRaw: IReducedGalleryCompressedImages = {
                 medium: [],
                 big: []
             }
 
-            if ( imageViewSize === 'medium' ) for (let i = 0; i < compressedImages.length; i += 4 ) {
-                reducedCompressedImages.medium.push(compressedImages.slice(i, i + 4));
-            } else if ( imageViewSize === 'big' ) for (let i = 0; i < compressedImages.length; i += 2 ) {
-                reducedCompressedImages.big.push(compressedImages.slice(i, i + 2));
+            if ( imageViewSize === 'medium' ) for ( let i = 0; i < compressedImagesRaw.length; i += 4 ) {
+                reducedCompressedImagesRaw.medium.push(compressedImagesRaw.slice(i, i + 4));
+            } else if ( imageViewSize === 'big' ) for ( let i = 0; i < compressedImagesRaw.length; i += 2 ) {
+                reducedCompressedImagesRaw.big.push(compressedImagesRaw.slice(i, i + 2));
             }
 
             const commonCompressedImagesCount: number = await this.compressedImageModel.count({ where: { name: imagesList, viewSizeType: imageViewSize }});
 
-            galleryCompressedImagesList = {
-                compressedImages: reducedCompressedImages, 
+            return {
+                compressedImagesRaw: reducedCompressedImagesRaw, 
                 photographyTypeDescription: (await this.getImagePhotographyTypesData([ 'name', 'description' ], 'gallery', imagesType)).description,
-                additionalImagesExists: commonCompressedImagesCount > imagesExistsCount + compressedImages.length && commonCompressedImagesCount > imagesLimit
+                additionalImagesExists: commonCompressedImagesCount > imagesExistsCount + compressedImagesRaw.length && commonCompressedImagesCount > imagesLimit
             }
         }
 
-        return galleryCompressedImagesList ?? compressedImages;
+        return compressedImagesRaw;
     }
 
     public async getDiscountsData (): Promise<IDiscount[]> {
@@ -265,29 +306,29 @@ export class ClientService {
     public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType>
     public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin' | 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType>
     public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin' | 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType> {
-        const photographyTypesData: IImagePhotographyType[] = await this.imagePhotographyTypeModel.findAll({ attributes: requiredFields, raw: true });
+        const photographyTypesDataRaw: IImagePhotographyType[] = await this.imagePhotographyTypeModel.findAll({ attributes: requiredFields, raw: true });
 
-        const reducedImagePhotographyTypesData: IImagePhotographyType[][] = [];
+        const reducedPhotographyTypesDataRaw: IImagePhotographyType[][] = [];
 
-        if ( photographyTypesData.length === 0 ) {
+        if ( photographyTypesDataRaw.length === 0 ) {
             for ( const photographyType of this.appService.imagePhotographyTypes) {
                 await this.imagePhotographyTypeModel.create({ name: photographyType });
             }
         }
 
-        if ( targetPage === 'home' ) for (let i = 0; i < photographyTypesData.length; i += 2 ) {
-            reducedImagePhotographyTypesData.push(photographyTypesData.slice(i, i + 2));
+        if ( targetPage === 'home' ) for ( let i = 0; i < photographyTypesDataRaw.length; i += 2 ) {
+            reducedPhotographyTypesDataRaw.push(photographyTypesDataRaw.slice(i, i + 2));
         }
 
-        let photographyTypesDataResult: IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType = null;
+        let photographyTypesDataRawFinalResult: IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType = null;
 
         switch ( targetPage ) {
-            case 'home': { photographyTypesDataResult = reducedImagePhotographyTypesData; break; }
-            case 'admin': { photographyTypesDataResult = photographyTypesData; break; }
-            case 'gallery': { photographyTypesDataResult = photographyTypesData.find(photographyTypeData => photographyTypeData.name === photographyTypeName); break; }
+            case 'home': { photographyTypesDataRawFinalResult = reducedPhotographyTypesDataRaw; break; }
+            case 'admin': { photographyTypesDataRawFinalResult = photographyTypesDataRaw; break; }
+            case 'gallery': { photographyTypesDataRawFinalResult = photographyTypesDataRaw.find(photographyTypeData => photographyTypeData.name === photographyTypeName); break; }
         }
 
-        return photographyTypesDataResult;
+        return photographyTypesDataRawFinalResult;
     }
 
     public async changeLocale (request: IRequest, newLocale: string, response: Response): Promise<string> {
@@ -295,10 +336,10 @@ export class ClientService {
 
         const decodedToken: IClient = this.jwtService.decode(token) as IClient;
 
-        const now: Date = new Date();
+        const dateNow: Date = new Date();
 
         const tokenExpiresAt: number = new Date(ms(`${decodedToken.exp}s`)).getTime();
-        const tokenExpiresIn: number = Math.round(new Date(tokenExpiresAt - now.getTime()).getTime() / 1000);
+        const tokenExpiresIn: number = Math.round(new Date(tokenExpiresAt - dateNow.getTime()).getTime() / 1000);
 
         decodedToken.locale = newLocale;
 
@@ -320,22 +361,21 @@ export class ClientService {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const activeClientLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
-        const client: Member = await this.get(request, activeClientLogin, { rawResult: false }) as Member;
+        const clientInstance: Member = await this.get(activeClientLogin, { rawResult: false }) as Member;
 
         let { imagePhotographyType, orderType } = requestBody.client;
         const { clientPhoneNumber, comment } = requestBody.client;
 
-        if ( orderType === 'full' && !client ) throw new UnauthorizedException();
+        if ( orderType === 'full' && !clientInstance ) throw new UnauthorizedException();
 
         const dateNow: Date = new Date();
-
         const id: number = parseInt(`${ dateNow.getFullYear() }${ dateNow.getMonth() }${ dateNow.getHours() }${ dateNow.getMinutes() }${ dateNow.getSeconds() }`, 10);
 
-        const existingOrder: ClientOrder = await this.clientOrderModel.findByPk(id);
+        const orderInstance: ClientOrder = await this.clientOrderModel.findByPk(id);
 
-        if ( existingOrder ) throw new BadRequestException();
+        if ( orderInstance ) throw new BadRequestException();
 
-        const newOrder: ClientOrder = await this.clientOrderModel.create({
+        const newOrderInstance: ClientOrder = await this.clientOrderModel.create({
             id,
             photographyType: imagePhotographyType,
             type: orderType,
@@ -343,7 +383,7 @@ export class ClientService {
             comment: comment
         });
 
-        if ( client ) await client.$add('clientOrders', newOrder);
+        if ( clientInstance ) await clientInstance.$add('clientOrders', newOrderInstance);
 
         ////////////////////////////////////////////////////////////// SEND EMAIL //////////////////////////////////////////////////////////////
         
@@ -384,6 +424,6 @@ export class ClientService {
         
         ////////////////////////////////////////////////////////////// SEND EMAIL //////////////////////////////////////////////////////////////
 
-        if ( client ) await commonServiceRef.registerClientLastActivityTime(client);
+        if ( clientInstance ) await commonServiceRef.registerClientLastActivityTime(clientInstance);
     }
 }

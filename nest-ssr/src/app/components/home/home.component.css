@@ -24,11 +24,6 @@
     height: 100% !important;
 }
 
-.imagePhotographyTypesGroup {
-    border-width: 10px !important;
-    border-color: gray !important;
-}
-
 .imagePhotographyTypesGroup > div > div > small, .imagePhotographyTypesGroup > div > div > span {
     height: 5% !important;
 }
@@ -86,6 +81,10 @@ and (-webkit-device-pixel-ratio: 2) {
 
     .imagePhotographyTypesGroup > div:nth-child(1):not(:last-child) {
         margin-bottom: 1rem !important;
+    }
+
+    .oneLengthImagePhotographyTypeGroup > div {
+        width: 100% !important;
     }
     
     .linkButtonContainer a {
@@ -183,17 +182,6 @@ and (-webkit-device-pixel-ratio: 2) {
     }
 }
 
-@media screen and (min-width: 1150px) {
-    .oneLengthImagePhotographyTypeGroup {
-        width: fit-content !important;
-        max-height: 70% !important;
-    }
-
-    .oneLengthImagePhotographyTypeGroup > div > div:nth-child(1) {
-        height: 100% !important;
-    }
-}
-
 @media screen and (min-width: 1400px) {
     :host ::ng-deep #imagesCarousel .carousel-item img {
         max-height: 950px;
@@ -201,16 +189,6 @@ and (-webkit-device-pixel-ratio: 2) {
     :host ::ng-deep #discountsCarousel {
         min-height: 280px;
     }
-}
-
-@keyframes imagePhotographyTypeCursorAnimation {
-    0%   { transform: translate(-50%, -30%) scale(1.5) }
-    50%  { transform: translate(-50%, -30%) scale(1.2) }
-    100% { transform: translate(-50%, -30%) scale(1.0) }
-}
-  
-.cursorIcon {
-    animation: imagePhotographyTypeCursorAnimation 1s infinite;
 }
 
 #scrollSnapItemRadiosContainer {

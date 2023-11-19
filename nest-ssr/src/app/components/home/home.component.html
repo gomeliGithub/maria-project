@@ -34,14 +34,21 @@
 </div>
 <ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0" >
     <ng-template ngFor let-imagePhotographyTypesDataArr [ngForOf]="imagePhotographyTypes" let-i="index">
-        <div class="d-flex flex-row justify-content-center align-items-center py-1 px-3 w-90 h-100 rounded shadow-lg imagePhotographyTypesGroup section"
-            [ngClass]="{ 'oneLengthImagePhotographyTypeGroup': imagePhotographyTypesDataArr.length === 1 }"
-            [style.backgroundColor]="i % 2 === 0 ? 'rgb(191 179 179)': null"
+        <div class="d-flex flex-row justify-content-center align-items-center px-3 w-100 h-100 imagePhotographyTypesGroup section"
+            [ngClass]="{
+                'oneLengthImagePhotographyTypeGroup': imagePhotographyTypesDataArr.length === 1,
+                'pb-2': i !== imagePhotographyTypes.length - 1,
+                'rounded-top': i === 0,
+                'rounded-bottom': i === imagePhotographyTypes.length - 1
+            }"
+            [style.backgroundColor]="'rgb(176 173 172)'"
             #scrollSnapSection
         >
             <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i2 = index"
-                class="border-0 position-relative h-100 w-100"
+                class="border-0 position-relative h-100"
                 [ngClass]="{
+                    'w-50': i === imagePhotographyTypes.length - 1,
+                    'w-100': i !== imagePhotographyTypes.length - 1,
                     'mw-50': imagePhotographyTypesDataArr.length !== 1,
                     'mw-100': imagePhotographyTypesDataArr.length === 1,
                     'me-2': i2 === 0 && imagePhotographyTypesDataArr.length !== 1
@@ -54,14 +61,10 @@
                 <div class="d-flex flex-column text-center"
                     [ngClass]="{ 'justify-content-end': imagePhotographyTypesDataArr.length === 1 }"
                     (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
-                    (@mouseTrigger.done)="mouseTriggerAnimationDone($event)"
                     [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
                     [ngSwitch]="imagePhotographyTypeData.name"
                 >
-                    <small class="text-body-secondary">
-                        {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i>
-                    </small>
-                    <span class="fs-5 fw-bold fst-italic">
+                    <span class="fs-5">
                         <ng-template ngSwitchCase="individual"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
                         <ng-template ngSwitchCase="children"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.CHILDREN' | translate }}</ng-template>
                         <ng-template ngSwitchCase="wedding"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.WEDDING' | translate }}</ng-template>
@@ -71,6 +74,9 @@
                     <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.compressedImageName }}" 
                         class="h-90"
                     >
+                    <small class="text-body-secondary">
+                        {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i>
+                    </small>
                 </div>
                 <div class="position-absolute top-50 start-50 w-50 linkButtonContainer"
                     [@link-button-container-animation]="currentLinkButtonContainerAnimationStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
@@ -89,24 +95,18 @@
                         {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate | uppercase }} <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
-                <span *ngIf="( isMobileDevice || isTabletDevice ) && cursorIconsDisplayStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
-                    class="position-absolute top-50 start-50 fs-3 shadow-lg p-3 rounded-pill text-nowrap text-black cursorIcon"
-                >
-                    <small class="fw-semibold fst-italic">{{ 'HOMEPAGE.CURSORCLICKICONTEXT' | translate }}</small>
-                    <i class="bi bi-mouse2-fill"></i>
-                </span>
             </div>
         </div>
     </ng-template>
 </ng-template>
-<div class="d-flex flex-column w-100 mt-3 mb-3 section" id="aboutSection" #scrollSnapSection>
+<div class="d-flex flex-column w-100 mt-3 mb-3 px-4 section" id="aboutSection" #scrollSnapSection>
     <div class="d-flex flex-row justify-content-center align-items-center h-100 w-100" id="aboutContainer">
         <img src="/assets/images_full/1697474336253508.jpg" class="rounded h-100 mw-100 shadow">
-        <div class="d-flex flex-column align-items-center h-100 fw-semibold ms-4 overflow-y-auto">
-            <p class="flex-fill text-center w-100 lead">{{ 'HOMEPAGE.ABOUTTEXT.PART1' | translate }}</p>
-            <p class="flex-fill text-center w-100 fs-5"><em class="">{{ 'HOMEPAGE.ABOUTTEXT.PART2' | translate }}</em></p>
-            <p class="flex-fill text-center w-100 fs-5"><em class="">{{ 'HOMEPAGE.ABOUTTEXT.PART3' | translate }}</em></p>
-            <p class="flex-fill text-center w-100 fs-5"><em class="">{{ 'HOMEPAGE.ABOUTTEXT.PART4' | translate }}</em></p>
+        <div class="d-flex flex-column align-items-center h-100 ms-4 overflow-x-auto overflow-y-auto">
+            <p class="flex-fill mt-3 text-center w-100 lead">{{ 'HOMEPAGE.ABOUTTEXT.PART1' | translate }}</p>
+            <p class="flex-fill text-start w-100 fs-5">{{ 'HOMEPAGE.ABOUTTEXT.PART2' | translate }}</p>
+            <p class="flex-fill text-start w-100 fs-5">{{ 'HOMEPAGE.ABOUTTEXT.PART3' | translate }}</p>
+            <p class="flex-fill text-start w-100 fs-5">{{ 'HOMEPAGE.ABOUTTEXT.PART4' | translate }}</p>
         </div>
     </div>
 </div>

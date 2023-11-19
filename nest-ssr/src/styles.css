@@ -45,8 +45,6 @@ app-home {
     flex-direction: column !important;
     align-items: center !important;
     overflow-x: hidden !important;
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
 }
 
 app-gallery, app-admin-panel-orders-control, app-admin-panel-discounts-control {

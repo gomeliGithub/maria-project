@@ -24,7 +24,7 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
                 opacity: 1
             })),
             transition('enter => leave', [
-                animate('0.5s 200ms ease')
+                animate('0.5s 200ms ease'),
             ]),
             transition('leave => enter', [
                 animate('0.5s 200ms ease')
@@ -96,7 +96,6 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     
     public currentMouseTriggerStates: string[] = [];
     public currentLinkButtonContainerAnimationStates: string[] = [];
-    public cursorIconsDisplayStates: boolean[] = [];
 
     public currentScrollSnapItemRadiosContainerAnimationState: string = 'leave';
     public currentScrollSnapItemRadiosEmbededContainerAnimationState: string = 'hide';
@@ -112,7 +111,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         if ( this.appService.checkIsPlatformBrowser() ) {
             this.appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => this.appService.setTitle(translation));
 
-            this.clientService.getCompressedImagesList('home').subscribe({
+            this.clientService.getCompressedImagesData('home').subscribe({
                 next: imagesList => this.compressedImagesList = imagesList,
                 error: () => this.appService.createErrorModal()
             });
@@ -130,8 +129,6 @@ export class HomeComponent implements OnInit, AfterViewChecked {
                     this.flatImagePhotographyTypes.forEach(() => {
                         this.currentMouseTriggerStates.push('leave');
                         this.currentLinkButtonContainerAnimationStates.push('leave');
-
-                        if ( this.isMobileDevice || this.isTabletDevice ) this.cursorIconsDisplayStates.push(true);
                     });
                 },
                 error: () => this.appService.createErrorModal()
@@ -159,7 +156,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
         this.clientService.setPrevNavbarAnimationStateChange(null);
 
-        const indentation: number = this.isDesktopDevice ? 1 : 150;
+        const indentation: number = this.isDesktopDevice ? 1 : 100;
 
         if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - indentation ) {
             this.clientService.setFooterAnimationState('show');
@@ -270,14 +267,6 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         const indexNumber: number = parseInt(mouseTriggerElement.parentElement.getAttribute('mouse-trigger-state-index'), 10);
 
         if ( event.toState === 'leave' ) this.currentLinkButtonContainerAnimationStates[indexNumber] = 'leave';
-        if ( event.toState === 'enter' ) this.cursorIconsDisplayStates[indexNumber] = false;
-    }
-
-    public mouseTriggerAnimationDone (event: AnimationEvent): void {
-        const mouseTriggerElement: HTMLDivElement = event.element as HTMLDivElement;
-        const indexNumber: number = parseInt(mouseTriggerElement.parentElement.getAttribute('mouse-trigger-state-index'), 10);
-
-        if ( event.toState === 'leave' ) this.cursorIconsDisplayStates[indexNumber] = true;
-        if ( event.toState === 'enter') this.currentLinkButtonContainerAnimationStates[indexNumber] = 'enter';
+        if ( event.toState === 'enter' ) this.currentLinkButtonContainerAnimationStates[indexNumber] = 'enter';
     }
 }

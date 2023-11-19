@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ServerModule } from '@angular/platform-server';
 
 import { AppModule } from './app.module';
@@ -11,8 +11,7 @@ import { TranslateInterceptor } from './interceptors/translate/translate.interce
 @NgModule({
     imports: [
         AppModule,
-        ServerModule,
-        HttpClientModule
+        ServerModule
     ],
     providers: [
         {

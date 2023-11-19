@@ -14,23 +14,23 @@ export class SignController {
     ) { }
 
     @Post('/up')
-    async signUp (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
+    async signUp (@Body() requestBody: IRequestBody): Promise<void> {
         if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password 
             || typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
             || ( requestBody.sign.clientData.email && typeof requestBody.sign.clientData.email !== 'string' )
         ) throw new BadRequestException();
 
-        return this.signService.signUp(request, requestBody.sign.clientData);
+        return this.signService.signUp(requestBody.sign.clientData);
     }
 
     @Put('/in')
     @ClientTypes('admin', 'member')
-    async signIn (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string> {
+    async signIn (@Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string> {
         if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password ||
             typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
         ) throw new BadRequestException();
 
-        return this.signService.signIn(request, requestBody.sign.clientData, response);
+        return this.signService.signIn(requestBody.sign.clientData, response);
     }
 
     @Put('/out')

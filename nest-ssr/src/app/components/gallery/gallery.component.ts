@@ -135,12 +135,12 @@ export class GalleryComponent implements OnInit {
 
             sessionStorage.clear();
 
-            this.getCompressedImagesList('medium');
+            this.getCompressedImagesData('medium');
 
             this.clientService.scrollPageBottomStatusChange.subscribe(value => {
                 if ( value ) {
                     if ( this.additionalImagesExists ) {
-                        this.getCompressedImagesList('medium', this.imageContainerViewRefs.length);
+                        this.getCompressedImagesData('medium', this.imageContainerViewRefs.length);
                         this.clientService.setScrollPageBottomStatus(false);
                     }
                 }
@@ -148,7 +148,7 @@ export class GalleryComponent implements OnInit {
         }
     }
 
-    public getCompressedImagesList (imageViewSize: 'medium' | 'big', currentImagesCount?: number): void {
+    public getCompressedImagesData (imageViewSize: 'medium' | 'big', currentImagesCount?: number): void {
         const compressedImagesListMedium: IClientCompressedImage[][] = (JSON.parse(sessionStorage.getItem('compressedImagesListMedium')) as IClientCompressedImage[][]);
         const compressedImagesListBig: IClientCompressedImage[][] = (JSON.parse(sessionStorage.getItem('compressedImagesListBig')) as IClientCompressedImage[][]);
 
@@ -175,46 +175,46 @@ export class GalleryComponent implements OnInit {
         if ( this.additionalImagesExists || ( !compressedImagesListMedium || !compressedImagesListBig ) ) {
             if ( !currentImagesCount ) currentImagesCount = 0;
 
-            this.clientService.getCompressedImagesList(this.photographyType, imageViewSize, currentImagesCount).subscribe({
+            this.clientService.getCompressedImagesData(this.photographyType, imageViewSize, currentImagesCount).subscribe({
                 next: data => {
-                    if ( data.compressedImages.medium.length !== 0 || data.compressedImages.big.length !== 0 ) {
+                    if ( data.compressedImagesRaw.medium.length !== 0 || data.compressedImagesRaw.big.length !== 0 ) {
                         if ( !this.additionalImagesExists ) {
-                            this.compressedImagesList = data.compressedImages;
+                            this.compressedImagesList = data.compressedImagesRaw;
 
                             this.isToggleBigGallery = false;
                         } else {
-                            this.compressedImagesList.medium.push(...data.compressedImages.medium);
-                            this.compressedImagesList.big.push(...data.compressedImages.big);
+                            this.compressedImagesList.medium.push(...data.compressedImagesRaw.medium);
+                            this.compressedImagesList.big.push(...data.compressedImagesRaw.big);
                         }
 
-                        if ( data.compressedImages.medium.length !== 0 ) {
+                        if ( data.compressedImagesRaw.medium.length !== 0 ) {
                             if ( !this.additionalImagesExists ) {
-                                sessionStorage.setItem('compressedImagesListMedium', JSON.stringify(data.compressedImages.medium));
-                                this.flatMediumCompressedImagesList = data.compressedImages.medium.flat();
+                                sessionStorage.setItem('compressedImagesListMedium', JSON.stringify(data.compressedImagesRaw.medium));
+                                this.flatMediumCompressedImagesList = data.compressedImagesRaw.medium.flat();
                             } else {
                                 const updatedCompressedImagesListMedium: IClientCompressedImage[][] = (JSON.parse(sessionStorage.getItem('compressedImagesListMedium')));
 
-                                updatedCompressedImagesListMedium.push(...data.compressedImages.medium);
+                                updatedCompressedImagesListMedium.push(...data.compressedImagesRaw.medium);
                                 
                                 sessionStorage.setItem('compressedImagesListMedium', JSON.stringify(updatedCompressedImagesListMedium));
-                                this.flatMediumCompressedImagesList.push(...data.compressedImages.medium.flat());
+                                this.flatMediumCompressedImagesList.push(...data.compressedImagesRaw.medium.flat());
                             }
 
                             this.flatMediumCompressedImagesList.forEach(() => {
                                 this.mediumLinkContainerAnimationStates.push('leave');
                                 this.mediumLinkContainerAnimationDisplayValues.push('none');
                             });
-                        } else if ( data.compressedImages.big.length !== 0 ) {
+                        } else if ( data.compressedImagesRaw.big.length !== 0 ) {
                             if ( !this.additionalImagesExists ) {
-                                sessionStorage.setItem('compressedImagesListBig', JSON.stringify(data.compressedImages.big));
-                                this.flatBigCompressedImagesList = data.compressedImages.big.flat();
+                                sessionStorage.setItem('compressedImagesListBig', JSON.stringify(data.compressedImagesRaw.big));
+                                this.flatBigCompressedImagesList = data.compressedImagesRaw.big.flat();
                             } else {
                                 const updatedCompressedImagesListBig: IClientCompressedImage[][] = (JSON.parse(sessionStorage.getItem('compressedImagesListBig')));
 
-                                updatedCompressedImagesListBig.push(...data.compressedImages.big);
+                                updatedCompressedImagesListBig.push(...data.compressedImagesRaw.big);
 
                                 sessionStorage.setItem('compressedImagesListBig', JSON.stringify(updatedCompressedImagesListBig));
-                                this.flatBigCompressedImagesList.push(...data.compressedImages.big.flat());
+                                this.flatBigCompressedImagesList.push(...data.compressedImagesRaw.big.flat());
                             }
 
                             this.flatBigCompressedImagesList.forEach(() => {
@@ -235,11 +235,11 @@ export class GalleryComponent implements OnInit {
 
     public toggleBigGallery (): void {
         if ( this.bigGalleryIsHide ) {
-            this.getCompressedImagesList('big');
+            this.getCompressedImagesData('big');
 
             this.bigGalleryIsHide = false;
         } else {
-            this.getCompressedImagesList('medium');
+            this.getCompressedImagesData('medium');
 
             this.bigGalleryIsHide = true;
         }

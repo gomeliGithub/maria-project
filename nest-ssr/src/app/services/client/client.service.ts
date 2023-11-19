@@ -99,10 +99,10 @@ export class ClientService {
         return this.http.get<boolean>(`/api/client/checkCompressedBigImagesIsExists/:${ photographyType }`);
     }
 
-    public getCompressedImagesList (imagesType: 'home', imageViewSize?: 'medium' | 'big'): Observable<IClientCompressedImage[]>
-    public getCompressedImagesList (imagesType: string, imageViewSize?: 'medium' | 'big', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData>
-    public getCompressedImagesList (imagesType: 'home' | string, imageViewSize?: 'medium' | 'big', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData | IClientCompressedImage[]> {
-        return this.http.get<IGalleryCompressedImagesData | IClientCompressedImage[]>(`/api/client/getCompressedImagesList/:${ imagesType }`, { params: {
+    public getCompressedImagesData (imagesType: 'home', imageViewSize?: 'medium' | 'big'): Observable<IClientCompressedImage[]>
+    public getCompressedImagesData (imagesType: string, imageViewSize?: 'medium' | 'big', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData>
+    public getCompressedImagesData (imagesType: 'home' | string, imageViewSize?: 'medium' | 'big', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData | IClientCompressedImage[]> {
+        return this.http.get<IGalleryCompressedImagesData | IClientCompressedImage[]>(`/api/client/getCompressedImagesData/:${ imagesType }`, { params: {
             imageViewSize,
             imagesExistsCount
         }});

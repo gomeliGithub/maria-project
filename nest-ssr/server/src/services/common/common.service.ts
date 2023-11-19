@@ -19,7 +19,7 @@ import { Admin, Member, ClientCompressedImage } from '../../models/client.model'
 import { IClient, IClientOrdersInfoDataArr, ICompressImageData, IRequest } from 'types/global';
 import { IClientGetOptions, ICreateImageDirsOptions, IGetActiveClientOptions, IGetClientOrdersOptions, IСompressedImageGetOptions } from 'types/options';
 import { IWebSocketClient } from 'types/web-socket';
-import { IImagePhotographyType } from 'types/models';
+import { IAdmin, IClientCompressedImage, IImagePhotographyType, IMember } from 'types/models';
 
 @Injectable()
 export class CommonService {
@@ -62,14 +62,59 @@ export class CommonService {
         }
     }
 
-    public async getClients (request: IRequest, loginList: string, options?: IClientGetOptions): Promise<Admin | Member>
-    public async getClients (request: IRequest, loginList: string[], options?: IClientGetOptions): Promise<Admin[] | Member[]>
-    public async getClients (request: IRequest, loginList: 'full', options?: IClientGetOptions): Promise<Member[]>
-    public async getClients (request: IRequest, loginList: string | string[], options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[]>
-    public async getClients (request: IRequest, loginList: string | string[], options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[]> {
+    public async getClients (loginList: string, options?: {
+        includeFields?: string[];
+        rawResult?: false;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<Admin | Member>
+    public async getClients (loginList: string, options?: {
+        includeFields?: string[];
+        rawResult?: true;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<IAdmin | IMember>
+    public async getClients (loginList: string[], options?: {
+        includeFields?: string[];
+        rawResult?: false;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<Admin[] | Member[]>
+    public async getClients (loginList: string[], options?: {
+        includeFields?: string[];
+        rawResult?: true;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<IAdmin[] | IMember[]>
+    public async getClients (loginList: 'full', options?: {
+        includeFields?: string[];
+        rawResult?: false;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<Member[]>
+    public async getClients (loginList: 'full', options?: {
+        includeFields?: string[];
+        rawResult?: true;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<IMember[]>
+    public async getClients (loginList: string | string[], options?: {
+        includeFields?: string[];
+        rawResult?: false;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<Admin | Member | Admin[] | Member[]>
+    public async getClients (loginList: string | string[], options?: {
+        includeFields?: string[];
+        rawResult?: true;
+        clientType?: 'admin' | 'member';
+        includeOrders?: boolean;
+    }): Promise<IAdmin | IMember | IAdmin[] | IMember[]>
+    public async getClients (loginList: string | string[], options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[] | IAdmin | IMember | IAdmin[] | IMember[]>
+    public async getClients (loginList: string | string[], options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[] | IAdmin | IMember | IAdmin[] | IMember[]> {
         const clientServiceRef = await this.appService.getServiceRef(ClientModule, ClientService);
 
-        return clientServiceRef.get(request, loginList, options);
+        return clientServiceRef.get(loginList, options);
     }
 
     public async getClientOrdersInfo (request: IRequest, loginList: string, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr>
@@ -83,16 +128,16 @@ export class CommonService {
     }
 
 
-    public async registerClientLastActivityTime (client: Admin | Member): Promise<void> {
+    public async registerClientLastActivityTime (clientInstance: Admin | Member): Promise<void> {
         const clientServiceRef = await this.appService.getServiceRef(ClientModule, ClientService);
 
-        return clientServiceRef.registerClientLastActivityTime(client);
+        return clientServiceRef.registerClientLastActivityTime(clientInstance);
     }
 
-    public async registerClientLastLoginTime (client: Admin | Member): Promise<void> {
+    public async registerClientLastLoginTime (clientInstance: Admin | Member): Promise<void> {
         const clientServiceRef = await this.appService.getServiceRef(ClientModule, ClientService);
 
-        return clientServiceRef.registerClientLastLoginTime(client);
+        return clientServiceRef.registerClientLastLoginTime(clientInstance);
     }
 
     public async getActiveClient (request: IRequest): Promise<IClient>
@@ -111,13 +156,36 @@ export class CommonService {
         return imageControlServiceRef.createImageDirs(options);
     }
 
-    public async compressImage (request: IRequest, compressImageData: ICompressImageData, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
+    public async compressImage (compressImageData: ICompressImageData, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
         const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
         
-        return imageControlServiceRef.compressImage(request, compressImageData, activeClientLogin, options);
+        return imageControlServiceRef.compressImage(compressImageData, activeClientLogin, options);
     }
 
-    public async getCompressedImages (options: IСompressedImageGetOptions): Promise<ClientCompressedImage[]> {
+    public async getCompressedImages (options: {
+        client?: Admin,
+        find?: {
+            imageTitles?: string[],
+            includeFields?: string[],
+            imageViewSize?: string,
+            rawResult: false
+        },
+        imagesLimit?: number,
+        imagesExistsCount?: number
+    }): Promise<ClientCompressedImage[]>
+    public async getCompressedImages (options: {
+        client?: Admin,
+        find?: {
+            imageTitles?: string[],
+            includeFields?: string[],
+            imageViewSize?: string,
+            rawResult: true 
+        },
+        imagesLimit?: number,
+        imagesExistsCount?: number
+    }): Promise<IClientCompressedImage[]>
+    public async getCompressedImages (options: IСompressedImageGetOptions): Promise<ClientCompressedImage[] | IClientCompressedImage[]>
+    public async getCompressedImages (options: IСompressedImageGetOptions): Promise<ClientCompressedImage[] | IClientCompressedImage[]> {
         const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
 
         return imageControlServiceRef.get(options);
@@ -135,10 +203,10 @@ export class CommonService {
         return adminPanelServiceRef.getFulfilledAccessPath(paths);
     }
 
-    public async deleteImage (request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
+    public async deleteImage (imagePath: string, clientLogin: string): Promise<boolean> {
         const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
 
-        return imageControlServiceRef.deleteImage(request, imagePath, clientLogin);
+        return imageControlServiceRef.deleteImage(imagePath, clientLogin);
     }
 
     public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home'): Promise<IImagePhotographyType[][]>
