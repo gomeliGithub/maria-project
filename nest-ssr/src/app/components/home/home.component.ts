@@ -66,7 +66,7 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
             state('visiable', style({ opacity: 1, transform: 'translateY(0px)' })),
             state('unvisiable', style({ opacity: 0, transform: 'translateY(50px)' })),
             transition('unvisiable => visiable', [
-                animate('0.5s ease', style({ opacity: 1, transform: 'translateY(0px)' }))
+                animate('0.5s 400ms ease', style({ opacity: 1, transform: 'translateY(0px)' }))
             ]),
             transition('visiable => unvisiable', [
                 animate('0.5s ease', style({ opacity: 0, transform: 'translateY(50px)' }))
@@ -175,7 +175,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
         this.clientService.setPrevNavbarAnimationStateChange(null);
 
-        const indentation: number = this.isDesktopDevice ? 1 : 100;
+        const indentation: number = this.isDesktopDevice ? 1 : 150;
 
         if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - indentation ) {
             this.clientService.setFooterAnimationState('show');
@@ -263,7 +263,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     public getCurrentScrollSnapVisiableAnimationSection (componentElement: HTMLElement): void {
         this.getScrollSnapVisiableAnimationSection();
 
-        const scrollPosition = componentElement.scrollTop + componentElement.offsetHeight;
+        const scrollPosition: number = componentElement.scrollTop + componentElement.offsetHeight;
 
         this.scrollSnapVisiableAnimationSectionsPosition.forEach((sectionData, index) => {
             if ( sectionData.offsetTop <= scrollPosition ) {
