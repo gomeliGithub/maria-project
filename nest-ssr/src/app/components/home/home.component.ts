@@ -34,10 +34,10 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
             state('enter', style({ opacity: 1, transform: 'translate(-50%, -50%) scale(1)' })),
             state('leave', style({ opacity: 0, transform: 'translate(-50%, -50%) scale(0)' })),
             transition('enter => leave', [
-                animate('300ms', style({ opacity: 0, transform: 'translate(-50%, -50%) scale(0)' }))
+                animate('300ms ease', style({ opacity: 0, transform: 'translate(-50%, -50%) scale(0)' }))
             ]),
             transition('leave => enter', [
-                animate('0.2s', style({ opacity: 1, transform: 'translate(-50%, -50%) scale(1)' }))
+                animate('0.2s 400ms ease', style({ opacity: 1, transform: 'translate(-50%, -50%) scale(1)' }))
             ])
         ]),
         trigger('scroll-snap-item-radios-container-animation', [
@@ -61,6 +61,16 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
             transition('hide => show', [
                 animate('0.3s ease', style({ opacity: 1 }))
             ])
+        ]),
+        trigger('scroll-snap-section-visiable-animation', [
+            state('visiable', style({ opacity: 1, transform: 'translateY(0px)' })),
+            state('unvisiable', style({ opacity: 0, transform: 'translateY(50px)' })),
+            transition('unvisiable => visiable', [
+                animate('0.5s ease', style({ opacity: 1, transform: 'translateY(0px)' }))
+            ]),
+            transition('visiable => unvisiable', [
+                animate('0.5s ease', style({ opacity: 0, transform: 'translateY(50px)' }))
+            ])
         ])
     ]
 })
@@ -80,6 +90,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     }
 
     @ViewChildren('scrollSnapSection', { read: ElementRef<HTMLDivElement> }) public readonly scrollSnapSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
+    @ViewChildren('scrollSnapVisiableAnimationSection', { read: ElementRef<HTMLDivElement> }) public readonly scrollSnapVisiableAnimationSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
     @ViewChildren('scrollSnapItemRadio', { read: ElementRef<HTMLInputElement> }) private readonly scrollSnapItemRadioViewRefs: QueryList<ElementRef<HTMLInputElement>>;
 
     public isMobileDevice: boolean;
@@ -92,6 +103,8 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     public scrollSnapSectionsPosition: { offsetTop: number, offsetHeight: number, offsetTopMod: number, indexNumber: number }[];
     public currentItem: number;
 
+    public scrollSnapVisiableAnimationSectionsPosition: { offsetTop: number, offsetHeight: number }[];
+
     public currentActiveScrollSnapSection = { index: null, section: null };
     
     public currentMouseTriggerStates: string[] = [];
@@ -99,6 +112,8 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
     public currentScrollSnapItemRadiosContainerAnimationState: string = 'leave';
     public currentScrollSnapItemRadiosEmbededContainerAnimationState: string = 'hide';
+
+    public currentScrollSnapSectionVisiableAnimationStates: { state: string, finished: boolean }[] = [];
 
     public compressedImagesList: IClientCompressedImage[];
 
@@ -130,6 +145,10 @@ export class HomeComponent implements OnInit, AfterViewChecked {
                         this.currentMouseTriggerStates.push('leave');
                         this.currentLinkButtonContainerAnimationStates.push('leave');
                     });
+
+                    this.imagePhotographyTypes.forEach(() => this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false }));
+
+                    this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false });
                 },
                 error: () => this.appService.createErrorModal()
             });
@@ -162,7 +181,10 @@ export class HomeComponent implements OnInit, AfterViewChecked {
             this.clientService.setFooterAnimationState('show');
         } else this.clientService.setFooterAnimationState('hide');
 
-        if ( this.secondViewChecked ) this.getActiveScrollSnapSection($event.srcElement);
+        if ( this.secondViewChecked ) {
+            this.getCurrentScrollSnapVisiableAnimationSection($event.srcElement);
+            this.getActiveScrollSnapSection($event.srcElement);
+        }
     }
 
     @HostListener('resize', [ '$event' ]) public onResize (): void {
@@ -198,13 +220,15 @@ export class HomeComponent implements OnInit, AfterViewChecked {
             this.currentItem = 0;
 
             this.setActiveScrollSnapSection();
-        } else for ( let i = 0; i < this.scrollSnapSectionsPosition.length; i++ ) {
-            if ( currentMiddlePosition > this.scrollSnapSectionsPosition[i].offsetTop && 
-                currentMiddlePosition < this.scrollSnapSectionsPosition[i].offsetTopMod
-            ) {
-                this.currentItem = i;
+        } else {
+            for ( let i = 0; i < this.scrollSnapSectionsPosition.length; i++ ) {
+                if ( currentMiddlePosition > this.scrollSnapSectionsPosition[i].offsetTop && 
+                    currentMiddlePosition < this.scrollSnapSectionsPosition[i].offsetTopMod
+                ) {
+                    this.currentItem = i;
 
-                this.setActiveScrollSnapSection();
+                    this.setActiveScrollSnapSection();
+                }
             }
         }
     }
@@ -225,6 +249,27 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         const scrollSnapSectionPosition = this.scrollSnapSectionsPosition[parseInt(targetRadio.id.replace('defaultCheck', ''), 10)];
 
         this.scrollSnapSectionViewRefs.toArray()[scrollSnapSectionPosition.indexNumber].nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    public getScrollSnapVisiableAnimationSection (): void {
+        this.scrollSnapVisiableAnimationSectionsPosition = this.scrollSnapVisiableAnimationSectionViewRefs.toArray().map(section => { 
+            return { 
+                offsetTop: section.nativeElement.offsetTop,
+                offsetHeight: section.nativeElement.offsetHeight
+            };
+        });
+    }
+
+    public getCurrentScrollSnapVisiableAnimationSection (componentElement: HTMLElement): void {
+        this.getScrollSnapVisiableAnimationSection();
+
+        const scrollPosition = componentElement.scrollTop + componentElement.offsetHeight;
+
+        this.scrollSnapVisiableAnimationSectionsPosition.forEach((sectionData, index) => {
+            if ( sectionData.offsetTop <= scrollPosition ) {
+                this.startScrollSnapSectionVisiableAnimation(index);
+            }
+        });
     }
 
     public startScrollSnapItemRadiosContainerAnimation (toState: string): void {
@@ -255,6 +300,17 @@ export class HomeComponent implements OnInit, AfterViewChecked {
                 if ( i !== index ) return 'leave';
                 else return this.currentMouseTriggerStates[index] === 'enter' ? 'leave' : 'enter';
             });
+        }
+    }
+    
+    public startScrollSnapSectionVisiableAnimation (index: number): void {
+        if ( !this.currentScrollSnapSectionVisiableAnimationStates[index].finished ) {
+            this.currentScrollSnapSectionVisiableAnimationStates[index].state = 'unvisiable';
+
+            setTimeout(() => {
+                this.currentScrollSnapSectionVisiableAnimationStates[index].state = 'visiable';
+                this.currentScrollSnapSectionVisiableAnimationStates[index].finished = true;
+            }, 500);
         }
     }
 
