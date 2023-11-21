@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, HostListener, Inject, OnInit, PLATFORM_ID, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, HostListener, Inject, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { animate, animateChild, query, state, style, transition, trigger } from '@angular/animations';
 
@@ -62,14 +62,14 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
                 animate('0.3s ease', style({ opacity: 1 }))
             ])
         ]),
-        trigger('scroll-snap-section-visiable-animation', [
+        trigger('scroll-snap-section-item-visiable-animation', [
             state('visiable', style({ opacity: 1, transform: 'translateY(0px)' })),
-            state('unvisiable', style({ opacity: 0, transform: 'translateY(50px)' })),
+            state('unvisiable', style({ opacity: 0, transform: 'translateY(150px)' })),
             transition('unvisiable => visiable', [
-                animate('0.5s 300ms ease', style({ opacity: 1, transform: 'translateY(0px)' }))
+                animate('1.5s ease', style({ opacity: 1, transform: 'translateY(0px)' }))
             ]),
             transition('visiable => unvisiable', [
-                animate('0.5s ease', style({ opacity: 0, transform: 'translateY(50px)' }))
+                animate('1.5s ease', style({ opacity: 0, transform: 'translateY(150px)' }))
             ])
         ])
     ]
@@ -79,7 +79,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
     constructor (
         @Inject(DOCUMENT) private readonly _document: Document,
-        @Inject(PLATFORM_ID) private platformId: Object,
+        private readonly _componentElementRef: ElementRef<HTMLElement>,
         
         private readonly deviceService: DeviceDetectorService,
 
@@ -97,8 +97,8 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     public isTabletDevice: boolean;
     public isDesktopDevice: boolean;
 
-    public firstViewChecked: boolean = false;
-    public secondViewChecked: boolean = false;
+    public componentElementIsRendered: boolean = false;
+    public firstScrollIsFinished: boolean = false;
 
     public scrollSnapSectionsPosition: { offsetTop: number, offsetHeight: number, offsetTopMod: number, indexNumber: number }[];
     public currentItem: number;
@@ -156,16 +156,23 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     }
 
     ngAfterViewChecked (): void {
-        const imagesCarousel = this._document.getElementById('imagesCarousel');
+        const componentElement: HTMLElement = this._componentElementRef.nativeElement;
 
-        if ( imagesCarousel && !this.firstViewChecked ) {
-            this.firstViewChecked = true;
+        if ( !this.componentElementIsRendered && componentElement.offsetHeight !== 0 && componentElement.offsetHeight > 450 ) {
+            this.componentElementIsRendered = true;
         }
 
-        if ( this.firstViewChecked && !this.secondViewChecked ) {
-            this.scrollSnapSectionViewRefs.first.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if ( this.componentElementIsRendered && !this.firstScrollIsFinished ) {
+            this.scrollSnapSectionViewRefs.first.nativeElement.scrollIntoView({ behavior: 'auto', block: 'start' });
 
-            this.secondViewChecked = true;
+            this.currentItem = 0;
+
+            this.setActiveScrollSnapSection();
+
+            if ( this.isMobileDevice ) {
+                this.currentScrollSnapItemRadiosContainerAnimationState = 'enter';
+                this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'show';
+            }
         }
     }
 
@@ -181,9 +188,12 @@ export class HomeComponent implements OnInit, AfterViewChecked {
             this.clientService.setFooterAnimationState('show');
         } else this.clientService.setFooterAnimationState('hide');
 
-        if ( this.secondViewChecked ) {
+        if ( this.componentElementIsRendered ) {
             this.getCurrentScrollSnapVisiableAnimationSection($event.srcElement);
-            this.getActiveScrollSnapSection($event.srcElement);
+
+            if ( !this.firstScrollIsFinished && $event.srcElement.scrollTop === 0 ) this.firstScrollIsFinished = true;
+
+            if ( this.firstScrollIsFinished ) this.getActiveScrollSnapSection($event.srcElement);
         }
     }
 
@@ -214,7 +224,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         this.getScrollSnapSectionsPosition();
 
         const currentScrollTop: number = componentElement.scrollTop;
-        const currentMiddlePosition: number = currentScrollTop + componentElement.offsetHeight / 2; 
+        const currentMiddlePosition: number = currentScrollTop + componentElement.offsetHeight / 2;
 
         if ( currentScrollTop === 0 ) {
             this.currentItem = 0;
@@ -237,8 +247,10 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         const prevActiveRadio = this.scrollSnapItemRadioViewRefs.toArray().find(el => el.nativeElement.checked === true);
 
         if ( prevActiveRadio ) prevActiveRadio.nativeElement.checked = false;
+
+        const currentItem = this.scrollSnapItemRadioViewRefs.toArray()[this.currentItem];
         
-        this.scrollSnapItemRadioViewRefs.toArray()[this.currentItem].nativeElement.checked = true;
+        if ( currentItem ) currentItem.nativeElement.checked = true;
 
         this.currentItem = this.currentItem += 1;
     }
@@ -251,7 +263,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         this.scrollSnapSectionViewRefs.toArray()[scrollSnapSectionPosition.indexNumber].nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    public getScrollSnapVisiableAnimationSection (): void {
+    public getScrollSnapVisiableAnimationSectionsPosition (): void {
         this.scrollSnapVisiableAnimationSectionsPosition = this.scrollSnapVisiableAnimationSectionViewRefs.toArray().map(section => { 
             return { 
                 offsetTop: section.nativeElement.offsetTop,
@@ -261,12 +273,12 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     }
 
     public getCurrentScrollSnapVisiableAnimationSection (componentElement: HTMLElement): void {
-        this.getScrollSnapVisiableAnimationSection();
+        this.getScrollSnapVisiableAnimationSectionsPosition();
 
         const scrollPosition: number = componentElement.scrollTop + componentElement.offsetHeight;
 
         this.scrollSnapVisiableAnimationSectionsPosition.forEach((sectionData, index) => {
-            if ( sectionData.offsetTop + ( sectionData.offsetHeight / 2 ) <= scrollPosition ) {
+            if ( this.firstScrollIsFinished && sectionData.offsetTop <= scrollPosition ) {
                 this.startScrollSnapSectionVisiableAnimation(index);
             }
         });

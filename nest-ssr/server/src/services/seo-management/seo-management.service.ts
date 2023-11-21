@@ -67,6 +67,7 @@ ${
 </urlset>
     `;
 
-        await fsPromises.writeFile(path.resolve(path.join(process.cwd(), 'dist/nest-ssr/browser'), "sitemap.xml"), sitemap);
+        await fsPromises.writeFile(path.resolve(path.join(process.cwd(), 'dist/nest-ssr/browser'), 'sitemap.xml'), sitemap);
+        await fsPromises.writeFile(path.resolve(path.join(process.cwd(), 'src'), 'sitemap.xml'), sitemap);
     }
 }

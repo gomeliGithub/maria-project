@@ -46,12 +46,12 @@ import { IClientCompressedImage } from 'types/models';
         ]),
         trigger('images-animation', [
             transition(':enter', [
-                style({ opacity: 0, transform: 'translate(0, 50%) rotate3d(1, 1, 1, 180deg)' }),
-                animate('800ms ease', style({ opacity: 1, transform: 'translate(0, 0) rotate3d(0, 0, 0, 0)' }))
+                style({ opacity: 0, transform: 'translateY(150px)' }),
+                animate('1.5s ease', style({ opacity: 1, transform: 'translateY(0px)' }))
             ]),
             transition(':leave', [
-                style({ opacity: 1, transform: 'translate(0, 0) rotate3d(0, 0, 0, 0)' }),
-                animate('800ms ease', style({ opacity: 0, transform: 'translate(0, -50%) rotate3d(1, 1, 1, 180deg)' }))
+                style({ opacity: 1, transform: 'translateY(0px)'}),
+                animate('1.5s ease', style({ opacity: 0, transform: 'translateY(150px)' }))
             ])
         ])
     ]
@@ -244,7 +244,7 @@ export class GalleryComponent implements OnInit {
             this.bigGalleryIsHide = true;
         }
 
-        this._componentRef.nativeElement.scroll({ top: 0, left: 0, behavior: 'smooth' });
+        this._componentRef.nativeElement.scrollIntoView({ behavior: 'auto', block: 'start' });
 
         this.isToggleBigGallery = true;
 
