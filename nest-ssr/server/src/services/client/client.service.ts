@@ -236,7 +236,7 @@ export class ClientService {
             const compressedImageDataRaw: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { name: options.compressedImageName } }) as unknown as IClientCompressedImage;
 
             if ( compressedImageDataRaw ) response.download(path.join(compressedImageDataRaw.originalDirPath, compressedImageDataRaw.originalName));
-            else throw new BadRequestException();
+            else throw new BadRequestException('DownloadOriginalImage - compressed image does not exists');
         }
     }
 
@@ -366,14 +366,14 @@ export class ClientService {
         let { imagePhotographyType, orderType } = requestBody.client;
         const { clientPhoneNumber, comment } = requestBody.client;
 
-        if ( orderType === 'full' && !clientInstance ) throw new UnauthorizedException();
+        if ( orderType === 'full' && !clientInstance ) throw new UnauthorizedException(`CreateOrder - clientInstance does not exists, login --- ${ activeClientLogin }`);
 
         const dateNow: Date = new Date();
         const id: number = parseInt(`${ dateNow.getFullYear() }${ dateNow.getMonth() }${ dateNow.getHours() }${ dateNow.getMinutes() }${ dateNow.getSeconds() }`, 10);
 
         const orderInstance: ClientOrder = await this.clientOrderModel.findByPk(id);
 
-        if ( orderInstance ) throw new BadRequestException();
+        if ( orderInstance ) throw new BadRequestException(`CreateOrder - order instance with same id is exists, login --- ${ activeClientLogin }`);
 
         const newOrderInstance: ClientOrder = await this.clientOrderModel.create({
             id,

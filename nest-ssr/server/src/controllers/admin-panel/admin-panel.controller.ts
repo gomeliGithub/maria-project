@@ -32,9 +32,7 @@ export class AdminPanelController {
             || typeof requestBody.client.imageViewSizeType !== 'string' || !this.appService.imageViewSizeTypes.includes(requestBody.client.imageViewSizeType)
             || requestBody.client.imageDescription && (typeof requestBody.client.imageDescription !== 'string' || requestBody.client.imageDescription.length > 20)
         ) {
-            await this.appService.logLineAsync(`[${ process.env.SERVER_API_PORT }] UploadImage - not valid client data`);
-    
-            throw new BadRequestException();
+            throw new BadRequestException('UploadImage - invalid request body data');
         }
 
         return this.adminPanelService.uploadImage(request, requestBody);
@@ -48,7 +46,7 @@ export class AdminPanelController {
 
     @Get('/getClientOrders')
     @ClientTypes('admin')
-    public async getClientOrders (@Req() request: IRequest, @Query() options: {}): Promise<IClientOrdersInfoData | IClientOrdersData> {
+    public async getClientOrders (@Query() options: {}): Promise<IClientOrdersInfoData | IClientOrdersData> {
         const getInfoData: string = options['getInfoData'] ? options['getInfoData'] : null;
         const memberLogin: string = options['memberLogin'] ? (options['memberLogin'] as string).trim() : null;
         const fromDate: Date = options['fromDate'] ? new Date(options['fromDate']) : null;
@@ -64,7 +62,7 @@ export class AdminPanelController {
             || status && (status === '' || !this.appService.clientOrdersStatuses.includes(status))
             || ordersLimit && (Number.isNaN(ordersLimit) || ordersLimit > 15)
             || existsCount && Number.isNaN(existsCount)
-        ) throw new BadRequestException();
+        ) throw new BadRequestException('GetClientOrders - invalid query data');
 
         return this.adminPanelService.getClientOrders({
             getInfoData,
@@ -90,7 +88,7 @@ export class AdminPanelController {
             || typeof requestBody.adminPanel.discountContent !== 'string' || requestBody.adminPanel.discountContent.length > 50
             || (new Date(requestBody.adminPanel.fromDate) as unknown as string) === 'Invalid Date' 
             || (new Date(requestBody.adminPanel.toDate) as unknown as string) === 'Invalid Date'
-        ) throw new BadRequestException();
+        ) throw new BadRequestException('CreateDiscount - invalid request body data');
 
         return this.adminPanelService.createDiscount(requestBody);
     }
@@ -105,7 +103,7 @@ export class AdminPanelController {
             ((new Date(requestBody.adminPanel.newFromDate) as unknown as string) === 'Invalid Date' )
             || requestBody.adminPanel.newToDate &&
             ((new Date(requestBody.adminPanel.newToDate) as unknown as string) === 'Invalid Date')
-        ) throw new BadRequestException();
+        ) throw new BadRequestException('ChangeDiscountData - invalid request body data');
 
         return this.adminPanelService.changeDiscountData(requestBody);
     }
@@ -115,7 +113,7 @@ export class AdminPanelController {
     public async deleteDiscount (@Query('discountId') discountId: string): Promise<void> {
         const discountIdNumber: number = parseInt(discountId, 10);
 
-        if ( Number.isNaN(discountIdNumber) ) throw new BadRequestException();
+        if ( Number.isNaN(discountIdNumber) ) throw new BadRequestException('DeleteDiscount - invalid discount id');
 
         return this.adminPanelService.deleteDiscount(discountIdNumber);
     }
@@ -126,7 +124,7 @@ export class AdminPanelController {
         if ( !requestBody.adminPanel.clientOrderId
             || typeof requestBody.adminPanel.clientOrderId !== 'number' 
             || requestBody.adminPanel.clientLogin && (typeof requestBody.adminPanel.clientLogin !== 'string' || requestBody.adminPanel.clientLogin === '')
-        ) throw new BadRequestException();
+        ) throw new BadRequestException('ChangeClientOrderStatus - invalid request body data');
 
         return this.adminPanelService.changeClientOrderStatus(requestBody);
     }
@@ -136,7 +134,7 @@ export class AdminPanelController {
     public async deleteImage (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<string> {
         if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName 
             || (requestBody.adminPanel.originalImageName && typeof requestBody.adminPanel.originalImageName !== 'string') 
-        ) throw new BadRequestException();
+        ) throw new BadRequestException('DeleteImage - invalid request body data');
 
         return this.adminPanelService.deleteImage(request, requestBody);
     } 
@@ -150,7 +148,7 @@ export class AdminPanelController {
                 requestBody.adminPanel.displayTargetPage !== 'home' 
                 && requestBody.adminPanel.displayTargetPage !== 'gallery' && requestBody.adminPanel.displayTargetPage !== 'original' 
             ))
-        ) throw new BadRequestException();
+        ) throw new BadRequestException('ChangeImageDisplayTarget - invalid request body data');
 
         return this.adminPanelService.changeImageDisplayTarget(request, requestBody);
     }
@@ -170,7 +168,7 @@ export class AdminPanelController {
                 typeof requestBody.adminPanel.newImageViewSizeType !== 'string' 
                 || !this.appService.imageViewSizeTypes.includes(requestBody.adminPanel.newImageViewSizeType)
             ))
-        ) throw new BadRequestException();
+        ) throw new BadRequestException('ChangeImageData - invalid request body data');
 
         return this.adminPanelService.changeImageData(request, requestBody);
     }
@@ -181,7 +179,7 @@ export class AdminPanelController {
         if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName || !requestBody.adminPanel.imagePhotographyType
             || typeof requestBody.adminPanel.originalImageName !== 'string' 
             || typeof requestBody.adminPanel.imagePhotographyType !== 'string' || !this.appService.imagePhotographyTypes.includes(requestBody.adminPanel.imagePhotographyType)
-        ) throw new BadRequestException();
+        ) throw new BadRequestException('SetPhotographyTypeImage - invalid request body data');
 
         return this.adminPanelService.setPhotographyTypeImage(request, requestBody);
     }
@@ -194,7 +192,7 @@ export class AdminPanelController {
             || !this.appService.imagePhotographyTypes.includes(requestBody.adminPanel.photographyTypeName)
             || typeof requestBody.adminPanel.photographyTypeNewDescription !== 'string' 
             || requestBody.adminPanel.photographyTypeNewDescription.length > 40
-        ) throw new BadRequestException();
+        ) throw new BadRequestException('ChangePhotographyTypeDescription - invalid request body data');
 
         this.adminPanelService.changePhotographyTypeDescription(requestBody);
     }

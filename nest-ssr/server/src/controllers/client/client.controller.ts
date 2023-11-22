@@ -23,7 +23,7 @@ export class ClientController {
     public async checkCompressedBigImagesIsExists (@Param('photographyType') photographyType: string): Promise<boolean> {
         photographyType = photographyType.substring(1);
 
-        if ( !this.appService.imagePhotographyTypes.includes(photographyType) ) throw new BadRequestException();
+        if ( !this.appService.imagePhotographyTypes.includes(photographyType) ) throw new BadRequestException('CheckCompressedBigImagesIsExists - invalid photography type');
 
         return this.clientService.checkCompressedBigImagesIsExists(photographyType);
     }
@@ -44,7 +44,7 @@ export class ClientController {
         if ( !thumbnailImageTypes.includes(imagesType) 
             || imageViewSize && !this.appService.imageViewSizeTypes.includes(imageViewSize) 
             || imagesExistsCount && Number.isNaN(imagesExistsCountInt) 
-        ) throw new BadRequestException();
+        ) throw new BadRequestException('GetCompressedImagesData - invalid param data');
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
@@ -69,7 +69,7 @@ export class ClientController {
     public async getImagePhotographyTypesData (@Param('targetPage') targetPage: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[]> {
         targetPage = targetPage.substring(1);
         
-        if ( !targetPage || ( targetPage !== 'home' && targetPage !== 'admin' ) ) throw new BadRequestException();
+        if ( !targetPage || ( targetPage !== 'home' && targetPage !== 'admin' ) ) throw new BadRequestException('GetImagePhotographyTypesData - invalid target page');
 
         const requiredFields: string[] = targetPage === 'home' ? [ 'name', 'compressedImageName' ] : [ 'name', 'description', 'compressedImageName' ];
 
@@ -79,11 +79,11 @@ export class ClientController {
     @Post('/changeLocale')
     @ClientTypes('admin', 'member')
     public async changeLocale (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string> {
-        if ( !requestBody.sign.newLocale || typeof requestBody.sign.newLocale !== 'string' ) throw new BadRequestException();
+        if ( !requestBody.sign.newLocale || typeof requestBody.sign.newLocale !== 'string' ) throw new BadRequestException('ChangeLocale - invalid new locale');
 
         const locales: string[] = [ 'ru', 'en' ];
 
-        if ( !locales.includes(requestBody.sign.newLocale) ) throw new BadRequestException();
+        if ( !locales.includes(requestBody.sign.newLocale) ) throw new BadRequestException('ChangeLocale - invalid new locale');
         
         return this.clientService.changeLocale(request, requestBody.sign.newLocale, response);
     }
@@ -100,7 +100,7 @@ export class ClientController {
             || requestBody.client.comment && (typeof requestBody.client.comment !== 'string' 
                 || requestBody.client.comment === '' || requestBody.client.comment.length > 30
             )
-        ) throw new BadRequestException();
+        ) throw new BadRequestException('CreateOrder - invalid request body data');
 
         return this.clientService.createOrder(request, requestBody);
     }

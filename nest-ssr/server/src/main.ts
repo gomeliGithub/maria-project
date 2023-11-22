@@ -3,8 +3,12 @@ import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
+import { AppService } from './app.service';
 
 import { generateCookieSecret, generateJWT_SecretCode } from './services/sign/sign.generateKeys';
+
+import { HttpExceptionFilter } from './filters/http-exception/http-exception.filter';
+import { CacheInterceptor } from './interceptors/cache/cache.interceptor';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
@@ -23,6 +27,11 @@ async function bootstrap() {
     app.use(cookieParser(process.env.COOKIE_SECRET));
 
     app.setGlobalPrefix('/api');
+
+    const appService = app.get(AppService);
+
+    app.useGlobalFilters(new HttpExceptionFilter(appService));
+    app.useGlobalInterceptors(new CacheInterceptor());
 
     await app.listen(process.env.PORT ?? process.env.SERVER_API_PORT);
 }

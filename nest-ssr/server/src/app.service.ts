@@ -34,6 +34,8 @@ export class AppService {
     public __dirname: string = dirname(__filename);
 
     public logFilePath: string = join(process.cwd(), 'server', 'logs', '_server.log');
+    public httpErrorLogFilePath: string = join(process.cwd(), 'server', 'logs', '_httpErrorServer.log');
+    public webSocketErrorLogFilePath: string = join(process.cwd(), 'server', 'logs', '_webSocketErrorServer.log');
 
     public cookieSerializeOptions: ICookieSerializeOptions = {
         httpOnly: true,
@@ -65,16 +67,24 @@ export class AppService {
         return serviceRef;
     }
 
-    public logLineAsync (logLine: string) {
+    public logLineAsync (logLine: string, error = false, errorLogType?: 'http' | 'webSocket'): Promise<void> {
         return new Promise<void>( (resolve, reject) => {
             const logDT = new Date();
 
             const time: string = logDT.toLocaleDateString() + " " + logDT.toLocaleTimeString();
             const fullLogLine: string = time + " " + logLine;
+
+            let logFilePath: string = null;
+
+            if ( !error ) logFilePath = this.logFilePath;
+            else {
+                if ( !errorLogType || errorLogType === 'http' ) logFilePath = this.httpErrorLogFilePath;
+                else if ( errorLogType === 'webSocket' ) logFilePath = this.webSocketErrorLogFilePath;
+            }
         
             console.log(fullLogLine);
         
-            fs.open(this.logFilePath, 'a+', (err, logFd) => {
+            fs.open(logFilePath, 'a+', (err, logFd) => {
                 if ( err ) 
                     reject(err);
                 else    

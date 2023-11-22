@@ -35,7 +35,7 @@ export class SignService {
     ) { }
 
     public async validateClient (request: IRequest, requiredClientTypes: string[]): Promise<boolean> {
-        const token = this.jwtControlService.extractTokenFromHeader(request); 
+        const token: string = this.jwtControlService.extractTokenFromHeader(request); 
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
@@ -54,9 +54,9 @@ export class SignService {
             const validatedClient: IClient = await this.jwtControlService.tokenValidate(request, token);
             const clientType: string = validatedClient.type;
 
-            const client: Admin | Member = await commonServiceRef.getClients(validatedClient.login, { rawResult: false }) as Admin | Member;
+            const clientInstance: Admin | Member = await commonServiceRef.getClients(validatedClient.login, { rawResult: false }) as Admin | Member;
 
-            if ( !client ) throw new UnauthorizedException();
+            if ( !clientInstance ) throw new UnauthorizedException(`ValidateClient - client instance does not exists, login - ${ validatedClient.login }`);
 
             return requiredClientTypes.some(requiredClientType => requiredClientType === clientType);
         }
@@ -71,8 +71,20 @@ export class SignService {
         const loginPattern: RegExp = /^[a-zA-Z](.[a-zA-Z0-9_-]*)$/;
         const emailPattern: RegExp = /^[^\s()<>@,;:\/]+@\w[\w\.-]+\.[a-z]{2,}$/i;
 
-        // clientPassword.length < 4 
-        if ( !loginPattern.test(clientLogin) || clientLogin.length < 4 || clientFullName.length < 5 || clientFullName.length > 25 || ( clientEmail && !emailPattern.test(clientEmail) ) ) throw new BadRequestException();
+        // clientPassword.length < 4
+        const incorrectLogin: boolean = !loginPattern.test(clientLogin) || clientLogin.length < 4;
+        const incorrectFullName: boolean = clientFullName.length < 5 || clientFullName.length > 25;
+        const incorrectRmail: boolean = !emailPattern.test(clientEmail);
+
+        if ( incorrectLogin || incorrectFullName || ( clientEmail && incorrectRmail ) ) {
+            let message: string = null;
+            
+            if ( incorrectLogin ) message = 'SignUp - incorrect login';
+            else if ( incorrectFullName ) message = 'SignUp - incorrect full name';
+            else if ( incorrectRmail ) message = 'SignUp - incorrect email';
+
+            throw new BadRequestException(message);
+        }
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
@@ -81,7 +93,7 @@ export class SignService {
             rawResult: true
         });
 
-        if ( clientRaw ) throw new UnauthorizedException();
+        if ( clientRaw ) throw new UnauthorizedException('SignUp - client instance does not exists');
         
         // const clientPasswordHash: string = await bcrypt.hash(clientPassword, process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS);
 
@@ -142,7 +154,7 @@ export class SignService {
     public async signOut (request: IRequest): Promise<void> {
         const token: string = this.jwtControlService.extractTokenFromHeader(request);
 
-        if ( !token || token === '' ) throw new UnauthorizedException();
+        if ( !token || token === '' ) throw new UnauthorizedException('SignOut - invalid or does not exists token');
 
         return this.jwtControlService.addRevokedToken(token);
     }
@@ -167,7 +179,7 @@ export class SignService {
         if ( validatedClientPayload ) {
             const clientInstance: Admin | Member = await commonServiceRef.getClients(validatedClientPayload.login, { rawResult: false });
 
-            if ( !clientInstance ) throw new UnauthorizedException();
+            if ( !clientInstance ) throw new UnauthorizedException('GetActiveClient - client instance does not exists');
         }
             
         if ( !options ) options = {};
@@ -175,7 +187,9 @@ export class SignService {
         if ( validatedClientPayload && options.includeFields ) {
             if ( typeof options.includeFields === 'string' ) return validatedClientPayload[options.includeFields];
             else if ( Array.isArray(options.includeFields) ) {
-                if ( options.allowedIncludedFields && options.includeFields.some(field => !options.allowedIncludedFields.includes(field)) ) throw new BadRequestException();
+                if ( options.allowedIncludedFields && options.includeFields.some(field => !options.allowedIncludedFields.includes(field)) ) {
+                    throw new BadRequestException('GetActiveClient - not allowed included field');
+                }
 
                 Object.keys(validatedClientPayload).forEach(field => {
                     !options.includeFields.includes(field) ? delete validatedClientPayload[field] : null;
@@ -194,7 +208,7 @@ export class SignService {
             rawResult: true
         });
 
-        if ( !clientRaw ) throw new UnauthorizedException();
+        if ( !clientRaw ) throw new UnauthorizedException('_signDataValidate - client instance does not exists');
 
         const passwordValid: boolean = await bcrypt.compare(clientPassword, clientRaw.password); 
         

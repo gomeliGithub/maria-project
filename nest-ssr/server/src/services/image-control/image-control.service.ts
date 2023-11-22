@@ -134,8 +134,6 @@ export class ImageControlService {
 
             return true;
         } catch {
-            await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] Compress Image - error, login --- ${ activeClientLogin }`);
-
             const accessResults = await Promise.allSettled([
                 fsPromises.access(compressImageData.inputImagePath, fsPromises.constants.F_OK),
                 fsPromises.access(outputImagePath, fsPromises.constants.F_OK),

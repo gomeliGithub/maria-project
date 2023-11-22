@@ -129,7 +129,11 @@
             (@scroll-snap-item-radios-embeded-container-animation.start)="scrollSnapItemRadiosEmbededContainerAnimationStart($event)"
             (@scroll-snap-item-radios-embeded-container-animation.done)="scrollSnapItemRadiosEmbededContainerAnimationDone($event)"
         >
-            <div *ngFor="let section of scrollSnapSectionViewRefs; let i = index" class="form-check form-check-reverse">
+            <div *ngFor="let section of scrollSnapSectionViewRefs; let i = index" class="form-check form-check-reverse"
+                [ngClass]="{
+                    'mb-3': isDesktopDevice && i !== scrollSnapSectionViewRefs.length - 1
+                }"
+            >
                 <input class="form-check-input" type="radio" value="" [id]="'defaultCheck' + i" (click)="changeActiveScrollSnapSection($event)"
                     [ngClass]="{ 'visible': isMobileDevice }"
                     [ngStyle]="{ 

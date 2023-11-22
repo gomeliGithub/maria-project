@@ -50,9 +50,7 @@ export class AdminPanelService {
         try {
             imageMeta = JSON.parse(requestBody.client.uploadImageMeta);
         } catch {
-            await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] UploadImage - not valid imageMeta, login --- ${ activeClientLogin }`);
-    
-            throw new BadRequestException();
+            throw new BadRequestException(`UploadImage - not valid imageMeta, login --- ${ activeClientLogin }`);
         }
 
         const imageAdditionalData: IImageAdditionalData = {
@@ -83,9 +81,7 @@ export class AdminPanelService {
         commonServiceRef.webSocketClients.forEach(client => client.activeWriteStream ? activeUploadsClientNumber += 1 : null);
     
         if ( activeUploadClientisExists ) {
-            await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] UploadImage - webSocketClient with the same id is exists, login --- ${ activeClientLogin }`);
-    
-            throw new BadRequestException();
+            throw new BadRequestException(`UploadImage - webSocketClient with the same id is exists, login --- ${ activeClientLogin }`);
         }
     
         if ( activeUploadsClientNumber > 3 ) return 'PENDING';
@@ -123,7 +119,9 @@ export class AdminPanelService {
     
             const currentClient: IWebSocketClient = commonServiceRef.webSocketClients.find(client => client._id === webSocketClientId);
     
-            await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.WEBSOCKETSERVER_PORT }] WebSocketClientId --- ${webSocketClientId}, login --- ${currentClient.login}. Stream error`);
+            await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.WEBSOCKETSERVER_PORT }] WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentClient.login }. Stream error`,
+                true, 'webSocket'
+            );
     
             const message: IWSMessage = this.createMessage('uploadImage', 'ERROR', { uploadedSize: currentClient.uploadedSize, imageMetaSize: imageMeta.size });
     
@@ -140,7 +138,10 @@ export class AdminPanelService {
                 imageMetaSize: imageMeta.size 
             });
     
-            await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.WEBSOCKETSERVER_PORT }] WebSocketClientId --- ${webSocketClientId}, login --- ${currentClient.login}. All chunks writed, overall size --> ${currentClient.uploadedSize}. Image ${imageMeta.name} uploaded`);
+            await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.WEBSOCKETSERVER_PORT }] 
+                WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentClient.login }. All chunks writed, overall size --> ${ currentClient.uploadedSize }. Image ${ imageMeta.name } uploaded`, 
+                true, 'webSocket'
+            );
 
             const compressResult: boolean = await commonServiceRef.compressImage({
                 inputImagePath: newOriginalImagePath, 
@@ -151,6 +152,11 @@ export class AdminPanelService {
 
             if ( !compressResult ) {
                 const errorMessage: IWSMessage = this.createMessage('uploadImage', 'ERROR');
+
+                await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.WEBSOCKETSERVER_PORT }] 
+                    WebSocketClientId --- ${ webSocketClientId }, login --- ${ activeClientLogin }. Compress Image - error`,
+                    true, 'webSocket'
+                );
 
                 currentClient.connection.send(JSON.stringify(errorMessage));
             } else currentClient.connection.send(JSON.stringify(successMessage));
@@ -344,7 +350,7 @@ export class AdminPanelService {
 
         const discountInstance: Discount = await this.discountModel.findByPk(id);
 
-        if ( discountInstance ) throw new BadRequestException()
+        if ( discountInstance ) throw new BadRequestException('CreateDiscount - discount instance is exists');
 
         await this.discountModel.create({
             id,
@@ -361,7 +367,7 @@ export class AdminPanelService {
 
         const discountInstance: Discount = await this.discountModel.findByPk(discountId);
 
-        if ( !discountInstance ) throw new BadRequestException();
+        if ( !discountInstance ) throw new BadRequestException('ChangeDiscountData - discount instance does not exists');
 
         const updateValues: { [ x: string ]: any } = {};
 
@@ -377,7 +383,7 @@ export class AdminPanelService {
     public async deleteDiscount (discountId: number): Promise<void> {
         const discountInstance: Discount = await this.discountModel.findByPk(discountId);
 
-        if ( !discountInstance ) throw new BadRequestException();
+        if ( !discountInstance ) throw new BadRequestException('DeleteDiscount - discount instance does not exists');
 
         await discountInstance.destroy();
     }
@@ -387,12 +393,14 @@ export class AdminPanelService {
 
         const clientOrderInstance: ClientOrder = await this.clientOrderModel.findByPk(requestBody.adminPanel.clientOrderId);
 
-        if ( !clientOrderInstance ) throw new BadRequestException();
+        if ( !clientOrderInstance ) throw new BadRequestException('ChangeClientOrderStatus - client order instance does not exists');
 
         const clientInstance: Member = await commonServiceRef.getClients(requestBody.adminPanel.clientLogin, { rawResult: false }) as Member;
 
         if ( clientInstance ) {
-            if ( !(await clientInstance.$has('clientOrders', clientOrderInstance)) ) throw new BadRequestException();
+            if ( !(await clientInstance.$has('clientOrders', clientOrderInstance)) ) {
+                throw new BadRequestException(`ChangeClientOrderStatus - client order instance of client '${ requestBody.adminPanel.clientLogin }' does not exists`);
+            }
         }
 
         await clientOrderInstance.update({ status: 'processed' });
@@ -413,15 +421,16 @@ export class AdminPanelService {
         }) as unknown as IClientCompressedImage[];
 
         const compressedImageRaw: IClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
-
         const imageIsExists: boolean = await commonServiceRef.checkFileExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
 
-        if ( !compressedImageRaw || !imageIsExists ) throw new BadRequestException();
+        if ( !compressedImageRaw || !imageIsExists ) {
+            throw new BadRequestException(`DeleteImage - ${ !compressedImageRaw ? 'compressed image does not exists' : 'original image does not exists'}`);
+        }
 
         const deleteImageResult: boolean = await commonServiceRef.managePromisesCache('deleteImage', commonServiceRef.deleteImage(originalImagePath, activeAdminLogin));
 
         if ( deleteImageResult ) return 'SUCCESS';
-        else throw new InternalServerErrorException()
+        else throw new InternalServerErrorException('DeleteImage - error')
     }
 
     public async changeImageDisplayTarget (request: IRequest, requestBody: IRequestBody): Promise<string> {
@@ -575,20 +584,25 @@ export class AdminPanelService {
             find: { includeFields: [ 'name', 'originalName', 'photographyType', 'displayedOnGalleryPage' ] }
         }) as unknown as IClientCompressedImage[];
 
-        const compressedImageInstance: IClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
-
+        const compressedImageRaw: IClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
         const imageExists: boolean = await commonServiceRef.checkFileExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
 
-        if ( !compressedImageInstance || !imageExists ) throw new BadRequestException();
-        if ( compressedImageInstance.displayedOnGalleryPage && (requestBody.adminPanel.displayTargetPage || requestBody.adminPanel.newImagePhotographyType) ) { 
+        const compressedImageRawIsExists: boolean = !compressedImageRaw;
+        const originalImageRawIsExists: boolean = !imageExists;
+
+        if ( !compressedImageRawIsExists|| !originalImageRawIsExists ) {
+            throw new BadRequestException(`ValidateImageControlRequests - ${ !compressedImageRawIsExists ? 'compressed image does not exists' : 'original image does not exists'}`);
+        }
+
+        if ( compressedImageRaw.displayedOnGalleryPage && (requestBody.adminPanel.displayTargetPage || requestBody.adminPanel.newImagePhotographyType) ) { 
             const galleryImagePaths: string[] = this.appService.imagePhotographyTypes.map(photographyType => {
-                return path.join(this.staticCompressedImagesDirPath, 'gallery', photographyType, compressedImageInstance.name);
+                return path.join(this.staticCompressedImagesDirPath, 'gallery', photographyType, compressedImageRaw.name);
             });
 
             const existingPath: string = await this.getFulfilledAccessPath(galleryImagePaths);
-            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageInstance.photographyType, compressedImageInstance.name);
+            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageRaw.photographyType, compressedImageRaw.name);
 
-            if ( existingPath !== staticFilesGalleryImagePath ) throw new InternalServerErrorException();
+            if ( existingPath !== staticFilesGalleryImagePath ) throw new InternalServerErrorException('ValidateImageControlRequests - compressed image does not exists in directory');
         }
         
         return originalImagePath;

@@ -21,7 +21,9 @@ export class JwtControlService {
     public extractTokenFromHeader (request: IRequest): string | undefined {
         const [ type, token ] = request.headers.authorization?.split(' ') ?? [];
 
-        if ( request.url !== "/api/sign/up" && request.url !== "/api/sign/in" && request.url !== "/api/sign/getActiveClient" && request.url !== "/api/sign/out" && !token ) throw new UnauthorizedException();
+        if ( request.url !== "/api/sign/up" && request.url !== "/api/sign/in" && request.url !== "/api/sign/getActiveClient" && request.url !== "/api/sign/out" && !token ) {
+            throw new UnauthorizedException('ExtractTokenFromHeader - access token does not exists');
+        }
         
         return type === 'Bearer' ? token : undefined;
     }
@@ -32,13 +34,13 @@ export class JwtControlService {
         try {
             validatedClientPayload = await this.jwtService.verifyAsync<IClient>(token);
         } catch {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(`TokenValidate - access token is invalid, token - ${ token } `);
         }
 
         const client__secure_fgpHash: string = (crypto.createHmac("SHA256", request.cookies['__secure_fgp'])).digest('hex');
 
         if ( client__secure_fgpHash !== validatedClientPayload.__secure_fgpHash || !(await this.validateRevokedToken(token)) ) {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(`TokenValidate - secure fingerprint hash is invalid, token - ${ token }`);
         }
 
         return validatedClientPayload;

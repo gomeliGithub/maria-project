@@ -18,7 +18,7 @@ export class SignController {
         if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password 
             || typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
             || ( requestBody.sign.clientData.email && typeof requestBody.sign.clientData.email !== 'string' )
-        ) throw new BadRequestException();
+        ) throw new BadRequestException('SignUp - invalid request body data');
 
         return this.signService.signUp(requestBody.sign.clientData);
     }
@@ -28,7 +28,7 @@ export class SignController {
     async signIn (@Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string> {
         if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password ||
             typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
-        ) throw new BadRequestException();
+        ) throw new BadRequestException('SignIn - invalid request body data');
 
         return this.signService.signIn(requestBody.sign.clientData, response);
     }
