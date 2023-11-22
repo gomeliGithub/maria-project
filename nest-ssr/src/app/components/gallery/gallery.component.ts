@@ -46,12 +46,12 @@ import { IClientCompressedImage } from 'types/models';
         ]),
         trigger('images-animation', [
             transition(':enter', [
-                style({ opacity: 0, transform: 'translateY(150px)' }),
+                style({ opacity: 0, transform: 'translateY(250px)' }),
                 animate('1.5s ease', style({ opacity: 1, transform: 'translateY(0px)' }))
             ]),
             transition(':leave', [
                 style({ opacity: 1, transform: 'translateY(0px)'}),
-                animate('1.5s ease', style({ opacity: 0, transform: 'translateY(150px)' }))
+                animate('1.5s ease', style({ opacity: 0, transform: 'translateY(250px)' }))
             ])
         ])
     ]

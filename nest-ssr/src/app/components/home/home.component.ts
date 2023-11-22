@@ -64,12 +64,12 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
         ]),
         trigger('scroll-snap-section-item-visiable-animation', [
             state('visiable', style({ opacity: 1, transform: 'translateY(0px)' })),
-            state('unvisiable', style({ opacity: 0, transform: 'translateY(150px)' })),
+            state('unvisiable', style({ opacity: 0, transform: 'translateY(250px)' })),
             transition('unvisiable => visiable', [
-                animate('1.5s ease', style({ opacity: 1, transform: 'translateY(0px)' }))
+                animate('1.5s ease-out', style({ opacity: 1, transform: 'translateY(0px)' }))
             ]),
             transition('visiable => unvisiable', [
-                animate('1.5s ease', style({ opacity: 0, transform: 'translateY(150px)' }))
+                animate('1.5s ease-out', style({ opacity: 0, transform: 'translateY(250px)' }))
             ])
         ])
     ]

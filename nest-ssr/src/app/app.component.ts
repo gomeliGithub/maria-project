@@ -76,13 +76,13 @@ import { IClientLocale } from 'types/global';
             ])
         ]),
         trigger('footer-animation', [
-            state('hide', style({ visibility: 'hidden', opacity: 0 })),
-            state('show', style({ visibility: 'visible', opacity: 1 })),
+            state('hide', style({ opacity: 0, transform: 'translateY(-100px) scale(0)' })),
+            state('show', style({ opacity: 1, transform: 'translateY(0px) scale(1)' })),
             transition('hide => show', [
-                animate('200ms', style({ opacity: 1 }))
+                animate('150ms', style({ opacity: 1, transform: 'translateY(0px) scale(1)' }))
             ]),
             transition('show => hide', [
-                animate('200ms', style({ opacity: 0 }))
+                animate('150ms', style({ opacity: 0, transform: 'translateY(-100px) scale(0)' }))
             ])
         ])
     ]
@@ -164,6 +164,8 @@ export class AppComponent implements OnInit {
         } else {
             this.componentClass = true;
             this.isHomePage = true;
+
+            component.firstScrollIsFinished = false;
 
             this.footerElementRef.nativeElement.classList.remove('position-relative');
             this.footerElementRef.nativeElement.classList.add('bottom-0', 'position-absolute');

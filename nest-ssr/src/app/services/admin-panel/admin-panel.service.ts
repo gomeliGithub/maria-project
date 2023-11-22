@@ -33,7 +33,7 @@ export class AdminPanelService {
     public getFullCompressedImagesData (): Observable<IFullCompressedImageData> {
         const headers: HttpHeaders = this.appService.createRequestHeaders();
 
-        return this.http.get('/api/admin-panel/getFullCompressedImagesList', { headers, withCredentials: true }).pipe(map(imagesList => imagesList)) as Observable<IFullCompressedImageData>;
+        return this.http.get<IFullCompressedImageData>('/api/admin-panel/getFullCompressedImagesList', { headers, withCredentials: true });
     }
 
     public getClientOrders (options: {
@@ -121,7 +121,7 @@ export class AdminPanelService {
 
             const slicedImageData: ArrayBuffer[] = [];
 
-            for (let i = 0; i <= fileData.byteLength; i += 100000) {
+            for ( let i = 0; i <= fileData.byteLength; i += 100000 ) {
                 slicedImageData.push(fileData.slice(i, i + 100000));
             } 
 

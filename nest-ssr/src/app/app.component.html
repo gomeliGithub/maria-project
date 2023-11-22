@@ -6,7 +6,7 @@
     (mouseleave)="menuMove(false)"
 >
     <div class="container-fluid">
-        <a class="navbar-brand" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" routerLink="/"
+        <a class="navbar-brand" routerLink="/"
             [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
         >
             <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
@@ -25,14 +25,14 @@
         </button>
         <div class="navbar-collapse collapse" id="navbarNavDropdown" [ngbCollapse]="navbarIsCollapsed">
             <ul class="navbar-nav flex-grow-1 justify-content-evenly mb-2 mb-lg-0">
-                <li class="nav-item me-4" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                <li class="nav-item me-4">
                     <a class="nav-link active" aria-current="page" routerLink="/"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
                         {{ 'PAGETITLES.HOME' | translate }}
                     </a>
                 </li>
-                <li class="nav-item me-4" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                <li class="nav-item me-4">
                     <a class="nav-link" routerLink="/gallery"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
@@ -48,17 +48,17 @@
                     {{ 'PAGETITLES.ADMINPANEL.MAIN' | translate }}
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="adminPanelMenuButton" ngbDropdownMenu (mouseleave)="menuMove(false, adminPanelMenu)">
-                        <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                            <a class="" ngbDropdownItem routerLink="/adminPanel">
+                        <li>
+                            <a class="" ngbDropdownItem routerLink="/adminPanel" routerLinkActive="">
                                 {{ 'PAGETITLES.ADMINPANEL.IMAGESCONTROL' | translate }}
                             </a>
                         </li>
-                        <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                        <li>
                             <a class="" ngbDropdownItem routerLink="/adminPanel/ordersControl">
                                 {{ 'PAGETITLES.ADMINPANEL.ORDERSCONTROL' | translate }}
                             </a>
                         </li>
-                        <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                        <li>
                             <a class="" ngbDropdownItem routerLink="/adminPanel/discountsControl">
                                 {{ 'PAGETITLES.ADMINPANEL.DISCOUNTSCONTROL' | translate }}
                             </a>
@@ -74,12 +74,12 @@
                         {{ 'CLIENTMENU.TITLE' | translate }}
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="clientMenuButton" ngbDropdownMenu (mouseleave)="menuMove(false, clientMenu)">
-                        <li *ngIf="!activeClientLogin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                        <li *ngIf="!activeClientLogin">
                             <a class="" ngbDropdownItem routerLink="/signUp">
                                 {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
                             </a>
                         </li>
-                        <li *ngIf="!activeClientLogin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                        <li *ngIf="!activeClientLogin">
                             <a class="" ngbDropdownItem routerLink="/signIn">
                                 {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
                             </a>
