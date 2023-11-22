@@ -147,11 +147,11 @@ export class ClientService {
         return clients;
     }
 
-    public async getClientOrdersInfo (request: IRequest, loginList: string, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr>
-    public async getClientOrdersInfo (request: IRequest, loginList: string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
-    public async getClientOrdersInfo (request: IRequest, loginList: 'all', options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
-    public async getClientOrdersInfo (request: IRequest, loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
-    public async getClientOrdersInfo (request: IRequest, loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[]> {
+    public async getClientOrdersInfo (loginList: string, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr>
+    public async getClientOrdersInfo (loginList: string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (loginList: 'all', options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[]> {
         const getOrdersOptions: FindOptions<any> = {
             offset: options.existsCount,
             limit: options.ordersLimit, 
@@ -171,7 +171,7 @@ export class ClientService {
         let clientsOrdersInfoData: IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[] = null;
 
         if ( loginList === 'all' ) {
-            const clients: Member[] = await this.memberModel.findAll(getOrdersOptions);
+            const clientInstances: Member[] = await this.memberModel.findAll(getOrdersOptions);
 
             if ( !clientsOrdersInfoData ) clientsOrdersInfoData = [];
 
@@ -186,7 +186,7 @@ export class ClientService {
                 delete getClientsOrdersCountOptions.where['memberLoginId'];
             }
 
-            for ( const client of clients ) {
+            for ( const client of clientInstances ) {
                 try {
                     (clientsOrdersInfoData as IClientOrdersInfoDataArr[]).push({
                         login: client.dataValues.login,
@@ -195,24 +195,24 @@ export class ClientService {
                 } catch { }
             }
         } else if ( typeof loginList === 'string' ) {
-            const client: Member = await this.get(loginList, { rawResult: false }) as Member;
+            const clientInstance: Member = await this.get(loginList, { rawResult: false }) as Member;
 
             try {
                 clientsOrdersInfoData = {
                     login: loginList,
-                    ordersCount: await client.$count('clientOrders', getClientsOrdersCountOptions)
+                    ordersCount: await clientInstance.$count('clientOrders', getClientsOrdersCountOptions)
                 } as IClientOrdersInfoDataArr;
             } catch { }
         } else if ( Array.isArray(loginList) ) {
             for ( const login of loginList ) {
-                const client: Member = await this.get(login, { rawResult: false }) as Member;
+                const clientInstance: Member = await this.get(login, { rawResult: false }) as Member;
 
                 if ( !clientsOrdersInfoData ) clientsOrdersInfoData = [];
 
                 try {
                     (clientsOrdersInfoData as IClientOrdersInfoDataArr[]).push({
                         login,
-                        ordersCount: await client.$count('clientOrders', getClientsOrdersCountOptions)
+                        ordersCount: await clientInstance.$count('clientOrders', getClientsOrdersCountOptions)
                     });
                 } catch { }
             }
@@ -392,7 +392,6 @@ export class ClientService {
             case 'children': { imagePhotographyType = "Детская съёмка"; break; }
             case 'wedding': { imagePhotographyType = "Свадебная съёмка"; break; }
             case 'family': { imagePhotographyType = "Семейная съёмка"; break; }
-            case 'event': { imagePhotographyType = "Съёмка мероприятий"; break; }
         }
 
         switch ( orderType ) {

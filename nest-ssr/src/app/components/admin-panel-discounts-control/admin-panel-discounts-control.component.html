@@ -106,7 +106,7 @@
     }"
     #datepickerContainer
 >
-    <form class="row row-cols-sm-auto py-4">
+    <form class="row row-cols-auto py-4 px-2">
         <div class="col-12 mx-auto">
             <div class="dp-hidden position-absolute">
                 <div class="input-group">
@@ -118,6 +118,7 @@
                         [autoClose]="'outside'"
                         (dateSelect)="onDateSelection($event)"
                         [displayMonths]="2"
+                        [navigation]="'none'"
                         [dayTemplate]="t"
                         outsideDays="hidden"
                         [startDate]="fromDate!"

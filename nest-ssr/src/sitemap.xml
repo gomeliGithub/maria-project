@@ -47,21 +47,21 @@
         <loc>http://178.172.173.222/gallery</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-11T13:55:18.772Z</lastmod>
+        <lastmod>2023-11-15T21:10:54.190Z</lastmod>
     </url>    
 
     <url>
         <loc>http://178.172.173.222/home</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-11T22:02:46.921Z</lastmod>
+        <lastmod>2023-11-21T00:16:01.173Z</lastmod>
     </url>    
 
     <url>
         <loc>http://178.172.173.222/</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-11T22:02:46.921Z</lastmod>
+        <lastmod>2023-11-21T00:16:01.173Z</lastmod>
     </url>    
 
 </urlset>

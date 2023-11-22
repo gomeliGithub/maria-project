@@ -112,6 +112,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
     public currentScrollSnapItemRadiosContainerAnimationState: string = 'leave';
     public currentScrollSnapItemRadiosEmbededContainerAnimationState: string = 'hide';
+    public scrollSnapItemRadioTimeout = null;
 
     public currentScrollSnapSectionVisiableAnimationStates: { state: string, finished: boolean }[] = [];
 
@@ -182,9 +183,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
         this.clientService.setPrevNavbarAnimationStateChange(null);
 
-        const indentation: number = this.isDesktopDevice ? 1 : 150;
-
-        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - indentation ) {
+        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 1 ) {
             this.clientService.setFooterAnimationState('show');
         } else this.clientService.setFooterAnimationState('hide');
 
@@ -197,10 +196,6 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         }
     }
 
-    @HostListener('resize', [ '$event' ]) public onResize (): void {
-        this.getScrollSnapSectionsPosition();
-    }
-    
     public setDeviceInfo (): void {
         this.deviceInfo = this.deviceService.getDeviceInfo();
         
@@ -246,11 +241,30 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     public setActiveScrollSnapSection (): void {
         const prevActiveRadio = this.scrollSnapItemRadioViewRefs.toArray().find(el => el.nativeElement.checked === true);
 
-        if ( prevActiveRadio ) prevActiveRadio.nativeElement.checked = false;
+        if ( prevActiveRadio ) {
+            const label: HTMLLabelElement = prevActiveRadio.nativeElement.nextSibling as HTMLLabelElement;
+
+            if ( this.isMobileDevice && label.classList.contains('visible') ) label.classList.remove('visible');
+
+            prevActiveRadio.nativeElement.checked = false;
+        }
 
         const currentItem = this.scrollSnapItemRadioViewRefs.toArray()[this.currentItem];
         
-        if ( currentItem ) currentItem.nativeElement.checked = true;
+        if ( currentItem ) {
+            const label: HTMLLabelElement = currentItem.nativeElement.nextSibling as HTMLLabelElement;
+
+            if ( this.isMobileDevice && !label.classList.contains('visible') ) {
+                clearTimeout(this.scrollSnapItemRadioTimeout);
+                
+                label.classList.add('visible');
+
+                this.scrollSnapItemRadioTimeout = setTimeout(() => label.classList.remove('visible'), 3000);
+
+            }
+
+            currentItem.nativeElement.checked = true;
+        }
 
         this.currentItem = this.currentItem += 1;
     }
@@ -293,12 +307,19 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         }
     }
 
-    public startScrollSnapItemRadiosContainerAnimationClick (): void {
-        if ( this.isMobileDevice || this.isTabletDevice ) {
-            this.currentScrollSnapItemRadiosContainerAnimationState = this.currentScrollSnapItemRadiosContainerAnimationState === 'enter' ? 'leave' : 'enter';
+    public scrollSnapItemRadiosEmbededContainerAnimationStart (event: AnimationEvent): void { 
+        if ( this.isDesktopDevice && event.toState === 'hide' ) {
+            const target: HTMLDivElement = event.element as HTMLDivElement;
 
-            if ( this.currentScrollSnapItemRadiosContainerAnimationState === 'enter' ) this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'show';
-            else if ( this.currentScrollSnapItemRadiosContainerAnimationState === 'leave' ) this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'hide';
+            target.querySelectorAll('label').forEach(label => label.classList.remove('visible'));
+        }
+    }
+
+    public scrollSnapItemRadiosEmbededContainerAnimationDone (event: AnimationEvent): void {
+        if ( this.isDesktopDevice && event.toState === 'show' ) {
+            const target: HTMLDivElement = event.element as HTMLDivElement;
+            
+            target.querySelectorAll('label').forEach(label => label.classList.add('visible'));
         }
     }
 

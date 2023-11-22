@@ -25,8 +25,7 @@
 			"PART3": "Portfolio",
 			"PART4": "Portfolio: Part 1",
 			"PART5": "Portfolio: Part 2",
-			"PART6": "Portfolio: Part 3",
-			"PART7": "About me"
+			"PART6": "About me"
 		},
 		"ABOUTTEXT": {
 			"PART1": "Hello, my name is Maria Burtseva and I am a professional photographer. I live and film in Gomel. And also throughout Belarus and the World.",
@@ -172,8 +171,7 @@
 				"INDIVIDUALBUTTONTEXT": "For individual photography", 
 				"CHILDRENBUTTONTEXT": "For children's photography", 
 				"WEDDINGBUTTONTEXT": "For wedding photography",
-				"FAMILYBUTTONTEXT": "For family photography", 
-				"EVENTBUTTONTEXT": "For event photography"
+				"FAMILYBUTTONTEXT": "For family photography"
 			}
 		},
 		"CHANGEIMAGEDATATEXT": {
@@ -210,15 +208,13 @@
 		"INDIVIDUAL": "Individual", 
 		"CHILDREN": "Children", 
 		"WEDDING": "Wedding", 
-		"FAMILY": "Family", 
-		"EVENT": "Event"
+		"FAMILY": "Family"
 	},
 	"IMAGEPHOTOGRAPHYTYPESFULLTEXT": {
 		"INDIVIDUAL": "Individual photography", 
 		"CHILDREN": "Children photography", 
 		"WEDDING": "Wedding photography", 
-		"FAMILY": "Family photography", 
-		"EVENT": "Events"
+		"FAMILY": "Family photography"
 	},
 	"IMAGEVIEWSIZETYPES": {
 		"SMALL": "Small",

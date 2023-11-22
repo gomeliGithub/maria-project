@@ -66,7 +66,7 @@ export class AdminPanelController {
             || existsCount && Number.isNaN(existsCount)
         ) throw new BadRequestException();
 
-        return this.adminPanelService.getClientOrders(request, {
+        return this.adminPanelService.getClientOrders({
             getInfoData,
             memberLogin,
             fromDate,
@@ -122,13 +122,13 @@ export class AdminPanelController {
 
     @Put('/changeClientOrderStatus')
     @ClientTypes('admin')
-    public async changeClientOrderStatus (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
+    public async changeClientOrderStatus (@Body() requestBody: IRequestBody): Promise<void> {
         if ( !requestBody.adminPanel.clientOrderId
             || typeof requestBody.adminPanel.clientOrderId !== 'number' 
             || requestBody.adminPanel.clientLogin && (typeof requestBody.adminPanel.clientLogin !== 'string' || requestBody.adminPanel.clientLogin === '')
         ) throw new BadRequestException();
 
-        return this.adminPanelService.changeClientOrderStatus(request, requestBody);
+        return this.adminPanelService.changeClientOrderStatus(requestBody);
     }
 
     @Post('/deleteImage')

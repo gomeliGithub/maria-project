@@ -18,7 +18,7 @@ export interface IDownloadOriginalImageOptions {
 }
 
 export interface IСompressedImageGetOptions {
-    client?: Admin;
+    clientInstance?: Admin;
     find?: {
         imageTitles?: string[];
         includeFields?: string[];

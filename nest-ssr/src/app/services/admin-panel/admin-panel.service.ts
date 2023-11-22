@@ -78,7 +78,6 @@ export class AdminPanelService {
                             case 'children': { clientOrder[field] = this.appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.CHILDREN'); break; }
                             case 'wedding': { clientOrder[field] = this.appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.WEDDING'); break; }
                             case 'family': { clientOrder[field] = this.appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.FAMILY'); break; }
-                            case 'event': { clientOrder[field] = this.appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.EVENT'); break; }
                         }
                         if ( field === 'type') {
                             switch ( clientOrder[field] ) {

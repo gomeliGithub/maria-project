@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 
 import sharp from 'sharp';
 
-import { CommonModule } from '../../modules/common.module';
 import { ClientModule } from '../../modules/client.module';
 import { SignModule } from '../../modules/sign.module';
 import { ImageControlModule } from '../../modules/image-control.module';
@@ -29,34 +28,33 @@ export class CommonService {
 
     public webSocketClients: IWebSocketClient[] = [];
     public promisesCache: { [ x: string ]: { pendingPromises: Promise<any>[], count: number } } = { };
+    public adminPanelImageOperationKeys: string[] = [ 'deleteImage', 'changeImageDisplayTargetRename', 'changeImageData', 'setPhotographyTypeImageUnlink', 'setPhotographyTypeImageCopy' ];
 
     public async managePromisesCache (key: string, promise: Promise<any>): Promise<any> {
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
-
-        if ( !commonServiceRef.promisesCache[key] ) {
-            commonServiceRef.promisesCache[key] = { 
+        if ( !this.promisesCache[key] ) {
+            this.promisesCache[key] = { 
                 pendingPromises: [],
                 count: 0
             }
         }
 
-        if ( commonServiceRef.promisesCache[key].count <= 3 ) {
+        if ( ( this.adminPanelImageOperationKeys.includes(key) && this.promisesCache[key].count === 0 ) || this.promisesCache[key].count <= 3 ) {
             const pendingPromise: Promise<any> = promise;
 
-            commonServiceRef.promisesCache[key].pendingPromises.push(pendingPromise);
-            commonServiceRef.promisesCache[key].count = commonServiceRef.promisesCache[key].count += 1;
+            this.promisesCache[key].pendingPromises.push(pendingPromise);
+            this.promisesCache[key].count = this.promisesCache[key].count += 1;
 
             await pendingPromise;
 
-            commonServiceRef.promisesCache[key].pendingPromises = commonServiceRef.promisesCache[key].pendingPromises.filter((_, index) => {
-                return index !== commonServiceRef.promisesCache[key].count - 1;
+            this.promisesCache[key].pendingPromises = this.promisesCache[key].pendingPromises.filter((_, index) => {
+                return index !== this.promisesCache[key].count - 1;
             });
 
-            commonServiceRef.promisesCache[key].count = commonServiceRef.promisesCache[key].count -= 1;
+            this.promisesCache[key].count = this.promisesCache[key].count -= 1;
 
             return pendingPromise;
         } else {
-            const firstPendingPromise: Promise<any> = commonServiceRef.promisesCache[key].pendingPromises[0];
+            const firstPendingPromise: Promise<any> = this.promisesCache[key].pendingPromises[0];
 
             await firstPendingPromise;
         }
@@ -117,14 +115,14 @@ export class CommonService {
         return clientServiceRef.get(loginList, options);
     }
 
-    public async getClientOrdersInfo (request: IRequest, loginList: string, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr>
-    public async getClientOrdersInfo (request: IRequest, loginList: string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
-    public async getClientOrdersInfo (request: IRequest, loginList: 'all', options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
-    public async getClientOrdersInfo (request: IRequest, loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
-    public async getClientOrdersInfo (request: IRequest, loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[]> {
+    public async getClientOrdersInfo (loginList: string, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr>
+    public async getClientOrdersInfo (loginList: string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (loginList: 'all', options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[]> {
         const clientServiceRef = await this.appService.getServiceRef(ClientModule, ClientService);
 
-        return clientServiceRef.getClientOrdersInfo(request, loginList, options);
+        return clientServiceRef.getClientOrdersInfo(loginList, options);
     }
 
 

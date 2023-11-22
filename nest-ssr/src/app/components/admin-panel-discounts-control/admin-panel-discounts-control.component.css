@@ -54,4 +54,15 @@ and (-webkit-device-pixel-ratio: 2) {
     :host ::ng-deep .changeDiscountButtonsContainer button:last-child {
         float: none !important;
     }
+
+    :host ::ng-deep ngb-datepicker > .ngb-dp-content.ngb-dp-months {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+}
+
+:host ::ng-deep ngb-datepicker {
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
 }

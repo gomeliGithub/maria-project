@@ -90,7 +90,7 @@ export class ClientController {
 
     @Post('/createOrder')
     public async createOrder (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
-        const phoneNumberPattern: RegExp = /(?:\+|\d)[\d\-\(\) ]{9,}\d/;
+        const phoneNumberPattern: RegExp = /(?:\+|\d)[\d\-\(\) ]{9,}\d/g;
 
         if ( !requestBody.client || !requestBody.client.imagePhotographyType || !this.appService.imagePhotographyTypes.includes(requestBody.client.imagePhotographyType)
             || !requestBody.client.orderType || !requestBody.client.clientPhoneNumber

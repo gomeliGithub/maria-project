@@ -25,8 +25,7 @@
 			"PART3": "Портфолио",
 			"PART4": "Портфолио: Часть 1",
 			"PART5": "Портфолио: Часть 2",
-			"PART6": "Портфолио: Часть 3",
-			"PART7": "Обо мне"
+			"PART6": "Обо мне"
 		},
 		"ABOUTTEXT": {
 			"PART1": "Здравствуйте, меня зовут Мария Бурцева и я профессиональный фотограф. Я живу и снимаю в Гомеле. А так же по всей Беларуси и Миру.",
@@ -169,8 +168,7 @@
 				"INDIVIDUALBUTTONTEXT": "Для индивидуальной съёмки", 
 				"CHILDRENBUTTONTEXT": "Для детской съёмки", 
 				"WEDDINGBUTTONTEXT": "Для свадебной съёмки",
-				"FAMILYBUTTONTEXT": "Для семейной съёмки", 
-				"EVENTBUTTONTEXT": "Для съёмки мероприятий"
+				"FAMILYBUTTONTEXT": "Для семейной съёмки"
 			}
 		},
 		"CHANGEIMAGEDATATEXT": {
@@ -207,15 +205,13 @@
 		"INDIVIDUAL": "Индивидуальная", 
 		"CHILDREN": "Детская", 
 		"WEDDING": "Свадьба", 
-		"FAMILY": "Семейная", 
-		"EVENT": "Мероприятие"
+		"FAMILY": "Семейная"
 	},
 	"IMAGEPHOTOGRAPHYTYPESFULLTEXT": {
 		"INDIVIDUAL": "Индивидуальная съёмка", 
 		"CHILDREN": "Детская съёмка", 
 		"WEDDING": "Свадебная съёмка", 
-		"FAMILY": "Семейная съёмка", 
-		"EVENT": "Мероприятия"
+		"FAMILY": "Семейная съёмка"
 	},
 	"IMAGEVIEWSIZETYPES": {
 		"SMALL": "Небольшой",

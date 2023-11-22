@@ -72,7 +72,7 @@ export class ImageControlService {
 
         let compressedImages: ClientCompressedImage[] = null;
 
-        if ( options.client ) compressedImages = await options.client.$get('compressedImages', findOptions);
+        if ( options.clientInstance) compressedImages = await options.clientInstance.$get('compressedImages', findOptions);
         else compressedImages = await this.compressedImageModel.findAll(findOptions);
 
         return compressedImages;
@@ -104,7 +104,7 @@ export class ImageControlService {
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const client: Admin = await commonServiceRef.getClients(activeClientLogin, { rawResult: false }) as Admin;
+        const clientInstance: Admin = await commonServiceRef.getClients(activeClientLogin, { rawResult: false }) as Admin;
 
         let newCompressedImage: ClientCompressedImage = null;
 
@@ -130,29 +130,29 @@ export class ImageControlService {
                 description: compressImageData.imageAdditionalData.description,
             });
 
-            await client.$add('compressedImages', newCompressedImage);
+            await clientInstance.$add('compressedImages', newCompressedImage);
 
             return true;
-        } catch ( error: any ) {
-            console.error(error);
+        } catch {
+            await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] Compress Image - error, login --- ${ activeClientLogin }`);
 
             const accessResults = await Promise.allSettled([
                 fsPromises.access(compressImageData.inputImagePath, fsPromises.constants.F_OK),
                 fsPromises.access(outputImagePath, fsPromises.constants.F_OK),
             ]);
 
-            const accessImagesErrorResults = accessResults.filter(result => result.status === 'fulfilled');
+            const accessImagesErrorResults: PromiseSettledResult<void>[] = accessResults.filter(result => result.status === 'fulfilled');
 
             let imagePath: string = '';
 
-            for (const result of accessImagesErrorResults) {
+            for ( const result of accessImagesErrorResults ) {
                 if ( accessResults.indexOf(result) === 0 ) imagePath = compressImageData.inputImagePath;
                 else if ( accessResults.indexOf(result) === 1 ) imagePath = outputImagePath;
 
                 await fsPromises.unlink(imagePath);
 
                 if ( newCompressedImage ) {
-                    await client.$remove('compressedImages', newCompressedImage);
+                    await clientInstance.$remove('compressedImages', newCompressedImage);
                     await newCompressedImage.destroy();
                 }
             }
@@ -162,7 +162,7 @@ export class ImageControlService {
     }
 
     public getTempFileName (targetFilePath: string, postfix = "_tmp"): string {
-        const targetPathParts = path.parse(targetFilePath);
+        const targetPathParts: path.ParsedPath = path.parse(targetFilePath);
 
         return targetPathParts.dir + path.sep + targetPathParts.name + postfix + targetPathParts.ext;
     }
@@ -204,13 +204,13 @@ export class ImageControlService {
     public async deleteImage (imagePath: string, clientLogin: string): Promise<boolean> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const client: Admin = await commonServiceRef.getClients(clientLogin, { rawResult: false }) as Admin;
-        const compressedImage: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(imagePath) } });
+        const clientInstance: Admin = await commonServiceRef.getClients(clientLogin, { rawResult: false }) as Admin;
+        const compressedImageInstance: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(imagePath) } });
 
         try {
-            const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImage.name);
-            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImage.photographyType, compressedImage.name);
-            const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, clientLogin, compressedImage.name);
+            const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImageInstance.name);
+            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageInstance.photographyType, compressedImageInstance.name);
+            const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, clientLogin, compressedImageInstance.name);
 
             const currentCompressedImagePath: string = await commonServiceRef.getFulfilledAccessPath([
                 staticFilesHomeImagePath, 
@@ -218,9 +218,9 @@ export class ImageControlService {
                 compressedImageOriginalPath
             ]);
 
-            await client.$remove('compressedImages', compressedImage);
-            await compressedImage.destroy();
-            await this.imagePhotographyTypeModel.update({ compressedImageName: null }, { where: { compressedImageName: compressedImage.name } });
+            await clientInstance.$remove('compressedImages', compressedImageInstance);
+            await compressedImageInstance.destroy();
+            await this.imagePhotographyTypeModel.update({ compressedImageName: null }, { where: { compressedImageName: compressedImageInstance.name } });
             await fsPromises.unlink(imagePath);
             await fsPromises.unlink(currentCompressedImagePath);
 

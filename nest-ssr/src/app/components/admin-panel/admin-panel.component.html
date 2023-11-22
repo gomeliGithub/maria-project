@@ -24,7 +24,6 @@
                     <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</ng-template>
                     <ng-template ngSwitchCase="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</ng-template>
                     <ng-template ngSwitchCase="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</ng-template>
-                    <ng-template ngSwitchCase="event">{{ 'IMAGEPHOTOGRAPHYTYPES.EVENT' | translate }}</ng-template>
                 </td>
                 <td [ngSwitch]="compressedImage.viewSizeType">
                     <ng-template ngSwitchCase="small">{{ 'IMAGEVIEWSIZETYPES.SMALL' | translate }}</ng-template>
@@ -121,13 +120,6 @@
                                     {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.FAMILYBUTTONTEXT' | translate }}
                                 </button>
                             </li>
-                            <li class="text-bg-secondary rounded">
-                                <button class="btn btn-sm" type="button" [attr.originalImageName]="compressedImage.originalName" 
-                                    [attr.imagePhotographyType]="'event'" ngbDropdownItem (click)="setPhotographyTypeImage($event)"
-                                >
-                                    {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.EVENTBUTTONTEXT' | translate }}
-                                </button>
-                            </li>
                         </ul>
                     </div>
                 </td>
@@ -150,7 +142,6 @@
                 <option value="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</option>
                 <option value="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</option>
                 <option value="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</option>
-                <option value="event">{{ 'IMAGEPHOTOGRAPHYTYPES.EVENT' | translate }}</option>
             </select>
             <label for="inputChangePhotographyType" class="form-label">{{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.PHOTOGRAPHYTYPE' | translate }}</label>
         </div>
@@ -188,7 +179,6 @@
                         <option value="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</option>
                         <option value="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</option>
                         <option value="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</option>
-                        <option value="event">{{ 'IMAGEPHOTOGRAPHYTYPES.EVENT' | translate }}</option>
                     </select>
                     <label for="inputPhotographyType" class="form-label">{{ 'ADMINPANEL.UPLOADIMAGETEXT.PHOTOGRAPHYTYPE' | translate }}</label>
                     <div class="alert alert-danger" *ngIf="uploadImageForm.controls['imagePhotographyType'].invalid && uploadImageForm.controls['imagePhotographyType'].touched">
@@ -242,7 +232,6 @@
                         <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</ng-template>
                         <ng-template ngSwitchCase="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</ng-template>
                         <ng-template ngSwitchCase="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</ng-template>
-                        <ng-template ngSwitchCase="event">{{ 'IMAGEPHOTOGRAPHYTYPES.EVENT' | translate }}</ng-template>
                     </td>
                     <td>
                         <ngb-accordion class="imagePhotographyTypeDescriptionAccordion">

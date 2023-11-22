@@ -40,6 +40,7 @@
 
 #aboutSection {
     height: 70% !important;
+    padding-bottom: 12rem !important;
     scroll-snap-align: start !important;
 }
 
@@ -92,32 +93,12 @@ and (-webkit-device-pixel-ratio: 2) {
         margin-bottom: 1rem !important;
     }
 
-    .oneLengthImagePhotographyTypeGroup > div {
-        width: 100% !important;
-    }
-
     #aboutSection {
-        height: auto !important;
-        margin-bottom: 0 !important;
-    }
-
-    #aboutSection > div:first-child {
-        width: 100% !important;
-        margin-top: 3.5rem !important;
-    }
-
-    #aboutContainer {
-        flex-direction: column !important;
+        padding-bottom: 6rem !important;
     }
 
     #aboutContainer > img {
-        height: auto !important;
-    }
-
-    #aboutContainer > div {
-        overflow-y: hidden !important;
-        margin-left: 0 !important;
-        margin-top: 2rem !important;
+        max-width: 100% !important;
     }
 }
 
@@ -158,6 +139,63 @@ and (-webkit-device-pixel-ratio: 2) {
     }
     :host ::ng-deep #discountsCarousel {
         min-height: 120px;
+    }
+}
+
+@media screen and (max-width: 1150px), only screen 
+and (width: 393px) 
+and (height: 852px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 430px) 
+and (height: 932px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 390px) 
+and (height: 844px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 428px) 
+and (height: 926px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 812px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 2),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 667px) 
+and (-webkit-device-pixel-ratio: 2) {
+    #aboutSection {
+        height: auto !important;
+        margin-bottom: 0 !important;
+    }
+
+    #aboutSection > div:first-child {
+        width: 100% !important;
+        margin-top: 3.5rem !important;
+    }
+
+    #aboutContainer {
+        flex-direction: column !important;
+    }
+
+    #aboutContainer > img {
+        height: auto !important;
+    }
+
+    #aboutContainer > div {
+        overflow-y: hidden !important;
+        margin-left: 0 !important;
+        margin-top: 2rem !important;
     }
 }
 
@@ -204,6 +242,15 @@ and (-webkit-device-pixel-ratio: 2) {
 #scrollSnapItemRadiosContainer > div > div:nth-child(2) {
     width: 4px;
     opacity: 1;
+}
+
+#scrollSnapItemRadiosContainer label {
+    transition: 1s ease-out;
+    transform: translateX(200px);
+}
+
+#scrollSnapItemRadiosContainer label.visible {
+    transform: translateX(0px);
 }
 
 #scrollSnapItemRadiosContainer > div > div:nth-child(3) {

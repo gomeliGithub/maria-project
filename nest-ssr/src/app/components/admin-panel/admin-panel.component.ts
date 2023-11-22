@@ -126,7 +126,7 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public imagePhotographyTypeValidator (control: FormControl<string>): { [ s: string ]: boolean } | null {
-        const imagePhotographyTypes: string[] = [ 'individual', 'children', 'wedding', 'family', 'event' ];
+        const imagePhotographyTypes: string[] = [ 'individual', 'children', 'wedding', 'family' ];
 
         if ( !imagePhotographyTypes.includes(control.value) ) {
             return { 'imagePhotographyType': true, 'newImagePhotographyType': true };

@@ -71,7 +71,7 @@ export class GalleryComponent implements OnInit {
 
         this.sendOrderForm = new FormGroup({
             'orderType': new FormControl("", [ Validators.required, this.orderTypeValidator ]),
-            'clientPhoneNumber': new FormControl("", [ Validators.required, Validators.pattern(/(?:\+|\d)[\d\-\(\) ]{9,}\d/) ]),
+            'clientPhoneNumber': new FormControl("", [ Validators.required, Validators.pattern(/(?:\+|\d)[\d\-\(\) ]{9,}\d/g) ]),
             'comment': new FormControl("", Validators.maxLength(30))
         });
     }

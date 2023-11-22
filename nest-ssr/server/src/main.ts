@@ -6,6 +6,8 @@ import { AppModule } from './app.module';
 
 import { generateCookieSecret, generateJWT_SecretCode } from './services/sign/sign.generateKeys';
 
+import { CacheInterceptor } from './interceptors/cache/cache.interceptor';
+
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
         logger: ['error', 'warn', 'log']
@@ -23,6 +25,8 @@ async function bootstrap() {
     app.use(cookieParser(process.env.COOKIE_SECRET));
 
     app.setGlobalPrefix('/api');
+
+    app.useGlobalInterceptors(new CacheInterceptor());
 
     await app.listen(process.env.PORT ?? process.env.SERVER_API_PORT);
 }

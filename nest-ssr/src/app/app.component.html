@@ -24,22 +24,22 @@
             <span class="icon-bar bottom-bar d-block border-1" [@bottom-bar-animation]="navbarTogglerIconTriggerState"></span>
         </button>
         <div class="navbar-collapse collapse" id="navbarNavDropdown" [ngbCollapse]="navbarIsCollapsed">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <ul class="navbar-nav flex-grow-1 justify-content-evenly mb-2 mb-lg-0">
+                <li class="nav-item me-4" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                     <a class="nav-link active" aria-current="page" routerLink="/"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
                         {{ 'PAGETITLES.HOME' | translate }}
                     </a>
                 </li>
-                <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                <li class="nav-item me-4" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
                     <a class="nav-link" routerLink="/gallery"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
                         {{ 'PAGETITLES.GALLERY' | translate }}
                     </a>
                 </li>
-                <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item" ngbDropdown display="dynamic" #adminPanelMenu="ngbDropdown">
+                <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item me-4" ngbDropdown display="dynamic" #adminPanelMenu="ngbDropdown">
                     <button class="nav-link" type="button" id="adminPanelMenuButton"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }" 
                         ngbDropdownToggle
@@ -92,7 +92,7 @@
                     </ul>
                 </li>
             </ul>
-            <div class="navbar-text" [ngClass]="{ 'me-3': !activeClientLogin }">
+            <div class="navbar-text flex-grow-0" [ngClass]="{ 'me-3': !activeClientLogin }">
                 <span *ngIf="activeClientLogin; else noActiveClientBlock">
                     <span class="fw-bold" 
                         [ngClass]="{ 'text-success': navbarAnimationState === 'scrolled', 'text-info': navbarAnimationState === 'static' }"
@@ -124,8 +124,9 @@
     </div>
 </nav>
 <router-outlet (activate)="onRouterOutlet($event)"></router-outlet>
-<footer class="flex-grow-0 flex-shrink-1 bottom-0 w-100 text-center text-white" style="background-color: #f1f1f1;"
+<footer class="flex-grow-0 flex-shrink-1 bottom-0 position-absolute w-100 text-center text-white" style="background-color: #f1f1f1;"
     [@footer-animation]="footerAnimationState"
+    #footer
 >
     <div class="container">
         <section class="">

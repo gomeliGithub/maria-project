@@ -28,12 +28,12 @@ export class AppService {
         private readonly lazyModuleLoader: LazyModuleLoader
     ) {}
 
-    public staticFilesDirPath: string = join(process.cwd(), 'dist/nest-ssr/browser/assets');
+    public staticFilesDirPath: string = join(process.cwd(), 'dist', 'nest-ssr', 'browser', 'assets');
 
     public __filename: string = fileURLToPath(import.meta.url);
     public __dirname: string = dirname(__filename);
 
-    public logFilePath: string = join(this.__dirname, '_server.log');
+    public logFilePath: string = join(process.cwd(), 'server/logs', '_server.log');
 
     public cookieSerializeOptions: ICookieSerializeOptions = {
         httpOnly: true,
@@ -43,10 +43,10 @@ export class AppService {
         priority: 'high'
     }
 
-    public clientOriginalImagesDir: string = path.join(this.__dirname, 'originalImages');
-    public clientCompressedImagesDir: string = path.join(this.__dirname, 'compressedImages');
+    public clientOriginalImagesDir: string = path.join(process.cwd(), 'server', 'files', 'originalImages');
+    public clientCompressedImagesDir: string = path.join(process.cwd(), 'server', 'files', 'compressedImages');
 
-    public imagePhotographyTypes: string[] = [ 'individual', 'children', 'wedding', 'family', 'event' ];
+    public imagePhotographyTypes: string[] = [ 'individual', 'children', 'wedding', 'family' ];
     public imageViewSizeTypes: string[] = [ 'medium', 'big' ];
 
     public clientOrderTypes: string[] = [ 'consultation', 'full' ];
