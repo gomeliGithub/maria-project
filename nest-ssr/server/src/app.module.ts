@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SequelizeModule } from '@nestjs/sequelize';
 import mysql2 from 'mysql2';
@@ -22,6 +23,8 @@ import { CommonModule } from './modules/common.module';
 
 import { WebSocketService } from './services/web-socket/web-socket.service';
 import { MailService } from './services/mail/mail.service';
+
+import { CacheInterceptor } from './interceptors/cache/cache.interceptor';
 
 import { JWT_token } from './models/sign.model';
 import { Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder } from './models/client.model';
@@ -78,7 +81,12 @@ import { Discount } from './models/admin-panel.model';
         CommonModule
     ],
     controllers: [AppController],
-    providers: [ AppService, WebSocketService, MailService ],
+    providers: [ AppService, WebSocketService, MailService,
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: CacheInterceptor,
+        }
+    ],
     exports: [ AppService, MailService ]
 })
 export class AppModule {}

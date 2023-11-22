@@ -1,15 +1,17 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { Response } from 'express';
 
 @Injectable()
 export class CacheInterceptor implements NestInterceptor {
     intercept (context: ExecutionContext, next: CallHandler): Observable<any> {
-        const response: Response = context.switchToHttp().getResponse();
+        return next.handle().pipe(
+            tap(() => {
+                const response: Response = context.switchToHttp().getResponse();
 
-        response.setHeader('Cache-Control', 'no-cache');
-        response.removeHeader('ETag');
-
-        return next.handle();
+                response.setHeader('Cache-Control', 'no-cache');
+                response.removeHeader('ETag');
+            })
+        );
     }
 }
