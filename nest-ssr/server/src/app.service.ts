@@ -33,7 +33,7 @@ export class AppService {
     public __filename: string = fileURLToPath(import.meta.url);
     public __dirname: string = dirname(__filename);
 
-    public logFilePath: string = join(process.cwd(), 'server/logs', '_server.log');
+    public logFilePath: string = join(process.cwd(), 'server', 'logs', '_server.log');
 
     public cookieSerializeOptions: ICookieSerializeOptions = {
         httpOnly: true,
