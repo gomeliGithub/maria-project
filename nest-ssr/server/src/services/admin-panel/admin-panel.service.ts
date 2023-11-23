@@ -86,9 +86,9 @@ export class AdminPanelService {
     
         if ( activeUploadsClientNumber > 3 ) return 'PENDING';
 
-        const client: Admin = await commonServiceRef.getClients(activeClientLogin, { rawResult: false }) as Admin;
+        const clientInstance: Admin = await commonServiceRef.getClients(activeClientLogin, { rawResult: false }) as Admin;
 
-        const compressedImagesRaw: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({ client, find: { rawResult: true } });
+        const compressedImagesRaw: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({ clientInstance, find: { rawResult: true } });
         const compressedImageRaw: IClientCompressedImage = compressedImagesRaw.length !== 0 ? compressedImagesRaw.find(image => image.originalName === path.basename(newOriginalImagePath)) : null;
 
         if ( compressedImageRaw ) return 'FILEEXISTS';
@@ -194,16 +194,18 @@ export class AdminPanelService {
         return message;
     }
 
-    public async getFullCompressedImagesList (request: IRequest): Promise<IFullCompressedImageData> {
+    public async getFullCompressedImagesList (request: IRequest, imagesLimit?: number, imagesExistsCount?: number): Promise<IFullCompressedImageData> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
         
         const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
+        const clientInstance: Admin = await commonServiceRef.getClients(activeAdminLogin, { rawResult: false }) as Admin;
 
-        const client: Admin = await commonServiceRef.getClients(activeAdminLogin, { rawResult: false }) as Admin;
+        if ( !imagesExistsCount ) imagesExistsCount = 0;
+        if ( !imagesLimit ) imagesLimit = 5;
 
-        const compressedImages: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({ 
-            client,
-            find: { 
+        const compressedImagesRaw: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({ 
+            clientInstance,
+            find: {
                 includeFields: [ 
                     'originalName', 
                     'originalSize', 
@@ -215,12 +217,20 @@ export class AdminPanelService {
                     'displayedOnGalleryPage' 
                 ],
                 rawResult: true
-            }
+            },
+            imagesLimit,
+            imagesExistsCount
         });
 
-        const imagesList: IFullCompressedImageData = { imagesList: compressedImages as unknown as IClientCompressedImage[], count: compressedImages.length };
+        const commonCompressedImagesCount: number = await this.compressedImageModel.count();
 
-        return imagesList;
+        const imagesData: IFullCompressedImageData = { 
+            imagesList: compressedImagesRaw, 
+            count: compressedImagesRaw.length,
+            additionalImagesIsExists: commonCompressedImagesCount > imagesExistsCount + compressedImagesRaw.length && commonCompressedImagesCount > imagesLimit
+        }
+
+        return imagesData;
     }
 
     public async getClientOrders (options: {

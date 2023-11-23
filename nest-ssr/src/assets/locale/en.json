@@ -151,6 +151,7 @@
 			"CLIENTCOMMENT": "Additional information from the client",
 			"CREATEDDATE": "Created date"
 		},
+		"ADDITIONALCOMPRESSEDIMAGESBUTTONTEXT": "More images",
 		"CLIENTORDERSTABLECHANGESTATUSBUTTONTEXT": "Mark as processed",
 		"GUESTLOGINTEXT": "Guest",
 		"ADDITIONALCLIENTORDERSBUTTONTEXT": "More orders",

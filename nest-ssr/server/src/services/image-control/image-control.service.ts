@@ -34,7 +34,7 @@ export class ImageControlService {
     public staticCompressedImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
 
     public async get (options: {
-        client?: Admin,
+        clientInstance?: Admin,
         find?: {
             imageTitles?: string[],
             includeFields?: string[],
@@ -45,7 +45,7 @@ export class ImageControlService {
         imagesExistsCount?: number
     }): Promise<ClientCompressedImage[]>
     public async get (options: {
-        client?: Admin,
+        clientInstance?: Admin,
         find?: {
             imageTitles?: string[],
             includeFields?: string[],

@@ -31,7 +31,7 @@
                 #imageContainer
             >
                 <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-fluid rounded h-100">
-                <div class="text-center position-absolute top-100 start-50 z-1 downloadOriginalImageLinkContainer"
+                <div class="position-absolute top-100 start-50 d-flex flex-row justify-content-center z-1 downloadOriginalImageLinkContainer"
                     [@link-container-animation]="mediumLinkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]"
                     (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(
                         imageData.name, imageData.viewSizeType), 
@@ -45,11 +45,16 @@
                         'display': mediumLinkContainerAnimationDisplayValues[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]
                     }"
                 >
-                    <a href="/api/client/downloadOriginalImage/:{{ imageData.name }}" class="btn btn-secondary btn-sm" 
-                        tabindex="-1" role="button" aria-disabled="true"
-                    >
-                    {{ 'GALLERYPAGE.DOWNLOADORIGINALIMAGEBUTTONTEXT' | translate }}
-                    </a>
+                    <div class="input-group justify-content-center flex-nowrap w-70">
+                        <a href="/api/client/downloadOriginalImage/:{{ imageData.name }}" class="btn btn-secondary btn-sm" 
+                            tabindex="-1" role="button" aria-disabled="true"
+                        >
+                            {{ 'GALLERYPAGE.DOWNLOADORIGINALIMAGEBUTTONTEXT' | translate }}
+                        </a>
+                        <span class="input-group-text text-bg-light p-0 px-1 border-0" [ngStyle]="{ 'backgroundColor': '#6c757d' }">
+                            <i class="bi bi-download"></i>
+                        </span>
+                    </div>
                 </div>
             </div>
         </ng-template>
@@ -74,7 +79,7 @@
                 #imageContainer
             >
                 <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="h-100 w-100 rounded">
-                <div class="text-center position-absolute top-100 start-50 z-1 downloadOriginalImageLinkContainer"
+                <div class="position-absolute top-100 start-50 d-flex flex-row justify-content-center z-1 downloadOriginalImageLinkContainer"
                     [@link-container-animation]="bigLinkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]"
                     (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(
                         imageData.name, imageData.viewSizeType),
@@ -88,11 +93,16 @@
                         'display': bigLinkContainerAnimationDisplayValues[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]
                     }"
                 >
-                    <a href="/api/client/downloadOriginalImage/:{{ imageData.name }}" class="btn btn-secondary btn-sm" 
-                        tabindex="-1" role="button" aria-disabled="true"
-                    >
-                    {{ 'GALLERYPAGE.DOWNLOADORIGINALIMAGEBUTTONTEXT' | translate }}
-                    </a>
+                    <div class="input-group justify-content-center flex-nowrap w-70">
+                        <a href="/api/client/downloadOriginalImage/:{{ imageData.name }}" class="btn btn-secondary btn-sm" 
+                            tabindex="-1" role="button" aria-disabled="true"
+                        >
+                            {{ 'GALLERYPAGE.DOWNLOADORIGINALIMAGEBUTTONTEXT' | translate }}
+                        </a>
+                        <span class="input-group-text text-bg-light p-0 px-1 border-0" [ngStyle]="{ 'backgroundColor': '#6c757d' }">
+                            <i class="bi bi-download"></i>
+                        </span>
+                    </div>
                 </div>
             </div>
         </ng-template>

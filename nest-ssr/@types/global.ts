@@ -87,6 +87,7 @@ export interface IClientLocale {
 export interface IFullCompressedImageData {
     imagesList: IClientCompressedImage[];
     count: number;
+    additionalImagesIsExists: boolean;
 }
 
 export interface IGalleryCompressedImagesData {

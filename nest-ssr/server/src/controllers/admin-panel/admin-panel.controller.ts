@@ -40,8 +40,15 @@ export class AdminPanelController {
 
     @Get('/getFullCompressedImagesList')
     @ClientTypes('admin')
-    public async getFullCompressedImagesList (@Req() request: IRequest): Promise<IFullCompressedImageData> {
-        return this.adminPanelService.getFullCompressedImagesList(request);
+    public async getFullCompressedImagesList (@Req() request: IRequest, @Query() options: {}): Promise<IFullCompressedImageData> {
+        const imagesExistsCount: number = options['imagesExistsCount'] ? parseInt(options['imagesExistsCount'], 10) : null;
+        const imagesLimit: number = options['imagesLimit'] ? parseInt(options['imagesLimit'], 10) : null;
+
+        if ( imagesExistsCount && Number.isNaN(imagesExistsCount)
+            || imagesLimit && (Number.isNaN(imagesLimit) || imagesLimit > 15)
+        ) throw new BadRequestException('GetFullCompressedImagesList - invalid query data');
+
+        return this.adminPanelService.getFullCompressedImagesList(request, imagesLimit, imagesExistsCount);
     }
 
     @Get('/getClientOrders')

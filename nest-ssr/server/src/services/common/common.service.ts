@@ -161,7 +161,7 @@ export class CommonService {
     }
 
     public async getCompressedImages (options: {
-        client?: Admin,
+        clientInstance?: Admin,
         find?: {
             imageTitles?: string[],
             includeFields?: string[],
@@ -172,7 +172,7 @@ export class CommonService {
         imagesExistsCount?: number
     }): Promise<ClientCompressedImage[]>
     public async getCompressedImages (options: {
-        client?: Admin,
+        clientInstance?: Admin,
         find?: {
             imageTitles?: string[],
             includeFields?: string[],

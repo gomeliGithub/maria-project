@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { FormControl, FormGroup } from '@angular/forms';
 
@@ -6,6 +6,7 @@ import { Observable, map } from 'rxjs';
 
 import { AdminPanelOrdersControlComponent } from '../../components/admin-panel-orders-control/admin-panel-orders-control.component';
 import { AdminPanelDiscountsControlComponent } from '../../components/admin-panel-discounts-control/admin-panel-discounts-control.component';
+import { ClientOrdersComponent } from '../../components/admin-panel-orders-control/client-orders/client-orders.component';
 
 import { AppService } from '../../app.service';
 import { WebSocketService } from '../web-socket/web-socket.service';
@@ -14,7 +15,6 @@ import { environment } from '../../../environments/environment';
 
 import { IClientOrdersData, IClientOrdersInfoData, IFullCompressedImageData } from 'types/global';
 import { IGetClientOrdersOptions } from 'types/options';
-import { ClientOrdersComponent } from 'src/app/components/admin-panel-orders-control/client-orders/client-orders.component';
 import { IDiscount } from 'types/models';
 
 @Injectable({
@@ -30,10 +30,21 @@ export class AdminPanelService {
 
     private readonly _socketServerHost: string = environment.webSocketServerURL;
 
-    public getFullCompressedImagesData (): Observable<IFullCompressedImageData> {
+    public spinnerHiddenStatusChange: EventEmitter<boolean> = new EventEmitter();
+
+    public setSpinnerHiddenStatus (value: boolean): void {
+        this.spinnerHiddenStatusChange.emit(value);
+    }
+
+    public getFullCompressedImagesData (imagesLimit?: number, imagesExistsCount?: number): Observable<IFullCompressedImageData> {
         const headers: HttpHeaders = this.appService.createRequestHeaders();
 
-        return this.http.get<IFullCompressedImageData>('/api/admin-panel/getFullCompressedImagesList', { headers, withCredentials: true });
+        let params: HttpParams = new HttpParams();
+
+        params = params.append('imagesLimit', imagesLimit ?? '');
+        params = params.append('imagesExistsCount', imagesExistsCount ?? '');
+
+        return this.http.get<IFullCompressedImageData>('/api/admin-panel/getFullCompressedImagesList', { params, headers, withCredentials: true });
     }
 
     public getClientOrders (options: {
@@ -42,21 +53,21 @@ export class AdminPanelService {
         untilDate?: Date,
         status?: string,
         ordersLimit?: number,
-        existsCount?: number
+        existsCount: number
     }): Observable<IClientOrdersInfoData>
-    public getClientOrders (options?: {
+    public getClientOrders (options: {
         getInfoData?: string,
         memberLogin: string,
         fromDate?: Date,
         untilDate?: Date,
         status?: string,
         ordersLimit?: number,
-        existsCount?: number
+        existsCount: number
     }): Observable<IClientOrdersData>
-    public getClientOrders (options?: IGetClientOrdersOptions): Observable<IClientOrdersInfoData | IClientOrdersData> {
+    public getClientOrders (options: IGetClientOrdersOptions): Observable<IClientOrdersInfoData | IClientOrdersData> {
         const headers: HttpHeaders = this.appService.createRequestHeaders();
 
-        let params = new HttpParams();
+        let params: HttpParams = new HttpParams();
 
         if ( options ) {
             params = params.append('getInfoData', options.getInfoData ?? '');
@@ -94,7 +105,7 @@ export class AdminPanelService {
                     return clientOrder;
                 });
             }
-            
+                
             return data;
         }));
     }
@@ -133,7 +144,7 @@ export class AdminPanelService {
 
     public switchImageControlResponses (responseText: string): void {
         switch ( responseText ) {
-            case 'SUCCESS': { window.location.reload(); break; }
+            case 'SUCCESS': { this.setSpinnerHiddenStatus(true); break; }
             case 'MAXCOUNT': {
                 this.appService.createWarningModal(this.appService.getTranslations('ADMINPANEL.MAXCOUNTONHOMEPAGEMESSAGE')); 
 

@@ -148,6 +148,7 @@
 			"CLIENTCOMMENT": "Дополнительная информация от клиента",
 			"CREATEDDATE": "Дата создания"
 		},
+		"ADDITIONALCOMPRESSEDIMAGESBUTTONTEXT": "Ещё фото",
 		"CLIENTORDERSTABLECHANGESTATUSBUTTONTEXT": "Отметить как обработанный",
 		"GUESTLOGINTEXT": "Гость",
 		"ADDITIONALCLIENTORDERSBUTTONTEXT": "Ещё заказы",

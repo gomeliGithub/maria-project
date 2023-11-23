@@ -1,18 +1,32 @@
 import { Component, ElementRef, HostBinding, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 import { AppService } from '../../app.service';
 import { AdminPanelService } from '../../services/admin-panel/admin-panel.service';
 import { ClientService } from '../../services/client/client.service';
 import { WebSocketService } from '../../services/web-socket/web-socket.service';
 
+import { AnimationEvent } from 'types/global';
 import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
 
 @Component({
     selector: 'app-admin-panel',
     templateUrl: './admin-panel.component.html',
-    styleUrls: ['./admin-panel.component.css']
+    styleUrls: ['./admin-panel.component.css'],
+    animations: [
+        trigger('images-table-rows-animation', [
+            transition(':enter', [
+                style({ opacity: 0, transform: 'translateX(-100%)' }),
+                animate('2s ease-out', style({ opacity: 1, transform: 'translateX(0)' }))
+            ]),
+            transition(':leave', [
+                style({ opacity: 1, transform: 'translateX(0)' }),
+                animate('1s ease', style({ opacity: 0, transform: 'translateX(-100%)' }))
+            ])
+        ])
+    ]
 })
 export class AdminPanelComponent implements OnInit {
     constructor (
@@ -51,6 +65,7 @@ export class AdminPanelComponent implements OnInit {
     }>;
 
     @ViewChild('changeImageDataContainer', { static: false }) private readonly changeImageDataContainerViewRef: ElementRef<HTMLDivElement>;
+    @ViewChild('additionalImagesButton', { static: false }) private readonly additionalImagesButtonViewRef: ElementRef<HTMLDivElement>;
 
     @HostListener('document:mousedown', [ '$event' ])
     public onGlobalClick (event): void {
@@ -73,6 +88,7 @@ export class AdminPanelComponent implements OnInit {
 
     public fullCompressedImagesList: IClientCompressedImage[];
     public fullCompressedImagesListCount: number;
+    public additionalImagesIsExists: boolean = false;
 
     public imagePhotographyTypes: IImagePhotographyType[];
 
@@ -82,17 +98,15 @@ export class AdminPanelComponent implements OnInit {
         if ( this.appService.checkIsPlatformBrowser() ) {
             this.appService.getTranslations('PAGETITLES.ADMINPANEL.IMAGESCONTROL', true).subscribe(translation => this.appService.setTitle(translation));
 
-            this.adminPanelService.getFullCompressedImagesData().subscribe({
-                next: imagesList => {
-                    this.fullCompressedImagesList = imagesList.imagesList;
-                    this.fullCompressedImagesListCount = imagesList.count;
-                },
-                error: () => this.appService.createErrorModal()
-            });
+            this.getFullCompressedImagesData();
 
             this.clientService.getImagePhotographyTypesData('admin').subscribe({
                 next: imagePhotographyTypesData => this.imagePhotographyTypes = imagePhotographyTypesData.length !== 0 ? imagePhotographyTypesData : null,
                 error: () => this.appService.createErrorModal()
+            });
+
+            this.adminPanelService.spinnerHiddenStatusChange.subscribe(value => {
+                this.spinnerHidden = value;
             });
         }
     }
@@ -103,6 +117,22 @@ export class AdminPanelComponent implements OnInit {
 
     public get progressBarValue (): number {
         return this.webSocketService.progressBarValue;
+    }
+
+    public getFullCompressedImagesData (imagesLimit?: number): void {
+        const imagesExistsCount: number = this.fullCompressedImagesList ? this.fullCompressedImagesList.length : 0;
+
+        this.adminPanelService.getFullCompressedImagesData(imagesLimit, imagesExistsCount).subscribe({
+            next: imageData => {
+                if ( !this.additionalImagesIsExists ) this.fullCompressedImagesList = imageData.imagesList;
+                else this.fullCompressedImagesList.push(...imageData.imagesList);
+
+                this.fullCompressedImagesListCount = imageData.count;
+
+                this.additionalImagesIsExists = imageData.additionalImagesIsExists;
+            },
+            error: () => this.appService.createErrorModal()
+        });
     }
 
     public fileChange (event: any): void {
@@ -211,20 +241,25 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public deleteImage (event: MouseEvent) {
-        const deleteImageButton: HTMLButtonElement = event.target as HTMLButtonElement;
+        const deleteImageButton: HTMLButtonElement = !(event.target instanceof HTMLButtonElement) ? (event.target as HTMLButtonElement).parentElement as HTMLButtonElement : event.target as HTMLButtonElement;
 
         if ( deleteImageButton ) {
             const originalImageName: string = deleteImageButton.getAttribute('originalImageName');
+            const indexNumber: number = parseInt(deleteImageButton.getAttribute('index-number'), 10);
 
             if ( originalImageName ) {
                 this.spinnerHidden = false;
 
                 const headers: HttpHeaders = this.appService.createRequestHeaders();
 
-                this.http.post('/api/admin-panel/deleteImage', { 
+                this.http.post('/api/admin-panel/deleteImage', {
                     adminPanel: { originalImageName }
                 }, { headers, responseType: 'text', withCredentials: true }).subscribe({
-                    next: responseText => this.adminPanelService.switchImageControlResponses(responseText),
+                    next: responseText => {
+                        this.adminPanelService.switchImageControlResponses(responseText);
+
+                        this.fullCompressedImagesList.splice(indexNumber, 1);
+                    },
                     error: () => {
                         this.spinnerHidden = true;
 
@@ -360,5 +395,21 @@ export class AdminPanelComponent implements OnInit {
                 } else this.appService.createWarningModal(this.appService.getTranslations('ADMINPANEL.CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTONINVALIDMESSSAGE'));
             }
         }
+    }
+
+    public imagesTableRowsAnimationStarted (event: AnimationEvent): void { 
+        const target: HTMLTableRowElement = event.element;
+
+        target.classList.add('pe-none');
+
+        this.additionalImagesButtonViewRef.nativeElement.hidden = true;
+    }
+
+    public imagesTableRowsAnimationDone (event: AnimationEvent): void {
+        const target: HTMLTableRowElement = event.element;
+
+        target.classList.remove('pe-none');
+
+        this.additionalImagesButtonViewRef.nativeElement.hidden = false;
     }
 }

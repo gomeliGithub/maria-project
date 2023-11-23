@@ -88,8 +88,7 @@ and (-webkit-device-pixel-ratio: 2) {
         flex: none !important;
     }
 
-    .downloadOriginalImageLinkContainer a {
-        width: 80%;
+    .downloadOriginalImageLinkContainer > div > a {
         --bs-btn-padding-y: .25rem; 
         --bs-btn-padding-x: .5rem; 
         --bs-btn-font-size: .60rem;

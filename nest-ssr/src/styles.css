@@ -15,6 +15,10 @@ body {
     width: 60% !important;
 }
 
+.w-70 {
+    width: 70% !important;
+}
+
 .w-80 {
     width: 80% !important;
 }
@@ -72,6 +76,7 @@ app-client {
     flex-direction: row !important;
     justify-content: center !important;
     align-items: center !important;
+    height: auto !important;
 }
 
 app-gallery, app-admin-panel, app-admin-panel-orders-control, app-admin-panel-client-orders, app-admin-panel-discounts-control {
