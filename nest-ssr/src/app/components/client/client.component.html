@@ -9,7 +9,7 @@
                 {{ 'CLIENTPAGE.LOGININVALIDMESSAGE' | translate }}
             </div>
         </div>
-        <span class="input-group-text fs-3"
+        <span *ngIf="signOp === 'up'" class="input-group-text fs-3"
             placement="auto"
             tooltipClass="custom-tooltip"
             [ngbTooltip]="'CLIENTPAGE.HELPBLOCKS.LOGIN' | translate"
@@ -27,7 +27,7 @@
                 {{ 'CLIENTPAGE.PASSWORDINVALIDMESSAGE' | translate }}
             </div>
         </div>
-        <span class="input-group-text fs-3"
+        <span *ngIf="signOp === 'up'" class="input-group-text fs-3"
             placement="auto"
             tooltipClass="custom-tooltip"
             [ngbTooltip]="'CLIENTPAGE.HELPBLOCKS.PASSWORD' | translate"
@@ -59,7 +59,11 @@
                 {{ 'CLIENTPAGE.EMAILINVALIDMESSAGE' | translate }}
             </div>
         </div>
-        <span class="input-group-text fs-3 invisible">
+        <span class="input-group-text fs-3"
+            placement="auto"
+            tooltipClass="custom-tooltip"
+            [ngbTooltip]="'CLIENTPAGE.HELPBLOCKS.EMAIL' | translate"
+        >
             <i class="bi bi-info-circle"></i>
         </span>
     </div>

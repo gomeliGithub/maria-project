@@ -18,14 +18,14 @@ export class ClientComponent implements OnInit {
         private readonly clientService: ClientService
     ) {
         const formControls = {
-            'clientLogin': new FormControl("", [ Validators.required, Validators.minLength(4), this.clientLoginValidator ]),
+            'clientLogin': new FormControl("", [ Validators.required, Validators.minLength(4), Validators.maxLength(15), this.clientLoginValidator ]),
             'clientPassword': new FormControl("", [ Validators.required, Validators.minLength(5), Validators.maxLength(20) ])
         };
 
         this.signOp = this.activateRoute.snapshot.paramMap.get('op') as 'up' | 'in';
 
         if (this.signOp === 'up') {
-            formControls['clientFullName'] = new FormControl("", [ Validators.required, Validators.minLength(5), Validators.maxLength(25) ]),
+            formControls['clientFullName'] = new FormControl("", [ Validators.required, Validators.minLength(3), Validators.maxLength(25) ]),
             formControls['clientEmail'] = new FormControl("", Validators.email);
         }
 

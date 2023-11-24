@@ -29,6 +29,9 @@
                     <a class="nav-link active" aria-current="page" routerLink="/"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
+                        <span class="fs-5">
+                            <i class="bi bi-house"></i>
+                        </span>
                         {{ 'PAGETITLES.HOME' | translate }}
                     </a>
                 </li>
@@ -36,6 +39,9 @@
                     <a class="nav-link" routerLink="/gallery"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
+                        <span class="fs-5">
+                            <i class="bi bi-images"></i>
+                        </span>
                         {{ 'PAGETITLES.GALLERY' | translate }}
                     </a>
                 </li>
@@ -45,21 +51,33 @@
                         ngbDropdownToggle
                         (mouseenter)="menuMove(true, adminPanelMenu)"
                     >
-                    {{ 'PAGETITLES.ADMINPANEL.MAIN' | translate }}
+                        <span class="fs-5">
+                            <i class="bi bi-menu-button-wide"></i>
+                        </span>
+                        {{ 'PAGETITLES.ADMINPANEL.MAIN' | translate }}
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="adminPanelMenuButton" ngbDropdownMenu (mouseleave)="menuMove(false, adminPanelMenu)">
                         <li>
                             <a class="" ngbDropdownItem routerLink="/adminPanel" routerLinkActive="">
+                                <span class="fs-5">
+                                    <i class="bi bi-1-circle"></i>
+                                </span>
                                 {{ 'PAGETITLES.ADMINPANEL.IMAGESCONTROL' | translate }}
                             </a>
                         </li>
                         <li>
                             <a class="" ngbDropdownItem routerLink="/adminPanel/ordersControl">
+                                <span class="fs-5">
+                                    <i class="bi bi-2-circle"></i>
+                                </span>
                                 {{ 'PAGETITLES.ADMINPANEL.ORDERSCONTROL' | translate }}
                             </a>
                         </li>
                         <li>
                             <a class="" ngbDropdownItem routerLink="/adminPanel/discountsControl">
+                                <span class="fs-5">
+                                    <i class="bi bi-3-circle"></i>
+                                </span>
                                 {{ 'PAGETITLES.ADMINPANEL.DISCOUNTSCONTROL' | translate }}
                             </a>
                         </li>
@@ -71,21 +89,33 @@
                         ngbDropdownToggle
                         (mouseenter)="menuMove(true, clientMenu)"
                     >
+                        <span class="fs-5">
+                            <i class="bi bi-person-circle"></i>
+                        </span>
                         {{ 'CLIENTMENU.TITLE' | translate }}
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="clientMenuButton" ngbDropdownMenu (mouseleave)="menuMove(false, clientMenu)">
                         <li *ngIf="!activeClientLogin">
                             <a class="" ngbDropdownItem routerLink="/signUp">
+                                <span class="fs-5">
+                                    <i class="bi bi-person-add"></i>
+                                </span>
                                 {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
                             </a>
                         </li>
                         <li *ngIf="!activeClientLogin">
                             <a class="" ngbDropdownItem routerLink="/signIn">
+                                <span class="fs-5">
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                </span>
                                 {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
                             </a>
                         </li>
                         <li *ngIf="activeClientLogin">
                             <button type="button" class="" ngbDropdownItem (click)="signOut()">
+                                <span class="fs-5">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                </span>
                                 {{ 'CLIENTMENU.SIGNOUTTEXT' | translate }}
                             </button>
                         </li>

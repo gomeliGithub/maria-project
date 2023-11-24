@@ -52,9 +52,10 @@
 		"FULLNAMEINVALIDMESSAGE": "Incorrect full name",
 		"EMAILINVALIDMESSAGE": "Incorrect email",
 		"HELPBLOCKS": {
-			"LOGIN": "Your login must contain only latin characters and (or) numbers.",
+			"LOGIN": "Your login must be from 4 to 15 characters long and contain only Latin characters and (or) numbers.",
 			"PASSWORD": "Your password must be 5-20 characters long.",
-			"FULLNAME": "Your full name must be 5-25 characters long."
+			"FULLNAME": "Your full name must be between 3 and 25 characters long.",
+			"EMAIL": "(Optional) Your email address."
 		},
 		"ACCOUNTHAVEMESSAGES": {
 			"HAVE": "Already have an account?",

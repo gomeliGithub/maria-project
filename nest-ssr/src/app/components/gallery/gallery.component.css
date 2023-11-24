@@ -88,12 +88,6 @@ and (-webkit-device-pixel-ratio: 2) {
         flex: none !important;
     }
 
-    .downloadOriginalImageLinkContainer > div > a {
-        --bs-btn-padding-y: .25rem; 
-        --bs-btn-padding-x: .5rem; 
-        --bs-btn-font-size: .60rem;
-    }
-
     #orderButton {
         --bs-btn-padding-x: 0.75rem;
         --bs-btn-padding-y: 0.375rem;

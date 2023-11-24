@@ -72,8 +72,8 @@ export class SignService {
         const emailPattern: RegExp = /^[^\s()<>@,;:\/]+@\w[\w\.-]+\.[a-z]{2,}$/i;
 
         // clientPassword.length < 4
-        const incorrectLogin: boolean = !loginPattern.test(clientLogin) || clientLogin.length < 4;
-        const incorrectFullName: boolean = clientFullName.length < 5 || clientFullName.length > 25;
+        const incorrectLogin: boolean = !loginPattern.test(clientLogin) || clientLogin.length < 4 || clientLogin.length > 15;
+        const incorrectFullName: boolean = clientFullName.length < 3 || clientFullName.length > 25;
         const incorrectRmail: boolean = !emailPattern.test(clientEmail);
 
         if ( incorrectLogin || incorrectFullName || ( clientEmail && incorrectRmail ) ) {

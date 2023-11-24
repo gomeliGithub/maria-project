@@ -402,7 +402,7 @@ export class AdminPanelComponent implements OnInit {
 
         target.classList.add('pe-none');
 
-        this.additionalImagesButtonViewRef.nativeElement.hidden = true;
+        if ( this.additionalImagesButtonViewRef ) this.additionalImagesButtonViewRef.nativeElement.hidden = true;
     }
 
     public imagesTableRowsAnimationDone (event: AnimationEvent): void {
@@ -410,6 +410,6 @@ export class AdminPanelComponent implements OnInit {
 
         target.classList.remove('pe-none');
 
-        this.additionalImagesButtonViewRef.nativeElement.hidden = false;
+        if ( this.additionalImagesButtonViewRef ) this.additionalImagesButtonViewRef.nativeElement.hidden = false;
     }
 }
