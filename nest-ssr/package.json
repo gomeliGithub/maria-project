@@ -39,7 +39,7 @@
     "@nestjs/sequelize": "^10.0.0",
     "@ng-bootstrap/ng-bootstrap": "^16.0.0",
     "@nguniversal/common": "^16.2.0",
-    "@nguniversal/express-engine": "^15.2.1",
+    "@nguniversal/express-engine": "^16.2.0",
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
     "@popperjs/core": "^2.11.8",
@@ -74,7 +74,7 @@
     "stream-http": "^3.2.0",
     "tslib": "^2.3.0",
     "ws": "^8.14.2",
-    "zone.js": "~0.13.3"
+    "zone.js": "^0.14.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.2.10",
