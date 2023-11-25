@@ -38,7 +38,7 @@
     "@nestjs/schedule": "^3.0.4",
     "@nestjs/sequelize": "^10.0.0",
     "@ng-bootstrap/ng-bootstrap": "^16.0.0",
-    "@nguniversal/common": "^15.2.1",
+    "@nguniversal/common": "^16.2.0",
     "@nguniversal/express-engine": "^15.2.1",
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
