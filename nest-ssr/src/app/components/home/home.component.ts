@@ -1,4 +1,4 @@
-import { AfterContentChecked, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChildren, afterRender } from '@angular/core';
+import { AfterContentChecked, AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChildren, afterRender } from '@angular/core';
 import { animate, animateChild, query, state, style, transition, trigger } from '@angular/animations';
 import { Observable, catchError, map, of } from 'rxjs';
 
@@ -74,7 +74,7 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
         ])
     ]
 })
-export class HomeComponent implements OnInit, AfterContentChecked, OnDestroy {
+export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChecked, OnDestroy {
     public deviceInfo: DeviceInfo = null;
 
     constructor (
@@ -105,6 +105,7 @@ export class HomeComponent implements OnInit, AfterContentChecked, OnDestroy {
     public isDesktopDevice: boolean = false;
 
     public componentElementIsRendered: boolean = false;
+    public compressedImagesDataIsLoaded: boolean = false;
 
     public scrollSnapSectionsPosition: { offsetTop: number, offsetHeight: number, offsetTopMod: number, indexNumber: number }[];
     public currentItem: number;
@@ -186,8 +187,19 @@ export class HomeComponent implements OnInit, AfterContentChecked, OnDestroy {
         this.changeDetector.detectChanges();
     }
 
+    ngAfterViewChecked (): void {
+        if ( this.appService.checkIsPlatformBrowser() ) {
+            if ( this.compressedImagesList && !this.compressedImagesDataIsLoaded ) {
+                this.scrollSnapSectionViewRefs.first.nativeElement.scrollIntoView({ behavior: 'auto', block: 'start' });
+
+                this.compressedImagesDataIsLoaded = true;
+            }
+        }
+    }
+
     ngOnDestroy (): void {
         this.componentElementIsRendered = false;
+        this.compressedImagesDataIsLoaded = false;
     }
 
     @HostListener('scroll', [ '$event' ]) public onScroll ($event: any): void {
