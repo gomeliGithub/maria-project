@@ -2,11 +2,12 @@ import { Component, ElementRef, HostBinding, OnInit, QueryList, ViewChild, ViewC
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { Observable, catchError, map, of } from 'rxjs';
 
 import { AppService } from '../../../app/app.service';
 import { ClientService } from '../../services/client/client.service';
 
-import { AnimationEvent, IReducedGalleryCompressedImages } from 'types/global';
+import { AnimationEvent, IGalleryCompressedImagesData, IReducedGalleryCompressedImages } from 'types/global';
 import { IClientCompressedImage } from 'types/models';
 
 @Component({
@@ -91,7 +92,9 @@ export class GalleryComponent implements OnInit {
 
     @ViewChild('sendOrderFormContainer', { static: false }) private readonly sendOrderFormContainerViewRef: ElementRef<HTMLDivElement>;
 
+    public compressedBigImagesIsExistsObservable: Observable<boolean>;
     public compressedBigImagesIsExists: boolean = false;
+    public compressedImagesListObservable: Observable<IGalleryCompressedImagesData> = null;
     public compressedImagesList: IReducedGalleryCompressedImages = null;
     public photographyTypeDescription: string;
 
@@ -114,6 +117,8 @@ export class GalleryComponent implements OnInit {
 
     public isToggleBigGallery: boolean = false;
 
+    public scrollPageBottomIsFinished: boolean = false;
+
     ngOnInit (): void {
         this.router.events.subscribe(evt => {
             if ( !(evt instanceof NavigationEnd) ) return;
@@ -122,118 +127,90 @@ export class GalleryComponent implements OnInit {
             if ( this.url.startsWith('/gallery') ) window.location.reload();
         });
 
-        if ( this.appService.checkIsPlatformBrowser() ) {
-            this.appService.getTranslations([ 'PAGETITLES.GALLERY', `IMAGEPHOTOGRAPHYTYPESFULLTEXT.${ this.photographyType.toUpperCase() }`], true).subscribe({
-                next: translation => this.appService.setTitle(`${ translation[0] } - ${ translation[1] }`),
-                error: () => this.appService.createErrorModal()
-            });
+        this.appService.getTranslations([ 'PAGETITLES.GALLERY', `IMAGEPHOTOGRAPHYTYPESFULLTEXT.${ this.photographyType.toUpperCase() }`], true).subscribe(translation => {
+            this.appService.setTitle(`${ translation[0] } - ${ translation[1] }`);
+        });
 
-            this.clientService.checkCompressedBigImagesIsExists(this.photographyType).subscribe({
-                next: result => this.compressedBigImagesIsExists = result,
-                error: () => this.appService.createErrorModal()
-            });
+        this.compressedBigImagesIsExistsObservable = this.clientService.checkCompressedBigImagesIsExists(this.photographyType).pipe(map(result => {
+            this.compressedBigImagesIsExists = result;
 
-            sessionStorage.clear();
+            return result;
+        }), catchError(() => {
+            this.appService.createErrorModal();
 
-            this.getCompressedImagesData('medium');
+            return of(null);
+        }));
 
-            this.clientService.scrollPageBottomStatusChange.subscribe(value => {
-                if ( value ) {
-                    if ( this.additionalImagesExists ) {
-                        this.getCompressedImagesData('medium', this.imageContainerViewRefs.length);
-                        this.clientService.setScrollPageBottomStatus(false);
-                    }
+        this.getCompressedImagesData('medium');
+
+        this.clientService.scrollPageBottomStatusChange.subscribe(value => {
+            if ( value ) {
+                if ( this.additionalImagesExists && !this.scrollPageBottomIsFinished ) {
+                    this.scrollPageBottomIsFinished = true;
+
+                    this.getCompressedImagesData('medium', this.imageContainerViewRefs.length);
+                    this.clientService.setScrollPageBottomStatus(false);
                 }
-            });
-        }
+            }
+        });
     }
 
     public getCompressedImagesData (imageViewSize: 'medium' | 'big', currentImagesCount?: number): void {
-        const compressedImagesListMedium: IClientCompressedImage[][] = (JSON.parse(sessionStorage.getItem('compressedImagesListMedium')) as IClientCompressedImage[][]);
-        const compressedImagesListBig: IClientCompressedImage[][] = (JSON.parse(sessionStorage.getItem('compressedImagesListBig')) as IClientCompressedImage[][]);
-
-        if ( !this.additionalImagesExists ) {
             if ( !currentImagesCount ) currentImagesCount = 0;
 
-            if ( imageViewSize === 'medium' && compressedImagesListMedium ) {
-                this.isToggleBigGallery = true;
+            this.compressedImagesListObservable = this.clientService.getCompressedImagesData(this.photographyType, imageViewSize, currentImagesCount).pipe(map(data => {
+                if ( data.compressedImagesRaw.medium.length !== 0 || data.compressedImagesRaw.big.length !== 0 ) {
+                    if ( !this.additionalImagesExists ) {
+                        this.compressedImagesList = data.compressedImagesRaw;
 
-                this.compressedImagesList.big = [];
-                this.compressedImagesList.medium = compressedImagesListMedium.slice(currentImagesCount, 8 / 4) ?? [];
-
-                this.additionalImagesExists = compressedImagesListMedium.length > this.compressedImagesList.medium.length;
-            } else if ( imageViewSize === 'big' && compressedImagesListBig ) {
-                this.isToggleBigGallery = true;
-                
-                this.compressedImagesList.medium = [];
-                this.compressedImagesList.big = compressedImagesListBig.slice(currentImagesCount, 8 / 8) ?? [];
-
-                this.additionalImagesExists = compressedImagesListBig.length > this.compressedImagesList.big.length;
-            }
-        }
-
-        if ( this.additionalImagesExists || ( !compressedImagesListMedium || !compressedImagesListBig ) ) {
-            if ( !currentImagesCount ) currentImagesCount = 0;
-
-            this.clientService.getCompressedImagesData(this.photographyType, imageViewSize, currentImagesCount).subscribe({
-                next: data => {
-                    if ( data.compressedImagesRaw.medium.length !== 0 || data.compressedImagesRaw.big.length !== 0 ) {
-                        if ( !this.additionalImagesExists ) {
-                            this.compressedImagesList = data.compressedImagesRaw;
-
-                            this.isToggleBigGallery = false;
-                        } else {
-                            this.compressedImagesList.medium.push(...data.compressedImagesRaw.medium);
-                            this.compressedImagesList.big.push(...data.compressedImagesRaw.big);
-                        }
-
-                        if ( data.compressedImagesRaw.medium.length !== 0 ) {
-                            if ( !this.additionalImagesExists ) {
-                                sessionStorage.setItem('compressedImagesListMedium', JSON.stringify(data.compressedImagesRaw.medium));
-                                this.flatMediumCompressedImagesList = data.compressedImagesRaw.medium.flat();
-                            } else {
-                                const updatedCompressedImagesListMedium: IClientCompressedImage[][] = (JSON.parse(sessionStorage.getItem('compressedImagesListMedium')));
-
-                                updatedCompressedImagesListMedium.push(...data.compressedImagesRaw.medium);
-                                
-                                sessionStorage.setItem('compressedImagesListMedium', JSON.stringify(updatedCompressedImagesListMedium));
-                                this.flatMediumCompressedImagesList.push(...data.compressedImagesRaw.medium.flat());
-                            }
-
-                            this.flatMediumCompressedImagesList.forEach(() => {
-                                this.mediumLinkContainerAnimationStates.push('leave');
-                                this.mediumLinkContainerAnimationDisplayValues.push('none');
-                            });
-                        } else if ( data.compressedImagesRaw.big.length !== 0 ) {
-                            if ( !this.additionalImagesExists ) {
-                                sessionStorage.setItem('compressedImagesListBig', JSON.stringify(data.compressedImagesRaw.big));
-                                this.flatBigCompressedImagesList = data.compressedImagesRaw.big.flat();
-                            } else {
-                                const updatedCompressedImagesListBig: IClientCompressedImage[][] = (JSON.parse(sessionStorage.getItem('compressedImagesListBig')));
-
-                                updatedCompressedImagesListBig.push(...data.compressedImagesRaw.big);
-
-                                sessionStorage.setItem('compressedImagesListBig', JSON.stringify(updatedCompressedImagesListBig));
-                                this.flatBigCompressedImagesList.push(...data.compressedImagesRaw.big.flat());
-                            }
-
-                            this.flatBigCompressedImagesList.forEach(() => {
-                                this.bigLinkContainerAnimationStates.push('leave');
-                                this.bigLinkContainerAnimationDisplayValues.push('none');
-                            });
-                        }
+                        this.isToggleBigGallery = false;
+                    } else {
+                        this.compressedImagesList.medium.push(...data.compressedImagesRaw.medium);
+                        this.compressedImagesList.big.push(...data.compressedImagesRaw.big);
                     }
 
-                    this.photographyTypeDescription = data.photographyTypeDescription ? data.photographyTypeDescription : null;
+                    if ( data.compressedImagesRaw.medium.length !== 0 ) {
+                        if ( !this.additionalImagesExists ) {
+                            this.flatMediumCompressedImagesList = data.compressedImagesRaw.medium.flat();
+                        } else {
+                            this.flatMediumCompressedImagesList.push(...data.compressedImagesRaw.medium.flat());
+                        }
 
-                    this.additionalImagesExists = data.additionalImagesExists;
-                },
-                error: () => this.appService.createErrorModal()
-            });
-        }
+                        this.flatMediumCompressedImagesList.forEach(() => {
+                            this.mediumLinkContainerAnimationStates.push('leave');
+                            this.mediumLinkContainerAnimationDisplayValues.push('none');
+                        });
+                    } else if ( data.compressedImagesRaw.big.length !== 0 ) {
+                        if ( !this.additionalImagesExists ) {
+                            this.flatBigCompressedImagesList = data.compressedImagesRaw.big.flat();
+                        } else {
+                            this.flatBigCompressedImagesList.push(...data.compressedImagesRaw.big.flat());
+                        }
+
+                        this.flatBigCompressedImagesList.forEach(() => {
+                            this.bigLinkContainerAnimationStates.push('leave');
+                            this.bigLinkContainerAnimationDisplayValues.push('none');
+                        });
+                    }
+                }
+
+                this.photographyTypeDescription = data.photographyTypeDescription ? data.photographyTypeDescription : null;
+
+                this.additionalImagesExists = data.additionalImagesExists;
+
+                this.scrollPageBottomIsFinished = false;
+
+                return data;
+            }), catchError(() => {
+                this.appService.createErrorModal();
+
+                return of(null);
+            }));
+
+
     }
 
-    public toggleBigGallery (): void {
+    public toggleBigGallery (): void { debugger;
         if ( this.bigGalleryIsHide ) {
             this.getCompressedImagesData('big');
 
@@ -243,8 +220,6 @@ export class GalleryComponent implements OnInit {
 
             this.bigGalleryIsHide = true;
         }
-
-        this._componentRef.nativeElement.scrollIntoView({ behavior: 'auto', block: 'start' });
 
         this.isToggleBigGallery = true;
 

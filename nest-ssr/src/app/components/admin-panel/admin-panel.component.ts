@@ -26,7 +26,8 @@ import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
                 animate('1s ease', style({ opacity: 0, transform: 'translateX(-100%)' }))
             ])
         ])
-    ]
+    ],
+    host: { ngSkipHydration: 'true' }
 })
 export class AdminPanelComponent implements OnInit {
     constructor (
@@ -271,7 +272,7 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public changeImageDisplayTarget (event: MouseEvent) {
-        const imageButton: HTMLButtonElement = event.target as HTMLButtonElement;
+        const imageButton: HTMLButtonElement = !(event.target instanceof HTMLButtonElement) ? (event.target as HTMLButtonElement).parentElement as HTMLButtonElement : event.target as HTMLButtonElement;
 
         if ( imageButton ) {
             const originalImageName: string = imageButton.getAttribute('originalImageName');
@@ -327,7 +328,7 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public changeImageFormActivate (event: MouseEvent): void {
-        const imageButton: HTMLButtonElement = event.target as HTMLButtonElement;
+        const imageButton: HTMLButtonElement = !(event.target instanceof HTMLButtonElement) ? (event.target as HTMLButtonElement).parentElement as HTMLButtonElement : event.target as HTMLButtonElement;
 
         if ( imageButton ) {
             this.changeImageDataFormHidden = false;
@@ -337,7 +338,7 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public setPhotographyTypeImage (event: MouseEvent): void {
-        const imageButton: HTMLButtonElement = event.target as HTMLButtonElement;
+        const imageButton: HTMLButtonElement = !(event.target instanceof HTMLButtonElement) ? (event.target as HTMLButtonElement).parentElement as HTMLButtonElement : event.target as HTMLButtonElement;
 
         if ( imageButton ) {
             const originalImageName: string = imageButton.getAttribute('originalImageName');

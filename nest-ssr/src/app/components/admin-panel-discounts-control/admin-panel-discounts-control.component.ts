@@ -10,7 +10,8 @@ import { IDiscount } from 'types/models';
 @Component({
     selector: 'app-admin-panel-discounts-control',
     templateUrl: './admin-panel-discounts-control.component.html',
-    styleUrls: ['./admin-panel-discounts-control.component.css']
+    styleUrls: ['./admin-panel-discounts-control.component.css'],
+    host: { ngSkipHydration: 'true' }
 })
 export class AdminPanelDiscountsControlComponent implements OnInit {
     constructor (

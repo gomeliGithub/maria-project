@@ -165,8 +165,6 @@ export class AppComponent implements OnInit {
             this.componentClass = true;
             this.isHomePage = true;
 
-            component.firstScrollIsFinished = false;
-
             this.footerElementRef.nativeElement.classList.remove('position-relative');
             this.footerElementRef.nativeElement.classList.add('bottom-0', 'position-absolute');
         }

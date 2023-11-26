@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
-import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TransferHttpCacheModule } from '@nguniversal/common';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -17,11 +18,9 @@ import { ClientModule } from './modules/client.module';
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
 import { ModalComponent } from './components/modal/modal.component';
-import { NotFoundComponent } from './components/not-found/not-found.component';
+import { NotFoundComponent } from './components/not-found/not-found.component'; 
 
 import { AppService } from './app.service';
-
-import { BrowserStateInterceptor } from './interceptors/browser-state/browser-state.interceptor';
 
 import { environment } from '../environments/environment';
 
@@ -34,7 +33,8 @@ import { environment } from '../environments/environment';
         NotFoundComponent
     ],
     imports: [
-        BrowserModule.withServerTransition({ appId: 'serverApp' }),
+        BrowserModule,
+        TransferHttpCacheModule,
         BrowserAnimationsModule,
         HttpClientModule,
         FormsModule,
@@ -53,12 +53,9 @@ import { environment } from '../environments/environment';
         ClientModule,
         NgbModule
     ],
-    providers: [ AppService,
-        {
-            provide: HTTP_INTERCEPTORS,
-            useClass: BrowserStateInterceptor,
-            multi: true
-        }
+    providers: [
+        provideHttpClient(withFetch()),
+        AppService
     ],
     bootstrap: [AppComponent]
 })

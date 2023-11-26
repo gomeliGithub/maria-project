@@ -115,9 +115,7 @@ export class ClientService {
     }
 
     public getDiscountsData (): Observable<IDiscount[]> {
-        const headers: HttpHeaders = this.appService.createRequestHeaders();
-
-        return this.http.get<IDiscount[]>('/api/client/getDiscountsData', { headers, withCredentials: true });
+        return this.http.get<IDiscount[]>('/api/client/getDiscountsData');
     }
 
     public sendOrder (photographyType: string, sendOrderFormValue: Partial<{

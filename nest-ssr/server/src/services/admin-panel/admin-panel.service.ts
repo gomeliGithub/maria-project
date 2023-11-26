@@ -600,7 +600,7 @@ export class AdminPanelService {
         const compressedImageRawIsExists: boolean = !compressedImageRaw;
         const originalImageRawIsExists: boolean = !imageExists;
 
-        if ( !compressedImageRawIsExists|| !originalImageRawIsExists ) {
+        if ( compressedImageRawIsExists || originalImageRawIsExists ) {
             throw new BadRequestException(`ValidateImageControlRequests - ${ !compressedImageRawIsExists ? 'compressed image does not exists' : 'original image does not exists'}`);
         }
 

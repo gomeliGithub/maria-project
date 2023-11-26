@@ -80,10 +80,10 @@
                     "builder": "@angular-devkit/build-angular:dev-server",
                     "configurations": {
                         "production": {
-                            "browserTarget": "nest-ssr:build:production"
+                            "buildTarget": "nest-ssr:build:production"
                         },
                         "development": {
-                            "browserTarget": "nest-ssr:build:development"
+                            "buildTarget": "nest-ssr:build:development"
                         }
                     },
                     "defaultConfiguration": "development"
@@ -91,7 +91,7 @@
                 "extract-i18n": {
                     "builder": "@angular-devkit/build-angular:extract-i18n",
                     "options": {
-                        "browserTarget": "nest-ssr:build"
+                        "buildTarget": "nest-ssr:build"
                     }
                 },
                 "test": {
@@ -155,7 +155,7 @@
                     "defaultConfiguration": "production"
                 },
                 "serve-ssr": {
-                    "builder": "@nguniversal/builders:ssr-dev-server",
+                    "builder": "@angular-devkit/build-angular:ssr-dev-server",
                     "configurations": {
                         "development": {
                             "browserTarget": "nest-ssr:build:development",
@@ -169,7 +169,7 @@
                     "defaultConfiguration": "development"
                 },
                 "prerender": {
-                    "builder": "@nguniversal/builders:prerender",
+                    "builder": "@angular-devkit/build-angular:prerender",
                     "options": {
                         "routes": [
                             "/"

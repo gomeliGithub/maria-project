@@ -1,6 +1,7 @@
-import { AfterViewChecked, Component, ElementRef, HostListener, Inject, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, QueryList, ViewChildren, afterRender } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { animate, animateChild, query, state, style, transition, trigger } from '@angular/animations';
+import { Observable, catchError, map, of } from 'rxjs';
 
 import { DeviceDetectorService, DeviceInfo } from 'ngx-device-detector';
 
@@ -74,31 +75,39 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
         ])
     ]
 })
-export class HomeComponent implements OnInit, AfterViewChecked {
+export class HomeComponent implements OnInit, AfterContentChecked, OnDestroy {
     public deviceInfo: DeviceInfo = null;
 
     constructor (
         @Inject(DOCUMENT) private readonly _document: Document,
         private readonly _componentElementRef: ElementRef<HTMLElement>,
+        private readonly changeDetector: ChangeDetectorRef,
         
         private readonly deviceService: DeviceDetectorService,
 
         private readonly appService: AppService,
         private readonly clientService: ClientService
     ) {
-        this.setDeviceInfo();
+        afterRender(() => {
+            if ( !this.componentElementIsRendered ) {
+                this.currentItem = 0;
+
+                this.setActiveScrollSnapSection();
+
+                this.componentElementIsRendered = true;
+            }
+        });
     }
 
     @ViewChildren('scrollSnapSection', { read: ElementRef<HTMLDivElement> }) public readonly scrollSnapSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
     @ViewChildren('scrollSnapVisiableAnimationSection', { read: ElementRef<HTMLDivElement> }) public readonly scrollSnapVisiableAnimationSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
     @ViewChildren('scrollSnapItemRadio', { read: ElementRef<HTMLInputElement> }) private readonly scrollSnapItemRadioViewRefs: QueryList<ElementRef<HTMLInputElement>>;
 
-    public isMobileDevice: boolean;
-    public isTabletDevice: boolean;
-    public isDesktopDevice: boolean;
+    public isMobileDevice: boolean = false;
+    public isTabletDevice: boolean = false;
+    public isDesktopDevice: boolean = false;
 
     public componentElementIsRendered: boolean = false;
-    public firstScrollIsFinished: boolean = false;
 
     public scrollSnapSectionsPosition: { offsetTop: number, offsetHeight: number, offsetTopMod: number, indexNumber: number }[];
     public currentItem: number;
@@ -116,65 +125,72 @@ export class HomeComponent implements OnInit, AfterViewChecked {
 
     public currentScrollSnapSectionVisiableAnimationStates: { state: string, finished: boolean }[] = [];
 
+    public compressedImagesListObservable: Observable<IClientCompressedImage[]>;
     public compressedImagesList: IClientCompressedImage[];
 
+    public discountsDataObservable: Observable<IDiscount[]>;
     public discountsData: IDiscount[];
 
+    public imagePhotographyTypesObservable: Observable<IImagePhotographyType[][]>;
     public imagePhotographyTypes: IImagePhotographyType[][];
     public flatImagePhotographyTypes: IImagePhotographyType[];
 
     ngOnInit (): void {
-        if ( this.appService.checkIsPlatformBrowser() ) {
-            this.appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => this.appService.setTitle(translation));
+        this.appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => this.appService.setTitle(translation));
 
-            this.clientService.getCompressedImagesData('home').subscribe({
-                next: imagesList => this.compressedImagesList = imagesList,
-                error: () => this.appService.createErrorModal()
+        this.compressedImagesListObservable = this.clientService.getCompressedImagesData('home').pipe(map(imagesData => {
+            this.compressedImagesList = imagesData.length !== 0 ? imagesData : null;
+
+            return imagesData;
+        }), catchError(() => {
+            this.appService.createErrorModal();
+
+            return of(null);
+        }));
+
+        this.discountsDataObservable = this.clientService.getDiscountsData().pipe(map(discountsData => {
+            this.discountsData = discountsData.length !== 0 ? discountsData : null;
+
+            return discountsData;
+        }), catchError(() => {
+            this.appService.createErrorModal();
+
+            return of(null);
+        }));
+        this.imagePhotographyTypesObservable = this.clientService.getImagePhotographyTypesData('home').pipe(map(imagePhotographyTypesData => {
+            this.imagePhotographyTypes = imagePhotographyTypesData.length !== 0 ? imagePhotographyTypesData: null;
+
+            this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
+            this.flatImagePhotographyTypes.forEach(() => {
+                this.currentMouseTriggerStates.push('leave');
+                this.currentLinkButtonContainerAnimationStates.push('leave');
             });
 
-            this.clientService.getDiscountsData().subscribe({
-                next: discountsData => this.discountsData = discountsData && discountsData.length !== 0 ? discountsData : null,
-                error: () => this.appService.createErrorModal()
-            });
-            
-            this.clientService.getImagePhotographyTypesData('home').subscribe({
-                next: imagePhotographyTypesData => {
-                    this.imagePhotographyTypes = imagePhotographyTypesData;
+            this.imagePhotographyTypes.forEach(() => this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false }));
 
-                    this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
-                    this.flatImagePhotographyTypes.forEach(() => {
-                        this.currentMouseTriggerStates.push('leave');
-                        this.currentLinkButtonContainerAnimationStates.push('leave');
-                    });
+            this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false });
 
-                    this.imagePhotographyTypes.forEach(() => this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false }));
+            return imagePhotographyTypesData;
+        }), catchError(() => {
+            this.appService.createErrorModal();
 
-                    this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false });
-                },
-                error: () => this.appService.createErrorModal()
-            });
-        }
+            return of(null);
+        }));
     }
 
-    ngAfterViewChecked (): void {
-        const componentElement: HTMLElement = this._componentElementRef.nativeElement;
+    ngAfterContentChecked (): void {
+        this.setDeviceInfo();
 
-        if ( !this.componentElementIsRendered && componentElement.offsetHeight !== 0 && componentElement.offsetHeight > 450 ) {
-            this.componentElementIsRendered = true;
+        if ( this.isMobileDevice ) {
+            this.currentScrollSnapItemRadiosContainerAnimationState = 'enter';
+            this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'show';
         }
 
-        if ( this.componentElementIsRendered && !this.firstScrollIsFinished ) {
-            this.scrollSnapSectionViewRefs.first.nativeElement.scrollIntoView({ behavior: 'auto', block: 'start' });
+        this.changeDetector.detectChanges();
+    }
 
-            this.currentItem = 0;
-
-            this.setActiveScrollSnapSection();
-
-            if ( this.isMobileDevice ) {
-                this.currentScrollSnapItemRadiosContainerAnimationState = 'enter';
-                this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'show';
-            }
-        }
+    ngOnDestroy (): void {
+        this.componentElementIsRendered = false;
     }
 
     @HostListener('scroll', [ '$event' ]) public onScroll ($event: any): void {
@@ -190,9 +206,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         if ( this.componentElementIsRendered ) {
             this.getCurrentScrollSnapVisiableAnimationSection($event.srcElement);
 
-            if ( !this.firstScrollIsFinished && $event.srcElement.scrollTop === 0 ) this.firstScrollIsFinished = true;
-
-            if ( this.firstScrollIsFinished ) this.getActiveScrollSnapSection($event.srcElement);
+            this.getActiveScrollSnapSection($event.srcElement);
         }
     }
 
@@ -292,7 +306,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
         const scrollPosition: number = componentElement.scrollTop + componentElement.offsetHeight;
 
         this.scrollSnapVisiableAnimationSectionsPosition.forEach((sectionData, index) => {
-            if ( this.firstScrollIsFinished && sectionData.offsetTop <= scrollPosition ) {
+            if ( sectionData.offsetTop <= scrollPosition ) {
                 this.startScrollSnapSectionVisiableAnimation(index);
             }
         });
@@ -308,18 +322,22 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     }
 
     public scrollSnapItemRadiosEmbededContainerAnimationStart (event: AnimationEvent): void { 
-        if ( this.isDesktopDevice && event.toState === 'hide' ) {
+        if ( this.appService.checkIsPlatformBrowser() && this.isDesktopDevice && event.toState === 'hide' ) {
             const target: HTMLDivElement = event.element as HTMLDivElement;
 
-            target.querySelectorAll('label').forEach(label => label.classList.remove('visible'));
+            const scrollSnapItemRadiosLabels: NodeListOf<HTMLLabelElement> = target.querySelectorAll('label');
+
+            if ( scrollSnapItemRadiosLabels ) scrollSnapItemRadiosLabels.forEach(label => label.classList.remove('visible'));
         }
     }
 
     public scrollSnapItemRadiosEmbededContainerAnimationDone (event: AnimationEvent): void {
-        if ( this.isDesktopDevice && event.toState === 'show' ) {
+        if ( this.appService.checkIsPlatformBrowser() && this.isDesktopDevice && event.toState === 'show' ) {
             const target: HTMLDivElement = event.element as HTMLDivElement;
+
+            const scrollSnapItemRadiosLabels: NodeListOf<HTMLLabelElement> = target.querySelectorAll('label');
             
-            target.querySelectorAll('label').forEach(label => label.classList.add('visible'));
+            if ( scrollSnapItemRadiosLabels ) scrollSnapItemRadiosLabels.forEach(label => label.classList.add('visible'));
         }
     }
 
@@ -328,7 +346,7 @@ export class HomeComponent implements OnInit, AfterViewChecked {
     }
 
     public startMouseTriggerAnimationClick (index: number): void {
-        if ( this.isMobileDevice || this.isTabletDevice ) {
+        if ( this.isMobileDevice ) {
             this.currentMouseTriggerStates = this.currentMouseTriggerStates.map((_, i) => {
                 if ( i !== index ) return 'leave';
                 else return this.currentMouseTriggerStates[index] === 'enter' ? 'leave' : 'enter';

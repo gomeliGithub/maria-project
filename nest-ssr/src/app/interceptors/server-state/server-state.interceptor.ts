@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import { TransferState, makeStateKey } from '@angular/platform-browser';
+import { Injectable, makeStateKey, TransferState } from '@angular/core';
 import {
     HttpRequest,
     HttpHandler,
@@ -16,6 +15,10 @@ export class ServerStateInterceptor implements HttpInterceptor {
     ) {}
 
     intercept (req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        if ( req.url === '/api/client/getDiscountsData' ) {
+            this.transferState.set(makeStateKey(req.url), req.body);
+        }
+
         return next.handle(req).pipe(
             tap(event => {
                 if ( req.method === 'POST' || req.method === 'GET' ) {
@@ -27,7 +30,8 @@ export class ServerStateInterceptor implements HttpInterceptor {
                         }
 
                         switch ( req.url ) {
-                            case '/assets/locale/ru.json': { this.transferState.set(makeStateKey(key), event.body); break; }
+                            // case '/assets/locale/ru.json': { this.transferState.set(makeStateKey(key), event.body); break; }
+                             case '/api/client/getDiscountsData': { this.transferState.set(makeStateKey(key), event.body); break; }
                         }
                     }
                 }

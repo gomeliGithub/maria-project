@@ -10,7 +10,7 @@
     >{{ 'GALLERYPAGE.ORDERBUTTONTEXT' | translate }}</button>
     <hr class="border-3 mt-5 w-100"/>
 </div>
-<div *ngIf="compressedImagesList; else noContentBlock" class="d-flex flex-column align-items-center justify-content-start mt-3 w-80" id="galleryImages">
+<div *ngIf="compressedImagesListObservable | async; else noContentBlock" class="d-flex flex-column align-items-center justify-content-start mt-3 w-80" id="galleryImages">
     <div *ngFor="let imageDataArr of compressedImagesList.medium" class="d-flex flex-row justify-content-center mb-2 mediumSizedImagesContainer">
         <ng-template ngFor let-imageData [ngForOf]="imageDataArr" let-i="index">
             <div class="d-flex flex-row justify-content-center position-relative h-auto"
@@ -113,7 +113,7 @@
         <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
     </div>
 </ng-template>
-<div *ngIf="compressedBigImagesIsExists" class="m-3">
+<div *ngIf="compressedBigImagesIsExistsObservable | async" class="m-3">
     <button type="button" class="btn btn-outline-secondary btn-lg" id="toggleBigGalleryButton" (click)="toggleBigGallery()">
         {{ !bigGalleryIsHide ? ('GALLERYPAGE.MEDIUMGALLERYBUTTONTEXT' | translate) : ('GALLERYPAGE.BIGGALLERYBUTTONTEXT' | translate) }}
     </button>

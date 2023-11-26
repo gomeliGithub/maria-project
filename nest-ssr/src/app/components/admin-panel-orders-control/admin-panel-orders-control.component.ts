@@ -9,7 +9,8 @@ import { IClientOrder } from 'types/models';
 @Component({
     selector: 'app-admin-panel-orders-control',
     templateUrl: './admin-panel-orders-control.component.html',
-    styleUrls: ['./admin-panel-orders-control.component.css']
+    styleUrls: ['./admin-panel-orders-control.component.css'],
+    host: { ngSkipHydration: 'true' }
 })
 export class AdminPanelOrdersControlComponent implements OnInit {
     constructor (

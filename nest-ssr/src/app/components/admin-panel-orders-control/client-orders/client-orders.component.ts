@@ -9,7 +9,8 @@ import { IClientOrder } from 'types/models';
 @Component({
   	selector: 'app-admin-panel-client-orders',
   	templateUrl: './client-orders.component.html',
-  	styleUrls: ['./client-orders.component.css']
+  	styleUrls: ['./client-orders.component.css'],
+	host: { ngSkipHydration: 'true' }
 })
 export class ClientOrdersComponent {
 	constructor (

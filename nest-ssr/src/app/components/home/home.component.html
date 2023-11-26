@@ -1,4 +1,4 @@
-<div class="vw-100 section" id="imagesCarouselContainer" #scrollSnapSection>
+<div *ngIf="compressedImagesListObservable | async" class="vw-100 section" id="imagesCarouselContainer" #scrollSnapSection>
     <ngb-carousel *ngIf="compressedImagesList" class="carousel carousel-fade h-100 w-100" id="imagesCarousel"
         [interval]="3000"
         [showNavigationArrows]="compressedImagesList.length !== 1"
@@ -9,7 +9,7 @@
         </ng-template>
     </ngb-carousel>
 </div>
-<div class="w-100 my-3 section" #scrollSnapSection>
+<div *ngIf="discountsDataObservable | async" class="w-100 my-3 section" #scrollSnapSection>
     <ngb-carousel *ngIf="discountsData; else noDiscountsDataBlock" class="carousel w-100" id="discountsCarousel" 
         [interval]="0"
         [showNavigationArrows]="discountsData.length !== 1"
@@ -32,65 +32,67 @@
 <div class="py-5 px-4 w-100 section" #scrollSnapSection>
     <h1 class="display-6 shadow-lg rounded-pill p-3 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
 </div>
-<ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0" >
-    <ng-template ngFor let-imagePhotographyTypesDataArr [ngForOf]="imagePhotographyTypes" let-i="index">
-        <div class="d-flex flex-row justify-content-center align-items-center px-5 pb-4 w-100 h-100 imagePhotographyTypesGroup section"
-            [ngClass]="{ 'pt-4': i === 0 }"
-            [style.backgroundColor]="'rgb(176 173 172)'"
-            #scrollSnapSection
-            #scrollSnapVisiableAnimationSection
-        >
-            <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i2 = index"
-                class="border-0 position-relative h-100 w-100"
-                [ngClass]="{
-                    'mw-50': imagePhotographyTypesDataArr.length !== 1,
-                    'mw-100': imagePhotographyTypesDataArr.length === 1,
-                    'me-4': i2 === 0 && imagePhotographyTypesDataArr.length !== 1
-                }"
-                (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
-                (mouseleave)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
-                (click)="startMouseTriggerAnimationClick(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
-                [attr.mouse-trigger-state-index]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
-                [@scroll-snap-section-item-visiable-animation]="currentScrollSnapSectionVisiableAnimationStates[i].state"
+<ng-template [ngIf]="imagePhotographyTypesObservable | async">
+    <ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0" >
+        <ng-template ngFor let-imagePhotographyTypesDataArr [ngForOf]="imagePhotographyTypes" let-i="index">
+            <div class="d-flex flex-row justify-content-center align-items-center px-5 pb-4 w-100 h-100 imagePhotographyTypesGroup section"
+                [ngClass]="{ 'pt-4': i === 0 }"
+                [style.backgroundColor]="'rgb(176 173 172)'"
+                #scrollSnapSection
+                #scrollSnapVisiableAnimationSection
             >
-                <div class="d-flex flex-column text-center"
-                    [ngClass]="{ 'justify-content-end': imagePhotographyTypesDataArr.length === 1 }"
-                    (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
-                    [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
-                    [ngSwitch]="imagePhotographyTypeData.name"
+                <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i2 = index"
+                    class="border-0 position-relative h-100 w-100"
+                    [ngClass]="{
+                        'mw-50': imagePhotographyTypesDataArr.length !== 1,
+                        'mw-100': imagePhotographyTypesDataArr.length === 1,
+                        'me-4': i2 === 0 && imagePhotographyTypesDataArr.length !== 1
+                    }"
+                    (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
+                    (mouseleave)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
+                    (click)="startMouseTriggerAnimationClick(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
+                    [attr.mouse-trigger-state-index]="setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)"
+                    [@scroll-snap-section-item-visiable-animation]="currentScrollSnapSectionVisiableAnimationStates[i].state"
                 >
-                    <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.compressedImageName }}" 
-                        class="h-80 rounded"
+                    <div class="d-flex flex-column text-center"
+                        [ngClass]="{ 'justify-content-end': imagePhotographyTypesDataArr.length === 1 }"
+                        (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
+                        [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
+                        [ngSwitch]="imagePhotographyTypeData.name"
                     >
-                    <span class="align-self-end mt-2 fs-5">
-                        <ng-template ngSwitchCase="individual"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
-                        <ng-template ngSwitchCase="children"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.CHILDREN' | translate }}</ng-template>
-                        <ng-template ngSwitchCase="wedding"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.WEDDING' | translate }}</ng-template>
-                        <ng-template ngSwitchCase="family"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.FAMILY' | translate }}</ng-template>
-                    </span>
-                    <small class="align-self-end text-body-secondary">
-                        {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i>
-                    </small>
-                </div>
-                <div class="position-absolute top-50 start-50 w-50 linkButtonContainer"
-                    [@link-button-container-animation]="currentLinkButtonContainerAnimationStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
-                >
-                    <h5 class="text-center text-break" [ngSwitch]="imagePhotographyTypeData.name">
-                        <ng-template ngSwitchCase="individual">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
-                        <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.CHILDREN' | translate }}</ng-template>
-                        <ng-template ngSwitchCase="wedding">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.WEDDING' | translate }}</ng-template>
-                        <ng-template ngSwitchCase="family">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.FAMILY' | translate }}</ng-template>
-                    </h5>
-                    <a [routerLink]="[ '/gallery', imagePhotographyTypeData.name ]" routerLinkActive="active" 
-                        class="btn btn-outline-light align-items-center justify-content-center icon-link w-100 fs-4" 
-                        tabindex="-1" role="button" aria-disabled="true"
+                        <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.compressedImageName }}" 
+                            class="h-80 rounded"
+                        >
+                        <span class="align-self-end mt-2 fs-5">
+                            <ng-template ngSwitchCase="individual"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="children"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.CHILDREN' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="wedding"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.WEDDING' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="family"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.FAMILY' | translate }}</ng-template>
+                        </span>
+                        <small class="align-self-end text-body-secondary">
+                            {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i>
+                        </small>
+                    </div>
+                    <div class="position-absolute top-50 start-50 w-50 linkButtonContainer"
+                        [@link-button-container-animation]="currentLinkButtonContainerAnimationStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
                     >
-                        <!-- {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate | uppercase }} <i class="bi bi-arrow-right"></i> -->
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
+                        <h5 class="text-center text-break" [ngSwitch]="imagePhotographyTypeData.name">
+                            <ng-template ngSwitchCase="individual">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.CHILDREN' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="wedding">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.WEDDING' | translate }}</ng-template>
+                            <ng-template ngSwitchCase="family">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.FAMILY' | translate }}</ng-template>
+                        </h5>
+                        <a [routerLink]="[ '/gallery', imagePhotographyTypeData.name ]" routerLinkActive="active" 
+                            class="btn btn-outline-light align-items-center justify-content-center icon-link w-100 fs-4" 
+                            tabindex="-1" role="button" aria-disabled="true"
+                        >
+                            <!-- {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate | uppercase }} <i class="bi bi-arrow-right"></i> -->
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
+        </ng-template>
     </ng-template>
 </ng-template>
 <div class="d-flex flex-column w-75 mt-3 mb-3 section" id="aboutSection"
@@ -115,7 +117,7 @@
         </div>
     </div>
 </div>
-<div *ngIf="componentElementIsRendered" class="position-fixed top-50 translate-middle z-2" id="scrollSnapItemRadiosContainer"
+<div *ngIf="compressedImagesList && imagePhotographyTypes" class="position-fixed top-50 translate-middle z-2" id="scrollSnapItemRadiosContainer"
     [ngClass]="{ 'invisible': isMobileDevice }"
     (mouseenter)="startScrollSnapItemRadiosContainerAnimation('enter')"
     (mouseleave)="startScrollSnapItemRadiosContainerAnimation('leave')"
