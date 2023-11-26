@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { HttpClient, HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, provideClientHydration } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TransferHttpCacheModule } from '@nguniversal/common';
@@ -54,6 +54,7 @@ import { environment } from '../environments/environment';
         NgbModule
     ],
     providers: [
+        provideClientHydration(),
         provideHttpClient(withFetch()),
         AppService
     ],

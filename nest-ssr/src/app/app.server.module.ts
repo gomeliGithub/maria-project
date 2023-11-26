@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { provideClientHydration } from '@angular/platform-browser';
 import { ServerModule } from '@angular/platform-server';
 
 import { AppModule } from './app.module';
@@ -10,9 +9,7 @@ import { AppComponent } from './app.component';
         AppModule,
         ServerModule
     ],
-    providers: [
-        provideClientHydration()
-    ],
+    providers: [],
     bootstrap: [AppComponent],
 })
 export class AppServerModule {
