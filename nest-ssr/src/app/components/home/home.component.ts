@@ -1,5 +1,4 @@
-import { AfterContentChecked, ChangeDetectorRef, Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, QueryList, ViewChildren, afterRender } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { AfterContentChecked, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChildren, afterRender } from '@angular/core';
 import { animate, animateChild, query, state, style, transition, trigger } from '@angular/animations';
 import { Observable, catchError, map, of } from 'rxjs';
 
@@ -79,8 +78,6 @@ export class HomeComponent implements OnInit, AfterContentChecked, OnDestroy {
     public deviceInfo: DeviceInfo = null;
 
     constructor (
-        @Inject(DOCUMENT) private readonly _document: Document,
-        private readonly _componentElementRef: ElementRef<HTMLElement>,
         private readonly changeDetector: ChangeDetectorRef,
         
         private readonly deviceService: DeviceDetectorService,
