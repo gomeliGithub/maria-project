@@ -5,14 +5,14 @@
         <loc>http://178.172.173.222/adminPanel</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-23T21:33:11.643Z</lastmod>
+        <lastmod>2023-11-26T17:57:53.100Z</lastmod>
     </url>    
 
     <url>
         <loc>http://178.172.173.222/adminPanel/imagesControl</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-23T21:33:11.643Z</lastmod>
+        <lastmod>2023-11-26T17:57:53.100Z</lastmod>
     </url>    
 
     <url>
@@ -47,21 +47,21 @@
         <loc>http://178.172.173.222/gallery</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-24T22:53:41.333Z</lastmod>
+        <lastmod>2023-11-26T21:18:59.057Z</lastmod>
     </url>    
 
     <url>
         <loc>http://178.172.173.222/home</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-22T23:06:28.496Z</lastmod>
+        <lastmod>2023-11-26T21:18:35.250Z</lastmod>
     </url>    
 
     <url>
         <loc>http://178.172.173.222/</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-22T23:06:28.496Z</lastmod>
+        <lastmod>2023-11-26T21:18:35.250Z</lastmod>
     </url>    
 
 </urlset>
