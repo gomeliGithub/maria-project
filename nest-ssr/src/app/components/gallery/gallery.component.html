@@ -10,104 +10,34 @@
     >{{ 'GALLERYPAGE.ORDERBUTTONTEXT' | translate }}</button>
     <hr class="border-3 mt-5 w-100"/>
 </div>
-<div *ngIf="compressedImagesListObservable | async; else noContentBlock" class="d-flex flex-column align-items-center justify-content-start mt-3 w-80" id="galleryImages">
-    <div *ngFor="let imageDataArr of compressedImagesList.medium" class="d-flex flex-row justify-content-center mb-2 mediumSizedImagesContainer">
-        <ng-template ngFor let-imageData [ngForOf]="imageDataArr" let-i="index">
-            <div class="d-flex flex-row justify-content-center position-relative h-auto"
-                [ngClass]="{ 
-                    'me-2': i !== imageDataArr.length - 1,
-                    'twoFirstImageContainer': i === 0 || i === 1,
-                    'oneLengthImageContainer': imageDataArr.length === 1
-                }"
-                (mouseenter)="startLinkContainerAnimation(
-                    setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
-                    imageData.viewSizeType
-                )"
-                (mouseleave)="startLinkContainerAnimation(
-                    setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
-                    imageData.viewSizeType
-                )"
-                @images-animation
-                #imageContainer
-            >
-                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-fluid rounded h-100">
-                <div class="position-absolute top-100 start-50 d-flex flex-row justify-content-center z-1 downloadOriginalImageLinkContainer"
-                    [@link-container-animation]="mediumLinkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]"
-                    (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(
-                        imageData.name, imageData.viewSizeType), 
-                        imageData.viewSizeType
-                    )"
-                    (@link-container-animation.done)="linkContainerAnimationDone($event, setCurrentLinkContainerAnimationStateIndex(
-                        imageData.name, imageData.viewSizeType), 
-                        imageData.viewSizeType
-                    )"
-                    [ngStyle]="{ 
-                        'display': mediumLinkContainerAnimationDisplayValues[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]
-                    }"
-                >
-                    <div class="input-group justify-content-center flex-nowrap w-70">
-                        <a href="/api/client/downloadOriginalImage/:{{ imageData.name }}" class="btn btn-success btn-sm" 
-                            tabindex="-1" role="button" aria-disabled="true"
-                        >
-                            <i class="bi bi-download"></i>
-                        </a>
-                        <span class="input-group-text text-wrap text-bg-light fw-medium p-0 px-1 border-0 user-select-none">
-                            {{ 'GALLERYPAGE.DOWNLOADORIGINALIMAGEBUTTONTEXT' | translate }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </ng-template>
-    </div>
-    <div *ngFor="let imageDataArr of compressedImagesList.big" class="d-flex flex-row justify-content-center align-items-start w-90 mb-2 bigSizedImagesContainer">
-        <ng-template ngFor let-imageData [ngForOf]="imageDataArr" let-i="index">
-            <div class="d-flex flex-row justify-content-center position-relative h-100"
-                [ngClass]="{
-                    'w-50 oneLengthImageContainer': imageDataArr.length === 1,
-                    'me-2': i !== imageDataArr.length - 1,
-                    'twoFirstImageContainer': i === 0 || i === 1,
-                }"
-                (mouseenter)="startLinkContainerAnimation(
-                    setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
-                    imageData.viewSizeType
-                )"
-                (mouseleave)="startLinkContainerAnimation(
-                    setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType), 
-                    imageData.viewSizeType
-                )"
-                @images-animation
-                #imageContainer
-            >
-                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="h-100 w-100 rounded">
-                <div class="position-absolute top-100 start-50 d-flex flex-row justify-content-center z-1 downloadOriginalImageLinkContainer"
-                    [@link-container-animation]="bigLinkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]"
-                    (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(
-                        imageData.name, imageData.viewSizeType),
-                        imageData.viewSizeType
-                    )"
-                    (@link-container-animation.done)="linkContainerAnimationDone($event, setCurrentLinkContainerAnimationStateIndex(
-                        imageData.name, imageData.viewSizeType), 
-                        imageData.viewSizeType
-                    )"
-                    [ngStyle]="{
-                        'display': bigLinkContainerAnimationDisplayValues[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]
-                    }"
-                >
-                    <div class="input-group justify-content-center flex-nowrap w-70">
-                        <a href="/api/client/downloadOriginalImage/:{{ imageData.name }}" class="btn btn-success btn-sm" 
-                            tabindex="-1" role="button" aria-disabled="true"
-                        >
-                            <i class="bi bi-download"></i>
-                        </a>
-                        <span class="input-group-text text-wrap text-bg-light fw-medium p-0 px-1 border-0 user-select-none">
-                            {{ 'GALLERYPAGE.DOWNLOADORIGINALIMAGEBUTTONTEXT' | translate }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </ng-template>
-    </div>
-</div>
+<!-- <ng-template [ngIf]="!firstStoredData" [ngIfElse]="additionalCompressedImagesListBlock"> -->
+    <ng-template [ngIf]="compressedImagesListObservable | async" [ngIfElse]="noContentBlock" class="d-flex flex-column align-items-center justify-content-start mt-3 w-80">
+        <app-compressed-images
+            [(photographyType)]="photographyType"
+            [(compressedImagesList)]="compressedImagesList"
+            [(compressedImagesListType)]="compressedImagesListType"
+            [(mediumLinkContainerAnimationStates)]="mediumLinkContainerAnimationStates"
+            [(bigLinkContainerAnimationStates)]="bigLinkContainerAnimationStates"
+            [(mediumLinkContainerAnimationDisplayValues)]="mediumLinkContainerAnimationDisplayValues"
+            [(bigLinkContainerAnimationDisplayValues)]="bigLinkContainerAnimationDisplayValues"
+            [(flatMediumCompressedImagesList)]="flatMediumCompressedImagesList"
+            [(flatBigCompressedImagesList)]="flatBigCompressedImagesList"
+        />
+    </ng-template>
+<!-- </ng-template> 
+<ng-template #additionalCompressedImagesListBlock>
+    <app-compressed-images ngSkipHydration
+        [(photographyType)]="photographyType"
+        [(compressedImagesList)]="compressedImagesList"
+        [(compressedImagesListType)]="compressedImagesListType"
+        [(mediumLinkContainerAnimationStates)]="mediumLinkContainerAnimationStates"
+        [(bigLinkContainerAnimationStates)]="bigLinkContainerAnimationStates"
+        [(mediumLinkContainerAnimationDisplayValues)]="mediumLinkContainerAnimationDisplayValues"
+        [(bigLinkContainerAnimationDisplayValues)]="bigLinkContainerAnimationDisplayValues"
+        [(flatMediumCompressedImagesList)]="flatMediumCompressedImagesList"
+        [(flatBigCompressedImagesList)]="flatBigCompressedImagesList"
+    />
+</ng-template> -->
 <ng-template #noContentBlock>
     <div class="noContentBlock text-center text-info fs-4 p-4">
         <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>

@@ -1,0 +1,91 @@
+.mediumSizedImagesContainer > div {
+    width: 25%;
+}
+.downloadOriginalImageLinkContainer {
+    width: 100%;
+    transform: translate(-50%, -100%) !important;
+}
+
+@media screen and (max-width: 768px), only screen 
+and (width: 393px) 
+and (height: 852px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 430px) 
+and (height: 932px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 390px) 
+and (height: 844px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 428px) 
+and (height: 926px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 812px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 2),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 667px) 
+and (-webkit-device-pixel-ratio: 2) {
+    .mediumSizedImagesContainer {
+        width: 90% !important;
+    }
+
+    .mediumSizedImagesContainer {
+        flex-wrap: wrap !important;
+    }
+
+    .bigSizedImagesContainer {
+        flex-direction: column !important;
+        align-items: center !important;
+        margin-bottom: 0 !important;
+    }
+
+    .mediumSizedImagesContainer > div {
+        width: 40%;
+        flex: 1 1 auto;
+    }
+
+    .bigSizedImagesContainer > div {
+        width: 85% !important;
+        margin-right: 0 !important;
+    }
+
+    .twoFirstImageContainer {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .bigSizedImagesContainer .twoFirstImageContainer > img {
+        width: 100% !important;
+    }
+
+    .twoFirstImageContainer:nth-child(2) {
+        margin-right: 0 !important;
+    }
+
+    .oneLengthImageContainer {
+        width: 50% !important;
+        flex: none !important;
+    }
+}
+
+@media screen and (min-width: 1400px) {
+    .bigSizedImagesContainer {
+        max-height: 723px;
+    }
+
+    .bigSizedImagesContainer > .oneLengthImageContainer > img {
+        object-fit: contain;
+    }
+}

@@ -29,9 +29,12 @@ export class ServerStateInterceptor implements HttpInterceptor {
                             key = req.url;
                         }
 
+                        console.log(req.url);
+
                         switch ( req.url ) {
                             // case '/assets/locale/ru.json': { this.transferState.set(makeStateKey(key), event.body); break; }
-                             case '/api/client/getDiscountsData': { this.transferState.set(makeStateKey(key), event.body); break; }
+                            // case '/api/client/getDiscountsData': { this.transferState.set(makeStateKey(key), event.body); break; }
+                            case '/api/client/getCompressedImagesData/:individual': { this.transferState.set(makeStateKey(key), event.body); break; }
                         }
                     }
                 }

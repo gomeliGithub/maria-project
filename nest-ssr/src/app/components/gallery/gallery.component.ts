@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostBinding, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostBinding, OnInit, QueryList, TransferState, ViewChild, makeStateKey } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
@@ -10,27 +10,13 @@ import { ClientService } from '../../services/client/client.service';
 import { AnimationEvent, IGalleryCompressedImagesData, IReducedGalleryCompressedImages } from 'types/global';
 import { IClientCompressedImage } from 'types/models';
 
+const GALLERY_COMPRESSEDIMAGESDATA_STATE_KEY = makeStateKey<IGalleryCompressedImagesData>('galleryCompressedImagesData');
+
 @Component({
     selector: 'app-gallery',
     templateUrl: './gallery.component.html',
     styleUrls: ['./gallery.component.css'],
     animations: [
-        trigger('link-container-animation', [
-            state('leave', style({
-                opacity: 0,
-                width: '0%',
-            })),
-            state('enter', style({
-                opacity: 1,
-                width: '100%',
-            })),
-            transition('leave => enter', [
-                animate('500ms', style({ opacity: 1, width: '100%' }))
-            ]),
-            transition('enter => leave', [
-                animate('500ms', style({ opacity: 0, width: '0%' }))
-            ])
-        ]),
         trigger('send-order-form-animation', [
             state('hide', style({
                 transform: 'translate(-400%, 0) rotate3d(1, 1, 1, 90deg)'
@@ -44,26 +30,18 @@ import { IClientCompressedImage } from 'types/models';
             transition('show => hide', [
                 animate('0.2s', style({ transform: 'translate(-400%, 0) rotate3d(1, 1, 1, 90deg)' }))
             ])
-        ]),
-        trigger('images-animation', [
-            transition(':enter', [
-                style({ opacity: 0, transform: 'translateY(250px)' }),
-                animate('1.5s ease', style({ opacity: 1, transform: 'translateY(0px)' }))
-            ]),
-            transition(':leave', [
-                style({ opacity: 1, transform: 'translateY(0px)'}),
-                animate('1.5s ease', style({ opacity: 0, transform: 'translateY(250px)' }))
-            ])
         ])
     ]
 })
 export class GalleryComponent implements OnInit {
     public photographyType: string;
 
+    public componentElementIsRendered: boolean = false;
+
     constructor (
         private readonly activateRoute: ActivatedRoute,
         private readonly router: Router,
-        private readonly _componentRef: ElementRef<HTMLElement>,
+        private readonly transferState: TransferState,
 
         private readonly appService: AppService,
         private readonly clientService: ClientService
@@ -88,7 +66,7 @@ export class GalleryComponent implements OnInit {
 
     @HostBinding('className') componentClass: string;
 
-    @ViewChildren('imageContainer', { read: ElementRef<HTMLDivElement> }) private readonly imageContainerViewRefs: QueryList<ElementRef<HTMLDivElement>>;
+    public imageContainerViewRefs: QueryList<ElementRef<HTMLDivElement>>;
 
     @ViewChild('sendOrderFormContainer', { static: false }) private readonly sendOrderFormContainerViewRef: ElementRef<HTMLDivElement>;
 
@@ -96,6 +74,7 @@ export class GalleryComponent implements OnInit {
     public compressedBigImagesIsExists: boolean = false;
     public compressedImagesListObservable: Observable<IGalleryCompressedImagesData> = null;
     public compressedImagesList: IReducedGalleryCompressedImages = null;
+    public compressedImagesListType: string = null;
     public photographyTypeDescription: string;
 
     public url: string;
@@ -114,6 +93,7 @@ export class GalleryComponent implements OnInit {
     public sendOrderFormAnimationState: string = 'hide';
 
     public additionalImagesExists: boolean = false;
+    public currentAdditionalImagesExists: boolean = false;
 
     public isToggleBigGallery: boolean = false;
 
@@ -143,12 +123,14 @@ export class GalleryComponent implements OnInit {
 
         this.getCompressedImagesData('medium');
 
+        this.clientService.galleryImageContainerViewRefsChange.subscribe(value => this.imageContainerViewRefs = value);
+
         this.clientService.scrollPageBottomStatusChange.subscribe(value => {
             if ( value ) {
                 if ( this.additionalImagesExists && !this.scrollPageBottomIsFinished ) {
                     this.scrollPageBottomIsFinished = true;
 
-                    this.getCompressedImagesData('medium', this.imageContainerViewRefs.length);
+                    this.getCompressedImagesData(this.bigGalleryIsHide ? 'medium' : 'big', this.imageContainerViewRefs.length);
                     this.clientService.setScrollPageBottomStatus(false);
                 }
             }
@@ -156,49 +138,52 @@ export class GalleryComponent implements OnInit {
     }
 
     public getCompressedImagesData (imageViewSize: 'medium' | 'big', currentImagesCount?: number): void {
-            if ( !currentImagesCount ) currentImagesCount = 0;
+        this.compressedImagesListType = imageViewSize;
 
+        if ( this.additionalImagesExists ) this.currentAdditionalImagesExists = true;
+        else this.currentAdditionalImagesExists = false;
+
+        if ( !currentImagesCount ) currentImagesCount = 0;
+
+        // let storedData = this.transferState.get<IGalleryCompressedImagesData>(GALLERY_COMPRESSEDIMAGESDATA_STATE_KEY, null); console.log(storedData);
+        
+        if ( !this.currentAdditionalImagesExists ) {
             this.compressedImagesListObservable = this.clientService.getCompressedImagesData(this.photographyType, imageViewSize, currentImagesCount).pipe(map(data => {
-                if ( data.compressedImagesRaw.medium.length !== 0 || data.compressedImagesRaw.big.length !== 0 ) {
-                    if ( !this.additionalImagesExists ) {
-                        this.compressedImagesList = data.compressedImagesRaw;
+                /* if ( !storedData || ( storedData && (
+                    ( imageViewSize === 'medium' && ( storedData.compressedImagesRaw.medium.length === 0 || !storedData.compressedImagesRaw.medium[currentImagesCount / 4] ) ) 
+                    || ( imageViewSize === 'big' && ( storedData.compressedImagesRaw.big.length === 0 || !storedData.compressedImagesRaw.big[currentImagesCount / 4] ) )
+                ))) {
+                    if ( !storedData ) {
+                        storedData = {
+                            additionalImagesExists: data.additionalImagesExists,
+                            compressedImagesRaw: {
+                                medium: null,
+                                big: null
+                            },
+                            photographyTypeDescription: data.photographyTypeDescription
+                        }
+                    }
 
-                        this.isToggleBigGallery = false;
+                    const updatedData = storedData;
+
+                    if ( !updatedData.compressedImagesRaw.medium || updatedData.compressedImagesRaw.medium.length === 0 ) {
+                        updatedData.compressedImagesRaw.medium = data.compressedImagesRaw.medium;
                     } else {
-                        this.compressedImagesList.medium.push(...data.compressedImagesRaw.medium);
-                        this.compressedImagesList.big.push(...data.compressedImagesRaw.big);
+                        updatedData.compressedImagesRaw.medium.push(...data.compressedImagesRaw.medium)
                     }
 
-                    if ( data.compressedImagesRaw.medium.length !== 0 ) {
-                        if ( !this.additionalImagesExists ) {
-                            this.flatMediumCompressedImagesList = data.compressedImagesRaw.medium.flat();
-                        } else {
-                            this.flatMediumCompressedImagesList.push(...data.compressedImagesRaw.medium.flat());
-                        }
-
-                        this.flatMediumCompressedImagesList.forEach(() => {
-                            this.mediumLinkContainerAnimationStates.push('leave');
-                            this.mediumLinkContainerAnimationDisplayValues.push('none');
-                        });
-                    } else if ( data.compressedImagesRaw.big.length !== 0 ) {
-                        if ( !this.additionalImagesExists ) {
-                            this.flatBigCompressedImagesList = data.compressedImagesRaw.big.flat();
-                        } else {
-                            this.flatBigCompressedImagesList.push(...data.compressedImagesRaw.big.flat());
-                        }
-
-                        this.flatBigCompressedImagesList.forEach(() => {
-                            this.bigLinkContainerAnimationStates.push('leave');
-                            this.bigLinkContainerAnimationDisplayValues.push('none');
-                        });
+                    if ( !updatedData.compressedImagesRaw.big || updatedData.compressedImagesRaw.big.length === 0 ) {
+                        updatedData.compressedImagesRaw.big = data.compressedImagesRaw.big;
+                    } else {
+                        updatedData.compressedImagesRaw.big.push(...data.compressedImagesRaw.big)
                     }
-                }
 
-                this.photographyTypeDescription = data.photographyTypeDescription ? data.photographyTypeDescription : null;
-
-                this.additionalImagesExists = data.additionalImagesExists;
-
-                this.scrollPageBottomIsFinished = false;
+                    this.transferState.set<IGalleryCompressedImagesData>(GALLERY_COMPRESSEDIMAGESDATA_STATE_KEY, updatedData);
+                    
+                    this._setCompressedImagesList(data, currentImagesCount / 4, this.currentAdditionalImagesExists, false);
+                } else */
+                this._setCompressedImagesList(data, currentImagesCount / 4, this.currentAdditionalImagesExists, true);
+                // this._setCompressedImagesList(storedData, currentImagesCount / 4, this.currentAdditionalImagesExists, true);
 
                 return data;
             }), catchError(() => {
@@ -206,11 +191,100 @@ export class GalleryComponent implements OnInit {
 
                 return of(null);
             }));
+        } else {
+            /* if ( storedData && ( 
+                ( storedData.compressedImagesRaw.medium.length !== 0 && storedData.compressedImagesRaw.medium[currentImagesCount / 4] ) 
+                || ( storedData.compressedImagesRaw.big.length === 0 && storedData.compressedImagesRaw.big[currentImagesCount / 4] )
+            )) {
+                this._setCompressedImagesList(storedData, currentImagesCount / 4, this.currentAdditionalImagesExists, true);
+            } else */
+            this.clientService.getCompressedImagesData(this.photographyType, imageViewSize, currentImagesCount).subscribe({
+                next: data => {
+                    /* const updatedData = storedData;
 
+                    if ( !updatedData.compressedImagesRaw.medium || updatedData.compressedImagesRaw.medium.length === 0 ) {
+                        updatedData.compressedImagesRaw.medium = data.compressedImagesRaw.medium;
+                    } else {
+                        updatedData.compressedImagesRaw.medium.push(...data.compressedImagesRaw.medium)
+                    }
+        
+                    if ( !updatedData.compressedImagesRaw.big || updatedData.compressedImagesRaw.big.length === 0 ) {
+                        updatedData.compressedImagesRaw.big = data.compressedImagesRaw.big;
+                    } else {
+                        updatedData.compressedImagesRaw.big.push(...data.compressedImagesRaw.big)
+                    }
+        
+                    this.transferState.set<IGalleryCompressedImagesData>(GALLERY_COMPRESSEDIMAGESDATA_STATE_KEY, updatedData);
+        
+                    this.scrollPageBottomIsFinished = false; */
 
+                    this._setCompressedImagesList(data, currentImagesCount / 4, this.currentAdditionalImagesExists, false);
+                },
+                error: () => this.appService.createErrorModal()
+            });
+        }
     }
 
-    public toggleBigGallery (): void { debugger;
+    private _setCompressedImagesList (data: IGalleryCompressedImagesData, currentImagesCount: number, currentAdditionalImagesExists: boolean, transferStateKeyIsExists: boolean): void {
+        if ( data.compressedImagesRaw.medium.length !== 0 || data.compressedImagesRaw.big.length !== 0 ) {
+            if ( !currentAdditionalImagesExists ) {
+                this.compressedImagesList = data.compressedImagesRaw;
+            } else {
+                this.compressedImagesList.medium.push(...data.compressedImagesRaw.medium);
+                this.compressedImagesList.big.push(...data.compressedImagesRaw.big);
+            }
+            /* else {
+                const additionalData: IReducedGalleryCompressedImages = data.compressedImagesRaw;
+
+                if ( transferStateKeyIsExists ) {
+                    additionalData.medium = data.compressedImagesRaw.medium.slice(currentImagesCount, 2);
+                    additionalData.big = data.compressedImagesRaw.big.slice(currentImagesCount, 2);
+                }
+
+                let test = false;
+                let test2 = false;
+
+                this.compressedImagesList.medium.forEach(value => value.find(value => additionalData.medium.forEach(sss => sss.forEach(s => test = s.name === value.name))));
+                this.compressedImagesList.big.forEach(value => value.find(value => additionalData.big.forEach(sss => sss.forEach(s => test2 = s.name === value.name))));
+
+                if ( !test ) this.compressedImagesList.medium.push(...additionalData.medium);
+                if ( !test2 ) this.compressedImagesList.big.push(...additionalData.big);
+            } */
+            
+
+            this.isToggleBigGallery = false;
+
+            this.TESTAAAA = data.compressedImagesRaw;
+
+            if ( data.compressedImagesRaw.medium.length !== 0 ) {
+                if ( !currentAdditionalImagesExists ) this.flatMediumCompressedImagesList = data.compressedImagesRaw.medium.flat();
+                else this.flatMediumCompressedImagesList.push(...data.compressedImagesRaw.medium.flat());
+
+                this.flatMediumCompressedImagesList.forEach(() => {
+                    this.mediumLinkContainerAnimationStates.push('leave');
+                    this.mediumLinkContainerAnimationDisplayValues.push('none');
+                });
+            } else if ( data.compressedImagesRaw.big.length !== 0 ) {
+                if ( !currentAdditionalImagesExists ) this.flatBigCompressedImagesList = data.compressedImagesRaw.big.flat();
+                else this.flatBigCompressedImagesList.push(...data.compressedImagesRaw.big.flat());
+
+                this.flatBigCompressedImagesList.forEach(() => {
+                    this.bigLinkContainerAnimationStates.push('leave');
+                    this.bigLinkContainerAnimationDisplayValues.push('none');
+                });
+            }
+        }
+
+        this.photographyTypeDescription = data.photographyTypeDescription ? data.photographyTypeDescription : null;
+
+        this.additionalImagesExists = data.additionalImagesExists;
+
+        this.scrollPageBottomIsFinished = false;
+    }
+
+    public TESTAAAA = null;
+
+    public toggleBigGallery (): void {
         if ( this.bigGalleryIsHide ) {
             this.getCompressedImagesData('big');
 

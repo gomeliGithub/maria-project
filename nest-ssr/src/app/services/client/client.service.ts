@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { ElementRef, EventEmitter, Injectable, QueryList } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable, forkJoin } from 'rxjs';
@@ -27,6 +27,8 @@ export class ClientService {
     public prevNavbarAnimationStateChange: EventEmitter<string> = new EventEmitter();
     public footerAnimationStateChange: EventEmitter<string> = new EventEmitter();
 
+    public galleryImageContainerViewRefsChange: EventEmitter<QueryList<ElementRef<HTMLDivElement>>> = new EventEmitter();
+
     public setScrollPageBottomStatus (value: boolean): void {
         this.scrollPageBottomStatusChange.emit(value);
     }
@@ -41,7 +43,11 @@ export class ClientService {
 
     public setFooterAnimationState (value: string): void {
         this.footerAnimationStateChange.emit(value);
-    } 
+    }
+
+    public setGalleryImageContainerViewRefs (value: QueryList<ElementRef<HTMLDivElement>>): void {
+        this.galleryImageContainerViewRefsChange.emit(value);
+    }
 
     public getActiveClient (): Observable<IClientBrowser> {
         const headers: HttpHeaders = this.appService.createRequestHeaders();

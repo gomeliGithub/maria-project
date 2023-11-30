@@ -17,6 +17,7 @@ import { ClientModule } from './modules/client.module';
 
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
+import { CompressedImagesComponent } from './components/gallery/compressed-images/compressed-images.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { NotFoundComponent } from './components/not-found/not-found.component'; 
 
@@ -29,6 +30,7 @@ import { environment } from '../environments/environment';
         AppComponent,
         HomeComponent,
         GalleryComponent,
+        CompressedImagesComponent,
         ModalComponent,
         NotFoundComponent
     ],

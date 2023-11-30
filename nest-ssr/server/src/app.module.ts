@@ -33,7 +33,9 @@ import { Discount } from './models/admin-panel.model';
             bootstrap: AppServerModule,
             viewsPath: join(process.cwd(), 'dist/nest-ssr/browser'),
             inlineCriticalCss: false,
-            cache: false
+            cache: {
+                expiresIn: 10800000
+            }
         }),
         ConfigModule.forRoot({
             envFilePath: [ 'server/config/.env.development', 'server/config/.env.production' ],
