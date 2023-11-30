@@ -20,7 +20,7 @@
                 (@images-animation.done)="imagesAnimationDone($event)"
                 #imageContainer
             >
-                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-fluid rounded h-100">
+                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-fluid rounded h-100" alt="">
                 <div class="position-absolute top-100 start-50 d-flex flex-row justify-content-center z-1 downloadOriginalImageLinkContainer"
                     [@link-container-animation]="mediumLinkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]"
                     (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(
@@ -72,7 +72,7 @@
                 (@images-animation.done)="imagesAnimationDone($event)"
                 #imageContainer
             >
-                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="h-100 w-100 rounded">
+                <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="h-100 w-100 rounded" alt="">
                 <div class="position-absolute top-100 start-50 d-flex flex-row justify-content-center z-1 downloadOriginalImageLinkContainer"
                     [@link-container-animation]="bigLinkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name, imageData.viewSizeType)]"
                     (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(

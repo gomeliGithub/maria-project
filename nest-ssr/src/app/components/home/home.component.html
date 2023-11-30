@@ -5,7 +5,7 @@
         [showNavigationIndicators]="compressedImagesList.length !== 1"
     >
         <ng-template ngbSlide *ngFor="let imageData of compressedImagesList; let i = index">
-            <img src="/assets/images_thumbnail/home/{{ imageData.name }}" class="h-100 w-100 object-fit-cover align-baseline">
+            <img src="/assets/images_thumbnail/home/{{ imageData.name }}" class="h-100 w-100 object-fit-cover align-baseline" alt="">
         </ng-template>
     </ngb-carousel>
 </div>
@@ -63,7 +63,7 @@
                         [ngSwitch]="imagePhotographyTypeData.name"
                     >
                         <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.compressedImageName }}" 
-                            class="h-80 rounded"
+                            class="h-80 rounded" alt=""
                         >
                         <span class="align-self-end mt-2 fs-5">
                             <ng-template ngSwitchCase="individual"> {{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
@@ -112,10 +112,10 @@
     <div class="d-flex flex-row justify-content-center align-items-center h-100 w-100 pb-3" id="aboutContainer"
         [@scroll-snap-section-item-visiable-animation]="currentScrollSnapSectionVisiableAnimationStates[currentScrollSnapSectionVisiableAnimationStates.length - 1] 
         ? currentScrollSnapSectionVisiableAnimationStates[currentScrollSnapSectionVisiableAnimationStates.length - 1].state : ''"
-                (@scroll-snap-section-item-visiable-animation.start)="scrollSnapSectionItemVisiableAnimationStarted($event)"
-                (@scroll-snap-section-item-visiable-animation.done)="scrollSnapSectionItemVisiableAnimationDone($event)"
+        (@scroll-snap-section-item-visiable-animation.start)="scrollSnapSectionItemVisiableAnimationStarted($event)"
+        (@scroll-snap-section-item-visiable-animation.done)="scrollSnapSectionItemVisiableAnimationDone($event)"
     >
-        <img src="/assets/images_full/1697474336253508.jpg" class="h-100 mw-75 rounded shadow">
+        <img src="/assets/images_full/1697474336253508.jpg" class="h-100 mw-75 rounded shadow" alt="">
         <div class="d-flex flex-column align-items-center h-100 ms-4 overflow-x-auto overflow-y-auto">
             <p class="flex-fill text-start w-100 fs-5">{{ 'HOMEPAGE.ABOUTTEXT.PART2' | translate }}</p>
             <p class="flex-fill text-start w-100 fs-5">{{ 'HOMEPAGE.ABOUTTEXT.PART3' | translate }}</p>
@@ -123,7 +123,7 @@
         </div>
     </div>
 </div>
-<div *ngIf="compressedImagesList && imagePhotographyTypes" class="position-fixed top-50 translate-middle z-2" id="scrollSnapItemRadiosContainer"
+<div *ngIf="componentElementIsRendered" class="position-fixed top-50 translate-middle z-2" id="scrollSnapItemRadiosContainer"
     [ngClass]="{ 'invisible': isMobileDevice }"
     (mouseenter)="startScrollSnapItemRadiosContainerAnimation('enter')"
     (mouseleave)="startScrollSnapItemRadiosContainerAnimation('leave')"

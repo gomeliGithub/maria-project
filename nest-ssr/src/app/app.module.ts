@@ -3,7 +3,6 @@ import { HttpClient, HttpClientModule, provideHttpClient, withFetch } from '@ang
 import { BrowserModule, provideClientHydration } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TransferHttpCacheModule } from '@nguniversal/common';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -36,7 +35,6 @@ import { environment } from '../environments/environment';
     ],
     imports: [
         BrowserModule,
-        TransferHttpCacheModule,
         BrowserAnimationsModule,
         HttpClientModule,
         FormsModule,
