@@ -27,8 +27,8 @@ export class AppService {
         private readonly translateService: TranslateService,
         private modalService: NgbModal
     ) { 
-        this.isPlatformBrowser = isPlatformBrowser(platformId);
-        this.isPlatformServer = isPlatformServer(platformId);
+        this.isPlatformBrowser = isPlatformBrowser(this.platformId);
+        this.isPlatformServer = isPlatformServer(this.platformId);
     }
 
     public checkIsPlatformBrowser (): boolean {
@@ -39,7 +39,11 @@ export class AppService {
         return this.isPlatformServer;
     }
 
-    public setMetaTag (property: string, content: string): void {
+    public getMetaNameTag (property: string): HTMLMetaElement {
+        return this.meta.getTag(`name="${ property }"` );
+    }
+
+    public setMetaPropertyTag (property: string, content: string): void {
         if ( this.meta.getTag(`property="${ property }"` ) === null) this.meta.addTag({ property, content });
         else this.meta.updateTag({ property, content });
     }

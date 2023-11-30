@@ -134,7 +134,9 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     public flatImagePhotographyTypes: IImagePhotographyType[];
 
     ngOnInit (): void {
-        this.appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => this.appService.setTitle(translation));
+        this.appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => {
+            this.appService.setTitle(translation);
+        });
 
         this.compressedImagesListObservable = this.clientService.getCompressedImagesData('home').pipe(map(imagesData => {
             this.compressedImagesList = imagesData.length !== 0 ? imagesData : null;

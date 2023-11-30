@@ -1,7 +1,7 @@
-import { Component, ElementRef, HostBinding, OnInit, QueryList, TransferState, ViewChild, makeStateKey } from '@angular/core';
+import { Component, ElementRef, HostBinding, OnInit, QueryList, TransferState, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Observable, catchError, map, of } from 'rxjs';
 
 import { AppService } from '../../../app/app.service';
@@ -10,7 +10,7 @@ import { ClientService } from '../../services/client/client.service';
 import { AnimationEvent, IGalleryCompressedImagesData, IReducedGalleryCompressedImages } from 'types/global';
 import { IClientCompressedImage } from 'types/models';
 
-const GALLERY_COMPRESSEDIMAGESDATA_STATE_KEY = makeStateKey<IGalleryCompressedImagesData>('galleryCompressedImagesData');
+// const GALLERY_COMPRESSEDIMAGESDATA_STATE_KEY = makeStateKey<IGalleryCompressedImagesData>('galleryCompressedImagesData');
 
 @Component({
     selector: 'app-gallery',
@@ -100,7 +100,7 @@ export class GalleryComponent implements OnInit {
     public scrollPageBottomIsFinished: boolean = false;
 
     ngOnInit (): void {
-        this.router.events.subscribe(evt => {
+        this.router.events.subscribe(evt => { if ( evt instanceof NavigationStart ) console.log(evt.url);
             if ( !(evt instanceof NavigationEnd) ) return;
             else this.url = evt.url;
             
@@ -109,6 +109,20 @@ export class GalleryComponent implements OnInit {
 
         this.appService.getTranslations([ 'PAGETITLES.GALLERY', `IMAGEPHOTOGRAPHYTYPESFULLTEXT.${ this.photographyType.toUpperCase() }`], true).subscribe(translation => {
             this.appService.setTitle(`${ translation[0] } - ${ translation[1] }`);
+
+            let photographyTypeMetaKeyword: string = null;
+
+            switch ( this.photographyType ) {
+                case 'children': { photographyTypeMetaKeyword = 'детский фотограф'; break; }
+                case 'family': { photographyTypeMetaKeyword = 'семейный фотограф, фотосессия пары'; break; }
+                case 'individual': { photographyTypeMetaKeyword = 'индивидуальный фотограф'; break; }
+                case 'wedding': { photographyTypeMetaKeyword = 'свадебный фотограф'; break; }
+            }
+
+            const keywordsMetaNameTag: HTMLMetaElement = this.appService.getMetaNameTag('keywords');
+            const keywordsMetaNameTagContent: string = keywordsMetaNameTag.getAttribute('content');
+
+            keywordsMetaNameTag.setAttribute('content', `${ keywordsMetaNameTagContent }, ${ photographyTypeMetaKeyword }`);
         });
 
         this.compressedBigImagesIsExistsObservable = this.clientService.checkCompressedBigImagesIsExists(this.photographyType).pipe(map(result => {
@@ -226,6 +240,8 @@ export class GalleryComponent implements OnInit {
     }
 
     private _setCompressedImagesList (data: IGalleryCompressedImagesData, currentImagesCount: number, currentAdditionalImagesExists: boolean, transferStateKeyIsExists: boolean): void {
+        transferStateKeyIsExists
+        
         if ( data.compressedImagesRaw.medium.length !== 0 || data.compressedImagesRaw.big.length !== 0 ) {
             if ( !currentAdditionalImagesExists ) {
                 this.compressedImagesList = data.compressedImagesRaw;
