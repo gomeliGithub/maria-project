@@ -374,6 +374,22 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
         }
     }
 
+    public scrollSnapSectionItemVisiableAnimationStarted (event: AnimationEvent): void {
+        if ( event.toState === 'visiable' ) {
+            const target: HTMLDivElement = event.element;
+
+            target.classList.add('pe-none');
+        }
+    }
+
+    public scrollSnapSectionItemVisiableAnimationDone (event: AnimationEvent): void {
+        if ( event.toState === 'visiable' ) {
+            const target: HTMLDivElement = event.element;
+
+            target.classList.remove('pe-none');
+        }
+    }
+
     public setCurrentMouseTriggerStateIndex (name: string): number { 
         return this.flatImagePhotographyTypes.findIndex(imagePhotographyTypeData => imagePhotographyTypeData.name === name);
     }
