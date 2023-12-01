@@ -9,24 +9,21 @@
         </ng-template>
     </ngb-carousel>
 </div>
-<div *ngIf="discountsDataObservable | async" class="w-100 my-3 section" #scrollSnapSection>
-    <ngb-carousel *ngIf="discountsData; else noDiscountsDataBlock" class="carousel w-100" id="discountsCarousel" 
-        [interval]="0"
-        [showNavigationArrows]="discountsData.length !== 1"
-        [showNavigationIndicators]="discountsData.length !== 1"
-    >
-        <ng-template ngbSlide *ngFor="let discountData of discountsData; let i = index">
-            <div class="h-100 w-100 text-center text-light">
-                <p class="row justify-content-center align-items-center h-100 h1">
-                    {{ discountData.content }}
-                </p>
-            </div>
-        </ng-template>
-    </ngb-carousel>
-</div>
-<ng-template #noDiscountsDataBlock>
-    <div class="text-center text-info fw-semibold fs-4 py-3">
-        <span>{{ 'HOMEPAGE.NODISCOUNTSMESSAGE' | translate }}</span>
+<ng-template [ngIf]="discountsDataObservable | async">
+    <div *ngIf="discountsData" class="w-100 my-3 section" #scrollSnapSection>
+        <ngb-carousel class="carousel w-100" id="discountsCarousel" 
+            [interval]="0"
+            [showNavigationArrows]="discountsData.length !== 1"
+            [showNavigationIndicators]="discountsData.length !== 1"
+        >
+            <ng-template ngbSlide *ngFor="let discountData of discountsData; let i = index">
+                <div class="h-100 w-100 text-center text-light">
+                    <p class="row justify-content-center align-items-center h-100 h1">
+                        {{ discountData.content }}
+                    </p>
+                </div>
+            </ng-template>
+        </ngb-carousel>
     </div>
 </ng-template>
 <div class="py-5 px-4 w-100 section" #scrollSnapSection>
@@ -123,8 +120,8 @@
         </div>
     </div>
 </div>
-<div *ngIf="componentElementIsRendered" class="position-fixed top-50 translate-middle z-2" id="scrollSnapItemRadiosContainer"
-    [ngClass]="{ 'invisible': isMobileDevice }"
+<div *ngIf="compressedImagesList && imagePhotographyTypes" class="position-fixed top-50 translate-middle z-2" id="scrollSnapItemRadiosContainer"
+    [ngClass]="{ 'invisible': isMobileDevice || !componentElementIsRendered }"
     (mouseenter)="startScrollSnapItemRadiosContainerAnimation('enter')"
     (mouseleave)="startScrollSnapItemRadiosContainerAnimation('leave')"
 >
@@ -132,7 +129,7 @@
         [@scroll-snap-item-radios-container-animation]="currentScrollSnapItemRadiosContainerAnimationState"
     >
         <div class="ms-2"
-            [ngClass]="{ 'z-2': isMobileDevice }"
+            [ngClass]="{ 'z-2': isMobileDevice && componentElementIsRendered }"
             [@scroll-snap-item-radios-embeded-container-animation]="currentScrollSnapItemRadiosEmbededContainerAnimationState"
             (@scroll-snap-item-radios-embeded-container-animation.start)="scrollSnapItemRadiosEmbededContainerAnimationStart($event)"
             (@scroll-snap-item-radios-embeded-container-animation.done)="scrollSnapItemRadiosEmbededContainerAnimationDone($event)"
@@ -143,18 +140,24 @@
                 }"
             >
                 <input class="form-check-input" type="radio" value="" [id]="'defaultCheck' + i" (click)="changeActiveScrollSnapSection($event)"
-                    [ngClass]="{ 'visible': isMobileDevice }"
+                    [ngClass]="{ 'visible': isMobileDevice && componentElementIsRendered }"
                     [ngStyle]="{ 
-                        'transform': isMobileDevice ? 'scale(1.3)' : null,
-                        'margin-right': isMobileDevice ? '-1.3rem' : null
+                        'transform': isMobileDevice && componentElementIsRendered ? 'scale(1.3)' : null,
+                        'margin-right': isMobileDevice && componentElementIsRendered ? '-1.3rem' : null
                     }"
-                    (change)="isMobileDevice ? scrollSnapItemRadio.blur() : null"
+                    (change)="isMobileDevice && componentElementIsRendered ? scrollSnapItemRadio.blur() : null"
                     #scrollSnapItemRadio
                 >
                 <label class="form-check-label text-nowrap" [for]="'defaultCheck' + i"
-                    [ngClass]="{ 'text-warning fw-semibold': isMobileDevice }"
+                    [ngClass]="{ 'text-warning fw-semibold': isMobileDevice && componentElementIsRendered }"
                 >
-                    {{ ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate }}
+                    {{ discountsData ? 
+                        ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate ) : 
+                        ( i >= 1 ? 
+                            ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 2 ) ) | translate ) :
+                            ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate )
+                        ) 
+                    }}
                 </label>
             </div>
         </div>

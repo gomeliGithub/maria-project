@@ -2,66 +2,66 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 
     <url>
-        <loc>http://localhost/adminPanel</loc>
+        <loc>http://178.172.173.222/adminPanel</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
         <lastmod>2023-11-26T17:57:53.100Z</lastmod>
     </url>    
 
     <url>
-        <loc>http://localhost/adminPanel/imagesControl</loc>
+        <loc>http://178.172.173.222/adminPanel/imagesControl</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
         <lastmod>2023-11-26T17:57:53.100Z</lastmod>
     </url>    
 
     <url>
-        <loc>http://localhost/adminPanel/discountsControl</loc>
+        <loc>http://178.172.173.222/adminPanel/discountsControl</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
         <lastmod>2023-11-22T17:10:59.284Z</lastmod>
     </url>    
 
     <url>
-        <loc>http://localhost/adminPanel/ordersControl</loc>
+        <loc>http://178.172.173.222/adminPanel/ordersControl</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
         <lastmod>2023-11-06T19:27:28.628Z</lastmod>
     </url>    
 
     <url>
-        <loc>http://localhost/signUp</loc>
+        <loc>http://178.172.173.222/signUp</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
         <lastmod>2023-11-24T22:53:18.841Z</lastmod>
     </url>    
 
     <url>
-        <loc>http://localhost/signIn</loc>
+        <loc>http://178.172.173.222/signIn</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
         <lastmod>2023-11-24T22:53:18.841Z</lastmod>
     </url>    
 
     <url>
-        <loc>http://localhost/gallery</loc>
+        <loc>http://178.172.173.222/gallery</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
         <lastmod>2023-11-30T15:20:39.758Z</lastmod>
     </url>    
 
     <url>
-        <loc>http://localhost/home</loc>
+        <loc>http://178.172.173.222/home</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-26T21:18:35.250Z</lastmod>
+        <lastmod>2023-11-30T21:52:12.564Z</lastmod>
     </url>    
 
     <url>
-        <loc>http://localhost/</loc>
+        <loc>http://178.172.173.222/</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-26T21:18:35.250Z</lastmod>
+        <lastmod>2023-11-30T21:52:12.564Z</lastmod>
     </url>    
 
 </urlset>

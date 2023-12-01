@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostBinding, OnInit, QueryList, TransferState, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Observable, catchError, map, of } from 'rxjs';
 
 import { AppService } from '../../../app/app.service';
@@ -100,7 +100,7 @@ export class GalleryComponent implements OnInit {
     public scrollPageBottomIsFinished: boolean = false;
 
     ngOnInit (): void {
-        this.router.events.subscribe(evt => { if ( evt instanceof NavigationStart ) console.log(evt.url);
+        this.router.events.subscribe(evt => {
             if ( !(evt instanceof NavigationEnd) ) return;
             else this.url = evt.url;
             

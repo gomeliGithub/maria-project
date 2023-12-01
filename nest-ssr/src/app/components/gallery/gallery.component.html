@@ -11,8 +11,8 @@
     <hr class="border-3 mt-5 w-100"/>
 </div>
 <!-- <ng-template [ngIf]="!firstStoredData" [ngIfElse]="additionalCompressedImagesListBlock"> -->
-    <ng-template [ngIf]="compressedImagesListObservable | async" [ngIfElse]="noContentBlock" class="d-flex flex-column align-items-center justify-content-start mt-3 w-80">
-        <app-compressed-images
+    <ng-template [ngIf]="compressedImagesListObservable | async" class="d-flex flex-column align-items-center justify-content-start mt-3 w-80">
+        <app-compressed-images *ngIf="compressedImagesList; else noContentBlock"
             [(photographyType)]="photographyType"
             [(compressedImagesList)]="compressedImagesList"
             [(compressedImagesListType)]="compressedImagesListType"
