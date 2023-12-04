@@ -189,8 +189,11 @@ export class AppComponent implements OnInit {
             this.componentClass = false;
 
             this.footerAnimationState = 'show';
-            this.footerElementRef.nativeElement.classList.remove('bottom-0', 'position-absolute');
-            this.footerElementRef.nativeElement.classList.add('position-relative');
+
+            if ( this.footerElementRef ) {
+                this.footerElementRef.nativeElement.classList.remove('bottom-0', 'position-absolute');
+                this.footerElementRef.nativeElement.classList.add('position-relative');
+            }
 
             this.isHomePage = false;
 

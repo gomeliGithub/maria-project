@@ -39,10 +39,6 @@ and (width: 375px)
 and (height: 667px) 
 and (-webkit-device-pixel-ratio: 2) {
     .mediumSizedImagesContainer {
-        width: 90% !important;
-    }
-
-    .mediumSizedImagesContainer {
         flex-wrap: wrap !important;
     }
 
