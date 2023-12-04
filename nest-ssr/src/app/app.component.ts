@@ -4,7 +4,7 @@ import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
 import { TranslateService } from '@ngx-translate/core';
 
-import { BehaviorSubject, Observable, Subscription, catchError, map, of } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
@@ -19,7 +19,7 @@ import { ClientService } from './services/client/client.service';
 
 import { environment } from '../environments/environment';
 
-import { IClientBrowser, IClientLocale } from 'types/global';
+import { IClientLocale } from 'types/global';
 
 @Component({
     selector: 'app-root',
@@ -116,68 +116,35 @@ export class AppComponent implements OnInit {
 
     public readonly locales: IClientLocale[] = environment.locales;
 
-    public activeClientObservable: Observable<IClientBrowser> = null;
-
     public activeClientLogin: string;
     public activeClientType: string;
     public activeClientLocale: string;
     public activeClientFullName: string;
 
     ngOnInit (): void {
-        // if ( this.appService.checkIsPlatformBrowser() ) {
-            // if ( !this.activeClientLogin && !this.activeClientType && !this.activeClientLocale && !this.activeClientFullName ) {
-                this.activeClientObservable = this.clientService.getActiveClient().pipe(map(activeClientData => {
-                    this.activeClientLogin = activeClientData ? activeClientData.login : null;
-                    this.activeClientType = activeClientData ? activeClientData.type : null;
-                    this.activeClientFullName = activeClientData ? activeClientData.fullName : null;
-                    this.activeClientLocale = activeClientData ? activeClientData.locale : null;
-
-                    this.document.documentElement.lang = this.activeClientLocale ?? environment.defaultLocale;
+        if ( this.appService.checkIsPlatformBrowser() ) {
+            this.clientService.getActiveClient().subscribe({
+                next: activeClient => {
+                    this.activeClientLogin = activeClient ? activeClient.login : null;
+                    this.activeClientType = activeClient ? activeClient.type : null;
+                    this.activeClientFullName = activeClient ? activeClient.fullName : null;
+                    this.activeClientLocale = activeClient ? activeClient.locale : null;
 
                     if ( this.activeClientLocale ) this.translateService.use(this.activeClientLocale);
                     else {
                         this.translateService.use(environment.defaultLocale);
                         this.activeClientLocale = environment.defaultLocale;
                     }
-                    
-                    return activeClientData;
-                }), catchError(() => {
-                    this.appService.createErrorModal();
 
-                    return of(null);
-                }));
+                    this.document.documentElement.lang = this.activeClientLocale ?? environment.defaultLocale;
+                },
+                error: () => this.appService.createErrorModal()
+            });
 
-                this.clientService.navbarAnimationStateChange.subscribe(value => this.navbarAnimationState = value);
-                this.clientService.prevNavbarAnimationStateChange.subscribe(value => this.prevNavbarAnimationState = value);
-                this.clientService.footerAnimationStateChange.subscribe(value => this.footerAnimationState = value);
-            // }
-        // }
-
-        /*
-
-        this.clientService.getActiveClient().subscribe({
-            next: activeClient => {
-                this.activeClientLogin = activeClient ? activeClient.login : null;
-                this.activeClientType = activeClient ? activeClient.type : null;
-                this.activeClientFullName = activeClient ? activeClient.fullName : null;
-                this.activeClientLocale = activeClient ? activeClient.locale : null;
-
-                if ( this.activeClientLocale ) this.translateService.use(this.activeClientLocale);
-                else {
-                    this.translateService.use(environment.defaultLocale);
-                    this.activeClientLocale = environment.defaultLocale;
-                }
-
-                this.document.documentElement.lang = this.activeClientLocale ?? environment.defaultLocale;
-            },
-            error: () => this.appService.createErrorModal()
-        });
-
-        this.clientService.navbarAnimationStateChange.subscribe(value => this.navbarAnimationState = value);
-        this.clientService.prevNavbarAnimationStateChange.subscribe(value => this.prevNavbarAnimationState = value);
-        this.clientService.footerAnimationStateChange.subscribe(value => this.footerAnimationState = value);
-
-        */
+            this.clientService.navbarAnimationStateChange.subscribe(value => this.navbarAnimationState = value);
+            this.clientService.prevNavbarAnimationStateChange.subscribe(value => this.prevNavbarAnimationState = value);
+            this.clientService.footerAnimationStateChange.subscribe(value => this.footerAnimationState = value);
+        }
     }
 
     public onRouterOutlet (component: HomeComponent | GalleryComponent | ClientComponent | AdminPanelComponent | AdminPanelOrdersControlComponent 
@@ -190,10 +157,8 @@ export class AppComponent implements OnInit {
 
             this.footerAnimationState = 'show';
 
-            if ( this.footerElementRef ) {
-                this.footerElementRef.nativeElement.classList.remove('bottom-0', 'position-absolute');
-                this.footerElementRef.nativeElement.classList.add('position-relative');
-            }
+            this.footerElementRef.nativeElement.classList.remove('bottom-0', 'position-absolute');
+            this.footerElementRef.nativeElement.classList.add('position-relative');
 
             this.isHomePage = false;
 
@@ -205,10 +170,8 @@ export class AppComponent implements OnInit {
             this.componentClass = true;
             this.isHomePage = true;
 
-            if ( this.footerElementRef ) {
-                this.footerElementRef.nativeElement.classList.remove('position-relative');
-                this.footerElementRef.nativeElement.classList.add('bottom-0', 'position-absolute');
-            }
+            this.footerElementRef.nativeElement.classList.remove('position-relative');
+            this.footerElementRef.nativeElement.classList.add('bottom-0', 'position-absolute');
         }
     }
 

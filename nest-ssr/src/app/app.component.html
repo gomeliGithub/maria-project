@@ -23,7 +23,7 @@
             <span class="icon-bar middle-bar d-block mb-1 border-1" [@middle-bar-animation]="navbarTogglerIconTriggerState"></span>
             <span class="icon-bar bottom-bar d-block border-1" [@bottom-bar-animation]="navbarTogglerIconTriggerState"></span>
         </button>
-        <div *ngIf="activeClientObservable | async" class="navbar-collapse collapse" id="navbarNavDropdown" [ngbCollapse]="navbarIsCollapsed">
+        <div class="navbar-collapse collapse" id="navbarNavDropdown" [ngbCollapse]="navbarIsCollapsed">
             <ul class="navbar-nav flex-grow-1 justify-content-evenly mb-2 mb-lg-0">
                 <li class="nav-item me-4">
                     <a class="nav-link active" aria-current="page" routerLink="/"

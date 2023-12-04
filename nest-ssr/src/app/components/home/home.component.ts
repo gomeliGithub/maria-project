@@ -1,6 +1,5 @@
 import { AfterContentChecked, AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChildren, afterRender } from '@angular/core';
 import { animate, animateChild, query, state, style, transition, trigger } from '@angular/animations';
-import { Observable, catchError, map, of } from 'rxjs';
 
 import { DeviceDetectorService, DeviceInfo } from 'ngx-device-detector';
 
@@ -75,6 +74,8 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
     ]
 })
 export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChecked, OnDestroy {
+    public componentElementIsRendered: boolean = false;
+    
     public deviceInfo: DeviceInfo = null;
 
     constructor (
@@ -104,7 +105,6 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     public isTabletDevice: boolean = false;
     public isDesktopDevice: boolean = false;
 
-    public componentElementIsRendered: boolean = false;
     public compressedImagesDataIsLoaded: boolean = false;
 
     public scrollSnapSectionsPosition: { offsetTop: number, offsetHeight: number, offsetTopMod: number, indexNumber: number }[];
@@ -123,13 +123,10 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
 
     public currentScrollSnapSectionVisiableAnimationStates: { state: string, finished: boolean }[] = [];
 
-    public compressedImagesListObservable: Observable<IClientCompressedImage[]>;
     public compressedImagesList: IClientCompressedImage[];
 
-    public discountsDataObservable: Observable<IDiscount[]>;
     public discountsData: IDiscount[];
 
-    public imagePhotographyTypesObservable: Observable<IImagePhotographyType[][]>;
     public imagePhotographyTypes: IImagePhotographyType[][];
     public flatImagePhotographyTypes: IImagePhotographyType[];
 
@@ -138,44 +135,32 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
             this.appService.setTitle(translation);
         });
 
-        this.compressedImagesListObservable = this.clientService.getCompressedImagesData('home').pipe(map(imagesData => {
-            this.compressedImagesList = imagesData.length !== 0 ? imagesData : null;
+        this.clientService.getCompressedImagesData('home').subscribe({
+            next: imagesData => this.compressedImagesList = imagesData.length !== 0 ? imagesData : null,
+            error: () => this.appService.createErrorModal()
+        });
 
-            return imagesData;
-        }), catchError(() => {
-            this.appService.createErrorModal();
+        this.clientService.getDiscountsData().subscribe({
+            next: discountsData => this.discountsData = discountsData.length !== 0 ? discountsData : null,
+            error: () => this.appService.createErrorModal()
+        });
 
-            return of(null);
-        }));
+        this.clientService.getImagePhotographyTypesData('home').subscribe({
+            next: imagePhotographyTypesData => {
+                this.imagePhotographyTypes = imagePhotographyTypesData.length !== 0 ? imagePhotographyTypesData: null;
 
-        this.discountsDataObservable = this.clientService.getDiscountsData().pipe(map(discountsData => {
-            this.discountsData = discountsData.length !== 0 ? discountsData : null;
-
-            return discountsData;
-        }), catchError(() => {
-            this.appService.createErrorModal();
-
-            return of(null);
-        }));
-        this.imagePhotographyTypesObservable = this.clientService.getImagePhotographyTypesData('home').pipe(map(imagePhotographyTypesData => {
-            this.imagePhotographyTypes = imagePhotographyTypesData.length !== 0 ? imagePhotographyTypesData: null;
-
-            this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
-            this.flatImagePhotographyTypes.forEach(() => {
-                this.currentMouseTriggerStates.push('leave');
-                this.currentLinkButtonContainerAnimationStates.push('leave');
-            });
-
-            this.imagePhotographyTypes.forEach(() => this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false }));
-
-            this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false });
-
-            return imagePhotographyTypesData;
-        }), catchError(() => {
-            this.appService.createErrorModal();
-
-            return of(null);
-        }));
+                this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
+                this.flatImagePhotographyTypes.forEach(() => {
+                    this.currentMouseTriggerStates.push('leave');
+                    this.currentLinkButtonContainerAnimationStates.push('leave');
+                });
+    
+                this.imagePhotographyTypes.forEach(() => this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false }));
+    
+                this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false });
+            },
+            error: () => this.appService.createErrorModal()
+        });
     }
 
     ngAfterContentChecked (): void {

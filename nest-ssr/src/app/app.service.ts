@@ -66,13 +66,11 @@ export class AppService {
     }
 
     public createRequestHeaders (): HttpHeaders {
-        // if ( this.isPlatformBrowser ) {
-            const token: string | null = localStorage.getItem('access_token');
+        const token: string | null = localStorage.getItem('access_token');
 
-            const headers = new HttpHeaders().set('Authorization', token ? `Bearer ${ token }` : "");
+        const headers = new HttpHeaders().set('Authorization', token ? `Bearer ${ token }` : "");
 
-            return token ? headers : null;
-        // } return null;
+        return token ? headers : null;
     }
 
     public createModalInstance (createOptions: IModalCreateOptions): NgbModalRef{
