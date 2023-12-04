@@ -39,7 +39,7 @@ export class AppService {
 
     public cookieSerializeOptions: ICookieSerializeOptions = {
         httpOnly: true,
-        maxAge: ms(process.env.COOKIE_MAXAGE_TIME as string),
+        maxAge: ms(process.env.COOKIE_MAXAGE_TIME),
         sameSite: 'strict',
         secure: false,
         priority: 'high'

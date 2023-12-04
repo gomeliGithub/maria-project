@@ -113,7 +113,7 @@ export class SignService {
         });
     }
 
-    public async signIn (clientSignData: IClientSignData, response: Response): Promise<string> {
+    public async signIn (clientSignData: IClientSignData, response: Response, clientLocale: string): Promise<string> {
         const clientLogin: string = clientSignData.login.trim();
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
@@ -146,7 +146,7 @@ export class SignService {
         await this.jwtControlService.saveToken(access_token);
 
         response.cookie('__secure_fgp', __secure_fgp, this.appService.cookieSerializeOptions);
-        response.cookie('locale', process.env.CLIENT_DEFAULT_LOCALE, this.appService.cookieSerializeOptions);
+        response.cookie('locale', clientLocale ?? process.env.CLIENT_DEFAULT_LOCALE, this.appService.cookieSerializeOptions);
 
         return access_token;
     }
@@ -161,18 +161,24 @@ export class SignService {
 
     public async getActiveClient (request: IRequest): Promise<IClient>
     public async getActiveClient (request: IRequest, options?: { includeFields?: string, allowedIncludedFields?: string[] }): Promise<string>
-    public async getActiveClient (request: IRequest, options?: { includeFields?: string[], allowedIncludedFields?: string[] }): Promise<IClient>
+    public async getActiveClient (request: IRequest, options?: { includeFields?: string[], allowedIncludedFields?: string[], response?: Response, clientLocale?: string }): Promise<IClient>
     public async getActiveClient (request: IRequest, options?: { includeFields?: string | string[], allowedIncludedFields?: string[] }): Promise<string | IClient>
     public async getActiveClient (request: IRequest, options?: IGetActiveClientOptions): Promise<string | IClient> {
         const token: string = this.jwtControlService.extractTokenFromHeader(request);
 
-        if ( !token || token === '') return null;
-
         let validatedClientPayload: IClient = null;
-        
+
         try {
             validatedClientPayload = await this.jwtControlService.tokenValidate(request, token);
         } catch { }
+
+        if ( !validatedClientPayload || !token || token === '' ) {
+            options.response.cookie('locale', options.clientLocale && options.clientLocale !== '' ? options.clientLocale : process.env.CLIENT_DEFAULT_LOCALE, this.appService.cookieSerializeOptions);
+
+            validatedClientPayload = { locale: options.clientLocale && options.clientLocale !== '' ? options.clientLocale : null };
+
+            return validatedClientPayload;
+        }
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 

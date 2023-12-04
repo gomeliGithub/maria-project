@@ -5,6 +5,8 @@ import { ClientTypes } from '../../decorators/client.types.decorator';
 
 import { SignService } from '../../services/sign/sign.service';
 
+import { Cookies } from '../../decorators/cookies.decorator';
+
 import { IClient, IRequest, IRequestBody } from 'types/global';
 
 @Controller('/sign')
@@ -25,12 +27,12 @@ export class SignController {
 
     @Put('/in')
     @ClientTypes('admin', 'member')
-    async signIn (@Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string> {
+    async signIn (@Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response, @Cookies('locale') clientLocale: string): Promise<string> {
         if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password ||
             typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
         ) throw new BadRequestException('SignIn - invalid request body data');
 
-        return this.signService.signIn(requestBody.sign.clientData, response);
+        return this.signService.signIn(requestBody.sign.clientData, response, clientLocale);
     }
 
     @Put('/out')
@@ -39,10 +41,10 @@ export class SignController {
     }
 
     @Get('/getActiveClient')
-    async getActiveClient (@Req() request: IRequest): Promise<string | IClient> {
+    async getActiveClient (@Req() request: IRequest, @Res({ passthrough: true }) response: Response, @Cookies('locale') clientLocale: string): Promise<string | IClient> {
         const includedFields: string[] = [ 'login', 'locale', 'fullName', 'type' ];
 
-        return this.signService.getActiveClient(request, { includeFields: includedFields });
+        return this.signService.getActiveClient(request, { includeFields: includedFields, response, clientLocale });
     }
 
     @Get('/getBcryptHashSaltrounds')

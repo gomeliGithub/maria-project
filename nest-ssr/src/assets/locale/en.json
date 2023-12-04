@@ -1,4 +1,5 @@
 {
+	"DEFAULTSUCCESSMESSAGE": "Operation completed successfully",
 	"DEFAULTERRORMESSAGE": "Something went wrong. Try again",
 	"PAGETITLES": {
 		"HOME": "Home",
@@ -94,7 +95,6 @@
 		"SUCCESSTITLE": "Success",
 		"WARNINGTITLE": "Warning",
 		"ERRORTITLE": "Error",
-		"DEFAULTERRORMESSAGE": "Something went wrong.",
 		"BUTTONS": {
 			"CONFIRMCAPTIONTEXT": "Close"
 		}

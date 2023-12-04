@@ -9,6 +9,7 @@ import { Observable, map } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 
 import { ModalComponent } from './components/modal/modal.component';
+
 import { IModalCreateOptions } from 'types/options';
 
 @Injectable({
@@ -25,7 +26,7 @@ export class AppService {
         private readonly platformTitle: Title,
         private readonly router: Router,
         private readonly translateService: TranslateService,
-        private modalService: NgbModal
+        private readonly modalService: NgbModal
     ) { 
         this.isPlatformBrowser = isPlatformBrowser(this.platformId);
         this.isPlatformServer = isPlatformServer(this.platformId);
@@ -59,21 +60,19 @@ export class AppService {
 
         this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
             this.router.navigate([url]).then(() => {
-                // console.log(`After navigation I am on: ${ this.router.url }`);
-
                 window.location.reload();
             })
         })
     }
 
     public createRequestHeaders (): HttpHeaders {
-        if ( this.isPlatformBrowser ) {
+        // if ( this.isPlatformBrowser ) {
             const token: string | null = localStorage.getItem('access_token');
 
-            const headers = new HttpHeaders().set('Authorization', token ? `Bearer ${token}` : "");
+            const headers = new HttpHeaders().set('Authorization', token ? `Bearer ${ token }` : "");
 
-            return headers;
-        } return null;
+            return token ? headers : null;
+        // } return null;
     }
 
     public createModalInstance (createOptions: IModalCreateOptions): NgbModalRef{
@@ -100,11 +99,11 @@ export class AppService {
         return modalRef;
     }
 
-    public createSuccessModal (bodyText: string): NgbModalRef {
+    public createSuccessModal (bodyText?: string): NgbModalRef {
         const createOptions: IModalCreateOptions = {
             title: this.getTranslations('MODAL.SUCCESSTITLE'),
             type: 'successModal',
-            body: `${bodyText}`,
+            body: `${ bodyText ? bodyText : this.getTranslations('DEFAULTSUCCESSMESSAGE') }`,
             closeButton: false,
             confirmButtonCaption: this.getTranslations('MODAL.BUTTONS.CONFIRMCAPTIONTEXT')
         }

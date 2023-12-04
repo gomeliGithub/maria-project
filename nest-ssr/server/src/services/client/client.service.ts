@@ -332,27 +332,41 @@ export class ClientService {
     }
 
     public async changeLocale (request: IRequest, newLocale: string, response: Response): Promise<string> {
-        const token: string = this.jwtControlService.extractTokenFromHeader(request); 
+        const token: string = this.jwtControlService.extractTokenFromHeader(request);
 
-        const decodedToken: IClient = this.jwtService.decode(token) as IClient;
+        let decodedToken: IClient = null;
+        let tokenExpiresIn: number = null;
+        let updatedAccess_token: string = null;
 
-        const dateNow: Date = new Date();
+        let tokenIsValid: boolean = false;
 
-        const tokenExpiresAt: number = new Date(ms(`${decodedToken.exp}s`)).getTime();
-        const tokenExpiresIn: number = Math.round(new Date(tokenExpiresAt - dateNow.getTime()).getTime() / 1000);
+        try { 
+            this.jwtControlService.tokenValidate(request, token);
 
-        decodedToken.locale = newLocale;
+            tokenIsValid = true;
+        } catch { }
 
-        delete decodedToken.iat;
-        delete decodedToken.exp;
+        if ( token && tokenIsValid ) {
+            decodedToken = this.jwtService.decode(token) as IClient;
 
-        const updatedAccess_token: string = this.jwtService.sign(decodedToken, { expiresIn: tokenExpiresIn });
+            const dateNow: Date = new Date();
+
+            const tokenExpiresAt: number = new Date(ms(`${ decodedToken.exp }s`)).getTime();
+            tokenExpiresIn = Math.round(new Date(tokenExpiresAt - dateNow.getTime()).getTime() / 1000);
+
+            decodedToken.locale = newLocale;
+
+            delete decodedToken.iat;
+            delete decodedToken.exp;
+
+            updatedAccess_token = this.jwtService.sign(decodedToken, { expiresIn: tokenExpiresIn });
+        }
 
         const cookieSerializeOptions: ICookieSerializeOptions = this.appService.cookieSerializeOptions;
 
-        cookieSerializeOptions.maxAge = ms(`${tokenExpiresIn}s`);
+        cookieSerializeOptions.maxAge = ms(token && tokenIsValid ? `${ tokenExpiresIn }s` : process.env.COOKIE_MAXAGE_TIME);
 
-        response.cookie('locale', newLocale, this.appService.cookieSerializeOptions);
+        response.cookie('locale', newLocale, cookieSerializeOptions);
 
         return updatedAccess_token;
     }

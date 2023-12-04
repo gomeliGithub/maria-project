@@ -64,12 +64,12 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
         ]),
         trigger('scroll-snap-section-item-visiable-animation', [
             state('visiable', style({ opacity: 1, transform: 'translateY(0px)' })),
-            state('unvisiable', style({ opacity: 0, transform: 'translateY(250px)' })),
+            state('unvisiable', style({ opacity: 0, transform: 'translateY(200px)' })),
             transition('unvisiable => visiable', [
                 animate('1.5s ease-out', style({ opacity: 1, transform: 'translateY(0px)' }))
             ]),
             transition('visiable => unvisiable', [
-                animate('1.5s ease-out', style({ opacity: 0, transform: 'translateY(250px)' }))
+                animate('1.5s ease-out', style({ opacity: 0, transform: 'translateY(200px)' }))
             ])
         ])
     ]
@@ -318,7 +318,7 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
 
         this.scrollSnapVisiableAnimationSectionsPosition.forEach((sectionData, index) => {
             if ( sectionData.offsetTop <= scrollPosition ) {
-                this.startScrollSnapSectionVisiableAnimation(index);
+                setTimeout(() => this.startScrollSnapSectionVisiableAnimation(index), 500);
             }
         });
     }

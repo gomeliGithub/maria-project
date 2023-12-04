@@ -1,4 +1,5 @@
 {
+	"DEFAULTSUCCESSMESSAGE": "Операция успешно завершена",
 	"DEFAULTERRORMESSAGE": "Что-то пошло не так. Попробуйте ещё раз",
 	"PAGETITLES": {
 		"HOME": "Главная",

@@ -62,7 +62,7 @@
                         </button>
                         <ul class="dropdown-menu border-0 bg-transparent" id="imageControlButtonList" ngbDropdownMenu>
                             <li class="text-bg-secondary">
-                                <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" ngbDropdownItem 
+                                <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.image-index-number]="i" ngbDropdownItem 
                                     (click)="changeImageFormActivate($event)"
                                 >
                                     <span class="flex-grow-1">
@@ -75,7 +75,7 @@
                             </li>
                             <li class="text-bg-danger">
                                 <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" 
-                                    [attr.index-number]="i"
+                                    [attr.image-index-number]="i" 
                                     ngbDropdownItem
                                     (click)="deleteImage($event)"
                                 >
@@ -88,7 +88,8 @@
                                 </button>
                             </li>
                             <li *ngIf="compressedImage.displayedOnHomePage === 0" class="text-bg-warning">
-                                <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'home'" 
+                                <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'home'"
+                                    [attr.image-index-number]="i"
                                     ngbDropdownItem (click)="changeImageDisplayTarget($event)"
                                 >
                                     <span class="flex-grow-1">
@@ -100,7 +101,8 @@
                                 </button>
                             </li>
                             <li *ngIf="compressedImage.displayedOnGalleryPage === 0" class="text-bg-warning">
-                                <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'gallery'" 
+                                <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'gallery'"
+                                    [attr.image-index-number]="i"
                                     ngbDropdownItem (click)="changeImageDisplayTarget($event)"
                                 >
                                     <span class="flex-grow-1">
@@ -112,7 +114,8 @@
                                 </button>
                             </li>
                             <li *ngIf="compressedImage.displayedOnHomePage === 1 || compressedImage.displayedOnGalleryPage === 1" class="text-bg-warning">                          
-                                <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'original'" 
+                                <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'original'"
+                                    [attr.image-index-number]="i"
                                     ngbDropdownItem (click)="changeImageDisplayTarget($event)"
                                 >
                                     <span class="flex-grow-1">
@@ -177,7 +180,9 @@
             <label for="inputChangeViewSizeType" class="form-label">{{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.VIEWSIZETYPE' | translate }}</label>
         </div>
         <div class="form-group form-floating mb-3">
-            <input type="text" class="form-control" id="inputChangeImageDescription" formControlName="newImageDescription" (change)="controlImageDescriptionChange()">
+            <input type="text" class="form-control" id="inputChangeImageDescription" formControlName="newImageDescription" 
+                (change)="controlImageDescriptionChange()"
+            >
             <label for="inputChangeImageDescription" class="form-label">{{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.DESCRIPTION' | translate }}</label>
         </div>
         <div class="form-group text-center">

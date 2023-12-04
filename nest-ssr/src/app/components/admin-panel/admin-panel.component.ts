@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostBinding, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { animate, style, transition, trigger } from '@angular/animations';
 
 import { AppService } from '../../app.service';
@@ -92,6 +92,8 @@ export class AdminPanelComponent implements OnInit {
     public additionalImagesIsExists: boolean = false;
 
     public imagePhotographyTypes: IImagePhotographyType[];
+
+    public deleteImageIsCompleted: boolean = false;
 
     public spinnerHidden: boolean = true;
 
@@ -190,6 +192,8 @@ export class AdminPanelComponent implements OnInit {
 
         if ( control.value ) control.setValidators([ Validators.required, this.imageViewSizeTypeValidator ])
         else control.setValidators(null);
+
+        console.log(control);
     
         control.updateValueAndValidity();
     }
@@ -246,9 +250,9 @@ export class AdminPanelComponent implements OnInit {
 
         if ( deleteImageButton ) {
             const originalImageName: string = deleteImageButton.getAttribute('originalImageName');
-            const indexNumber: number = parseInt(deleteImageButton.getAttribute('index-number'), 10);
+            const imageIndexNumber: number = parseInt(deleteImageButton.getAttribute('image-index-number'), 10);
 
-            if ( originalImageName ) {
+            if ( originalImageName && !isNaN(imageIndexNumber) ) {
                 this.spinnerHidden = false;
 
                 const headers: HttpHeaders = this.appService.createRequestHeaders();
@@ -257,9 +261,10 @@ export class AdminPanelComponent implements OnInit {
                     adminPanel: { originalImageName }
                 }, { headers, responseType: 'text', withCredentials: true }).subscribe({
                     next: responseText => {
-                        this.adminPanelService.switchImageControlResponses(responseText);
+                        this.adminPanelService.switchImageControlResponses(responseText, 'delete');
+                        this.deleteImageIsCompleted = true;
 
-                        this.fullCompressedImagesList.splice(indexNumber, 1);
+                        this.fullCompressedImagesList.splice(imageIndexNumber, 1);
                     },
                     error: () => {
                         this.spinnerHidden = true;
@@ -277,8 +282,9 @@ export class AdminPanelComponent implements OnInit {
         if ( imageButton ) {
             const originalImageName: string = imageButton.getAttribute('originalImageName');
             const displayTargetPage: string = imageButton.getAttribute('targetPage');
+            const imageIndexNumber: number = parseInt(imageButton.getAttribute('image-index-number'), 10);
 
-            if ( originalImageName && displayTargetPage ) {
+            if ( originalImageName && displayTargetPage && !isNaN(imageIndexNumber) ) {
                 this.spinnerHidden = false;
 
                 const headers: HttpHeaders = this.appService.createRequestHeaders();
@@ -286,7 +292,18 @@ export class AdminPanelComponent implements OnInit {
                 this.http.post('/api/admin-panel/changeImageDisplayTarget', {
                     adminPanel: { originalImageName, displayTargetPage }
                 }, { headers, responseType: 'text', withCredentials: true }).subscribe({
-                    next: responseText => this.adminPanelService.switchImageControlResponses(responseText),
+                    next: responseText => {
+                        this.adminPanelService.switchImageControlResponses(responseText, 'changeDisplayTarget');
+
+                        this.fullCompressedImagesList[imageIndexNumber].displayedOnHomePage = 0;
+                        this.fullCompressedImagesList[imageIndexNumber].displayedOnGalleryPage = 0;
+
+                        switch ( displayTargetPage ) {
+                            case 'home': { this.fullCompressedImagesList[imageIndexNumber].displayedOnHomePage = 1; break; }
+                            case 'gallery': { this.fullCompressedImagesList[imageIndexNumber].displayedOnGalleryPage = 1; break; }
+                            case 'original': { break; }
+                        }
+                    },
                     error: () => {
                         this.spinnerHidden = true;
                         
@@ -314,9 +331,40 @@ export class AdminPanelComponent implements OnInit {
                     this.changeImageDataFormHidden = true;
                     this.spinnerHidden = true;
 
-                    this.adminPanelService.switchImageControlResponses(responseText);
+                    this.adminPanelService.switchImageControlResponses(responseText, 'changeData');
 
-                    this.changeImageDataForm.reset();
+                    const changedImageIndexNumber: number = this.fullCompressedImagesList.findIndex(imageData => imageData.originalName = originalImageName);
+
+                    let control: AbstractControl<string, string> = null;
+                    
+                    this.fullCompressedImagesList[changedImageIndexNumber];
+
+                    if ( newImagePhotographyType && this.fullCompressedImagesList[changedImageIndexNumber].photographyType !== newImagePhotographyType ) {
+                        control = this.changeImageDataForm.get('newImagePhotographyType');
+
+                        control.setValidators(null);
+                        this.fullCompressedImagesList[changedImageIndexNumber].photographyType = newImagePhotographyType;
+                    }
+
+                    if ( newImageDescription && this.fullCompressedImagesList[changedImageIndexNumber].description !== newImageDescription ) {
+                        control = this.changeImageDataForm.get('newImageDescription');
+
+                        control.setValidators(null);
+                        this.fullCompressedImagesList[changedImageIndexNumber].description = newImageDescription;
+                    }
+
+                    if ( newImageViewSizeType && this.fullCompressedImagesList[changedImageIndexNumber].viewSizeType !== newImageViewSizeType ) {
+                        control = this.changeImageDataForm.get('newImageViewSizeType');
+
+                        control.setValidators(null);
+                        this.fullCompressedImagesList[changedImageIndexNumber].viewSizeType = newImageViewSizeType;
+                    }
+
+                    this.changeImageDataForm.reset({
+                        newImagePhotographyType: '',
+                        newImageViewSizeType: '',
+                        newImageDescription: ''
+                    });
                 },
                 error: () => {
                     this.spinnerHidden = true;
@@ -355,7 +403,7 @@ export class AdminPanelComponent implements OnInit {
                     next: responseText => {
                         this.spinnerHidden = true;
     
-                        this.adminPanelService.switchImageControlResponses(responseText);
+                        this.adminPanelService.switchImageControlResponses(responseText, 'setPhotographyType');
                     },
                     error: () => {
                         this.spinnerHidden = true;
@@ -410,6 +458,11 @@ export class AdminPanelComponent implements OnInit {
         const target: HTMLTableRowElement = event.element;
 
         target.classList.remove('pe-none');
+
+        if ( this.deleteImageIsCompleted ) {
+            this.deleteImageIsCompleted = false;
+            this.appService.createSuccessModal();
+        }
 
         if ( this.additionalImagesButtonViewRef ) this.additionalImagesButtonViewRef.nativeElement.hidden = false;
     }

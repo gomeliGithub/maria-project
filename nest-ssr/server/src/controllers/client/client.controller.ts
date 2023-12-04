@@ -1,8 +1,6 @@
 import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, Res } from '@nestjs/common';
 import { Response } from 'express';
 
-import { ClientTypes } from 'server/src/decorators/client.types.decorator';
-
 import { CommonModule } from 'server/src/modules/common.module';
 
 import { AppService } from '../../app.service';
@@ -77,7 +75,6 @@ export class ClientController {
     }
 
     @Post('/changeLocale')
-    @ClientTypes('admin', 'member')
     public async changeLocale (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string> {
         if ( !requestBody.sign.newLocale || typeof requestBody.sign.newLocale !== 'string' ) throw new BadRequestException('ChangeLocale - invalid new locale');
 

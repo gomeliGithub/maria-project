@@ -62,11 +62,11 @@ export interface IRequestBody {
 }
 
 export interface IClient {
-    id: number;
-    login: string;
-    type: 'admin' | 'member';
+    id?: number;
+    login?: string;
+    type?: 'admin' | 'member';
     locale: string;
-    fullName: string;
+    fullName?: string;
     __secure_fgpHash?: string;
     iat?: number;
     exp?: number;

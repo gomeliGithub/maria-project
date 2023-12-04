@@ -1,8 +1,12 @@
+import { Response } from 'express';
+
 import { Admin } from "server/src/models/client.model";
 
 export interface IGetActiveClientOptions {
     includeFields?: string | string[];
     allowedIncludedFields?: string[];
+    clientLocale?: string;
+    response?: Response;
 }
 
 export interface IClientGetOptions {

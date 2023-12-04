@@ -23,7 +23,7 @@
             <span class="icon-bar middle-bar d-block mb-1 border-1" [@middle-bar-animation]="navbarTogglerIconTriggerState"></span>
             <span class="icon-bar bottom-bar d-block border-1" [@bottom-bar-animation]="navbarTogglerIconTriggerState"></span>
         </button>
-        <div class="navbar-collapse collapse" id="navbarNavDropdown" [ngbCollapse]="navbarIsCollapsed">
+        <div *ngIf="activeClientObservable | async" class="navbar-collapse collapse" id="navbarNavDropdown" [ngbCollapse]="navbarIsCollapsed">
             <ul class="navbar-nav flex-grow-1 justify-content-evenly mb-2 mb-lg-0">
                 <li class="nav-item me-4">
                     <a class="nav-link active" aria-current="page" routerLink="/"
@@ -122,30 +122,33 @@
                     </ul>
                 </li>
             </ul>
-            <div class="navbar-text flex-grow-0" [ngClass]="{ 'me-3': !activeClientLogin }">
+            <div class="navbar-text flex-grow-0">
                 <span *ngIf="activeClientLogin; else noActiveClientBlock">
                     <span class="fw-bold" 
                         [ngClass]="{ 'text-success': navbarAnimationState === 'scrolled', 'text-info': navbarAnimationState === 'static' }"
-                    >{{activeClientLogin}}</span>
-                    <small class="d-block" [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }">{{activeClientFullName}}</small>
+                    >
+                        {{ activeClientLogin }}
+                    </span>
+                    <small class="d-block" [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }">
+                        {{ activeClientFullName }}
+                    </small>
                 </span>
                 <ng-template #noActiveClientBlock>  
                     <span class="text-warning">{{ 'CLIENTMENU.NONSIGNINTEXT' | translate }}</span>
                 </ng-template>
             </div>
-            <ul *ngIf="activeClientLogin" class="navbar-nav ms-2 me-3">
+            <ul class="navbar-nav ms-2 me-3">
                 <li class="nav-item" ngbDropdown display="dynamic" #changeClientLocaleMenu="ngbDropdown">
                     <button type="button" class="nav-link" id="dropdownMenuButton"
                         [ngClass]="{ 'text-info': navbarAnimationState === 'static' }"
                         ngbDropdownToggle
                         (mouseenter)="menuMove(true, changeClientLocaleMenu)"
-                        #changeClientLocaleButton
                     >
                         {{ activeClientLocale }}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu aria-labelledby="dropdownMenuButton" (mouseleave)="menuMove(false, changeClientLocaleMenu)">
                         <li *ngFor="let locale of locales">
-                            <button type="button" class="" ngbDropdownItem id={{locale.code}} (click)="changeClientLocale($event)">{{locale.code}} ({{locale.title}})</button>
+                            <button type="button" class="" ngbDropdownItem [id]="locale.code" (click)="changeClientLocale($event)">{{ locale.code }} ({{ locale.title }})</button>
                         </li>
                     </ul>
                 </li>

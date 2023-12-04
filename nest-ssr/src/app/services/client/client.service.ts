@@ -52,8 +52,7 @@ export class ClientService {
     public getActiveClient (): Observable<IClientBrowser> {
         const headers: HttpHeaders = this.appService.createRequestHeaders();
 
-        return this.http.get('/api/sign/getActiveClient', { headers, withCredentials: true }
-        ).pipe(activeClient => activeClient as Observable<IClientBrowser>);
+        return this.http.get<IClientBrowser>('/api/sign/getActiveClient', { headers, withCredentials: true });
     }
 
     public sign (signFormValue: Partial<{
@@ -86,7 +85,7 @@ export class ClientService {
                 });
             } else this.http.put('/api/sign/in', { 
                 sign: { clientData }
-            }, { responseType: 'text', headers, withCredentials: true }).pipe(access_token => access_token).subscribe({
+            }, { responseType: 'text', headers, withCredentials: true }).subscribe({
                 next: access_token => {
                     localStorage.setItem('access_token', access_token);
 

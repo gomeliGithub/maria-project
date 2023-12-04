@@ -142,14 +142,22 @@ export class AdminPanelService {
         reader.readAsArrayBuffer(formFile);
     }
 
-    public switchImageControlResponses (responseText: string): void {
+    public switchImageControlResponses (responseText: string, operationName: string): void {
         switch ( responseText ) {
-            case 'SUCCESS': { this.setSpinnerHiddenStatus(true); break; }
+            case 'SUCCESS': {
+                this.setSpinnerHiddenStatus(true);
+
+                if ( operationName !== 'delete' ) this.appService.createSuccessModal();
+                
+                break; 
+            }
+
             case 'MAXCOUNT': {
                 this.appService.createWarningModal(this.appService.getTranslations('ADMINPANEL.MAXCOUNTONHOMEPAGEMESSAGE')); 
 
                 break;
             }
+
             case 'PENDING': { 
                 this.appService.createWarningModal(this.appService.getTranslations('UPLOADIMAGERESPONSES.PENDING')); 
                     
