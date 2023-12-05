@@ -173,7 +173,7 @@ export class SignService {
         } catch { }
 
         if ( !validatedClientPayload || !token || token === '' ) {
-            options.response.cookie('locale', options.clientLocale && options.clientLocale !== '' ? options.clientLocale : process.env.CLIENT_DEFAULT_LOCALE, this.appService.cookieSerializeOptions);
+            if ( !options.clientLocale || options.clientLocale === '' ) options.response.cookie('locale', process.env.CLIENT_DEFAULT_LOCALE, this.appService.cookieSerializeOptions);
 
             validatedClientPayload = { locale: options.clientLocale && options.clientLocale !== '' ? options.clientLocale : null };
 
