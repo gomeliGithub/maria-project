@@ -341,7 +341,7 @@ export class ClientService {
         let tokenIsValid: boolean = false;
 
         try { 
-            this.jwtControlService.tokenValidate(request, token);
+            await this.jwtControlService.tokenValidate(request, token);
 
             tokenIsValid = true;
         } catch { }
