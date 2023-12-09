@@ -35,6 +35,7 @@ export class AppService {
 
     public logFilePath: string = join(process.cwd(), 'server', 'logs', '_server.log');
     public httpErrorLogFilePath: string = join(process.cwd(), 'server', 'logs', '_httpErrorServer.log');
+    public webSocketLogFilePath: string = join(process.cwd(), 'server', 'logs', '_webSocketServer.log');
     public webSocketErrorLogFilePath: string = join(process.cwd(), 'server', 'logs', '_webSocketErrorServer.log');
 
     public cookieSerializeOptions: ICookieSerializeOptions = {
@@ -67,7 +68,7 @@ export class AppService {
         return serviceRef;
     }
 
-    public logLineAsync (logLine: string, error = false, errorLogType?: 'http' | 'webSocket'): Promise<void> {
+    public logLineAsync (logLine: string, error: boolean, logType: 'http' | 'webSocket'): Promise<void> {
         return new Promise<void>( (resolve, reject) => {
             const logDT = new Date();
 
@@ -76,10 +77,10 @@ export class AppService {
 
             let logFilePath: string = null;
 
-            if ( !error ) logFilePath = this.logFilePath;
-            else {
-                if ( !errorLogType || errorLogType === 'http' ) logFilePath = this.httpErrorLogFilePath;
-                else if ( errorLogType === 'webSocket' ) logFilePath = this.webSocketErrorLogFilePath;
+            if ( logType === 'http' ) {
+                logFilePath = !error ? this.logFilePath : this.httpErrorLogFilePath;
+            } else if ( logType === 'webSocket' ) {
+                logFilePath = !error ? this.webSocketLogFilePath : this.webSocketErrorLogFilePath;
             }
         
             console.log(fullLogLine);

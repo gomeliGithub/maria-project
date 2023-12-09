@@ -42,7 +42,7 @@ export class WebSocketService {
 
             currentClient.connection = connection;
 
-            this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] New connection established. WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentClient.login }`);
+            this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] New connection established. WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentClient.login }`, false, 'webSocket');
                 
             connection.on('message', async (data, isBinary) => this.connectionOnMessageHandler(currentClient, webSocketClientId, data, isBinary));
 
@@ -53,7 +53,7 @@ export class WebSocketService {
             this.setIntervalStart();
         });
 
-        this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } Socket server running on port ${ this.webSocketServerPort }`);
+        this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } Socket server running on port ${ this.webSocketServerPort }`, false, 'http');
     }
 
     public async connectionOnMessageHandler (currentClient: IWebSocketClient, webSocketClientId: number, data: any, isBinary: boolean) {
@@ -64,14 +64,16 @@ export class WebSocketService {
             if ( isBinary ) {
                 const fileData: string | Buffer = data;
 
-                if ( currentClient.uploadedSize === 0 ) await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentClient.login }. Upload file ${ currentClient.imageMetaName }, size --- ${ currentClient.imageMetaSize } is started`);
+                if ( currentClient.uploadedSize === 0 ) await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] WebSocketClientId --- ${ webSocketClientId }, 
+                login --- ${ currentClient.login }. Upload file ${ currentClient.imageMetaName }, size --- ${ currentClient.imageMetaSize } is started`, false, 'webSocket');
 
                 currentClient.uploadedSize += fileData.length;
 
                 currentClient.activeWriteStream.write(fileData, async () => {
                     const message = this.adminPanelService.createMessage('uploadImage', 'SUCCESS', { uploadedSize: currentClient.uploadedSize, imageMetaSize: currentClient.imageMetaSize });
 
-                    await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentClient.login }. Chunk ${ currentClient.currentChunkNumber } writed, size --> ${ fileData.length }`);
+                    await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] WebSocketClientId --- ${ webSocketClientId }, 
+                    login --- ${ currentClient.login }. Chunk ${ currentClient.currentChunkNumber } writed, size --> ${ fileData.length }`, false, 'webSocket');
 
                     currentClient.currentChunkNumber += 1;
 
@@ -115,7 +117,7 @@ export class WebSocketService {
         
                         client.connection = null;
             
-                        this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] Websocket client ${ client.login } disconnected`);
+                        this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] Websocket client ${ client.login } disconnected`, false, 'webSocket');
                     } else if ( client.connection ) {
                         const message: IWSMessage = this.adminPanelService.createMessage('timer', 'timer= ' + timer);
         
@@ -125,7 +127,7 @@ export class WebSocketService {
         
                 commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter(client => client.connection);
             } catch {
-                this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] WebSocketServer error`);
+                this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] WebSocketServer error`, true, 'webSocket');
             }
         }, 3000);
     }

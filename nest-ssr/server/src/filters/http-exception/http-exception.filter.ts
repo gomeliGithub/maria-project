@@ -15,7 +15,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const status: number = exception.getStatus();
         const message: string = exception.message;
 
-        this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ status } ${ message }`, true);
+        this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ status } ${ message }`, true, 'http');
 
         response.status(status).json({
             statusCode: status,

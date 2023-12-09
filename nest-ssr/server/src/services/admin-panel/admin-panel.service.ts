@@ -140,7 +140,7 @@ export class AdminPanelService {
     
             await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.WEBSOCKETSERVER_PORT }] 
                 WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentClient.login }. All chunks writed, overall size --> ${ currentClient.uploadedSize }. Image ${ imageMeta.name } uploaded`, 
-                true, 'webSocket'
+                false, 'webSocket'
             );
 
             const compressResult: boolean = await commonServiceRef.compressImage({

@@ -55,13 +55,13 @@ export class AppService {
         this.platformTitle.setTitle(`${ mainTitle } - ${ title }`);
     }
 
-    public reloadComponent (self: boolean, urlToNavigateTo?: string) {
+    public reloadComponent (self: boolean, urlToNavigateTo?: string, reloadPage = true) {
         const url: string = self ? this.router.url : urlToNavigateTo;
 
         this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
             this.router.navigate([url]).then(() => {
-                window.location.reload();
-            })
+                if ( reloadPage ) window.location.reload();
+            });
         })
     }
 
