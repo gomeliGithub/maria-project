@@ -428,7 +428,7 @@ export class ClientService {
                     <p>Логин клиента - <span style="font-weight: 600;">${ activeClientLogin ?? 'Гость' }</span></p>
                 </div>
                 <div>
-                    <p>Дополнительная информация от клиента - ${ comment }</p>
+                    <p>Дополнительная информация от клиента - ${ comment ?? '<span style="font-weight: 600;">Отсутствует</span>' }</p>
                 </div>
             </div>
         `;
