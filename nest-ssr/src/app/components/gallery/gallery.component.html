@@ -1,3 +1,26 @@
+<div class="vw-100 imagesCarouselContainer" #scrollSnapSection>
+    <ngb-carousel class="carousel carousel-fade h-100 w-100 imagesCarousel"
+        [interval]="3000"
+        [showNavigationArrows]="true"
+        [showNavigationIndicators]="true"
+    >
+        <ng-template ngbSlide>
+            <img src="/assets/images_full/photo_1.jpg" class="h-100 w-100 object-fit-cover align-baseline" alt="">
+        </ng-template>
+        <ng-template ngbSlide>
+            <img src="/assets/images_full/photo_2.jpg" class="h-100 w-100 object-fit-cover align-baseline" alt="">
+        </ng-template>
+        <ng-template ngbSlide>
+            <img src="/assets/images_full/photo_3.jpg" class="h-100 w-100 object-fit-cover align-baseline" alt="">
+        </ng-template>
+        <ng-template ngbSlide>
+            <img src="/assets/images_full/photo_4.jpg" class="h-100 w-100 object-fit-cover align-baseline" alt="">
+        </ng-template>
+        <ng-template ngbSlide>
+            <img src="/assets/images_full/photo_5.jpg" class="h-100 w-100 object-fit-cover align-baseline" alt="">
+        </ng-template>
+    </ngb-carousel>
+</div>
 <h1 class="display-4 text-center">{{ 'GALLERYPAGE.HEADERTITLE' | translate }}</h1>
 <div class="p-5" id="titleHeaderContainer">
     <div class="text-bg-danger text-center p-3 h-100 rounded">
@@ -10,46 +33,23 @@
     >{{ 'GALLERYPAGE.ORDERBUTTONTEXT' | translate }}</button>
     <hr class="border-3 mt-5 w-100"/>
 </div>
-<!-- <ng-template [ngIf]="!firstStoredData" [ngIfElse]="additionalCompressedImagesListBlock"> -->
-
-
-
-    <!-- <ng-template [ngIf]="compressedImagesListObservable | async" class="d-flex flex-column align-items-center justify-content-start mt-3 w-80"> -->
-        <app-compressed-images *ngIf="compressedImagesList; else noContentBlock"
-            [(photographyType)]="photographyType"
-            [(compressedImagesList)]="compressedImagesList"
-            [(compressedImagesListType)]="compressedImagesListType"
-            [(mediumLinkContainerAnimationStates)]="mediumLinkContainerAnimationStates"
-            [(bigLinkContainerAnimationStates)]="bigLinkContainerAnimationStates"
-            [(mediumLinkContainerAnimationDisplayValues)]="mediumLinkContainerAnimationDisplayValues"
-            [(bigLinkContainerAnimationDisplayValues)]="bigLinkContainerAnimationDisplayValues"
-            [(flatMediumCompressedImagesList)]="flatMediumCompressedImagesList"
-            [(flatBigCompressedImagesList)]="flatBigCompressedImagesList"
-        />
-    <!-- </ng-template> -->
-
-
-
-<!-- </ng-template> 
-<ng-template #additionalCompressedImagesListBlock>
-    <app-compressed-images ngSkipHydration
-        [(photographyType)]="photographyType"
-        [(compressedImagesList)]="compressedImagesList"
-        [(compressedImagesListType)]="compressedImagesListType"
-        [(mediumLinkContainerAnimationStates)]="mediumLinkContainerAnimationStates"
-        [(bigLinkContainerAnimationStates)]="bigLinkContainerAnimationStates"
-        [(mediumLinkContainerAnimationDisplayValues)]="mediumLinkContainerAnimationDisplayValues"
-        [(bigLinkContainerAnimationDisplayValues)]="bigLinkContainerAnimationDisplayValues"
-        [(flatMediumCompressedImagesList)]="flatMediumCompressedImagesList"
-        [(flatBigCompressedImagesList)]="flatBigCompressedImagesList"
-    />
-</ng-template> -->
+<app-compressed-images *ngIf="compressedImagesList; else noContentBlock"
+    [(photographyType)]="photographyType"
+    [(compressedImagesList)]="compressedImagesList"
+    [(compressedImagesListType)]="compressedImagesListType"
+    [(mediumLinkContainerAnimationStates)]="mediumLinkContainerAnimationStates"
+    [(bigLinkContainerAnimationStates)]="bigLinkContainerAnimationStates"
+    [(mediumLinkContainerAnimationDisplayValues)]="mediumLinkContainerAnimationDisplayValues"
+    [(bigLinkContainerAnimationDisplayValues)]="bigLinkContainerAnimationDisplayValues"
+    [(flatMediumCompressedImagesList)]="flatMediumCompressedImagesList"
+    [(flatBigCompressedImagesList)]="flatBigCompressedImagesList"
+/>
 <ng-template #noContentBlock>
     <div class="noContentBlock text-center text-info fs-4 p-4">
         <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
     </div>
 </ng-template>
-<div *ngIf="compressedBigImagesIsExistsObservable | async" class="m-3">
+<div *ngIf="compressedBigImagesIsExists" class="m-3">
     <button type="button" class="btn btn-outline-secondary btn-lg" id="toggleBigGalleryButton" (click)="toggleBigGallery()">
         {{ !bigGalleryIsHide ? ('GALLERYPAGE.MEDIUMGALLERYBUTTONTEXT' | translate) : ('GALLERYPAGE.BIGGALLERYBUTTONTEXT' | translate) }}
     </button>

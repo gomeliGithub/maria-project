@@ -67,7 +67,7 @@ app-gallery, app-admin-panel-orders-control, app-admin-panel-discounts-control {
 }
 
 app-gallery {
-    padding: 1rem;
+    padding: 0 1rem 1rem 1rem !important;
     height: auto !important;
 }
 
@@ -79,7 +79,7 @@ app-client {
     height: auto !important;
 }
 
-app-gallery, app-admin-panel, app-admin-panel-orders-control, app-admin-panel-client-orders, app-admin-panel-discounts-control {
+app-admin-panel, app-admin-panel-orders-control, app-admin-panel-client-orders, app-admin-panel-discounts-control {
     margin-top: 5rem !important;
 }
 
@@ -149,6 +149,89 @@ and (-webkit-device-pixel-ratio: 2) {
     .btn-outline-light {
         --bs-btn-color: #000;
         --bs-btn-bg: #f8f9fa;
+    }
+}
+
+.imagesCarouselContainer {
+    max-height: 100vh !important;
+}
+
+.imagesCarousel .carousel-inner {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+.imagesCarousel .carousel-control-prev-icon {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23fff" class="bi bi-caret-left" viewBox="0 0 16 16"><path d="M10 12.796V3.204L4.519 8 10 12.796zm-.659.753-5.48-4.796a1 1 0 0 1 0-1.506l5.48-4.796A1 1 0 0 1 11 3.204v9.592a1 1 0 0 1-1.659.753z"/></svg>');
+}
+
+.imagesCarousel .carousel-control-next-icon {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23fff" class="bi bi-caret-right" viewBox="0 0 16 16"><path d="M6 12.796V3.204L11.481 8 6 12.796zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753z"/></svg>');
+}
+
+.imagesCarousel .carousel-indicators button {
+    height: 6px!important;
+}
+
+
+@media screen and (max-width: 576px), only screen 
+and (width: 393px) 
+and (height: 852px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 430px) 
+and (height: 932px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 390px) 
+and (height: 844px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 428px) 
+and (height: 926px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 812px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 2),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 667px) 
+and (-webkit-device-pixel-ratio: 2) {
+    .imagesCarousel .carousel-item img {
+        min-height: 300px;
+    }
+}
+
+@media screen and (min-width: 576px) {
+    .imagesCarousel .carousel-item img {
+        max-height: 390px;
+    }
+}
+
+@media screen and (min-width: 735px) {
+    .imagesCarousel .carousel-item img {
+        max-height: 620px;
+    }
+}
+
+@media screen and (min-width: 960px) {
+    .imagesCarousel .carousel-item img {
+        max-height: 710px;
+    }
+}
+
+@media screen and (min-width: 1400px) {
+    .imagesCarousel .carousel-item img {
+        max-height: 950px;
     }
 }
 

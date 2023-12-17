@@ -2,7 +2,6 @@ import { Component, ElementRef, HostBinding, OnDestroy, OnInit, QueryList, Trans
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Observable, catchError, map, of } from 'rxjs';
 
 import { AppService } from '../../../app/app.service';
 import { ClientService } from '../../services/client/client.service';
@@ -76,11 +75,10 @@ export class GalleryComponent implements OnInit, OnDestroy {
 
     @ViewChild('sendOrderFormContainer', { static: false }) private readonly sendOrderFormContainerViewRef: ElementRef<HTMLDivElement>;
 
-    public compressedBigImagesIsExistsObservable: Observable<boolean>;
     public compressedBigImagesIsExists: boolean = false;
-    // public compressedImagesListObservable: Observable<IGalleryCompressedImagesData> = null;
     public compressedImagesList: IReducedGalleryCompressedImages = null;
     public compressedImagesListType: string = null;
+
     public photographyTypeDescription: string;
 
     public url: string;
@@ -131,15 +129,10 @@ export class GalleryComponent implements OnInit, OnDestroy {
             keywordsMetaNameTag.setAttribute('content', `${ keywordsMetaNameTagContent }, ${ photographyTypeMetaKeyword }`);
         });
 
-        this.compressedBigImagesIsExistsObservable = this.clientService.checkCompressedBigImagesIsExists(this.photographyType).pipe(map(result => {
-            this.compressedBigImagesIsExists = result;
-
-            return result;
-        }), catchError(() => {
-            this.appService.createErrorModal();
-
-            return of(null);
-        }));
+        this.clientService.checkCompressedBigImagesIsExists(this.photographyType).subscribe({
+            next: result => this.compressedBigImagesIsExists = result,
+            error: () => this.appService.createErrorModal()
+        });
 
         this.getCompressedImagesData('medium');
 

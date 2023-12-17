@@ -1,5 +1,5 @@
-<div class="vw-100 section" id="imagesCarouselContainer" #scrollSnapSection>
-    <ngb-carousel *ngIf="compressedImagesList" class="carousel carousel-fade h-100 w-100" id="imagesCarousel"
+<div class="vw-100 imagesCarouselContainer section" #scrollSnapSection>
+    <ngb-carousel *ngIf="compressedImagesList" class="carousel carousel-fade h-100 w-100 imagesCarousel"
         [interval]="3000"
         [showNavigationArrows]="compressedImagesList.length !== 1"
         [showNavigationIndicators]="compressedImagesList.length !== 1"
