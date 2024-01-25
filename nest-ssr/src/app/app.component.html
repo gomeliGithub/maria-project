@@ -122,7 +122,7 @@
                     </ul>
                 </li>
             </ul>
-            <div class="navbar-text flex-grow-0">
+            <div class="navbar-text flex-grow-0 user-select-none">
                 <span *ngIf="activeClientLogin; else noActiveClientBlock">
                     <span class="fw-bold" 
                         [ngClass]="{ 'text-success': navbarAnimationState === 'scrolled', 'text-info': navbarAnimationState === 'static' }"

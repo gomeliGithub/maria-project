@@ -22,25 +22,27 @@ export class JwtControlService {
         const [ type, token ] = request.headers.authorization?.split(' ') ?? [];
 
         if ( request.url !== "/api/sign/up" && request.url !== "/api/sign/in" && request.url !== "/api/sign/getActiveClient" && request.url !== "/api/sign/out" && !token ) {
-            throw new UnauthorizedException('ExtractTokenFromHeader - access token does not exists');
+            throw new UnauthorizedException(`${ request.url } "ExtractTokenFromHeader - access token does not exists"`);
         }
         
         return type === 'Bearer' ? token : undefined;
     }
 
-    public async tokenValidate (request: IRequest, token: string): Promise<IClient> {
+    public async tokenValidate (request: IRequest, token: string, throwError = true): Promise<IClient> {
         let validatedClientPayload: IClient = null;
 
         try {
             validatedClientPayload = await this.jwtService.verifyAsync<IClient>(token);
         } catch {
-            throw new UnauthorizedException(`TokenValidate - access token is invalid, token - ${ token } `);
+            if ( throwError ) throw new UnauthorizedException(`${ request.url } "TokenValidate - access token is invalid, token - ${ token }"`);
+            else return null;
         }
 
         const client__secure_fgpHash: string = (crypto.createHmac("SHA256", request.cookies['__secure_fgp'])).digest('hex');
 
         if ( client__secure_fgpHash !== validatedClientPayload.__secure_fgpHash || !(await this.validateRevokedToken(token)) ) {
-            throw new UnauthorizedException(`TokenValidate - secure fingerprint hash is invalid, token - ${ token }`);
+            if ( throwError ) throw new UnauthorizedException(`${ request.url } "TokenValidate - secure fingerprint hash is invalid, token - ${ token }"`);
+            else return null;
         }
 
         return validatedClientPayload;

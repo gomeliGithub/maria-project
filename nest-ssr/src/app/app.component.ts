@@ -242,6 +242,8 @@ export class AppComponent implements OnInit {
                 if ( data[0] ) localStorage.setItem('access_token', data[0]);
 
                 this.activeClientLocale = newLocale;
+
+                this.appService.createSuccessModal(this.appService.getTranslations('CHANGECLIENTLOCALESUCCESSMESSAGE'));
             },
             error: () => this.appService.createErrorModal()
         });

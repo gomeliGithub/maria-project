@@ -2,6 +2,7 @@ import { Request } from "express";
 
 import { IClientSignData } from "./sign";
 import { IClientCompressedImage, IClientOrder } from "./models";
+import { Admin, Member } from "server/src/models/client.model";
 
 export interface ICookieSerializeOptions {
     domain?: string;
@@ -15,6 +16,7 @@ export interface ICookieSerializeOptions {
 
 export interface IRequest extends Request {
     session: null;
+    activeClientInstance?: Admin | Member;
 }
 
 export interface IRequestBody {

@@ -61,6 +61,12 @@ export class CommonService {
         }
     }
 
+    public async validateClient (request: IRequest, requiredClientTypes: string[], throwError = true): Promise<boolean> {
+        const signServiceRef = await this.appService.getServiceRef(SignModule, SignService);
+
+        return signServiceRef.validateClient(request, requiredClientTypes, throwError);
+    }
+
     public async getClients (loginList: string, options?: {
         includeFields?: string[];
         rawResult?: false;
@@ -126,7 +132,6 @@ export class CommonService {
         return clientServiceRef.getClientOrdersInfo(loginList, options);
     }
 
-
     public async registerClientLastActivityTime (clientInstance: Admin | Member): Promise<void> {
         const clientServiceRef = await this.appService.getServiceRef(ClientModule, ClientService);
 
@@ -155,10 +160,10 @@ export class CommonService {
         return imageControlServiceRef.createImageDirs(options);
     }
 
-    public async compressImage (compressImageData: ICompressImageData, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
+    public async compressImage (request: IRequest, compressImageData: ICompressImageData, options?: sharp.SharpOptions): Promise<boolean> {
         const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
         
-        return imageControlServiceRef.compressImage(compressImageData, activeClientLogin, options);
+        return imageControlServiceRef.compressImage(request, compressImageData, options);
     }
 
     public async getCompressedImages (options: {
@@ -196,16 +201,16 @@ export class CommonService {
         return imageControlServiceRef.checkFileExists(filePath);
     }
 
-    async getFulfilledAccessPath (paths: string[]): Promise<string> {
+    public async getFulfilledAccessPath (paths: string[]): Promise<string> {
         const adminPanelServiceRef = await this.appService.getServiceRef(AdminPanelModule, AdminPanelService);
 
         return adminPanelServiceRef.getFulfilledAccessPath(paths);
     }
 
-    public async deleteImage (imagePath: string, clientLogin: string): Promise<boolean> {
+    public async deleteImage (request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
         const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
 
-        return imageControlServiceRef.deleteImage(imagePath, clientLogin);
+        return imageControlServiceRef.deleteImage(request, imagePath, clientLogin);
     }
 
     public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home'): Promise<IImagePhotographyType[][]>

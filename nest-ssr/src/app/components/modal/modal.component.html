@@ -1,5 +1,23 @@
 <div class="modal-header">
-    <h1 class="modal-title fs-5" id="modalLabel">{{ title }}</h1>
+    <h1 class="modal-title fs-5 p-2 rounded-pill shadow user-select-none" id="modalLabel"
+        [ngClass]="{
+            'text-success': type === 'successModal',
+            'text-warning': type === 'warningModal',
+            'text-danger': type === 'errorModal'
+        }"
+        [ngSwitch]="type"
+    >
+        <ng-template [ngSwitchCase]="'successModal'">
+            <i class="bi bi-info-circle-fill"></i>
+        </ng-template>
+        <ng-template [ngSwitchCase]="'warningModal'">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </ng-template>
+        <ng-template [ngSwitchCase]="'errorModal'">
+            <i class="bi bi-exclamation-circle-fill"></i>
+        </ng-template>
+        {{ title }}
+    </h1>
     <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss()"></button>
 </div>
 <div [ngSwitch]="type" class="modal-body">

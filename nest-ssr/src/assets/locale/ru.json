@@ -15,6 +15,7 @@
 		"NOTFOUND": "Не найдено"
 	},
 	"NOIMAGESMESSAGE": "Изображений пока нет",
+	"CHANGECLIENTLOCALESUCCESSMESSAGE": "Язык успешно изменен",
 	"HOMEPAGE": {
 		"HEADERTITLE": "Портфолио",
 		"PHOTOGRAPHYTYPESLINKTEXT": "Смотреть работы",

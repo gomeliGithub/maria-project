@@ -16,7 +16,7 @@ import { CommonService } from '../common/common.service';
 
 import { Admin, ClientCompressedImage, ImagePhotographyType } from '../../models/client.model';
 
-import { ICompressImageData } from 'types/global';
+import { ICompressImageData, IRequest } from 'types/global';
 import { ICreateImageDirsOptions, IСompressedImageGetOptions } from 'types/options';
 import { IClientCompressedImage } from 'types/models';
 
@@ -78,7 +78,7 @@ export class ImageControlService {
         return compressedImages;
     }
 
-    public async compressImage (compressImageData: ICompressImageData, activeClientLogin: string, options?: sharp.SharpOptions): Promise<boolean> {
+    public async compressImage (request: IRequest, compressImageData: ICompressImageData, options?: sharp.SharpOptions): Promise<boolean> {
         const supportedImageTypes: string[] = [ 'jpg', 'png', 'webp', 'avif', 'gif', 'svg', 'tiff' ];
 
         const { ext } = await fileTypeFromFile(compressImageData.inputImagePath);
@@ -101,10 +101,6 @@ export class ImageControlService {
         const outputImagePath: string = path.join(compressImageData.outputDirPath, outputImageName);
 
         const outputTempFilePath: string = this.getTempFileName(outputImagePath);
-
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
-
-        const clientInstance: Admin = await commonServiceRef.getClients(activeClientLogin, { rawResult: false }) as Admin;
 
         let newCompressedImage: ClientCompressedImage = null;
 
@@ -130,7 +126,7 @@ export class ImageControlService {
                 description: compressImageData.imageAdditionalData.description,
             });
 
-            await clientInstance.$add('compressedImages', newCompressedImage);
+            await request.activeClientInstance.$add('compressedImages', newCompressedImage);
 
             return true;
         } catch {
@@ -150,7 +146,7 @@ export class ImageControlService {
                 await fsPromises.unlink(imagePath);
 
                 if ( newCompressedImage ) {
-                    await clientInstance.$remove('compressedImages', newCompressedImage);
+                    await request.activeClientInstance.$remove('compressedImages', newCompressedImage);
                     await newCompressedImage.destroy();
                 }
             }
@@ -199,10 +195,9 @@ export class ImageControlService {
         }
     }
 
-    public async deleteImage (imagePath: string, clientLogin: string): Promise<boolean> {
+    public async deleteImage (request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const clientInstance: Admin = await commonServiceRef.getClients(clientLogin, { rawResult: false }) as Admin;
         const compressedImageInstance: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(imagePath) } });
 
         try {
@@ -216,7 +211,7 @@ export class ImageControlService {
                 compressedImageOriginalPath
             ]);
 
-            await clientInstance.$remove('compressedImages', compressedImageInstance);
+            await request.activeClientInstance.$remove('compressedImages', compressedImageInstance);
             await compressedImageInstance.destroy();
             await this.imagePhotographyTypeModel.update({ compressedImageName: null }, { where: { compressedImageName: compressedImageInstance.name } });
             await fsPromises.unlink(imagePath);

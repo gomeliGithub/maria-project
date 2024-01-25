@@ -18,7 +18,7 @@ export class ClientComponent implements OnInit {
         private readonly clientService: ClientService
     ) {
         const formControls = {
-            'clientLogin': new FormControl("", [ Validators.required, Validators.minLength(4), Validators.maxLength(15), this.clientLoginValidator ]),
+            'clientLogin': new FormControl("", [ Validators.required, Validators.minLength(4), Validators.maxLength(15), Validators.pattern(/^[a-zA-Z](.[a-zA-Z0-9_-]*)$/) ]),
             'clientPassword': new FormControl("", [ Validators.required, Validators.minLength(5), Validators.maxLength(20) ])
         };
 
@@ -57,14 +57,6 @@ export class ClientComponent implements OnInit {
                 error: () => this.appService.createErrorModal()
             });
         }
-    }
-
-    public clientLoginValidator (control: FormControl<'string'>): { [ s: string ]: boolean } | null {
-        const loginPattern: RegExp = /^[a-zA-Z](.[a-zA-Z0-9_-]*)$/;
-
-        if ( !loginPattern.test(control.value) ) return { 'clientLogin': true };
-
-        return null;
     }
 
     public sign (): void {

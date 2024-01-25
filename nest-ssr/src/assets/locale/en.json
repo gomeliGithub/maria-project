@@ -15,6 +15,7 @@
 		"NOTFOUND": "Not Found"
 	},
 	"NOIMAGESMESSAGE": "No images yet",
+	"CHANGECLIENTLOCALESUCCESSMESSAGE": "Language changed successfully",
 	"HOMEPAGE": {
 		"HEADERTITLE": "Portfolio",
 		"PHOTOGRAPHYTYPESLINKTEXT": "View works",

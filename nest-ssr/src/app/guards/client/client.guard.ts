@@ -14,14 +14,18 @@ export const ClientGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state:
 
     const appService: AppService = inject(AppService);
 
-    const headers: HttpHeaders = appService.createRequestHeaders();
+    if ( appService.checkIsPlatformBrowser() ) {
+        const headers: HttpHeaders = appService.createRequestHeaders();
 
-    return http.get<boolean>('/api/admin-panel/checkAccess', { headers, withCredentials: true }).pipe(map(checkAccessResult => {
-        if ( checkAccessResult ) return true;
-        else {
-            appService.reloadComponent(false, '/', false);
-
-            return false;
-        }
-    }));
+        return http.get<boolean>('/api/admin-panel/checkAccess', { headers, withCredentials: true }).pipe(map(checkAccessResult => {
+            if ( checkAccessResult ) return true;
+            else {
+                appService.reloadComponent(false, '/', false);
+    
+                return false;
+            }
+        }));
+    } else if ( appService.checkIsPlatformServer() ) {
+        return true;
+    }
 };

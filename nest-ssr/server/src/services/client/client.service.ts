@@ -229,14 +229,14 @@ export class ClientService {
         await clientInstance.update({ lastSignInDate: sequelize.literal('CURRENT_TIMESTAMP') });
     }
 
-    public async downloadOriginalImage (response: Response, options: IDownloadOriginalImageOptions): Promise<void> {
+    public async downloadOriginalImage (request: IRequest, response: Response, options: IDownloadOriginalImageOptions): Promise<void> {
         if ( options.imagePath ) {
             response.download(options.imagePath);
         } else if ( options.compressedImageName ) {
             const compressedImageDataRaw: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { name: options.compressedImageName } }) as unknown as IClientCompressedImage;
 
             if ( compressedImageDataRaw ) response.download(path.join(compressedImageDataRaw.originalDirPath, compressedImageDataRaw.originalName));
-            else throw new BadRequestException('DownloadOriginalImage - compressed image does not exists');
+            else throw new BadRequestException(`${ request.url } "DownloadOriginalImage - compressed image does not exists"`);
         }
     }
 
@@ -375,19 +375,18 @@ export class ClientService {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const activeClientLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
-        const clientInstance: Member = await this.get(activeClientLogin, { rawResult: false }) as Member;
 
         let { imagePhotographyType, orderType } = requestBody.client;
         const { clientPhoneNumber, comment } = requestBody.client;
 
-        if ( orderType === 'full' && !clientInstance ) throw new UnauthorizedException(`CreateOrder - clientInstance does not exists, login --- ${ activeClientLogin }`);
+        if ( orderType === 'full' && !request.activeClientInstance ) throw new UnauthorizedException(`${ request.url } "CreateOrder - clientInstance does not exists, login --- ${ activeClientLogin }"`);
 
         const dateNow: Date = new Date();
         const id: number = parseInt(`${ dateNow.getFullYear() }${ dateNow.getMonth() }${ dateNow.getHours() }${ dateNow.getMinutes() }${ dateNow.getSeconds() }`, 10);
 
         const orderInstance: ClientOrder = await this.clientOrderModel.findByPk(id);
 
-        if ( orderInstance ) throw new BadRequestException(`CreateOrder - order instance with same id is exists, login --- ${ activeClientLogin }`);
+        if ( orderInstance ) throw new BadRequestException(`${ request.url } "CreateOrder - order instance with same id is exists, login --- ${ activeClientLogin }"`);
 
         const newOrderInstance: ClientOrder = await this.clientOrderModel.create({
             id,
@@ -397,7 +396,7 @@ export class ClientService {
             comment: comment
         });
 
-        if ( clientInstance ) await clientInstance.$add('clientOrders', newOrderInstance);
+        if ( request.activeClientInstance ) await request.activeClientInstance.$add('clientOrders', newOrderInstance);
 
         ////////////////////////////////////////////////////////////// SEND EMAIL //////////////////////////////////////////////////////////////
         
@@ -437,6 +436,6 @@ export class ClientService {
         
         ////////////////////////////////////////////////////////////// SEND EMAIL //////////////////////////////////////////////////////////////
 
-        if ( clientInstance ) await commonServiceRef.registerClientLastActivityTime(clientInstance);
+        if ( request.activeClientInstance ) await commonServiceRef.registerClientLastActivityTime(request.activeClientInstance);
     }
 }

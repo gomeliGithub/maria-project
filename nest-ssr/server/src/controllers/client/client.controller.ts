@@ -18,16 +18,16 @@ export class ClientController {
     ) { }
 
     @Get('/checkCompressedBigImagesIsExists/:photographyType')
-    public async checkCompressedBigImagesIsExists (@Param('photographyType') photographyType: string): Promise<boolean> {
+    public async checkCompressedBigImagesIsExists (@Req() request: IRequest, @Param('photographyType') photographyType: string): Promise<boolean> {
         photographyType = photographyType.substring(1);
 
-        if ( !this.appService.imagePhotographyTypes.includes(photographyType) ) throw new BadRequestException('CheckCompressedBigImagesIsExists - invalid photography type');
+        if ( !this.appService.imagePhotographyTypes.includes(photographyType) ) throw new BadRequestException(`${ request.url } "CheckCompressedBigImagesIsExists - invalid photography type"`);
 
         return this.clientService.checkCompressedBigImagesIsExists(photographyType);
     }
 
     @Get('/getCompressedImagesData/:imagesType')
-    public async getCompressedImagesData (@Param('imagesType') imagesType: string,
+    public async getCompressedImagesData (@Req() request: IRequest, @Param('imagesType') imagesType: string,
         @Query('imageViewSize') imageViewSize: string, @Query('imagesExistsCount') imagesExistsCount: string
     ): Promise<IGalleryCompressedImagesData | IClientCompressedImage[]> {
         const thumbnailImageTypes: string[] = [ 'home' ].concat(this.appService.imagePhotographyTypes);
@@ -42,7 +42,7 @@ export class ClientController {
         if ( !thumbnailImageTypes.includes(imagesType) 
             || imageViewSize && !this.appService.imageViewSizeTypes.includes(imageViewSize) 
             || imagesExistsCount && Number.isNaN(imagesExistsCountInt) 
-        ) throw new BadRequestException('GetCompressedImagesData - invalid param data');
+        ) throw new BadRequestException(`${ request.url } "GetCompressedImagesData - invalid param data"`);
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
@@ -57,17 +57,17 @@ export class ClientController {
     }
 
     @Get('/downloadOriginalImage/:compressedImageName')
-    public async downloadOriginalImage (@Param('compressedImageName') compressedImageName: string, @Res() response: Response): Promise<void> {
+    public async downloadOriginalImage (@Req() request: IRequest, @Param('compressedImageName') compressedImageName: string, @Res() response: Response): Promise<void> {
         compressedImageName = compressedImageName.substring(1);
 
-        return this.clientService.downloadOriginalImage(response, { compressedImageName });
+        return this.clientService.downloadOriginalImage(request, response, { compressedImageName });
     }
 
     @Get('/getImagePhotographyTypesData/:targetPage')
-    public async getImagePhotographyTypesData (@Param('targetPage') targetPage: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[]> {
+    public async getImagePhotographyTypesData (@Req() request: IRequest, @Param('targetPage') targetPage: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[]> {
         targetPage = targetPage.substring(1);
         
-        if ( !targetPage || ( targetPage !== 'home' && targetPage !== 'admin' ) ) throw new BadRequestException('GetImagePhotographyTypesData - invalid target page');
+        if ( !targetPage || ( targetPage !== 'home' && targetPage !== 'admin' ) ) throw new BadRequestException(`${ request.url } "GetImagePhotographyTypesData - invalid target page"`);
 
         const requiredFields: string[] = targetPage === 'home' ? [ 'name', 'compressedImageName' ] : [ 'name', 'description', 'compressedImageName' ];
 
@@ -80,7 +80,7 @@ export class ClientController {
 
         const locales: string[] = [ 'ru', 'en' ];
 
-        if ( !locales.includes(requestBody.sign.newLocale) ) throw new BadRequestException('ChangeLocale - invalid new locale');
+        if ( !locales.includes(requestBody.sign.newLocale) ) throw new BadRequestException(`${ request.url } "ChangeLocale - invalid new locale"`);
         
         return this.clientService.changeLocale(request, requestBody.sign.newLocale, response);
     }
@@ -97,7 +97,7 @@ export class ClientController {
             || requestBody.client.comment && (typeof requestBody.client.comment !== 'string' 
                 || requestBody.client.comment === '' || requestBody.client.comment.length > 30
             )
-        ) throw new BadRequestException('CreateOrder - invalid request body data');
+        ) throw new BadRequestException(`${ request.url } "CreateOrder - invalid request body data"`);
 
         return this.clientService.createOrder(request, requestBody);
     }

@@ -27,7 +27,7 @@
     </div>
 </ng-template>
 <div class="py-5 px-4 w-100 section" #scrollSnapSection>
-    <h1 class="display-6 shadow-lg rounded-pill p-3 text-center">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
+    <h1 class="display-6 shadow-lg rounded-pill p-3 text-center user-select-none">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
 </div>
 <ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0" >
     <ng-template ngFor let-imagePhotographyTypesDataArr [ngForOf]="imagePhotographyTypes" let-i="index">
@@ -81,10 +81,10 @@
                         <ng-template ngSwitchCase="family">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.FAMILY' | translate }}</ng-template>
                     </h5>
                     <a [routerLink]="[ '/gallery', imagePhotographyTypeData.name ]" routerLinkActive="active" 
-                        class="btn btn-outline-light align-items-center justify-content-center icon-link w-100 fs-4" 
+                        class="btn btn-outline-light align-items-center justify-content-center icon-link icon-link-hover w-100 fs-4" 
                         tabindex="-1" role="button" aria-disabled="true"
                     >
-                        <i class="bi bi-arrow-right"></i>
+                        <i class="bi bi-forward"></i>
                     </a>
                 </div>
             </div>

@@ -34,7 +34,7 @@ export class SignService {
         private readonly memberModel: typeof Member
     ) { }
 
-    public async validateClient (request: IRequest, requiredClientTypes: string[]): Promise<boolean> {
+    public async validateClient (request: IRequest, requiredClientTypes: string[], throwError = true): Promise<boolean> {
         const token: string = this.jwtControlService.extractTokenFromHeader(request); 
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
@@ -45,24 +45,30 @@ export class SignService {
             const clientLogin: string = requestBody.sign.clientData.login;
             const clientPassword: string = requestBody.sign.clientData.password;
 
-            await this._signDataValidate(clientLogin, clientPassword);
+            await this._signDataValidate(request, clientLogin, clientPassword);
 
             if ( token ) await this.jwtControlService.addRevokedToken(token);
 
             return true;
         } else {
-            const validatedClient: IClient = await this.jwtControlService.tokenValidate(request, token);
-            const clientType: string = validatedClient.type;
+            const validatedClientPayload: IClient = await this.jwtControlService.tokenValidate(request, token, throwError);
+            const clientType: string = validatedClientPayload ? validatedClientPayload.type : null;
+            const clientLogin: string = validatedClientPayload ? validatedClientPayload.login : null;
 
-            const clientInstance: Admin | Member = await commonServiceRef.getClients(validatedClient.login, { rawResult: false }) as Admin | Member;
+            const clientInstance: Admin | Member = await commonServiceRef.getClients(clientLogin, { rawResult: false }) as Admin | Member;
 
-            if ( !clientInstance ) throw new UnauthorizedException(`ValidateClient - client instance does not exists, login - ${ validatedClient.login }`);
+            if ( !clientInstance ) {
+                if ( throwError ) throw new UnauthorizedException(`${ request.url } "ValidateClient - client instance does not exists, login - ${ validatedClientPayload.login }"`);
+                else return false;
+            }
+
+            request.activeClientInstance = clientInstance;
 
             return requiredClientTypes.some(requiredClientType => requiredClientType === clientType);
         }
     }
 
-    public async signUp (clientData: IClientSignData, isNewAdmin = false): Promise<void> {
+    public async signUp (request: IRequest, clientData: IClientSignData, isNewAdmin = false): Promise<void> {
         const clientLogin: string = clientData.login.trim();
         const clientPassword: string = clientData.password;
         const clientFullName: string = clientData.fullName.trim();
@@ -72,28 +78,28 @@ export class SignService {
         const emailPattern: RegExp = /^[^\s()<>@,;:\/]+@\w[\w\.-]+\.[a-z]{2,}$/i;
 
         // clientPassword.length < 4
-        const incorrectLogin: boolean = !loginPattern.test(clientLogin) || clientLogin.length < 4 || clientLogin.length > 15;
-        const incorrectFullName: boolean = clientFullName.length < 3 || clientFullName.length > 25;
-        const incorrectRmail: boolean = !emailPattern.test(clientEmail);
+        const isIncorrectLogin: boolean = !loginPattern.test(clientLogin) || clientLogin.length < 4 || clientLogin.length > 15;
+        const isIncorrectFullName: boolean = clientFullName.length < 3 || clientFullName.length > 25;
+        const isIncorrectEmail: boolean = !emailPattern.test(clientEmail);
 
-        if ( incorrectLogin || incorrectFullName || ( clientEmail && incorrectRmail ) ) {
+        if ( isIncorrectLogin || isIncorrectFullName || ( clientEmail && isIncorrectEmail ) ) {
             let message: string = null;
             
-            if ( incorrectLogin ) message = 'SignUp - incorrect login';
-            else if ( incorrectFullName ) message = 'SignUp - incorrect full name';
-            else if ( incorrectRmail ) message = 'SignUp - incorrect email';
+            if ( isIncorrectLogin ) message = 'SignUp - incorrect login';
+            else if ( isIncorrectFullName ) message = 'SignUp - incorrect full name';
+            else if ( isIncorrectEmail ) message = 'SignUp - incorrect email';
 
-            throw new BadRequestException(message);
+            throw new BadRequestException(`${ request.url } "${ message }"`);
         }
 
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const clientRaw: IAdmin | IMember = await commonServiceRef.getClients(clientLogin, {
+        const clientRawData: IAdmin | IMember = await commonServiceRef.getClients(clientLogin, {
             includeFields: [ 'login', 'fullName' ],
             rawResult: true
         });
 
-        if ( clientRaw ) throw new UnauthorizedException('SignUp - client instance does not exists');
+        if ( clientRawData ) throw new UnauthorizedException(`${ request.url } "SignUp - client instance does not exists"`);
         
         // const clientPasswordHash: string = await bcrypt.hash(clientPassword, process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS);
 
@@ -146,7 +152,8 @@ export class SignService {
         await this.jwtControlService.saveToken(access_token);
 
         response.cookie('__secure_fgp', __secure_fgp, this.appService.cookieSerializeOptions);
-        response.cookie('locale', clientLocale ?? process.env.CLIENT_DEFAULT_LOCALE, this.appService.cookieSerializeOptions);
+
+        if ( !clientLocale ) response.cookie('locale', process.env.CLIENT_DEFAULT_LOCALE, this.appService.cookieSerializeOptions);
 
         return access_token;
     }
@@ -154,7 +161,7 @@ export class SignService {
     public async signOut (request: IRequest): Promise<void> {
         const token: string = this.jwtControlService.extractTokenFromHeader(request);
 
-        if ( !token || token === '' ) throw new UnauthorizedException('SignOut - invalid or does not exists token');
+        if ( !token || token === '' ) throw new UnauthorizedException(`${ request.url } "SignOut - invalid or does not exists token"`);
 
         return this.jwtControlService.addRevokedToken(token);
     }
@@ -185,7 +192,7 @@ export class SignService {
         if ( validatedClientPayload ) {
             const clientInstance: Admin | Member = await commonServiceRef.getClients(validatedClientPayload.login, { rawResult: false });
 
-            if ( !clientInstance ) throw new UnauthorizedException('GetActiveClient - client instance does not exists');
+            if ( !clientInstance ) throw new UnauthorizedException(`${ request.url } "GetActiveClient - client instance does not exists"`);
         }
             
         if ( !options ) options = {};
@@ -194,7 +201,7 @@ export class SignService {
             if ( typeof options.includeFields === 'string' ) return validatedClientPayload[options.includeFields];
             else if ( Array.isArray(options.includeFields) ) {
                 if ( options.allowedIncludedFields && options.includeFields.some(field => !options.allowedIncludedFields.includes(field)) ) {
-                    throw new BadRequestException('GetActiveClient - not allowed included field');
+                    throw new BadRequestException(`${ request.url } "GetActiveClient - not allowed included field"`);
                 }
 
                 Object.keys(validatedClientPayload).forEach(field => {
@@ -206,17 +213,17 @@ export class SignService {
         return validatedClientPayload;
     }
 
-    private async _signDataValidate (clientLogin: string, clientPassword: string): Promise<void> {
+    private async _signDataValidate (request: IRequest, clientLogin: string, clientPassword: string): Promise<void> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const clientRaw: IAdmin | IMember = await commonServiceRef.getClients(clientLogin, {
+        const clientRawData: IAdmin | IMember = await commonServiceRef.getClients(clientLogin, {
             includeFields: [ 'password' ],
             rawResult: true
         });
 
-        if ( !clientRaw ) throw new UnauthorizedException('_signDataValidate - client instance does not exists');
+        if ( !clientRawData ) throw new UnauthorizedException(`${ request.url } "_signDataValidate - client instance does not exists"`);
 
-        const passwordValid: boolean = await bcrypt.compare(clientPassword, clientRaw.password); 
+        const passwordValid: boolean = await bcrypt.compare(clientPassword, clientRawData.password); 
         
         
         // console.log(clientPassword); 
@@ -224,7 +231,7 @@ export class SignService {
         // console.log(await bcrypt.compare(clientPassword, client.password));
 
 
-        if ( !passwordValid ) throw new UnauthorizedException();
+        if ( !passwordValid ) throw new UnauthorizedException(`${ request.url } "_signDataValidate - client password invalid"`);
     }
 
     public async getBcryptHashSaltrounds (): Promise<string> {
