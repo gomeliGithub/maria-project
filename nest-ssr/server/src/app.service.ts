@@ -50,7 +50,7 @@ export class AppService {
     public clientCompressedImagesDir: string = path.join(process.cwd(), 'server', 'files', 'compressedImages');
 
     public imagePhotographyTypes: string[] = [ 'individual', 'children', 'wedding', 'family' ];
-    public imageViewSizeTypes: string[] = [ 'medium', 'big' ];
+    public imageViewSizeTypes: string[] = [ 'horizontal', 'vertical' ];
 
     public clientOrderTypes: string[] = [ 'consultation', 'full' ];
     public clientOrdersStatuses: string[] = [ 'new', 'processed' ];

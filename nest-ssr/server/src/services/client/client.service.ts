@@ -21,7 +21,7 @@ import { AdminPanelService } from '../admin-panel/admin-panel.service';
 
 import { Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder } from '../../models/client.model';
 
-import { IClient, IClientOrdersInfoDataArr, ICookieSerializeOptions, IGalleryCompressedImagesData, IReducedGalleryCompressedImages, IRequest, IRequestBody } from 'types/global';
+import { IClient, IClientOrdersInfoDataArr, ICookieSerializeOptions, IGalleryCompressedImagesData, IRequest, IRequestBody } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions, IGetClientOrdersOptions } from 'types/options';
 import { IAdmin, IClientCompressedImage, IDiscount, IImagePhotographyType, IMember } from 'types/models';
 
@@ -240,16 +240,7 @@ export class ClientService {
         }
     }
 
-    public async checkCompressedBigImagesIsExists (photographyType: string): Promise<boolean> {
-        const bigViewSizeCompressedImagesCount: number = await this.compressedImageModel.count({ 
-            where: { photographyType, viewSizeType: 'big' }   
-        });
-
-        if ( bigViewSizeCompressedImagesCount !== 0 ) return true;
-        else return false;
-    }
-
-    public async getCompressedImagesData (imagesType: 'home' | string, imageViewSize: 'medium' | 'big', imagesExistsCount?: number): Promise<IGalleryCompressedImagesData | IClientCompressedImage[]> {
+    public async getCompressedImagesData (imagesType: 'home' | string, imageViewSize: 'horizontal' | 'vertical', imagesExistsCount?: number): Promise<IGalleryCompressedImagesData | IClientCompressedImage[]> {
         const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const imagesPath: string = imagesType === 'home' ? path.join(this.compressedImagesDirPath, imagesType) : path.join(this.compressedImagesDirPath, 'gallery', imagesType);
@@ -261,7 +252,7 @@ export class ClientService {
             find: {
                 imageTitles: imagesList,
                 includeFields: [ 'name', 'photographyType', 'viewSizeType', 'description', 'uploadDate' ],
-                imageViewSize: imagesType !== 'home' ? imageViewSize : null,
+                imageViewSize: imageViewSize,
                 rawResult: true
             },
             imagesLimit: imagesType !== 'home' ? imagesLimit : null,
@@ -269,15 +260,10 @@ export class ClientService {
         });
 
         if ( imagesType !== 'home' ) {
-            const reducedCompressedImagesRaw: IReducedGalleryCompressedImages = {
-                medium: [],
-                big: []
-            }
+            const reducedCompressedImagesRaw: IClientCompressedImage[][] = []
 
-            if ( imageViewSize === 'medium' ) for ( let i = 0; i < compressedImagesRaw.length; i += 4 ) {
-                reducedCompressedImagesRaw.medium.push(compressedImagesRaw.slice(i, i + 4));
-            } else if ( imageViewSize === 'big' ) for ( let i = 0; i < compressedImagesRaw.length; i += 2 ) {
-                reducedCompressedImagesRaw.big.push(compressedImagesRaw.slice(i, i + 2));
+            for ( let i = 0; i < compressedImagesRaw.length; i += 4 ) {
+                reducedCompressedImagesRaw.push(compressedImagesRaw.slice(i, i + 4));
             }
 
             const commonCompressedImagesCount: number = await this.compressedImageModel.count({ where: { name: imagesList, viewSizeType: imageViewSize }});

@@ -4,7 +4,7 @@ import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
 import { TranslateService } from '@ngx-translate/core';
 
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
@@ -16,6 +16,7 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 
 import { AppService } from './app.service';
 import { ClientService } from './services/client/client.service';
+import { HomeService } from './services/home/home.service';
 
 import { environment } from '../environments/environment';
 
@@ -66,13 +67,13 @@ import { IClientLocale } from 'types/global';
             ])
         ]),
         trigger('navbar-animation', [
-            state('static', style({ backgroundColor: 'transparent' })),
-            state('scrolled', style({ backgroundColor: '#e3f2fd' })),
+            state('static', style({ backgroundColor: '#d7d7d740' })), // #d7d7d780
+            state('scrolled', style({ backgroundColor: '#d7d7d7' })),
             transition('static => scrolled', [
-                animate('200ms', style({ backgroundColor: '#e3f2fd' }))
+                animate('200ms', style({ backgroundColor: '#d7d7d7' }))
             ]),
             transition('scrolled => static', [
-                animate('200ms', style({ backgroundColor: 'transparent' }))
+                animate('200ms', style({ backgroundColor: '#d7d7d740' })) // #d7d7d780
             ])
         ]),
         trigger('footer-animation', [
@@ -88,13 +89,12 @@ import { IClientLocale } from 'types/global';
     ]
 })
 export class AppComponent implements OnInit {
-    static isBrowser = new BehaviorSubject<boolean>(null);
-    
     constructor (
         @Inject(DOCUMENT) private readonly document: Document,
         
         private readonly appService: AppService,
         private readonly clientService: ClientService,
+        private readonly homeService: HomeService,
         private readonly translateService: TranslateService
     ) { }
 
@@ -107,12 +107,16 @@ export class AppComponent implements OnInit {
     public navbarAnimationState: string = 'static';
     public prevNavbarAnimationState: string = null;
 
+    public discountsDataIsExists: boolean = false;
+
     public footerAnimationState: string = 'hide';
 
     @ViewChildren(NgbDropdown) dropdowns: QueryList<NgbDropdown>;
 
     @ViewChild('navbar', { static: false }) private readonly navbarElementRef: ElementRef<HTMLDivElement>;
     @ViewChild('footer', { static: false }) private readonly footerElementRef: ElementRef<HTMLDivElement>;
+
+    @ViewChildren('scrollSnapSection', { read: ElementRef<HTMLDivElement> }) public scrollSnapSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
 
     public readonly locales: IClientLocale[] = environment.locales;
 
@@ -144,6 +148,9 @@ export class AppComponent implements OnInit {
             this.clientService.navbarAnimationStateChange.subscribe(value => this.navbarAnimationState = value);
             this.clientService.prevNavbarAnimationStateChange.subscribe(value => this.prevNavbarAnimationState = value);
             this.clientService.footerAnimationStateChange.subscribe(value => this.footerAnimationState = value);
+
+            this.homeService.scrollSnapSectionViewRefsChange.subscribe(value => this.scrollSnapSectionViewRefs = value);
+            this.homeService.discountsDataIsExistsChange.subscribe(value => this.discountsDataIsExists = value);
         }
     }
 
@@ -221,6 +228,14 @@ export class AppComponent implements OnInit {
 
     public changeNavbarTogglerIconTriggerState (): void {
         this.navbarTogglerIconTriggerState = this.navbarTogglerIconTriggerState === 'collapsed' ? 'expanded' : 'collapsed';
+    }
+
+    public changeActiveScrollSnapSection (event: MouseEvent): void {
+        const targetRadio: HTMLInputElement = event.target as HTMLInputElement;
+
+        const scrollSnapSectionPositionIndex: number = parseInt(targetRadio.id.replace('defaultCheck', ''), 10);
+
+        this.homeService.setActiveScrollSnapSection(scrollSnapSectionPositionIndex);
     }
 
     public signOut (): Subscription {

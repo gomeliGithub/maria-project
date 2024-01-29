@@ -5,63 +5,91 @@
         <loc>http://45.128.205.220/adminPanel</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-12-04T14:53:54.535Z</lastmod>
+        <lastmod>2024-01-26T19:11:31.742Z</lastmod>
     </url>    
 
     <url>
         <loc>http://45.128.205.220/adminPanel/imagesControl</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-12-04T14:53:54.535Z</lastmod>
+        <lastmod>2024-01-26T19:11:31.742Z</lastmod>
     </url>    
 
     <url>
         <loc>http://45.128.205.220/adminPanel/discountsControl</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-22T17:10:59.284Z</lastmod>
+        <lastmod>2024-01-26T19:11:31.870Z</lastmod>
     </url>    
 
     <url>
         <loc>http://45.128.205.220/adminPanel/ordersControl</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-06T19:27:28.628Z</lastmod>
+        <lastmod>2024-01-26T19:11:32.006Z</lastmod>
     </url>    
 
     <url>
         <loc>http://45.128.205.220/signUp</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-24T22:53:18.841Z</lastmod>
+        <lastmod>2024-01-26T19:11:32.234Z</lastmod>
     </url>    
 
     <url>
         <loc>http://45.128.205.220/signIn</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-11-24T22:53:18.841Z</lastmod>
+        <lastmod>2024-01-26T19:11:32.234Z</lastmod>
     </url>    
 
     <url>
         <loc>http://45.128.205.220/gallery</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-12-14T22:20:47.862Z</lastmod>
+        <lastmod>2024-01-26T19:11:32.458Z</lastmod>
+    </url>    
+
+    <url>
+        <loc>http://45.128.205.220/gallery/individual</loc>
+        <changefreq>weekly</changefreq>
+        <priority>1</priority>
+        <lastmod>2024-01-26T19:11:32.458Z</lastmod>
+    </url>    
+
+    <url>
+        <loc>http://45.128.205.220/gallery/children</loc>
+        <changefreq>weekly</changefreq>
+        <priority>1</priority>
+        <lastmod>2024-01-26T19:11:32.458Z</lastmod>
+    </url>    
+
+    <url>
+        <loc>http://45.128.205.220/gallery/wedding</loc>
+        <changefreq>weekly</changefreq>
+        <priority>1</priority>
+        <lastmod>2024-01-26T19:11:32.458Z</lastmod>
+    </url>    
+
+    <url>
+        <loc>http://45.128.205.220/gallery/family</loc>
+        <changefreq>weekly</changefreq>
+        <priority>1</priority>
+        <lastmod>2024-01-26T19:11:32.458Z</lastmod>
     </url>    
 
     <url>
         <loc>http://45.128.205.220/home</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-12-09T21:31:52.515Z</lastmod>
+        <lastmod>2024-01-26T19:11:32.574Z</lastmod>
     </url>    
 
     <url>
         <loc>http://45.128.205.220/</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2023-12-09T21:31:52.515Z</lastmod>
+        <lastmod>2024-01-26T19:11:32.574Z</lastmod>
     </url>    
 
 </urlset>

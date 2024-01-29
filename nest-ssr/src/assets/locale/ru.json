@@ -20,13 +20,11 @@
 		"HEADERTITLE": "Портфолио",
 		"PHOTOGRAPHYTYPESLINKTEXT": "Смотреть работы",
 		"SCROLLSNAPITEMRADIOSTEXT": {
-			"MAIN": "Обзор",
 			"PART1": "Карусель",
 			"PART2": "Скидки",
-			"PART3": "Портфолио",
-			"PART4": "Портфолио: Часть 1",
-			"PART5": "Портфолио: Часть 2",
-			"PART6": "Обо мне"
+			"PART3": "Портфолио: Часть 1",
+			"PART4": "Портфолио: Часть 2",
+			"PART5": "Обо мне"
 		},
 		"ABOUTTEXT": {
 			"PART1": "Здравствуйте, меня зовут Мария Бурцева и я профессиональный фотограф. Я живу и снимаю в Гомеле. А так же по всей Беларуси и Миру.",
@@ -36,11 +34,9 @@
 		}
 	},
 	"GALLERYPAGE": {
-		"HEADERTITLE": "Галерея фото",
+		"HEADERTITLE": "Бурцева Мария",
 		"ORDERBUTTONTEXT": "Заказать фотосессию",
 		"DOWNLOADORIGINALIMAGEBUTTONTEXT": "Скачать оригинал",
-		"MEDIUMGALLERYBUTTONTEXT": "Меньше фото",
-		"BIGGALLERYBUTTONTEXT": "Больше фото",
 		"HELPBLOCKS": {
 			"CLIENTPHONENUMBER": "Ваш номер телефона в международном формате.",
 			"COMMENT": "Ваш комментарий или пожелание к заказу."
@@ -101,6 +97,7 @@
 		}
 	},
 	"UPLOADIMAGERESPONSES": {
+		"WRONGVIEWSIZETYPE": "Не подходящяя ориентация изображения",
 		"PENDING": "Сервер занят. Повторите попытку позже",
 		"FILEEXISTS": "Изображение с таким именем уже загружено",
 		"MAXCOUNT": "Загружено максимальное количество изображений",
@@ -217,9 +214,8 @@
 		"FAMILY": "Семейная съёмка"
 	},
 	"IMAGEVIEWSIZETYPES": {
-		"SMALL": "Небольшой",
-		"MEDIUM": "Средний",
-		"BIG": "Большой"
+		"HORIZONTAL": "Горизонтальный",
+		"VERTICAL": "Вертикальный"
 	},
 	"CLIENTORDERTYPES": {
 		"CONSULTATION": "Консультация",

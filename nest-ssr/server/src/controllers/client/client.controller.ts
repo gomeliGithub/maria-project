@@ -1,11 +1,13 @@
 import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, Res } from '@nestjs/common';
 import { Response } from 'express';
 
-import { CommonModule } from 'server/src/modules/common.module';
+import { CommonModule } from '../../modules/common.module';
 
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
-import { CommonService } from 'server/src/services/common/common.service';
+import { CommonService } from '../../services/common/common.service';
+
+import { ClientTypes } from '../../decorators/client.types.decorator';
 
 import { IGalleryCompressedImagesData, IRequest, IRequestBody } from 'types/global';
 import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
@@ -16,15 +18,6 @@ export class ClientController {
         private readonly appService: AppService,
         private readonly clientService: ClientService
     ) { }
-
-    @Get('/checkCompressedBigImagesIsExists/:photographyType')
-    public async checkCompressedBigImagesIsExists (@Req() request: IRequest, @Param('photographyType') photographyType: string): Promise<boolean> {
-        photographyType = photographyType.substring(1);
-
-        if ( !this.appService.imagePhotographyTypes.includes(photographyType) ) throw new BadRequestException(`${ request.url } "CheckCompressedBigImagesIsExists - invalid photography type"`);
-
-        return this.clientService.checkCompressedBigImagesIsExists(photographyType);
-    }
 
     @Get('/getCompressedImagesData/:imagesType')
     public async getCompressedImagesData (@Req() request: IRequest, @Param('imagesType') imagesType: string,
@@ -48,7 +41,7 @@ export class ClientController {
 
         await commonServiceRef.createImageDirs();
         
-        return this.clientService.getCompressedImagesData(imagesType as 'home' | string, imageViewSize as 'medium' | 'big', imagesExistsCountInt);
+        return this.clientService.getCompressedImagesData(imagesType as 'home' | string, imageViewSize as 'horizontal' | 'vertical', imagesExistsCountInt);
     }
 
     @Get('/getDiscountsData')
@@ -57,6 +50,7 @@ export class ClientController {
     }
 
     @Get('/downloadOriginalImage/:compressedImageName')
+    @ClientTypes('admin')
     public async downloadOriginalImage (@Req() request: IRequest, @Param('compressedImageName') compressedImageName: string, @Res() response: Response): Promise<void> {
         compressedImageName = compressedImageName.substring(1);
 

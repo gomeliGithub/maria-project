@@ -100,13 +100,9 @@ export class ClientService {
         return this.http.get('/api/sign/getBcryptHashSaltrounds', { responseType: 'text', withCredentials: true });
     }
 
-    public checkCompressedBigImagesIsExists (photographyType: string): Observable<boolean> {
-        return this.http.get<boolean>(`/api/client/checkCompressedBigImagesIsExists/:${ photographyType }`);
-    }
-
-    public getCompressedImagesData (imagesType: 'home', imageViewSize?: 'medium' | 'big'): Observable<IClientCompressedImage[]>
-    public getCompressedImagesData (imagesType: string, imageViewSize?: 'medium' | 'big', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData>
-    public getCompressedImagesData (imagesType: 'home' | string, imageViewSize?: 'medium' | 'big', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData | IClientCompressedImage[]> {
+    public getCompressedImagesData (imagesType: 'home', imageViewSize: 'horizontal' | 'vertical'): Observable<IClientCompressedImage[]>
+    public getCompressedImagesData (imagesType: string, imageViewSize: 'horizontal' | 'vertical', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData>
+    public getCompressedImagesData (imagesType: 'home' | string, imageViewSize: 'horizontal' | 'vertical', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData | IClientCompressedImage[]> {
         return this.http.get<IGalleryCompressedImagesData | IClientCompressedImage[]>(`/api/client/getCompressedImagesData/:${ imagesType }`, { params: {
             imageViewSize,
             imagesExistsCount

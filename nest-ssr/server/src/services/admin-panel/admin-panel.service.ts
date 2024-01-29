@@ -455,11 +455,17 @@ export class AdminPanelService {
 
         const compressedImageRaw: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true }) as unknown as IClientCompressedImage;
 
-        const homeImagesCount: number = (await fsPromises.readdir(path.join(this.staticCompressedImagesDirPath, 'home'))).length;
-
-        if ( homeImagesCount >= 10 ) return 'MAXCOUNT';
-
         const displayTargetPage: 'home' | 'gallery' | 'original' = requestBody.adminPanel.displayTargetPage;
+
+        if ( displayTargetPage === 'home' ) {
+            const homeImagesCount: number = (await fsPromises.readdir(path.join(this.staticCompressedImagesDirPath, 'home'))).length;
+
+            if ( homeImagesCount >= 10 ) return 'MAXCOUNT';
+        } else if ( displayTargetPage === 'gallery' ) {
+            const galleryImagesCount: number = (await fsPromises.readdir(path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageRaw.photographyType))).length;
+
+            if ( galleryImagesCount >= 15 ) return 'MAXCOUNT';
+        }
 
         const updateValues: { [ x: string ]: any } = { };
 
@@ -490,13 +496,22 @@ export class AdminPanelService {
             staticFilesGalleryImagePath
         ]);
 
-        if ( displayTargetPage === 'home' ) newPath = staticFilesHomeImagePath;
-        else if ( displayTargetPage === 'gallery' ) newPath = staticFilesGalleryImagePath;
-        else if ( displayTargetPage === 'original' ) newPath = compressedImageOriginalPath;
+        const clientCompressedImageInstance: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) } });
+
+        if ( displayTargetPage === 'home' ) {
+            if ( clientCompressedImageInstance.viewSizeType !== 'horizontal' ) return 'WRONGVIEWSIZETYPE';
+
+            newPath = staticFilesHomeImagePath;
+        }
+        else if ( displayTargetPage === 'gallery' ) {
+            if ( clientCompressedImageInstance.viewSizeType !== 'vertical' ) return 'WRONGVIEWSIZETYPE';
+
+            newPath = staticFilesGalleryImagePath;
+        } else if ( displayTargetPage === 'original' ) newPath = compressedImageOriginalPath;
 
         await commonServiceRef.managePromisesCache('changeImageDisplayTargetRename', fsPromises.rename(oldPath, newPath));
 
-        await this.compressedImageModel.update(updateValues, { where: { originalName: path.basename(originalImagePath) }});
+        await clientCompressedImageInstance.update(updateValues);
 
         return 'SUCCESS';
     }
@@ -550,6 +565,8 @@ export class AdminPanelService {
 
         const compressedImageRaw: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true }) as unknown as IClientCompressedImage;
 
+        if ( compressedImageRaw.viewSizeType !== 'horizontal' ) return 'WRONGVIEWSIZETYPE';
+
         const imagePhotographyType: string = requestBody.adminPanel.imagePhotographyType;
 
         const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImageRaw.name);
@@ -565,10 +582,10 @@ export class AdminPanelService {
             staticFilesGalleryImagePath
         ]);
 
-        const currentPhotographyTypeImage: ImagePhotographyType = await this.imagePhotographyTypeModel.findOne({ where: { name: imagePhotographyType } });
+        const currentPhotographyType: ImagePhotographyType = await this.imagePhotographyTypeModel.findOne({ where: { name: imagePhotographyType } });
 
-        if ( currentPhotographyTypeImage && currentPhotographyTypeImage.compressedImageName && path.extname(currentPhotographyTypeImage.compressedImageName) !== '' ) {
-            await commonServiceRef.managePromisesCache('setPhotographyTypeImageUnlink', fsPromises.unlink(path.join(this.staticCompressedImagesDirPath, 'home', 'imagePhotographyTypes', currentPhotographyTypeImage.compressedImageName)));
+        if ( currentPhotographyType && currentPhotographyType.compressedImageName && path.extname(currentPhotographyType.compressedImageName) !== '' ) {
+            await commonServiceRef.managePromisesCache('setPhotographyTypeImageUnlink', fsPromises.unlink(path.join(this.staticCompressedImagesDirPath, 'home', 'imagePhotographyTypes', currentPhotographyType.compressedImageName)));
         }
 
         await commonServiceRef.managePromisesCache('setPhotographyTypeImageCopy', fsPromises.copyFile(currentPath, newPath));

@@ -1,10 +1,11 @@
-import { AfterContentChecked, AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChildren, afterRender } from '@angular/core';
+import { AfterContentChecked, AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChildren, afterRender } from '@angular/core';
 import { animate, animateChild, query, state, style, transition, trigger } from '@angular/animations';
 
 import { DeviceDetectorService, DeviceInfo } from 'ngx-device-detector';
 
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
+import { HomeService } from '../../services/home/home.service';
 
 import { AnimationEvent } from 'types/global';
 import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
@@ -17,16 +18,17 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
         trigger('mouseTrigger', [
             state('enter', style({
                 opacity: 0.4,
-                transform: 'rotate3d(0, -5, 0, -0.5turn) scale(0.8)'
+                // transform: 'rotate3d(0, -5, 0, -0.5turn) scale(0.8)'
+                transform: 'scale(0.75)'
             })),
             state('leave', style({
                 opacity: 1
             })),
             transition('enter => leave', [
-                animate('0.5s 200ms ease'),
+                animate('0.5s ease'),
             ]),
             transition('leave => enter', [
-                animate('0.5s 200ms ease')
+                animate('0.5s ease')
             ])
         ]),
         trigger('link-button-container-animation', [
@@ -73,7 +75,7 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
         ])
     ]
 })
-export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChecked, OnDestroy {
+export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChecked, AfterViewInit, OnDestroy {
     public componentElementIsRendered: boolean = false;
     
     public deviceInfo: DeviceInfo = null;
@@ -84,7 +86,8 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
         private readonly deviceService: DeviceDetectorService,
 
         private readonly appService: AppService,
-        private readonly clientService: ClientService
+        private readonly clientService: ClientService,
+        private readonly homeService: HomeService,
     ) {
         afterRender(() => {
             if ( !this.componentElementIsRendered ) {
@@ -135,13 +138,17 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
             this.appService.setTitle(translation);
         });
 
-        this.clientService.getCompressedImagesData('home').subscribe({
+        this.clientService.getCompressedImagesData('home', 'horizontal').subscribe({
             next: imagesData => this.compressedImagesList = imagesData.length !== 0 ? imagesData : null,
             error: () => this.appService.createErrorModal()
         });
 
         this.clientService.getDiscountsData().subscribe({
-            next: discountsData => this.discountsData = discountsData.length !== 0 ? discountsData : null,
+            next: discountsData => {
+                this.discountsData = discountsData.length !== 0 ? discountsData : null;
+
+                if ( this.discountsData ) this.homeService.setDiscountsDataIsExists(true);
+            },
             error: () => this.appService.createErrorModal()
         });
 
@@ -161,17 +168,29 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
             },
             error: () => this.appService.createErrorModal()
         });
+
+        this.homeService.activeScrollSnapSectionChange.subscribe(value => {
+            this.getScrollSnapSectionsPosition();
+
+            const scrollSnapSectionPosition = this.scrollSnapSectionsPosition[value];
+
+            this.scrollSnapSectionViewRefs.toArray()[scrollSnapSectionPosition.indexNumber].nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
     }
 
     ngAfterContentChecked (): void {
         this.setDeviceInfo();
 
-        if ( this.isMobileDevice ) {
+        // if ( this.isMobileDevice ) {
             this.currentScrollSnapItemRadiosContainerAnimationState = 'enter';
             this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'show';
-        }
+        // }
 
         this.changeDetector.detectChanges();
+    }
+
+    ngAfterViewInit (): void {
+        this.homeService.setScrollSnapSectionViewRefs(this.scrollSnapSectionViewRefs);
     }
 
     ngAfterViewChecked (): void {
@@ -254,17 +273,19 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
         if ( prevActiveRadio ) {
             const label: HTMLLabelElement = prevActiveRadio.nativeElement.nextSibling as HTMLLabelElement;
 
-            if ( this.isMobileDevice && label.classList.contains('visible') ) label.classList.remove('visible');
+            // if ( this.isMobileDevice && label.classList.contains('visible') ) label.classList.remove('visible');
+            if ( label.classList.contains('visible') ) label.classList.remove('visible');
 
             prevActiveRadio.nativeElement.checked = false;
         }
 
-        const currentItem = this.scrollSnapItemRadioViewRefs.toArray()[this.currentItem];
+        const currentItem: ElementRef<HTMLInputElement> = this.scrollSnapItemRadioViewRefs.toArray()[this.currentItem];
         
         if ( currentItem ) {
             const label: HTMLLabelElement = currentItem.nativeElement.nextSibling as HTMLLabelElement;
 
-            if ( this.isMobileDevice && !label.classList.contains('visible') ) {
+            // if ( this.isMobileDevice && !label.classList.contains('visible') ) {
+            if ( !label.classList.contains('visible') ) {
                 clearTimeout(this.scrollSnapItemRadioTimeout);
                 
                 label.classList.add('visible');
@@ -317,8 +338,9 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
         }
     }
 
-    public scrollSnapItemRadiosEmbededContainerAnimationStart (event: AnimationEvent): void { 
-        if ( this.appService.checkIsPlatformBrowser() && this.isDesktopDevice && event.toState === 'hide' ) {
+    public scrollSnapItemRadiosEmbededContainerAnimationStart (event: AnimationEvent): void {
+        // if ( this.appService.checkIsPlatformBrowser() && this.isDesktopDevice && event.toState === 'hide' ) {
+        if ( this.appService.checkIsPlatformBrowser() && event.toState === 'hide' ) {
             const target: HTMLDivElement = event.element as HTMLDivElement;
 
             const scrollSnapItemRadiosLabels: NodeListOf<HTMLLabelElement> = target.querySelectorAll('label');
@@ -328,7 +350,8 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     }
 
     public scrollSnapItemRadiosEmbededContainerAnimationDone (event: AnimationEvent): void {
-        if ( this.appService.checkIsPlatformBrowser() && this.isDesktopDevice && event.toState === 'show' ) {
+        // if ( this.appService.checkIsPlatformBrowser() && this.isDesktopDevice && event.toState === 'show' ) {
+        if ( this.appService.checkIsPlatformBrowser() && event.toState === 'show' ) {
             const target: HTMLDivElement = event.element as HTMLDivElement;
 
             const scrollSnapItemRadiosLabels: NodeListOf<HTMLLabelElement> = target.querySelectorAll('label');

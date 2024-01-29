@@ -221,6 +221,8 @@ export class SignService {
             rawResult: true
         });
 
+        console.log(await bcrypt.hash('12345Admin', parseInt(process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS, 10)));
+
         if ( !clientRawData ) throw new UnauthorizedException(`${ request.url } "_signDataValidate - client instance does not exists"`);
 
         const passwordValid: boolean = await bcrypt.compare(clientPassword, clientRawData.password); 

@@ -13,10 +13,6 @@
     background-position: center;
 }
 
-.linkButtonContainer > a > i {
-    transform: matrix3d(4, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1) translateY(-0.4rem);
-}
-
 #aboutSection {
     height: 70% !important;
     padding-bottom: 12rem !important;
@@ -199,8 +195,25 @@ and (-webkit-device-pixel-ratio: 2) {
     }
 }
 
+.mouseTriggerIsStarted {
+    animation: borderShow 2s ease 1s both;
+}
+
+@keyframes borderShow {
+    50% {
+        border-left: solid red;
+        border-right: solid red;
+    }
+    100% {
+        border-left: solid red;
+        border-right: solid red;
+        border-top: solid red;
+        border-bottom: solid red;
+    }
+}
+
 #scrollSnapItemRadiosContainer {
-    right: -300px;
+    right: -260px;
 }
 
 #scrollSnapItemRadiosContainer > div > div:nth-child(2) {

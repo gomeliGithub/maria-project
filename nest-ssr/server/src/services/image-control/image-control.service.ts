@@ -38,7 +38,6 @@ export class ImageControlService {
         find?: {
             imageTitles?: string[],
             includeFields?: string[],
-            imageViewSize?: string,
             rawResult: false
         },
         imagesLimit?: number,
@@ -49,7 +48,6 @@ export class ImageControlService {
         find?: {
             imageTitles?: string[],
             includeFields?: string[],
-            imageViewSize?: string,
             rawResult: true 
         },
         imagesLimit?: number,

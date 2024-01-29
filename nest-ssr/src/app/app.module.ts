@@ -16,11 +16,11 @@ import { ClientModule } from './modules/client.module';
 
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
-import { CompressedImagesComponent } from './components/gallery/compressed-images/compressed-images.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { NotFoundComponent } from './components/not-found/not-found.component'; 
 
 import { AppService } from './app.service';
+import { HomeService } from './services/home/home.service';
 
 import { environment } from '../environments/environment';
 
@@ -29,7 +29,6 @@ import { environment } from '../environments/environment';
         AppComponent,
         HomeComponent,
         GalleryComponent,
-        CompressedImagesComponent,
         ModalComponent,
         NotFoundComponent
     ],
@@ -56,7 +55,8 @@ import { environment } from '../environments/environment';
     providers: [
         provideClientHydration(),
         provideHttpClient(withFetch()),
-        AppService
+        AppService,
+        HomeService
     ],
     bootstrap: [AppComponent]
 })

@@ -20,13 +20,11 @@
 		"HEADERTITLE": "Portfolio",
 		"PHOTOGRAPHYTYPESLINKTEXT": "View works",
 		"SCROLLSNAPITEMRADIOSTEXT": {
-			"MAIN": "Overview",
 			"PART1": "Carousell",
 			"PART2": "Discounts",
-			"PART3": "Portfolio",
-			"PART4": "Portfolio: Part 1",
-			"PART5": "Portfolio: Part 2",
-			"PART6": "About me"
+			"PART3": "Portfolio: Part 1",
+			"PART4": "Portfolio: Part 2",
+			"PART5": "About me"
 		},
 		"ABOUTTEXT": {
 			"PART1": "Hello, my name is Maria Burtseva and I am a professional photographer. I live and film in Gomel. And also throughout Belarus and the World.",
@@ -36,11 +34,9 @@
 		}
 	},
 	"GALLERYPAGE": {
-		"HEADERTITLE": "Photo gallery",
+		"HEADERTITLE": "Burtseva Maria",
 		"ORDERBUTTONTEXT": "Order a photo session",
 		"DOWNLOADORIGINALIMAGEBUTTONTEXT": "Download original",
-		"MEDIUMGALLERYBUTTONTEXT": "Less photo",
-		"BIGGALLERYBUTTONTEXT": "More photo",
 		"HELPBLOCKS": {
 			"CLIENTPHONENUMBER": "Your phone number in developing format.",
 			"COMMENT": "Your comment or request for your order."
@@ -101,6 +97,7 @@
 		}
 	},
 	"UPLOADIMAGERESPONSES": {
+		"WRONGVIEWSIZETYPE": "Inappropriate image orientation",
 		"PENDING": "The server is busy. Please try again later",
 		"FILEEXISTS": "A image with the same name has already been uploaded",
 		"MAXCOUNT": "Maximum number of images uploaded",
@@ -219,9 +216,8 @@
 		"FAMILY": "Family photography"
 	},
 	"IMAGEVIEWSIZETYPES": {
-		"SMALL": "Small",
-		"MEDIUM": "Medium",
-		"BIG": "Big"
+		"HORIZONTAL": "Horizontal",
+		"VERTICAL": "Vertical"
 	},
 	"CLIENTORDERTYPES": {
 		"CONSULTATION": "Consultation",

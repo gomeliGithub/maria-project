@@ -169,7 +169,7 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public imageViewSizeTypeValidator (control: FormControl<string>): { [ s: string ]: boolean } | null {
-        const imageViewSizeTypes: string[] = [ 'medium', 'big' ];
+        const imageViewSizeTypes: string[] = [ 'horizontal', 'vertical' ];
 
         if ( !imageViewSizeTypes.includes(control.value) ) {
             return { 'imageViewSizeType': true, 'newImageViewSizeType': true };

@@ -26,23 +26,24 @@
         </ngb-carousel>
     </div>
 </ng-template>
-<div class="py-5 px-4 w-100 section" #scrollSnapSection>
-    <h1 class="display-6 shadow-lg rounded-pill p-3 text-center user-select-none">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
+<div class="py-5 px-4 w-100"> <!--section #scrollSnapSection -->
+    <h1 class="display-4 p-3 text-center user-select-none">{{ 'HOMEPAGE.HEADERTITLE' | translate }}</h1>
 </div>
 <ng-template [ngIf]="imagePhotographyTypes && imagePhotographyTypes.length !== 0" >
     <ng-template ngFor let-imagePhotographyTypesDataArr [ngForOf]="imagePhotographyTypes" let-i="index">
         <div class="d-flex flex-row justify-content-center align-items-center px-5 pb-4 w-100 h-100 imagePhotographyTypesGroup section"
             [ngClass]="{ 'pt-4': i === 0 }"
-            [style.backgroundColor]="'rgb(176 173 172)'"
+            [style.backgroundColor]="'#f2f2f2'"
             #scrollSnapSection
             #scrollSnapVisiableAnimationSection
         >
-            <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let i2 = index"
-                class="border-0 position-relative h-100 w-100"
+            <div *ngFor="let imagePhotographyTypeData of imagePhotographyTypesDataArr; let j = index"
+                class="rounded h-100 w-100"
                 [ngClass]="{
                     'mw-50': imagePhotographyTypesDataArr.length !== 1,
                     'mw-100': imagePhotographyTypesDataArr.length === 1,
-                    'me-4': i2 === 0 && imagePhotographyTypesDataArr.length !== 1
+                    'me-4': j === 0 && imagePhotographyTypesDataArr.length !== 1,
+                    'mouseTriggerIsStarted': currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)] === 'enter'
                 }"
                 (mouseenter)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
                 (mouseleave)="startMouseTriggerAnimation(setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name))"
@@ -52,12 +53,12 @@
                 (@scroll-snap-section-item-visiable-animation.start)="scrollSnapSectionItemVisiableAnimationStarted($event)"
                 (@scroll-snap-section-item-visiable-animation.done)="scrollSnapSectionItemVisiableAnimationDone($event)"
             >
-                <div class="d-flex flex-column text-center"
+                <a class="btn d-flex flex-column text-center" [routerLink]="[ '/gallery', imagePhotographyTypeData.name ]" routerLinkActive="active" role="button"
                     [ngClass]="{ 'justify-content-end': imagePhotographyTypesDataArr.length === 1 }"
                     (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
                     [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
                     [ngSwitch]="imagePhotographyTypeData.name"
-                >
+                > <!-- <div -->
                     <img src="/assets/images_thumbnail/home/imagePhotographyTypes/{{ imagePhotographyTypeData.compressedImageName }}" 
                         class="h-80 rounded" alt=""
                     >
@@ -70,23 +71,23 @@
                     <small class="align-self-end text-body-secondary">
                         {{ 'HOMEPAGE.PHOTOGRAPHYTYPESLINKTEXT' | translate }} <i class="bi bi-arrow-right"></i>
                     </small>
-                </div>
-                <div class="position-absolute top-50 start-50 w-50 linkButtonContainer"
+                </a> <!-- </div> -->
+                <a class="btn position-absolute top-50 start-50 w-50 linkButtonContainer" [routerLink]="[ '/gallery', imagePhotographyTypeData.name ]" routerLinkActive="active" role="button"
                     [@link-button-container-animation]="currentLinkButtonContainerAnimationStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"
-                >
-                    <h5 class="text-center text-break" [ngSwitch]="imagePhotographyTypeData.name">
+                > <!-- <div -->
+                    <h5 class="text-center text-break user-select-none" [ngSwitch]="imagePhotographyTypeData.name">
                         <ng-template ngSwitchCase="individual">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.INDIVIDUAL' | translate }}</ng-template>
                         <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.CHILDREN' | translate }}</ng-template>
                         <ng-template ngSwitchCase="wedding">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.WEDDING' | translate }}</ng-template>
                         <ng-template ngSwitchCase="family">{{ 'IMAGEPHOTOGRAPHYTYPESFULLTEXT.FAMILY' | translate }}</ng-template>
                     </h5>
-                    <a [routerLink]="[ '/gallery', imagePhotographyTypeData.name ]" routerLinkActive="active" 
+                    <!-- <a [routerLink]="[ '/gallery', imagePhotographyTypeData.name ]" routerLinkActive="active" 
                         class="btn btn-outline-light align-items-center justify-content-center icon-link icon-link-hover w-100 fs-4" 
                         tabindex="-1" role="button" aria-disabled="true"
                     >
                         <i class="bi bi-forward"></i>
-                    </a>
-                </div>
+                    </a> -->
+                </a> <!-- </div> -->
             </div>
         </div>
     </ng-template>
@@ -111,36 +112,58 @@
         </div>
     </div>
 </div>
+<!-- [ngClass]="{ 'invisible': isMobileDevice || !componentElementIsRendered }" -->
 <div *ngIf="compressedImagesList && imagePhotographyTypes" class="position-fixed top-50 translate-middle z-2" id="scrollSnapItemRadiosContainer"
-    [ngClass]="{ 'invisible': isMobileDevice || !componentElementIsRendered }"
+    [ngClass]="{ 'invisible': !componentElementIsRendered }"
     (mouseenter)="startScrollSnapItemRadiosContainerAnimation('enter')"
     (mouseleave)="startScrollSnapItemRadiosContainerAnimation('leave')"
 >
-    <div class="position-relative d-flex flex-row-reverse justify-content-center align-items-center text-bg-secondary rounded pe-1"
+    <!--
+        (mouseenter)="startScrollSnapItemRadiosContainerAnimation('enter')"
+        (mouseleave)="startScrollSnapItemRadiosContainerAnimation('leave')"
+    -->
+    <div class="position-relative d-flex flex-row-reverse justify-content-center align-items-center pe-1"
         [@scroll-snap-item-radios-container-animation]="currentScrollSnapItemRadiosContainerAnimationState"
     >
-        <div class="ms-2"
-            [ngClass]="{ 'z-2': isMobileDevice && componentElementIsRendered }"
-            [@scroll-snap-item-radios-embeded-container-animation]="currentScrollSnapItemRadiosEmbededContainerAnimationState"
+        <!-- [ngClass]="{ 'z-2': isMobileDevice && componentElementIsRendered }" -->
+        <!--
             (@scroll-snap-item-radios-embeded-container-animation.start)="scrollSnapItemRadiosEmbededContainerAnimationStart($event)"
             (@scroll-snap-item-radios-embeded-container-animation.done)="scrollSnapItemRadiosEmbededContainerAnimationDone($event)"
+        -->
+        <div class="ms-2"
+            [ngClass]="{ 'z-2': componentElementIsRendered }"
+            [@scroll-snap-item-radios-embeded-container-animation]="currentScrollSnapItemRadiosEmbededContainerAnimationState"
         >
-            <div *ngFor="let section of scrollSnapSectionViewRefs; let i = index" class="form-check form-check-reverse"
+            <!--
                 [ngClass]="{
                     'mb-3': isDesktopDevice && i !== scrollSnapSectionViewRefs.length - 1
                 }"
+            -->
+            <div *ngFor="let section of scrollSnapSectionViewRefs; let i = index" class="form-check form-check-reverse"
+                [ngClass]="{
+                    'mb-3': i !== scrollSnapSectionViewRefs.length - 1
+                }"
             >
-                <input class="form-check-input" type="radio" value="" [id]="'defaultCheck' + i" (click)="changeActiveScrollSnapSection($event)"
+                    <!--
+
                     [ngClass]="{ 'visible': isMobileDevice && componentElementIsRendered }"
                     [ngStyle]="{ 
                         'transform': isMobileDevice && componentElementIsRendered ? 'scale(1.3)' : null,
                         'margin-right': isMobileDevice && componentElementIsRendered ? '-1.3rem' : null
                     }"
-                    (change)="isMobileDevice && componentElementIsRendered ? scrollSnapItemRadio.blur() : null"
+                    
+                    -->
+                <input class="form-check-input" type="radio" value="" [id]="'defaultCheck' + i" (click)="changeActiveScrollSnapSection($event)"
+                    [ngClass]="{ 'visible': componentElementIsRendered }"
+                    [ngStyle]="{ 
+                        'transform': componentElementIsRendered ? 'scale(1.3)' : null,
+                        'margin-right': componentElementIsRendered ? '-1.3rem' : null
+                    }"
+                    (change)="componentElementIsRendered ? scrollSnapItemRadio.blur() : null"
                     #scrollSnapItemRadio
                 >
                 <label class="form-check-label text-nowrap" [for]="'defaultCheck' + i"
-                    [ngClass]="{ 'text-warning fw-semibold': isMobileDevice && componentElementIsRendered }"
+                    [ngClass]="{ 'text-warning fw-semibold': componentElementIsRendered }"
                 >
                     {{ discountsData ? 
                         ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate ) : 
@@ -151,10 +174,6 @@
                     }}
                 </label>
             </div>
-        </div>
-        <div class="vr"></div>
-        <div class="">
-            <span>{{ 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.MAIN' | translate }}</span>
         </div>
     </div>
 </div>

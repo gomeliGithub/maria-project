@@ -163,6 +163,12 @@ export class AdminPanelService {
                     
                 break; 
             }
+
+            case 'WRONGVIEWSIZETYPE': {
+                this.appService.createWarningModal(this.appService.getTranslations('UPLOADIMAGERESPONSES.WRONGVIEWSIZETYPE')); 
+
+                break;
+            }
         }
     }
 

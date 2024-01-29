@@ -1,3 +1,40 @@
+@media screen and (max-width: 991px), only screen 
+and (width: 393px) 
+and (height: 852px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 430px) 
+and (height: 932px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 390px) 
+and (height: 844px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 428px) 
+and (height: 926px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 812px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 2),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 667px) 
+and (-webkit-device-pixel-ratio: 2) {
+    :host ::ng-deep .carousel .carousel-inner > .carousel-item > div > div:nth-child(n+2) {
+        margin-bottom: 0.5rem !important;
+    }
+}
+
 @media screen and (max-width: 768px), only screen 
 and (width: 393px) 
 and (height: 852px) 
@@ -87,11 +124,25 @@ and (-webkit-device-pixel-ratio: 2) {
     }
 }
 
-app-compressed-images {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    margin-top: 1rem !important;
-    width: 80% !important;
+:host ::ng-deep .carousel .carousel-inner {
+    border-radius: var(--bs-border-radius) !important;
+    box-shadow: var(--bs-box-shadow-lg) !important;
+    padding-right: 0.5rem !important;
+    padding-left: 0.5rem !important;
+}
+
+:host ::ng-deep .carousel .carousel-control-prev {
+    transform: translateX(-40%);
+}
+
+:host ::ng-deep .carousel .carousel-control-next {
+    transform: translateX(40%);
+}
+
+.mediumSizedImagesContainer > div {
+    width: 25%;
+}
+.downloadOriginalImageLinkContainer {
+    width: 100%;
+    transform: translate(-50%, -100%) !important;
 }

@@ -6,12 +6,12 @@
     (mouseleave)="menuMove(false)"
 >
     <div class="container-fluid">
-        <a class="navbar-brand" routerLink="/"
+        <!-- <a class="navbar-brand" routerLink="/"
             [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
         >
             <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
             Mashulik
-        </a>
+        </a> -->
         <button class="navbar-toggler" id="navbarTogglerButton" type="button" aria-controls="navbarNavDropdown"
             [@navbar-toggler-icon-trigger]="navbarTogglerIconTriggerState"
             (click)="changeNavbarTogglerIconTriggerState()"
@@ -25,15 +25,105 @@
         </button>
         <div class="navbar-collapse collapse" id="navbarNavDropdown" [ngbCollapse]="navbarIsCollapsed">
             <ul class="navbar-nav flex-grow-1 justify-content-evenly mb-2 mb-lg-0">
-                <li class="nav-item me-4">
-                    <a class="nav-link active" aria-current="page" routerLink="/"
+                <li class="nav-item me-4"> <!-- ngbDropdown display="dynamic" #homeMenu="ngbDropdown" -->
+                    <!-- <a class="nav-link active" aria-current="page" routerLink="/"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
                         <span class="fs-5">
                             <i class="bi bi-house"></i>
                         </span>
                         {{ 'PAGETITLES.HOME' | translate }}
+                    </a> -->
+
+
+
+
+
+
+
+
+
+                    <div class="btn-group">
+                        <a class="" type="button" class="" aria-current="page" routerLink="/"
+                            [ngClass]="{
+                                'nav-link active': true,
+                                'text-white': navbarAnimationState === 'static' && isHomePage 
+                            }"
+                        >
+                            <span class="fs-5">
+                                <i class="bi bi-house"></i>
+                            </span>
+                            {{ 'PAGETITLES.HOME' | translate }}
+                        </a>
+                        <div class="btn-group" ngbDropdown role="group" display="dynamic" #homeMenu="ngbDropdown">
+                            <a type="button" class="btn dropdown-toggle-split mt-auto" id="homeMenuButton"
+                                [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
+                                ngbDropdownToggle
+                                (mouseenter)="menuMove(true, homeMenu)"
+                            >
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="homeMenuButton" ngbDropdownMenu (mouseleave)="menuMove(false, homeMenu)">
+                                <button *ngFor="let section of scrollSnapSectionViewRefs; let i = index" class="" [id]="'defaultCheck' + i" ngbDropdownItem (click)="changeActiveScrollSnapSection($event)">
+                                    <span class="fs-5">
+                                        <i class="bi bi-link-45deg"></i>
+                                    </span>
+                                    {{ discountsDataIsExists ? 
+                                    ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate ) : 
+                                    ( i >= 1 ? 
+                                        ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 2 ) ) | translate ) :
+                                        ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate )
+                                    ) 
+                                    }}
+
+                                    
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+                    
+
+                    <!-- <a class="nav-link" type="button" id="homeMenuButton"
+                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
+                        ngbDropdownToggle
+                        (mouseenter)="menuMove(true, homeMenu)"
+                    >
+                        <span class="fs-5">
+                            <i class="bi bi-house"></i>
+                        </span>
+                        {{ 'PAGETITLES.HOME' | translate }}
                     </a>
+                    <ul class="dropdown-menu" aria-labelledby="homeMenuButton" ngbDropdownMenu (mouseleave)="menuMove(false, homeMenu)">
+                        <li *ngFor="let section of scrollSnapSectionViewRefs; let i = index">
+                            <button type="button" ngbDropdownItem (click)="">
+                                <span class="fs-5">
+                                    <i class="bi bi-link-45deg"></i>
+                                </span>
+                                {{ ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate }}
+                            </button>
+                        </li>
+                    </ul> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 </li>
                 <li class="nav-item me-4">
                     <a class="nav-link" routerLink="/gallery"
