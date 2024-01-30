@@ -55,10 +55,10 @@ export class AppService {
         this.platformTitle.setTitle(`${ mainTitle } - ${ title }`);
     }
 
-    public reloadComponent (self: boolean, urlToNavigateTo?: string, reloadPage = true) {
+    public async reloadComponent (self: boolean, urlToNavigateTo?: string, reloadPage = true): Promise<void> {
         const url: string = self ? this.router.url : urlToNavigateTo;
 
-        this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        return this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
             this.router.navigate([url]).then(() => {
                 if ( reloadPage ) window.location.reload();
             });

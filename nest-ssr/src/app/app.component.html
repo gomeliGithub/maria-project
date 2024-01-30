@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-md navbar-light w-100 fixed-top" style="background-color: transparent;" #navbar
+<nav class="navbar navbar-expand-md navbar-light w-100 fixed-top" style="background-color: transparent;" #navbar id="targetRed"
     [@navbar-animation]="navbarAnimationState"
     [ngClass]="{ 'bg-gradient': navbarAnimationState === 'scrolled' }"
     (mouseleave)="menuMove(false)"
@@ -35,20 +35,23 @@
                         {{ 'PAGETITLES.HOME' | translate }}
                     </a> -->
 
+                    <a class="" class="nav-link active" aria-current="page" routerLink="/"
+                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
+                        (click)="goToPageTop($event)"
+                    >
+                        <span class="fs-5">
+                            <i class="bi bi-house"></i>
+                        </span>
+                        {{ 'PAGETITLES.HOME' | translate }}
+                    </a>
 
-
-
-
-
-
-
-
-                    <div class="btn-group">
+                    <!-- <div class="btn-group">
                         <a class="" type="button" class="" aria-current="page" routerLink="/"
                             [ngClass]="{
                                 'nav-link active': true,
                                 'text-white': navbarAnimationState === 'static' && isHomePage 
                             }"
+                            (click)="goToPageTop($event)"
                         >
                             <span class="fs-5">
                                 <i class="bi bi-house"></i>
@@ -74,20 +77,10 @@
                                         ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate )
                                     ) 
                                     }}
-
-                                    
                                 </button>
                             </div>
                         </div>
-                    </div>
-
-
-
-
-
-
-
-                    
+                    </div> -->
 
                     <!-- <a class="nav-link" type="button" id="homeMenuButton"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
@@ -110,21 +103,28 @@
                         </li>
                     </ul> -->
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 </li>
+                <li *ngFor="let section of scrollSnapSectionViewRefs; let i = index; let isLast = last" class="nav-item">
+                    <button class="nav-link" [id]="'defaultCheck' + i" (click)="changeActiveScrollSnapSection($event)"
+                        [ngClass]="{ 
+                            'me-4': !isLast,
+                            'me-5': isLast,
+                            'text-white': navbarAnimationState === 'static' && isHomePage
+                        }"
+                    >
+                        <span class="fs-5">
+                            <i class="bi bi-house-fill"></i>
+                        </span>
+                        {{ discountsDataIsExists ? 
+                        ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate ) : 
+                        ( i >= 1 ? 
+                            ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 2 ) ) | translate ) :
+                            ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate )
+                        ) 
+                        }}
+                    </button>
+                </li>
+
                 <li class="nav-item me-4">
                     <a class="nav-link" routerLink="/gallery"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"

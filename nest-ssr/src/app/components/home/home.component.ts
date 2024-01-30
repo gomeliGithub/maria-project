@@ -17,12 +17,12 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
     animations: [
         trigger('mouseTrigger', [
             state('enter', style({
-                opacity: 0.4,
+                // opacity: 0.4,
                 // transform: 'rotate3d(0, -5, 0, -0.5turn) scale(0.8)'
-                transform: 'scale(0.75)'
+                transform: 'scale(0.85)'
             })),
             state('leave', style({
-                opacity: 1
+                // opacity: 1
             })),
             transition('enter => leave', [
                 animate('0.5s ease'),

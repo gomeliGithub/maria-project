@@ -195,23 +195,6 @@ and (-webkit-device-pixel-ratio: 2) {
     }
 }
 
-.mouseTriggerIsStarted {
-    animation: borderShow 2s ease 1s both;
-}
-
-@keyframes borderShow {
-    50% {
-        border-left: solid red;
-        border-right: solid red;
-    }
-    100% {
-        border-left: solid red;
-        border-right: solid red;
-        border-top: solid red;
-        border-bottom: solid red;
-    }
-}
-
 #scrollSnapItemRadiosContainer {
     right: -260px;
 }

@@ -111,7 +111,7 @@ export class AdminPanelService {
 
         const TWENTY_MEGABYTES: number = 20000000;
     
-        if ( uploadedFilesCount >= 40 ) return 'MAXCOUNT';
+        if ( uploadedFilesCount >= 100 ) return 'MAXCOUNT';
         else if ( imageMeta.size > TWENTY_MEGABYTES ) return 'MAXSIZE';
         else if ( imageMeta.name.length < 4 ) return 'MAXNAMELENGTH';
     
@@ -119,21 +119,21 @@ export class AdminPanelService {
         const uploadedSize: number = 0;
     
         const writeStream = fs.createWriteStream(newOriginalImagePath);
+
+        const uploadImageTimeout = setTimeout(async () => {
+            const currentUploadImageStats: fs.Stats = await fsPromises.stat(newOriginalImagePath);
+
+            if ( currentUploadImageStats.size === 0 ) {
+                this._throwWebSocketError(commonServiceRef, newOriginalImagePath, webSocketClientId, imageMeta);
+
+                clearTimeout(uploadImageTimeout);
+            }
+        }, 2000);
     
         writeStream.on('error', async () => {
             const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
-            await fsPromises.unlink(newOriginalImagePath);
-    
-            const currentClient: IWebSocketClient = commonServiceRef.webSocketClients.find(client => client._id === webSocketClientId);
-    
-            await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.WEBSOCKETSERVER_PORT }] WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentClient.login }. Stream error`,
-                true, 'webSocket'
-            );
-    
-            const message: IWSMessage = this.createMessage('uploadImage', 'ERROR', { uploadedSize: currentClient.uploadedSize, imageMetaSize: imageMeta.size });
-    
-            currentClient.connection.send(JSON.stringify(message));
+            this._throwWebSocketError(commonServiceRef, newOriginalImagePath, webSocketClientId, imageMeta);
         });
     
         writeStream.on('finish', async () => {
@@ -189,6 +189,20 @@ export class AdminPanelService {
         });
 
         return 'START';
+    }
+
+    private async _throwWebSocketError (commonServiceRef: CommonService, newOriginalImagePath: string, webSocketClientId: number, imageMeta: IImageMeta): Promise<void> {
+        await fsPromises.unlink(newOriginalImagePath);
+
+        const currentClient: IWebSocketClient = commonServiceRef.webSocketClients.find(client => client._id === webSocketClientId);
+
+        await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.WEBSOCKETSERVER_PORT }] WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentClient.login }. Stream error`,
+            true, 'webSocket'
+        );
+
+        const message: IWSMessage = this.createMessage('uploadImage', 'ERROR', { uploadedSize: currentClient.uploadedSize, imageMetaSize: imageMeta.size });
+
+        currentClient.connection.send(JSON.stringify(message));
     }
 
     public createMessage (eventType: string, eventText: string, percentUploadedOptions?: IPercentUploadedOptions) {

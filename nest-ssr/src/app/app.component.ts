@@ -231,11 +231,25 @@ export class AppComponent implements OnInit {
     }
 
     public changeActiveScrollSnapSection (event: MouseEvent): void {
+        if ( !this.isHomePage ) {
+            this.appService.reloadComponent(false, '/', false).then(() => setTimeout(() => this.goToActiveScrollSnapSection(event), 1000));
+        } else this.goToActiveScrollSnapSection(event);
+    }
+
+    public goToActiveScrollSnapSection (event: MouseEvent): void {
         const targetRadio: HTMLInputElement = event.target as HTMLInputElement;
 
         const scrollSnapSectionPositionIndex: number = parseInt(targetRadio.id.replace('defaultCheck', ''), 10);
 
         this.homeService.setActiveScrollSnapSection(scrollSnapSectionPositionIndex);
+    }
+
+    public goToPageTop (event: MouseEvent): void {
+        if ( this.isHomePage ) {
+            event.preventDefault();
+
+            this.homeService.setActiveScrollSnapSection(0);
+        }
     }
 
     public signOut (): Subscription {

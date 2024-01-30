@@ -1,7 +1,7 @@
 <div class="flex-grow-0 mt-5 p-3">
     <h1 class="display-4">{{ 'GALLERYPAGE.HEADERTITLE' | translate }}</h1>
 </div>
-<div *ngIf="compressedImagesList; else noContentBlock" class="flex-grow-1 w-100">
+<div *ngIf="compressedImagesList; else noContentBlock" class="flex-grow-0 w-100">
     <ngb-carousel class="carousel"
         [interval]="3000"
         [showNavigationArrows]="compressedImagesList.length > 1"
@@ -52,12 +52,12 @@
         <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
     </div>
 </ng-template>
-<div class="p-5" id="titleHeaderContainer">
+<div class="flex-grow-0 p-5" id="titleHeaderContainer">
     <div class="text-bg-danger text-center p-3 h-100 rounded">
         <h1 class="display-6" id="titleHeader">{{ photographyTypeDescription }}</h1>
     </div>
 </div> 
-<div class="text-center w-100">
+<div class="flex-grow-1 text-center w-100">
     <button type="button" class="btn btn-outline-success btn-lg" id="orderButton" 
         (click)="changeSendOrderFormAnimationState()"
     >

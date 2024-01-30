@@ -3,7 +3,7 @@
 	"DEFAULTERRORMESSAGE": "Что-то пошло не так. Попробуйте ещё раз",
 	"PAGETITLES": {
 		"HOME": "Главная",
-		"GALLERY": "Галерея",
+		"GALLERY": "Портфолио",
 		"ADMINPANEL": {
 			"MAIN": "Панель администратора",
 			"IMAGESCONTROL": "Управление фото",
