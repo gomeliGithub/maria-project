@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostBinding, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { animate, style, transition, trigger } from '@angular/animations';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
 import { AppService } from '../../app.service';
 import { AdminPanelService } from '../../services/admin-panel/admin-panel.service';
@@ -24,6 +24,24 @@ import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
             transition(':leave', [
                 style({ opacity: 1, transform: 'translateX(0)' }),
                 animate('1s ease', style({ opacity: 0, transform: 'translateX(-100%)' }))
+            ])
+        ]),
+        trigger('image-thumbnail-container-animation', [
+            state('true', style({
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)' 
+            })),
+            state('false', style({
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-210%, -50%)' 
+            })),
+            transition('false => true', [
+                animate('1s ease', style({ transform: 'translate(-50%, -50%)' }))
+            ]),
+            transition('true => false', [
+                animate('0.5s ease', style({ transform: 'translate(-210%, -50%)' }))
             ])
         ])
     ],
@@ -81,6 +99,9 @@ export class AdminPanelComponent implements OnInit {
 
     @ViewChildren('imagePhotographyTypeDescription', { read: ElementRef<HTMLInputElement> }) 
     private readonly imagePhotographyTypeDescriptionViewRefs: QueryList<ElementRef<HTMLInputElement>>;
+
+    public imageThumbnailUrl: string = null;
+    public imageThumbnailContainerVisible: boolean = false;
 
     public changeImageDataFormHidden: boolean = true;
     public changingOriginalImageName: string;
@@ -192,8 +213,6 @@ export class AdminPanelComponent implements OnInit {
 
         if ( control.value ) control.setValidators([ Validators.required, this.imageViewSizeTypeValidator ])
         else control.setValidators(null);
-
-        console.log(control);
     
         control.updateValueAndValidity();
     }
@@ -205,6 +224,55 @@ export class AdminPanelComponent implements OnInit {
         else control.setValidators(null);
     
         control.updateValueAndValidity();
+    }
+
+    public loadAndShowImageThumbnail (event: MouseEvent): void {
+        const imageButton: HTMLButtonElement = !(event.target instanceof HTMLButtonElement) ? (event.target as HTMLButtonElement).parentElement as HTMLButtonElement : event.target as HTMLButtonElement;
+
+        if ( imageButton ) {
+            this.adminPanelService.loadAndShowImageThumbnail(this, imageButton).subscribe({
+                next: imageThumbnailBlob => {
+                    const reader = new FileReader();
+
+                    reader.readAsDataURL(imageThumbnailBlob);
+
+                    reader.onload = event => {
+                        this.spinnerHidden = true;
+
+                        this.imageThumbnailUrl = event.target.result as string;
+                        
+                        this.switchImageThumbnailContainerVisible();
+                    };
+                },
+                error: () => {
+                    this.spinnerHidden = true;
+
+                    this.appService.createErrorModal()
+                }
+            });
+        }
+    }
+
+    public imageThumbnailContainerAnimationStart (event: AnimationEvent): void {
+        if ( event.toState === 'show' ) {
+            const target: HTMLDivElement = event.element;
+
+            target.classList.add('pe-none');
+        }
+    }
+
+    public imageThumbnailContainerAnimationDone (event: AnimationEvent): void {
+        if ( event.toState === 'hide' ) {
+            const target: HTMLDivElement = event.element;
+
+            target.classList.remove('pe-none');
+
+            this.imageThumbnailUrl = null;
+        }
+    }
+
+    public switchImageThumbnailContainerVisible (): void {
+        this.imageThumbnailContainerVisible = !this.imageThumbnailContainerVisible;
     }
 
     public uploadImage (): void {

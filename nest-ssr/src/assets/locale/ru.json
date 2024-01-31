@@ -14,18 +14,16 @@
 		"SIGNIN": "Вход",
 		"NOTFOUND": "Не найдено"
 	},
+	"SCROLLSNAPITEMSTEXT": {
+		"DISCOUNTS": "Скидки",
+		"PORTFOLIOOVERVIEW": "Портфолио: Обзор",
+		"ABOUTME": "Обо мне"
+	},
 	"NOIMAGESMESSAGE": "Изображений пока нет",
 	"CHANGECLIENTLOCALESUCCESSMESSAGE": "Язык успешно изменен",
 	"HOMEPAGE": {
 		"HEADERTITLE": "Портфолио",
 		"PHOTOGRAPHYTYPESLINKTEXT": "Смотреть работы",
-		"SCROLLSNAPITEMRADIOSTEXT": {
-			"PART1": "Карусель",
-			"PART2": "Скидки",
-			"PART3": "Портфолио: Часть 1",
-			"PART4": "Портфолио: Часть 2",
-			"PART5": "Обо мне"
-		},
 		"ABOUTTEXT": {
 			"PART1": "Здравствуйте, меня зовут Мария Бурцева и я профессиональный фотограф. Я живу и снимаю в Гомеле. А так же по всей Беларуси и Миру.",
 			"PART2": "Я снимаю уже более пяти лет. Чаще свадьбы и частные портреты, у меня большой опыт в том, что бы сделать ваши воспоминания красивыми и незабываемыми.",
@@ -44,6 +42,8 @@
 		"CLIENTORDERSUCCESSMESSAGE": "Заказ успешно отправлен. Я с вами свяжусь в ближайшее время"
 	},
 	"CLIENTPAGE": {
+		"PASSWORDSHOWSWITCHTEXT": "Показать пароль",
+		"PASSWORDHIDESWITCHTEXT": "Скрыть пароль",
 		"LOGININVALIDMESSAGE": "Некорректный логин",
 		"PASSWORDINVALIDMESSAGE": "Некорректный пароль",
 		"FULLNAMEINVALIDMESSAGE": "Некорректное полное имя",
@@ -108,6 +108,7 @@
 	"ADMINPANEL": {
 		"BOOLEANTRUETEXT": "Да",
 		"BOOLEANFALSETEXT": "Нет",
+		"IMAGETHUMBNAILCONTAINERCAPTION": "Предпросмотр",
 		"NOIMAGESMESSAGE": "Загруженных изображений пока нет",
 		"NOCLIENTORDERSMESSAGE": "Новых заказов пока нет",
 		"NOCLIENTORDERSMESSAGES": {

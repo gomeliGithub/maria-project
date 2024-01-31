@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import fsPromises from 'fs/promises';
 import path from 'path';
 
+import sharp from 'sharp';
 import ms from 'ms';
 
 import { CommonModule } from '../../modules/common.module';
@@ -48,6 +49,20 @@ export class AdminPanelService {
         const validateClientAuthResult: boolean = await commonServiceRef.validateClient(request, [ 'admin' ], false);
 
         return validateClientAuthResult;
+    }
+
+    public async getImageThumbnail (request: IRequest, originalName: string): Promise<Buffer> {
+        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+
+        const activeClientLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
+        const originalImagePath: string = path.join(this.appService.clientOriginalImagesDir, activeClientLogin, originalName);
+
+        if ( !commonServiceRef.checkFileExists(originalImagePath) ) throw new BadRequestException(`${ request.url } "GetImageThumbnail - original image does not exists"`);
+        else {
+            const originalImageThumbnail: Buffer = await commonServiceRef.managePromisesCache('resizeImageThumbnail', sharp(originalImagePath).resize(1500, 1500).toBuffer());
+
+            return originalImageThumbnail;
+        }
     }
 
     public async uploadImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
@@ -124,7 +139,12 @@ export class AdminPanelService {
             const currentUploadImageStats: fs.Stats = await fsPromises.stat(newOriginalImagePath);
 
             if ( currentUploadImageStats.size === 0 ) {
-                this._throwWebSocketError(commonServiceRef, newOriginalImagePath, webSocketClientId, imageMeta);
+                const currentClient: IWebSocketClient = await this._throwWebSocketError(commonServiceRef, newOriginalImagePath, webSocketClientId, imageMeta);
+
+                currentClient.connection.terminate();
+                currentClient.connection = null;
+        
+                commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter((client => client.connection));
 
                 clearTimeout(uploadImageTimeout);
             }
@@ -191,7 +211,7 @@ export class AdminPanelService {
         return 'START';
     }
 
-    private async _throwWebSocketError (commonServiceRef: CommonService, newOriginalImagePath: string, webSocketClientId: number, imageMeta: IImageMeta): Promise<void> {
+    private async _throwWebSocketError (commonServiceRef: CommonService, newOriginalImagePath: string, webSocketClientId: number, imageMeta: IImageMeta): Promise<IWebSocketClient> {
         await fsPromises.unlink(newOriginalImagePath);
 
         const currentClient: IWebSocketClient = commonServiceRef.webSocketClients.find(client => client._id === webSocketClientId);
@@ -203,6 +223,8 @@ export class AdminPanelService {
         const message: IWSMessage = this.createMessage('uploadImage', 'ERROR', { uploadedSize: currentClient.uploadedSize, imageMetaSize: imageMeta.size });
 
         currentClient.connection.send(JSON.stringify(message));
+
+        return currentClient;
     }
 
     public createMessage (eventType: string, eventText: string, percentUploadedOptions?: IPercentUploadedOptions) {

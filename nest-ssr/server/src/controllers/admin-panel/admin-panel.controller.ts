@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Post, Body, BadRequestException, Put, Query, Delete } from '@nestjs/common';
+import { Controller, Get, Req, Post, Body, BadRequestException, Put, Query, Delete, StreamableFile } from '@nestjs/common';
 
 import { AppService } from '../../app.service';
 import { AdminPanelService } from '../../services/admin-panel/admin-panel.service';
@@ -19,6 +19,14 @@ export class AdminPanelController {
     @Get('/checkAccess')
     public async checkAccess (@Req() request: IRequest, @Cookies('__secure_fgp') __secure_fgp: string): Promise<boolean> {
         return this.adminPanelService.checkAccess(request, __secure_fgp);
+    }
+
+    @Get('/getImageThumbnail')
+    @ClientTypes('admin')
+    public async getImageThumbnail (@Req() request: IRequest, @Query('originalName') originalName: string): Promise<StreamableFile> {
+        if ( !originalName || originalName.trim() === '' ) throw new BadRequestException(`${ request.url } "GetImageThumbnail - invalid original image name"`);
+
+        return new StreamableFile(await this.adminPanelService.getImageThumbnail(request, originalName));
     }
 
     @Post('/uploadImage')
@@ -45,7 +53,7 @@ export class AdminPanelController {
         const imagesLimit: number = options['imagesLimit'] ? parseInt(options['imagesLimit'], 10) : null;
 
         if ( imagesExistsCount && Number.isNaN(imagesExistsCount)
-            || imagesLimit && (Number.isNaN(imagesLimit) || imagesLimit > 15)
+            || imagesLimit && ( Number.isNaN(imagesLimit) || imagesLimit > 15 )
         ) throw new BadRequestException(`${ request.url } "GetFullCompressedImagesList - invalid query data"`);
 
         return this.adminPanelService.getFullCompressedImagesList(request, imagesLimit, imagesExistsCount);

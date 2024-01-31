@@ -18,11 +18,12 @@ export class JwtControlService {
         private readonly JWT_tokenModel: typeof JWT_token
     ) { }
 
-    public extractTokenFromHeader (request: IRequest): string | undefined {
+    public extractTokenFromHeader (request: IRequest, throwError = true): string | undefined {
         const [ type, token ] = request.headers.authorization?.split(' ') ?? [];
 
         if ( request.url !== "/api/sign/up" && request.url !== "/api/sign/in" && request.url !== "/api/sign/getActiveClient" && request.url !== "/api/sign/out" && !token ) {
-            throw new UnauthorizedException(`${ request.url } "ExtractTokenFromHeader - access token does not exists"`);
+            if ( throwError ) throw new UnauthorizedException(`${ request.url } "ExtractTokenFromHeader - access token does not exists"`);
+            else return undefined;
         }
         
         return type === 'Bearer' ? token : undefined;

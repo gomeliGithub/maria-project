@@ -1,4 +1,5 @@
-import { AfterContentChecked, AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChildren, afterRender } from '@angular/core';
+import { AfterContentChecked, AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChildren, afterRender } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
 import { animate, animateChild, query, state, style, transition, trigger } from '@angular/animations';
 
 import { DeviceDetectorService, DeviceInfo } from 'ngx-device-detector';
@@ -75,12 +76,13 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
         ])
     ]
 })
-export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChecked, AfterViewInit, OnDestroy {
+export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChecked, OnDestroy {
     public componentElementIsRendered: boolean = false;
     
     public deviceInfo: DeviceInfo = null;
 
     constructor (
+        private readonly router: Router,
         private readonly changeDetector: ChangeDetectorRef,
         
         private readonly deviceService: DeviceDetectorService,
@@ -122,7 +124,6 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
 
     public currentScrollSnapItemRadiosContainerAnimationState: string = 'leave';
     public currentScrollSnapItemRadiosEmbededContainerAnimationState: string = 'hide';
-    public scrollSnapItemRadioTimeout = null;
 
     public currentScrollSnapSectionVisiableAnimationStates: { state: string, finished: boolean }[] = [];
 
@@ -136,6 +137,13 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     ngOnInit (): void {
         this.appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => {
             this.appService.setTitle(translation);
+        });
+
+        this.router.events.subscribe(evt => {
+            if ( !(evt instanceof NavigationEnd) ) return;
+            else {
+                if ( !evt.url.startsWith('/') ) this.clientService.setNavbarAnimationState('static');
+            }
         });
 
         this.clientService.getCompressedImagesData('home', 'horizontal').subscribe({
@@ -181,16 +189,10 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     ngAfterContentChecked (): void {
         this.setDeviceInfo();
 
-        // if ( this.isMobileDevice ) {
-            this.currentScrollSnapItemRadiosContainerAnimationState = 'enter';
-            this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'show';
-        // }
+        this.currentScrollSnapItemRadiosContainerAnimationState = 'enter';
+        this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'show';
 
         this.changeDetector.detectChanges();
-    }
-
-    ngAfterViewInit (): void {
-        this.homeService.setScrollSnapSectionViewRefs(this.scrollSnapSectionViewRefs);
     }
 
     ngAfterViewChecked (): void {
@@ -214,9 +216,9 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
 
         this.clientService.setPrevNavbarAnimationStateChange(null);
 
-        if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 1 ) {
+        /* if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 1 ) {
             this.clientService.setFooterAnimationState('show');
-        } else this.clientService.setFooterAnimationState('hide');
+        } else this.clientService.setFooterAnimationState('hide'); */
 
         if ( this.componentElementIsRendered ) {
             this.getCurrentScrollSnapVisiableAnimationSection($event.srcElement);
@@ -270,32 +272,11 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     public setActiveScrollSnapSection (): void {
         const prevActiveRadio = this.scrollSnapItemRadioViewRefs.toArray().find(el => el.nativeElement.checked === true);
 
-        if ( prevActiveRadio ) {
-            const label: HTMLLabelElement = prevActiveRadio.nativeElement.nextSibling as HTMLLabelElement;
-
-            // if ( this.isMobileDevice && label.classList.contains('visible') ) label.classList.remove('visible');
-            if ( label.classList.contains('visible') ) label.classList.remove('visible');
-
-            prevActiveRadio.nativeElement.checked = false;
-        }
+        if ( prevActiveRadio ) prevActiveRadio.nativeElement.checked = false;
 
         const currentItem: ElementRef<HTMLInputElement> = this.scrollSnapItemRadioViewRefs.toArray()[this.currentItem];
         
-        if ( currentItem ) {
-            const label: HTMLLabelElement = currentItem.nativeElement.nextSibling as HTMLLabelElement;
-
-            // if ( this.isMobileDevice && !label.classList.contains('visible') ) {
-            if ( !label.classList.contains('visible') ) {
-                clearTimeout(this.scrollSnapItemRadioTimeout);
-                
-                label.classList.add('visible');
-
-                this.scrollSnapItemRadioTimeout = setTimeout(() => label.classList.remove('visible'), 3000);
-
-            }
-
-            currentItem.nativeElement.checked = true;
-        }
+        if ( currentItem ) currentItem.nativeElement.checked = true;
 
         this.currentItem = this.currentItem += 1;
     }
@@ -335,28 +316,6 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
 
             if ( toState === 'enter' ) this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'show';
             else if ( toState === 'leave' ) this.currentScrollSnapItemRadiosEmbededContainerAnimationState = 'hide';
-        }
-    }
-
-    public scrollSnapItemRadiosEmbededContainerAnimationStart (event: AnimationEvent): void {
-        // if ( this.appService.checkIsPlatformBrowser() && this.isDesktopDevice && event.toState === 'hide' ) {
-        if ( this.appService.checkIsPlatformBrowser() && event.toState === 'hide' ) {
-            const target: HTMLDivElement = event.element as HTMLDivElement;
-
-            const scrollSnapItemRadiosLabels: NodeListOf<HTMLLabelElement> = target.querySelectorAll('label');
-
-            if ( scrollSnapItemRadiosLabels ) scrollSnapItemRadiosLabels.forEach(label => label.classList.remove('visible'));
-        }
-    }
-
-    public scrollSnapItemRadiosEmbededContainerAnimationDone (event: AnimationEvent): void {
-        // if ( this.appService.checkIsPlatformBrowser() && this.isDesktopDevice && event.toState === 'show' ) {
-        if ( this.appService.checkIsPlatformBrowser() && event.toState === 'show' ) {
-            const target: HTMLDivElement = event.element as HTMLDivElement;
-
-            const scrollSnapItemRadiosLabels: NodeListOf<HTMLLabelElement> = target.querySelectorAll('label');
-            
-            if ( scrollSnapItemRadiosLabels ) scrollSnapItemRadiosLabels.forEach(label => label.classList.add('visible'));
         }
     }
 

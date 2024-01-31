@@ -1,10 +1,11 @@
 import { Component, ElementRef, HostBinding, HostListener, Inject, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
-import { TranslateService } from '@ngx-translate/core';
 
 import { Subscription } from 'rxjs';
+import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
+import { DeviceDetectorService } from 'ngx-device-detector';
 
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
@@ -95,10 +96,14 @@ export class AppComponent implements OnInit {
         private readonly appService: AppService,
         private readonly clientService: ClientService,
         private readonly homeService: HomeService,
-        private readonly translateService: TranslateService
+
+        private readonly translateService: TranslateService,
+        private readonly deviceService: DeviceDetectorService
     ) { }
 
     public componentElementIsRendered: boolean = false;
+    
+    public isMobileDevice: boolean;
 
     public isHomePage: boolean = true;
 
@@ -109,14 +114,14 @@ export class AppComponent implements OnInit {
 
     public discountsDataIsExists: boolean = false;
 
-    public footerAnimationState: string = 'hide';
+    public footerAnimationState: string = 'show'; // public footerAnimationState: string = 'hide';
 
     @ViewChildren(NgbDropdown) dropdowns: QueryList<NgbDropdown>;
 
     @ViewChild('navbar', { static: false }) private readonly navbarElementRef: ElementRef<HTMLDivElement>;
     @ViewChild('footer', { static: false }) private readonly footerElementRef: ElementRef<HTMLDivElement>;
 
-    @ViewChildren('scrollSnapSection', { read: ElementRef<HTMLDivElement> }) public scrollSnapSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
+    public scrollSnapItemRadiosIndex: number = 1;
 
     public readonly locales: IClientLocale[] = environment.locales;
 
@@ -145,11 +150,12 @@ export class AppComponent implements OnInit {
                 error: () => this.appService.createErrorModal()
             });
 
+            this.isMobileDevice = this.deviceService.isMobile();
+
             this.clientService.navbarAnimationStateChange.subscribe(value => this.navbarAnimationState = value);
             this.clientService.prevNavbarAnimationStateChange.subscribe(value => this.prevNavbarAnimationState = value);
-            this.clientService.footerAnimationStateChange.subscribe(value => this.footerAnimationState = value);
+            // this.clientService.footerAnimationStateChange.subscribe(value => this.footerAnimationState = value);
 
-            this.homeService.scrollSnapSectionViewRefsChange.subscribe(value => this.scrollSnapSectionViewRefs = value);
             this.homeService.discountsDataIsExistsChange.subscribe(value => this.discountsDataIsExists = value);
         }
     }
@@ -162,7 +168,7 @@ export class AppComponent implements OnInit {
         if ( !(component instanceof HomeComponent) ) {
             this.componentClass = false;
 
-            this.footerAnimationState = 'show';
+            // this.footerAnimationState = 'show';
 
             this.footerElementRef.nativeElement.classList.remove('bottom-0', 'position-absolute');
             this.footerElementRef.nativeElement.classList.add('position-relative');
@@ -233,7 +239,11 @@ export class AppComponent implements OnInit {
     public changeActiveScrollSnapSection (event: MouseEvent): void {
         if ( !this.isHomePage ) {
             this.appService.reloadComponent(false, '/', false).then(() => setTimeout(() => this.goToActiveScrollSnapSection(event), 1000));
-        } else this.goToActiveScrollSnapSection(event);
+        } else {
+            if ( this.isMobileDevice ) this.navbarTogglerClick(true);
+
+            this.goToActiveScrollSnapSection(event);
+        }
     }
 
     public goToActiveScrollSnapSection (event: MouseEvent): void {
@@ -248,7 +258,9 @@ export class AppComponent implements OnInit {
         if ( this.isHomePage ) {
             event.preventDefault();
 
-            this.homeService.setActiveScrollSnapSection(0);
+            if ( this.isMobileDevice ) this.navbarTogglerClick(true);
+
+            setTimeout(() => this.homeService.setActiveScrollSnapSection(0), 500);
         }
     }
 

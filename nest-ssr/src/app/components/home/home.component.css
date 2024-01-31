@@ -20,7 +20,7 @@
 }
 
 .section {
-    scroll-snap-align: center !important;
+    scroll-snap-align: center;
 }
 
 @media screen and (max-width: 650px), only screen 
@@ -196,21 +196,12 @@ and (-webkit-device-pixel-ratio: 2) {
 }
 
 #scrollSnapItemRadiosContainer {
-    right: -260px;
+    right: -185px;
 }
 
 #scrollSnapItemRadiosContainer > div > div:nth-child(2) {
     width: 4px;
     opacity: 1;
-}
-
-#scrollSnapItemRadiosContainer label {
-    transition: 1s ease-out;
-    transform: translateX(200px);
-}
-
-#scrollSnapItemRadiosContainer label.visible {
-    transform: translateX(0px);
 }
 
 #scrollSnapItemRadiosContainer > div > div:nth-child(3) {

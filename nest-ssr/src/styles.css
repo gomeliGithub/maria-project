@@ -67,7 +67,6 @@ app-gallery, app-admin-panel-orders-control, app-admin-panel-discounts-control {
 }
 
 app-gallery {
-    padding: 0 1rem 1rem 1rem !important;
     height: auto !important;
 }
 

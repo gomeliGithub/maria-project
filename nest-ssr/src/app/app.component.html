@@ -26,15 +26,6 @@
         <div class="navbar-collapse collapse" id="navbarNavDropdown" [ngbCollapse]="navbarIsCollapsed">
             <ul class="navbar-nav flex-grow-1 justify-content-evenly mb-2 mb-lg-0">
                 <li class="nav-item me-4"> <!-- ngbDropdown display="dynamic" #homeMenu="ngbDropdown" -->
-                    <!-- <a class="nav-link active" aria-current="page" routerLink="/"
-                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
-                    >
-                        <span class="fs-5">
-                            <i class="bi bi-house"></i>
-                        </span>
-                        {{ 'PAGETITLES.HOME' | translate }}
-                    </a> -->
-
                     <a class="" class="nav-link active" aria-current="page" routerLink="/"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                         (click)="goToPageTop($event)"
@@ -104,8 +95,63 @@
                     </ul> -->
 
                 </li>
-                <li *ngFor="let section of scrollSnapSectionViewRefs; let i = index; let isLast = last" class="nav-item">
-                    <button class="nav-link" [id]="'defaultCheck' + i" (click)="changeActiveScrollSnapSection($event)"
+
+
+
+
+
+
+
+
+
+                <li *ngIf="discountsDataIsExists" class="nav-item">
+                    <button class="nav-link me-4" id="defaultCheck1"
+                        [ngClass]="{ 
+                            'text-white': navbarAnimationState === 'static' && isHomePage
+                        }"
+                        (click)="changeActiveScrollSnapSection($event)"
+                    >
+                        <span class="fs-5">
+                            <i class="bi bi-house-fill"></i>
+                        </span>
+                        {{ ( 'SCROLLSNAPITEMSTEXT.DISCOUNTS' ) | translate }}
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link me-4" [id]="'defaultCheck' + ( discountsDataIsExists ? 2 : 1 )"
+                        [ngClass]="{ 
+                            'text-white': navbarAnimationState === 'static' && isHomePage
+                        }"
+                        (click)="changeActiveScrollSnapSection($event)"
+                    >
+                        <span class="fs-5">
+                            <i class="bi bi-house-fill"></i>
+                        </span>
+                        {{ ( 'SCROLLSNAPITEMSTEXT.PORTFOLIOOVERVIEW' ) | translate }}
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link me-5" [id]="'defaultCheck' + ( discountsDataIsExists ? 4 : 3 )"
+                        [ngClass]="{ 
+                            'text-white': navbarAnimationState === 'static' && isHomePage
+                        }"
+                        (click)="changeActiveScrollSnapSection($event)"
+                    >
+                        <span class="fs-5">
+                            <i class="bi bi-house-fill"></i>
+                        </span>
+                        {{ ( 'SCROLLSNAPITEMSTEXT.ABOUTME' ) | translate }}
+                    </button>
+                </li>
+
+
+
+
+
+
+
+                <!-- <li *ngFor="let section of scrollSnapSectionViewRefs; let i = index; let isFirst = first; let isLast = last" class="nav-item">
+                    <button class="nav-link" [id]="'defaultCheck' + ( i + 1 )" (click)="changeActiveScrollSnapSection($event)"
                         [ngClass]="{ 
                             'me-4': !isLast,
                             'me-5': isLast,
@@ -116,14 +162,14 @@
                             <i class="bi bi-house-fill"></i>
                         </span>
                         {{ discountsDataIsExists ? 
-                        ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate ) : 
-                        ( i >= 1 ? 
-                            ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 2 ) ) | translate ) :
-                            ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate )
-                        ) 
+                            ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( scrollSnapItemRadiosIndex + 1 ) ) | translate ) : 
+                            ( i === 0 ? 
+                                ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( scrollSnapItemRadiosIndex + 2 ) ) | translate ) :
+                                ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( scrollSnapItemRadiosIndex + 1 ) ) | translate )
+                            ) 
                         }}
                     </button>
-                </li>
+                </li> -->
 
                 <li class="nav-item me-4">
                     <a class="nav-link" routerLink="/gallery"

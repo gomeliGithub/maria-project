@@ -30,8 +30,9 @@ only screen
 and (width: 375px) 
 and (height: 667px) 
 and (-webkit-device-pixel-ratio: 2) {
-    :host ::ng-deep .carousel .carousel-inner > .carousel-item > div > div:nth-child(n+2) {
-        margin-bottom: 0.5rem !important;
+    :host ::ng-deep .carousel .carousel-inner > .carousel-item > div > div {
+        flex: 0 0 auto !important;
+        width: 30% !important;
     }
 }
 

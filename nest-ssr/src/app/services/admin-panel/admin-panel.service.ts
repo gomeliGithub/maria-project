@@ -4,6 +4,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 
 import { Observable, map } from 'rxjs';
 
+import { AdminPanelComponent } from '../../components/admin-panel/admin-panel.component';
 import { AdminPanelOrdersControlComponent } from '../../components/admin-panel-orders-control/admin-panel-orders-control.component';
 import { AdminPanelDiscountsControlComponent } from '../../components/admin-panel-discounts-control/admin-panel-discounts-control.component';
 import { ClientOrdersComponent } from '../../components/admin-panel-orders-control/client-orders/client-orders.component';
@@ -45,6 +46,22 @@ export class AdminPanelService {
         params = params.append('imagesExistsCount', imagesExistsCount ?? '');
 
         return this.http.get<IFullCompressedImageData>('/api/admin-panel/getFullCompressedImagesList', { params, headers, withCredentials: true });
+    }
+
+    public loadAndShowImageThumbnail (componentThis: AdminPanelComponent, imageButton: HTMLButtonElement): Observable<Blob> {
+        const originalImageName: string = imageButton.getAttribute('originalImageName');
+
+        if ( originalImageName ) {
+            const headers: HttpHeaders = this.appService.createRequestHeaders();
+
+            componentThis.spinnerHidden = false;
+
+            return this.http.get('/api/admin-panel/getImageThumbnail', { 
+                params: {
+                    originalName: originalImageName
+                },  headers, responseType: 'blob', withCredentials: true
+            });
+        }
     }
 
     public getClientOrders (options: {

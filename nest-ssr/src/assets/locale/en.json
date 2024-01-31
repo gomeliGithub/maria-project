@@ -14,18 +14,16 @@
 		"SIGNIN": "Sign in",
 		"NOTFOUND": "Not Found"
 	},
+	"SCROLLSNAPITEMSTEXT": {
+		"DISCOUNTS": "Discounts",
+		"PORTFOLIOOVERVIEW": "Portfolio: Overview",
+		"ABOUTME": "About Me"
+	},
 	"NOIMAGESMESSAGE": "No images yet",
 	"CHANGECLIENTLOCALESUCCESSMESSAGE": "Language changed successfully",
 	"HOMEPAGE": {
 		"HEADERTITLE": "Portfolio",
 		"PHOTOGRAPHYTYPESLINKTEXT": "View works",
-		"SCROLLSNAPITEMRADIOSTEXT": {
-			"PART1": "Carousell",
-			"PART2": "Discounts",
-			"PART3": "Portfolio: Part 1",
-			"PART4": "Portfolio: Part 2",
-			"PART5": "About me"
-		},
 		"ABOUTTEXT": {
 			"PART1": "Hello, my name is Maria Burtseva and I am a professional photographer. I live and film in Gomel. And also throughout Belarus and the World.",
 			"PART2": "I have been photographing for over five years. Mostly weddings and private portraits, I have extensive experience in making your memories beautiful and unforgettable.",
@@ -44,6 +42,8 @@
 		"CLIENTORDERSUCCESSMESSAGE": "The order has been sent successfully. I will contact you shortly"
 	},
 	"CLIENTPAGE": {
+		"PASSWORDSHOWSWITCHTEXT": "Show password",
+		"PASSWORDHIDESWITCHTEXT": "Hide password",
 		"LOGININVALIDMESSAGE": "Incorrect login",
 		"PASSWORDINVALIDMESSAGE": "Incorrect password",
 		"FULLNAMEINVALIDMESSAGE": "Incorrect full name",
@@ -108,10 +108,9 @@
 	"ADMINPANEL": {
 		"BOOLEANTRUETEXT": "Yes",
 		"BOOLEANFALSETEXT": "No",
+		"IMAGETHUMBNAILCONTAINERCAPTION": "Preview",
 		"NOIMAGESMESSAGE": "No images uploaded yet",
-
 		"NOCLIENTORDERSMESSAGE": "No new orders yet",
-		"NOCLIENTWITHNEWORDERSMESSAGE": "There are no clients with new orders yet",
 		"NOCLIENTORDERSMESSAGES": {
 			"NEWORDERS": "No new orders yet",
 			"PROCESSEDORDERS": "No processed orders yet"

@@ -3,6 +3,7 @@
         <caption>{{ 'ADMINPANEL.TABLECAPTION' | translate }}</caption>
         <thead>
             <tr>
+                <th scope="col"></th>
                 <th scope="col">#</th>
                 <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALNAME' | translate }}</th>
                 <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALSIZE' | translate }}</th>
@@ -20,6 +21,11 @@
                 (@images-table-rows-animation.start)="imagesTableRowsAnimationStarted($event)"
                 (@images-table-rows-animation.done)="imagesTableRowsAnimationDone($event)"
             >
+                <td>
+                    <button type="button" class="btn" [attr.originalImageName]="compressedImage.originalName" (click)="loadAndShowImageThumbnail($event)">
+                        <i class="bi bi-image"></i>
+                    </button>
+                </td>
                 <th scope="row">{{ i + 1 }}</th>
                 <td>{{ compressedImage.originalName }}</td>
                 <td>{{ compressedImage.originalSize | imageSize }}</td>
@@ -145,6 +151,28 @@
             </tr>
         </tbody>
     </table>
+    <div class="position-absolute z-1"
+        [ngClass]="{ 'invisible' : !imageThumbnailUrl }"
+        [@image-thumbnail-container-animation]="imageThumbnailContainerVisible"
+        (@image-thumbnail-container-animation.start)="imageThumbnailContainerAnimationStart($event)"
+        (@image-thumbnail-container-animation.done)="imageThumbnailContainerAnimationDone($event)"
+    >
+        <div class="text-bg-light text-center rounded-top">
+            <span class="fs-4 fw-semibold">{{ 'ADMINPANEL.IMAGETHUMBNAILCONTAINERCAPTION' | translate }}</span>
+        </div>
+        <div class="position-relative">
+            <div class="position-absolute top-0 start-100 translate-middle">
+                <button type="button" class="btn" (click)="switchImageThumbnailContainerVisible()"
+                    [ngStyle]="{
+                        'transform': 'scale(1.5) translate(0.3rem, -0.3rem)'
+                    }"
+                >
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <img [src]="imageThumbnailUrl" class="img-fluid img-thumbnail" alt="">
+        </div>
+    </div>
     <div *ngIf="additionalImagesIsExists" class="w-100 text-center">
         <button class="btn btn-outline-info w-50 my-3 shadow" type="button" (click)="getFullCompressedImagesData()" #additionalImagesButton>
             {{ 'ADMINPANEL.ADDITIONALCOMPRESSEDIMAGESBUTTONTEXT' | translate }}

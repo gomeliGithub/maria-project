@@ -260,10 +260,10 @@ export class ClientService {
         });
 
         if ( imagesType !== 'home' ) {
-            const reducedCompressedImagesRaw: IClientCompressedImage[][] = []
+            const reducedCompressedImagesRaw: IClientCompressedImage[][] = [];
 
-            for ( let i = 0; i < compressedImagesRaw.length; i += 4 ) {
-                reducedCompressedImagesRaw.push(compressedImagesRaw.slice(i, i + 4));
+            for ( let i = 0; i < compressedImagesRaw.length; i += 3 ) {
+                reducedCompressedImagesRaw.push(compressedImagesRaw.slice(i, i + 3));
             }
 
             const commonCompressedImagesCount: number = await this.compressedImageModel.count({ where: { name: imagesList, viewSizeType: imageViewSize }});
@@ -318,7 +318,7 @@ export class ClientService {
     }
 
     public async changeLocale (request: IRequest, newLocale: string, response: Response): Promise<string> {
-        const token: string = this.jwtControlService.extractTokenFromHeader(request);
+        const token: string = this.jwtControlService.extractTokenFromHeader(request, false);
 
         let decodedToken: IClient = null;
         let tokenExpiresIn: number = null;
