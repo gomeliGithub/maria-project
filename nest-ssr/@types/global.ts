@@ -111,6 +111,12 @@ export interface IImageAdditionalData {
     description?: string;
 }
 
+export interface IDownloadingOriginalImageData {
+    name: string;
+    path: string;
+    extension: string;
+}
+
 export interface IClientOrdersInfoData {
     infoData: IClientOrdersInfoDataArr[];
     additionalOrdersInfoDataExists: boolean;

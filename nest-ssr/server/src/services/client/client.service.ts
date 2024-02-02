@@ -21,7 +21,7 @@ import { AdminPanelService } from '../admin-panel/admin-panel.service';
 
 import { Admin, Member, ClientCompressedImage, ImagePhotographyType, ClientOrder } from '../../models/client.model';
 
-import { IClient, IClientOrdersInfoDataArr, ICookieSerializeOptions, IGalleryCompressedImagesData, IRequest, IRequestBody } from 'types/global';
+import { IClient, IClientOrdersInfoDataArr, ICookieSerializeOptions, IDownloadingOriginalImageData, IGalleryCompressedImagesData, IRequest, IRequestBody } from 'types/global';
 import { IClientGetOptions, IDownloadOriginalImageOptions, IGetClientOrdersOptions } from 'types/options';
 import { IAdmin, IClientCompressedImage, IDiscount, IImagePhotographyType, IMember } from 'types/models';
 
@@ -229,13 +229,24 @@ export class ClientService {
         await clientInstance.update({ lastSignInDate: sequelize.literal('CURRENT_TIMESTAMP') });
     }
 
-    public async downloadOriginalImage (request: IRequest, response: Response, options: IDownloadOriginalImageOptions): Promise<void> {
+    public async downloadOriginalImage (request: IRequest, options: IDownloadOriginalImageOptions): Promise<IDownloadingOriginalImageData> {
         if ( options.imagePath ) {
-            response.download(options.imagePath);
+            const compressedImageDataRaw: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { name: path.basename(options.imagePath) } }) as unknown as IClientCompressedImage;
+
+            if ( compressedImageDataRaw ) return {
+                name: compressedImageDataRaw.originalName,
+                path: options.imagePath,
+                extension: path.extname(path.basename(compressedImageDataRaw.originalName))
+            };
+            else throw new BadRequestException(`${ request.url } "DownloadOriginalImage - original image does not exists"`);
         } else if ( options.compressedImageName ) {
             const compressedImageDataRaw: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { name: options.compressedImageName } }) as unknown as IClientCompressedImage;
 
-            if ( compressedImageDataRaw ) response.download(path.join(compressedImageDataRaw.originalDirPath, compressedImageDataRaw.originalName));
+            if ( compressedImageDataRaw ) return {
+                name: compressedImageDataRaw.originalName,
+                path: path.join(compressedImageDataRaw.originalDirPath, compressedImageDataRaw.originalName),
+                extension: path.extname(path.basename(compressedImageDataRaw.originalName))
+            };
             else throw new BadRequestException(`${ request.url } "DownloadOriginalImage - compressed image does not exists"`);
         }
     }

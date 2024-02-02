@@ -1,4 +1,6 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, Res, StreamableFile } from '@nestjs/common';
+
+import { createReadStream } from 'fs';
 import { Response } from 'express';
 
 import { CommonModule } from '../../modules/common.module';
@@ -9,7 +11,7 @@ import { CommonService } from '../../services/common/common.service';
 
 import { ClientTypes } from '../../decorators/client.types.decorator';
 
-import { IGalleryCompressedImagesData, IRequest, IRequestBody } from 'types/global';
+import { IDownloadingOriginalImageData, IGalleryCompressedImagesData, IRequest, IRequestBody } from 'types/global';
 import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
 
 @Controller('/client')
@@ -51,10 +53,19 @@ export class ClientController {
 
     @Get('/downloadOriginalImage/:compressedImageName')
     @ClientTypes('admin')
-    public async downloadOriginalImage (@Req() request: IRequest, @Param('compressedImageName') compressedImageName: string, @Res() response: Response): Promise<void> {
+    public async downloadOriginalImage (@Req() request: IRequest, @Param('compressedImageName') compressedImageName: string, @Res({ passthrough: true }) response: Response): Promise<StreamableFile> {
         compressedImageName = compressedImageName.substring(1);
 
-        return this.clientService.downloadOriginalImage(request, response, { compressedImageName });
+        const downloadingOriginalImageData: IDownloadingOriginalImageData = await this.clientService.downloadOriginalImage(request, { compressedImageName });
+
+        const image = createReadStream(downloadingOriginalImageData.path);
+
+        response.set({
+            'Content-Type': `image/${ downloadingOriginalImageData.extension }`,
+            'Content-Disposition': `attachment; filename=${ downloadingOriginalImageData.name }`,
+        });
+
+        return new StreamableFile(image);
     }
 
     @Get('/getImagePhotographyTypesData/:targetPage')

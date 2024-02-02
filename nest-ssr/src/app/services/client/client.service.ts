@@ -1,5 +1,5 @@
 import { ElementRef, EventEmitter, Injectable, QueryList } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 
 import { Observable, forkJoin } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
@@ -117,6 +117,12 @@ export class ClientService {
 
     public getDiscountsData (): Observable<IDiscount[]> {
         return this.http.get<IDiscount[]>('/api/client/getDiscountsData');
+    }
+
+    public downloadOriginalImage (compressedImageName: string): Observable<HttpResponse<Blob>> {
+        const headers: HttpHeaders = this.appService.createRequestHeaders();
+
+        return this.http.get(`/api/client/downloadOriginalImage/:${ compressedImageName }`, { responseType: 'blob', observe: 'response', headers, withCredentials: true });
     }
 
     public sendOrder (photographyType: string, sendOrderFormValue: Partial<{
