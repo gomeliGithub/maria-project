@@ -133,11 +133,11 @@ export class AppComponent implements OnInit {
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
             this.clientService.getActiveClient().subscribe({
-                next: activeClient => {
-                    this.activeClientLogin = activeClient ? activeClient.login : null;
-                    this.activeClientType = activeClient ? activeClient.type : null;
-                    this.activeClientFullName = activeClient ? activeClient.fullName : null;
-                    this.activeClientLocale = activeClient ? activeClient.locale : null;
+                next: activeClientData => {
+                    this.activeClientLogin = activeClientData ? activeClientData.login : null;
+                    this.activeClientType = activeClientData ? activeClientData.type : null;
+                    this.activeClientFullName = activeClientData ? activeClientData.fullName : null;
+                    this.activeClientLocale = activeClientData ? activeClientData.locale : null;
 
                     if ( this.activeClientLocale ) this.translateService.use(this.activeClientLocale);
                     else {
@@ -174,11 +174,6 @@ export class AppComponent implements OnInit {
             this.footerElementRef.nativeElement.classList.add('position-relative');
 
             this.isHomePage = false;
-
-            if ( component instanceof GalleryComponent ) {
-                component.activeClientIsExists = this.activeClientLogin ? true : false;
-                component.activeClientType = this.activeClientType;
-            }
         } else {
             this.componentClass = true;
             this.isHomePage = true;
