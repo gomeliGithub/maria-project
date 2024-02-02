@@ -236,7 +236,7 @@ export class ClientService {
             if ( compressedImageDataRaw ) return {
                 name: compressedImageDataRaw.originalName,
                 path: options.imagePath,
-                extension: path.extname(path.basename(compressedImageDataRaw.originalName))
+                extension: path.extname(path.basename(compressedImageDataRaw.originalName)).replace('.', '')
             };
             else throw new BadRequestException(`${ request.url } "DownloadOriginalImage - original image does not exists"`);
         } else if ( options.compressedImageName ) {
@@ -245,7 +245,7 @@ export class ClientService {
             if ( compressedImageDataRaw ) return {
                 name: compressedImageDataRaw.originalName,
                 path: path.join(compressedImageDataRaw.originalDirPath, compressedImageDataRaw.originalName),
-                extension: path.extname(path.basename(compressedImageDataRaw.originalName))
+                extension: path.extname(path.basename(compressedImageDataRaw.originalName)).replace('.', '')
             };
             else throw new BadRequestException(`${ request.url } "DownloadOriginalImage - compressed image does not exists"`);
         }

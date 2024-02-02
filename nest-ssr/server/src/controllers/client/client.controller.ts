@@ -61,8 +61,8 @@ export class ClientController {
         const image = createReadStream(downloadingOriginalImageData.path);
 
         response.set({
-            'Content-Type': `image/${ downloadingOriginalImageData.extension }`,
-            'Content-Disposition': `attachment; filename=${ downloadingOriginalImageData.name }`,
+            'Content-Type': `image/${ downloadingOriginalImageData.extension === 'jpg' ? 'jpeg' : downloadingOriginalImageData.extension }`,
+            'Content-Disposition': `attachment; filename=${ encodeURIComponent(downloadingOriginalImageData.name) }`,
         });
 
         return new StreamableFile(image);
