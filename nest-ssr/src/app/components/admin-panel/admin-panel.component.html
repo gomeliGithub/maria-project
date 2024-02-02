@@ -151,25 +151,23 @@
             </tr>
         </tbody>
     </table>
-    <div class="position-absolute z-1"
-        [ngClass]="{ 'invisible' : !imageThumbnailUrl }"
-        [@image-thumbnail-container-animation]="imageThumbnailContainerVisible"
+    <div class="col-5 col-sm-5 col-md-5 col-lg-5 col-xl-5 col-xxl-5 position-absolute z-1"
+        [ngClass]="{ 'invisible' : !imageThumbnailContainerIsVisible }"
+        [@image-thumbnail-container-animation]="imageThumbnailContainerAnimationState"
         (@image-thumbnail-container-animation.start)="imageThumbnailContainerAnimationStart($event)"
         (@image-thumbnail-container-animation.done)="imageThumbnailContainerAnimationDone($event)"
     >
         <div class="text-bg-light text-center rounded-top">
             <span class="fs-4 fw-semibold">{{ 'ADMINPANEL.IMAGETHUMBNAILCONTAINERCAPTION' | translate }}</span>
+            <button type="button" class="btn float-end" (click)="switchImageThumbnailContainerVisible()"
+            [ngStyle]="{
+                'transform': 'scale(1.5) translate(0.4rem, -0.2rem)'
+            }"
+        >
+            <i class="bi bi-x-lg"></i>
+        </button>
         </div>
-        <div class="position-relative">
-            <div class="position-absolute top-0 start-100 translate-middle">
-                <button type="button" class="btn" (click)="switchImageThumbnailContainerVisible()"
-                    [ngStyle]="{
-                        'transform': 'scale(1.5) translate(0.3rem, -0.3rem)'
-                    }"
-                >
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
+        <div class="">
             <img [src]="imageThumbnailUrl" class="img-fluid img-thumbnail" alt="">
         </div>
     </div>

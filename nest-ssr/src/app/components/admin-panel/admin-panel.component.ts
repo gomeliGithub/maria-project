@@ -35,13 +35,13 @@ import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
             state('false', style({
                 top: '50%',
                 left: '50%',
-                transform: 'translate(-210%, -50%)' 
+                transform: 'translate(-230%, -50%)' 
             })),
             transition('false => true', [
                 animate('1s ease', style({ transform: 'translate(-50%, -50%)' }))
             ]),
             transition('true => false', [
-                animate('0.5s ease', style({ transform: 'translate(-210%, -50%)' }))
+                animate('0.5s ease', style({ transform: 'translate(-230%, -50%)' }))
             ])
         ])
     ],
@@ -101,7 +101,8 @@ export class AdminPanelComponent implements OnInit {
     private readonly imagePhotographyTypeDescriptionViewRefs: QueryList<ElementRef<HTMLInputElement>>;
 
     public imageThumbnailUrl: string = null;
-    public imageThumbnailContainerVisible: boolean = false;
+    public imageThumbnailContainerAnimationState: boolean = false;
+    public imageThumbnailContainerIsVisible: boolean = false;
 
     public changeImageDataFormHidden: boolean = true;
     public changingOriginalImageName: string;
@@ -240,6 +241,8 @@ export class AdminPanelComponent implements OnInit {
                         this.spinnerHidden = true;
 
                         this.imageThumbnailUrl = event.target.result as string;
+
+                        this.imageThumbnailContainerIsVisible = true;
                         
                         this.switchImageThumbnailContainerVisible();
                     };
@@ -254,25 +257,26 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public imageThumbnailContainerAnimationStart (event: AnimationEvent): void {
-        if ( event.toState === 'show' ) {
-            const target: HTMLDivElement = event.element;
+        const target: HTMLDivElement = event.element;
 
-            target.classList.add('pe-none');
-        }
+        if ( event.toState === true ) target.classList.add('pe-none');
+        else if ( event.toState === false ) target.classList.add('pe-none');
     }
 
     public imageThumbnailContainerAnimationDone (event: AnimationEvent): void {
-        if ( event.toState === 'hide' ) {
-            const target: HTMLDivElement = event.element;
+        const target: HTMLDivElement = event.element;
 
+        if ( event.toState === false ) {
             target.classList.remove('pe-none');
 
             this.imageThumbnailUrl = null;
-        }
+
+            this.imageThumbnailContainerIsVisible = false;
+        } else if ( event.toState === true ) target.classList.remove('pe-none');
     }
 
     public switchImageThumbnailContainerVisible (): void {
-        this.imageThumbnailContainerVisible = !this.imageThumbnailContainerVisible;
+        this.imageThumbnailContainerAnimationState = !this.imageThumbnailContainerAnimationState;
     }
 
     public uploadImage (): void {

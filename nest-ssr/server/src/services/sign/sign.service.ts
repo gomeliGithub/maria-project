@@ -182,7 +182,7 @@ export class SignService {
         if ( !validatedClientPayload || !token || token === '' ) {
             if ( options.response && ( !options.clientLocale || options.clientLocale === '' ) ) options.response.cookie('locale', process.env.CLIENT_DEFAULT_LOCALE, this.appService.cookieSerializeOptions);
 
-            validatedClientPayload = { locale: options.clientLocale && options.clientLocale !== '' ? options.clientLocale : null };
+            if ( options.response ) validatedClientPayload = { locale: options.clientLocale && options.clientLocale !== '' ? options.clientLocale : null };
 
             return validatedClientPayload;
         }

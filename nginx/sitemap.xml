@@ -5,14 +5,14 @@
         <loc>http://45.128.205.220/adminPanel</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2024-01-29T19:06:42.196Z</lastmod>
+        <lastmod>2024-01-31T22:08:10.131Z</lastmod>
     </url>    
 
     <url>
         <loc>http://45.128.205.220/adminPanel/imagesControl</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2024-01-29T19:06:42.196Z</lastmod>
+        <lastmod>2024-01-31T22:08:10.131Z</lastmod>
     </url>    
 
     <url>
@@ -33,14 +33,14 @@
         <loc>http://45.128.205.220/signUp</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2024-01-26T19:11:32.234Z</lastmod>
+        <lastmod>2024-01-31T22:08:30.559Z</lastmod>
     </url>    
 
     <url>
         <loc>http://45.128.205.220/signIn</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2024-01-26T19:11:32.234Z</lastmod>
+        <lastmod>2024-01-31T22:08:30.559Z</lastmod>
     </url>    
 
     <url>
@@ -82,14 +82,14 @@
         <loc>http://45.128.205.220/home</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2024-01-30T10:48:19.448Z</lastmod>
+        <lastmod>2024-01-31T22:09:03.265Z</lastmod>
     </url>    
 
     <url>
         <loc>http://45.128.205.220/</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2024-01-30T10:48:19.448Z</lastmod>
+        <lastmod>2024-01-31T22:09:03.265Z</lastmod>
     </url>    
 
 </urlset>

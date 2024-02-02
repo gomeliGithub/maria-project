@@ -262,8 +262,8 @@ export class ClientService {
         if ( imagesType !== 'home' ) {
             const reducedCompressedImagesRaw: IClientCompressedImage[][] = [];
 
-            for ( let i = 0; i < compressedImagesRaw.length; i += 3 ) {
-                reducedCompressedImagesRaw.push(compressedImagesRaw.slice(i, i + 3));
+            for ( let i = 0; i < compressedImagesRaw.length; i += 5 ) {
+                reducedCompressedImagesRaw.push(compressedImagesRaw.slice(i, i + 5));
             }
 
             const commonCompressedImagesCount: number = await this.compressedImageModel.count({ where: { name: imagesList, viewSizeType: imageViewSize }});

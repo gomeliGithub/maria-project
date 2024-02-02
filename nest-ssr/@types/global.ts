@@ -132,11 +132,11 @@ export interface IComponentInfo {
 }
 
 export interface AnimationEvent {
-    fromState: string
-    toState: string
-    totalTime: number
-    phaseName: string
-    element: any
-    triggerName: string
-    disabled: boolean
+    fromState: string | boolean;
+    toState: string | boolean;
+    totalTime: number;
+    phaseName: string;
+    element: any;
+    triggerName: string;
+    disabled: boolean;
 }

@@ -171,7 +171,7 @@
                     </button>
                 </li> -->
 
-                <li class="nav-item me-4">
+                <!-- <li class="nav-item me-4">
                     <a class="nav-link" routerLink="/gallery"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                     >
@@ -180,7 +180,7 @@
                         </span>
                         {{ 'PAGETITLES.GALLERY' | translate }}
                     </a>
-                </li>
+                </li> -->
                 <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item me-4" ngbDropdown display="dynamic" #adminPanelMenu="ngbDropdown">
                     <button class="nav-link" type="button" id="adminPanelMenuButton"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }" 
