@@ -93,7 +93,7 @@ export interface IFullCompressedImageData {
 }
 
 export interface IGalleryCompressedImagesData {
-    compressedImagesRaw: IClientCompressedImage[][];
+    compressedImagesRaw: IClientCompressedImage[]; // compressedImagesRaw: IClientCompressedImage[][];
     photographyTypeDescription: string;
     additionalImagesExists: boolean;
 }

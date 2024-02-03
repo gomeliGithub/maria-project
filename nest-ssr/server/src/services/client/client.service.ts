@@ -271,16 +271,20 @@ export class ClientService {
         });
 
         if ( imagesType !== 'home' ) {
-            const reducedCompressedImagesRaw: IClientCompressedImage[][] = [];
+            // const reducedCompressedImagesRaw: IClientCompressedImage[][] = [];
 
+            /* 
+            
             for ( let i = 0; i < compressedImagesRaw.length; i += 5 ) {
                 reducedCompressedImagesRaw.push(compressedImagesRaw.slice(i, i + 5));
             }
+            
+            */
 
             const commonCompressedImagesCount: number = await this.compressedImageModel.count({ where: { name: imagesList, viewSizeType: imageViewSize }});
 
             return {
-                compressedImagesRaw: reducedCompressedImagesRaw, 
+                compressedImagesRaw: compressedImagesRaw, // reducedCompressedImagesRaw, 
                 photographyTypeDescription: (await this.getImagePhotographyTypesData([ 'name', 'description' ], 'gallery', imagesType)).description,
                 additionalImagesExists: commonCompressedImagesCount > imagesExistsCount + compressedImagesRaw.length && commonCompressedImagesCount > imagesLimit
             }
