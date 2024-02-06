@@ -506,7 +506,11 @@ export class AdminPanelComponent implements OnInit {
                     this.http.post<void>('/api/admin-panel/changePhotographyTypeDescription', {
                         adminPanel: { photographyTypeName, photographyTypeNewDescription }
                     }, { headers, withCredentials: true }).subscribe({
-                        next: () => window.location.reload(),
+                        next: () => {
+                            this.spinnerHidden = true;
+
+                            this.appService.createSuccessModal()
+                        },
                         error: () => {
                             this.spinnerHidden = true;
                             
