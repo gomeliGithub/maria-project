@@ -57,7 +57,8 @@
 		"ACCOUNTHAVEMESSAGES": {
 			"HAVE": "Уже есть аккаунт?",
 			"HAVENT": "Ещё нет аккаунта?"
-		}
+		},
+		"SIGNERRORTEXT": "Неверный логин или пароль"
 	},
 	"NOTFOUNDPAGE": {
 		"MAINTEXT": "Страница, которую вы ищете, не существует.",

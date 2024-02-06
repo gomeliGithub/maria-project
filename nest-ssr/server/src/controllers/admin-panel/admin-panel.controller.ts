@@ -206,7 +206,7 @@ export class AdminPanelController {
             || typeof requestBody.adminPanel.photographyTypeName !== 'string' 
             || !this.appService.imagePhotographyTypes.includes(requestBody.adminPanel.photographyTypeName)
             || typeof requestBody.adminPanel.photographyTypeNewDescription !== 'string' 
-            || requestBody.adminPanel.photographyTypeNewDescription.length > 40
+            || requestBody.adminPanel.photographyTypeNewDescription.length > 800
         ) throw new BadRequestException(`${ request.url } "ChangePhotographyTypeDescription - invalid request body data"`);
 
         this.adminPanelService.changePhotographyTypeDescription(requestBody);

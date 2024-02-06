@@ -498,7 +498,7 @@ export class AdminPanelComponent implements OnInit {
                     return imagePhotographyTypeDescription.nativeElement.getAttribute('photography-type-name') === photographyTypeName;
                 }).nativeElement.value;
 
-                if ( photographyTypeNewDescription.length <= 40 ) {
+                if ( photographyTypeNewDescription.length <= 800 ) {
                     this.spinnerHidden = false;
                     
                     const headers: HttpHeaders = this.appService.createRequestHeaders();

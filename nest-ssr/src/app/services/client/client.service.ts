@@ -81,7 +81,7 @@ export class ClientService {
                     sign: { clientData }
                 }, { headers, withCredentials: true }).subscribe({
                     next: () => this.appService.reloadComponent(false, '/signIn'),
-                    error: () => this.appService.createErrorModal()
+                    error: () => this.appService.createErrorModal(this.appService.getTranslations('CLIENTPAGE.SIGNERRORTEXT'))
                 });
             } else this.http.put('/api/sign/in', { 
                 sign: { clientData }
@@ -91,7 +91,7 @@ export class ClientService {
 
                     this.appService.reloadComponent(false, '');
                 },
-                error: () => this.appService.createErrorModal()
+                error: () => this.appService.createErrorModal(this.appService.getTranslations('CLIENTPAGE.SIGNERRORTEXT'))
             });
         });
     }

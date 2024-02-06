@@ -7,6 +7,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { CarouselModule } from 'ngx-owl-carousel-o';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -50,7 +51,8 @@ import { environment } from '../environments/environment';
         AppRoutingModule,
         AdminPanelModule,
         ClientModule,
-        NgbModule
+        NgbModule,
+        CarouselModule
     ],
     providers: [
         provideClientHydration(),
