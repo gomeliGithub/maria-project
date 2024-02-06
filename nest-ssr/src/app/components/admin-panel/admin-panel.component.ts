@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostBinding, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostBinding, HostListener, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
@@ -50,6 +50,7 @@ import { IClientCompressedImage, IImagePhotographyType } from 'types/models';
 export class AdminPanelComponent implements OnInit {
     constructor (
         private readonly http: HttpClient,
+        private readonly changeDetectorRef: ChangeDetectorRef,
 
         private readonly appService: AppService,
         private readonly adminPanelService: AdminPanelService,
@@ -116,6 +117,8 @@ export class AdminPanelComponent implements OnInit {
     public imagePhotographyTypes: IImagePhotographyType[];
 
     public deleteImageIsCompleted: boolean = false;
+
+    public currentLoadedImageThumbnailOriginalName: string = null;
 
     public spinnerHidden: boolean = true;
 
@@ -270,8 +273,8 @@ export class AdminPanelComponent implements OnInit {
             target.classList.remove('pe-none');
 
             this.imageThumbnailUrl = null;
-
             this.imageThumbnailContainerIsVisible = false;
+            this.currentLoadedImageThumbnailOriginalName = null;
         } else if ( event.toState === true ) target.classList.remove('pe-none');
     }
 
@@ -476,6 +479,11 @@ export class AdminPanelComponent implements OnInit {
                         this.spinnerHidden = true;
     
                         this.adminPanelService.switchImageControlResponses(responseText, 'setPhotographyType');
+
+                        const editedPhotographyTypeIndex: number = this.imagePhotographyTypes.findIndex(photographyTypeData => photographyTypeData.name === imagePhotographyType);
+                        this.imagePhotographyTypes[editedPhotographyTypeIndex].compressedImageName = this.fullCompressedImagesList.find(imageData => imageData.originalName === originalImageName).name;
+
+                        this.changeDetectorRef.detectChanges();
                     },
                     error: () => {
                         this.spinnerHidden = true;
@@ -509,7 +517,12 @@ export class AdminPanelComponent implements OnInit {
                         next: () => {
                             this.spinnerHidden = true;
 
-                            this.appService.createSuccessModal()
+                            const editedPhotographyTypeIndex: number = this.imagePhotographyTypes.findIndex(photographyTypeData => photographyTypeData.name === photographyTypeName);
+                            this.imagePhotographyTypes[editedPhotographyTypeIndex].description = photographyTypeNewDescription;
+
+                            this.changeDetectorRef.detectChanges();
+
+                            this.appService.createSuccessModal();
                         },
                         error: () => {
                             this.spinnerHidden = true;

@@ -237,6 +237,7 @@ and (-webkit-device-pixel-ratio: 2) {
 textarea {
     resize: none;
     height: 150px !important;
+    min-width: 120px !important;
 }
 
 input.ng-touched.ng-invalid {

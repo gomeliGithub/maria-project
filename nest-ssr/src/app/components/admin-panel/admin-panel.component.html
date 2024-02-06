@@ -151,28 +151,6 @@
             </tr>
         </tbody>
     </table>
-    <div class="col-8 col-sm-8 col-md-8 col-lg-6 col-xl-6 col-xxl-5 position-absolute z-1 d-flex flex-column"
-        [ngClass]="{ 'invisible' : !imageThumbnailContainerIsVisible }"
-        [@image-thumbnail-container-animation]="imageThumbnailContainerAnimationState"
-        (@image-thumbnail-container-animation.start)="imageThumbnailContainerAnimationStart($event)"
-        (@image-thumbnail-container-animation.done)="imageThumbnailContainerAnimationDone($event)"
-    >
-        <div class="d-flex flex-row align-items-center text-bg-secondary text-center rounded-top">
-            <div class="flex-grow-1">
-                <span class="fs-6 fw-semibold">{{ 'ADMINPANEL.IMAGETHUMBNAILCONTAINERCAPTION' | translate }}</span>
-            </div>
-            <button type="button" class="btn float-end text-white" (click)="switchImageThumbnailContainerVisible()"
-                [ngStyle]="{
-                    'transform': 'scale(1.5)'
-                }"
-            >
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
-        <div class="">
-            <img [src]="imageThumbnailUrl" class="img-fluid img-thumbnail" alt="">
-        </div>
-    </div>
     <div *ngIf="additionalImagesIsExists" class="w-100 text-center">
         <button class="btn btn-outline-info w-50 my-3 shadow" type="button" (click)="getFullCompressedImagesData()" #additionalImagesButton>
             {{ 'ADMINPANEL.ADDITIONALCOMPRESSEDIMAGESBUTTONTEXT' | translate }}
@@ -183,6 +161,29 @@
             <span class="fw-bold">{{ 'ADMINPANEL.NOIMAGESMESSAGE' | translate }}</span>
         </div>
     </ng-template>
+</div>
+<div class="col-8 col-sm-8 col-md-8 col-lg-6 col-xl-6 col-xxl-5 position-fixed z-3 d-flex flex-column"
+    [ngClass]="{ 'invisible' : !imageThumbnailContainerIsVisible }"
+    [@image-thumbnail-container-animation]="imageThumbnailContainerAnimationState"
+    (@image-thumbnail-container-animation.start)="imageThumbnailContainerAnimationStart($event)"
+    (@image-thumbnail-container-animation.done)="imageThumbnailContainerAnimationDone($event)"
+>
+    <div class="d-flex flex-row align-items-center text-bg-secondary text-center rounded-top">
+        <div class="flex-grow-1">
+            <span class="fst-italic float-start ms-2">{{ currentLoadedImageThumbnailOriginalName }}</span>
+            <span class="me-5 fw-semibold">{{ 'ADMINPANEL.IMAGETHUMBNAILCONTAINERCAPTION' | translate }}</span>
+        </div>
+        <button type="button" class="btn float-end text-white" (click)="switchImageThumbnailContainerVisible()"
+            [ngStyle]="{
+                'transform': 'scale(1.5)'
+            }"
+        >
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+    <div class="">
+        <img [src]="imageThumbnailUrl" class="img-fluid img-thumbnail" alt="">
+    </div>
 </div>
 <div class="d-flex flex-row align-self-center w-50" id="changeImageDataContainer" [ngClass]="{ 'visually-hidden': changeImageDataFormHidden }" #changeImageDataContainer>
     <form [formGroup]="changeImageDataForm" class="w-100" novalidate (submit)="changeImageData()">
@@ -328,11 +329,11 @@
         </table>
     </div>
 </div>
-<div class="d-flex align-items-center position-absolute top-50 start-50 translate-middle z-2" [ngClass]="{ 'visually-hidden': spinnerHidden }">
+<div class="d-flex align-items-center position-fixed top-50 start-50 translate-middle z-2" [ngClass]="{ 'visually-hidden': spinnerHidden }">
     <strong class="text-info fs-4" role="status">{{ 'SPINNERTITLES.PROCESSING' | translate }}</strong>
     <div class="spinner-border text-info ms-auto" aria-hidden="true"></div>
 </div>
-<div class="text-bg-secondary position-absolute top-50 start-50 translate-middle z-2 p-3 rounded w-75"
+<div class="text-bg-secondary position-fixed top-50 start-50 translate-middle z-2 p-3 rounded w-75"
     [ngClass]="{ 'visually-hidden': !progressBarVisible }"
 >
     <span class="fw-semibold">{{ 'PROGRESSBAR.TITLE' | translate }}</span>

@@ -54,6 +54,7 @@ export class AdminPanelService {
         if ( originalImageName ) {
             const headers: HttpHeaders = this.appService.createRequestHeaders();
 
+            componentThis.currentLoadedImageThumbnailOriginalName = originalImageName;
             componentThis.spinnerHidden = false;
 
             return this.http.get('/api/admin-panel/getImageThumbnail', { 

@@ -232,7 +232,7 @@ export class ImagePhotographyType extends Model {
 
     @AllowNull(true)
     @Column({ 
-        type: DataType.STRING
+        type: DataType.STRING(1000)
     })
     description: string;
 

@@ -249,7 +249,8 @@ export class AdminPanelService {
             find: {
                 includeFields: [ 
                     'originalName', 
-                    'originalSize', 
+                    'originalSize',
+                    'name',
                     'photographyType', 
                     'viewSizeType', 
                     'description', 
