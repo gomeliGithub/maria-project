@@ -212,25 +212,25 @@ and (-webkit-device-pixel-ratio: 2) {
 
 @media screen and (min-width: 576px) {
     .imagesCarousel .carousel-item img {
-        max-height: 390px;
+        max-height: 490px;
     }
 }
 
 @media screen and (min-width: 735px) {
     .imagesCarousel .carousel-item img {
-        max-height: 620px;
+        max-height: 640px;
     }
 }
 
 @media screen and (min-width: 960px) {
     .imagesCarousel .carousel-item img {
-        max-height: 710px;
+        max-height: 930px;
     }
 }
 
 @media screen and (min-width: 1400px) {
     .imagesCarousel .carousel-item img {
-        max-height: 950px;
+        max-height: 1160px;
     }
 }
 
