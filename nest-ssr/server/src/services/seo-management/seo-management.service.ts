@@ -1,23 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 
+import { Stats } from 'fs';
 import fsPromises from 'fs/promises';
 import path from 'path';
-
-import { AppService } from '../../app.service';
 
 import { IComponentInfo } from 'types/global';
 
 @Injectable()
 export class SeoManagementService {
-    constructor (
-        private readonly appService: AppService
-    ) { }
+    constructor () { }
 
     public routes = [
         { url: '/home', componentFileName: 'home.component.html' },
         { url: '/', componentFileName: 'home.component.html' },
-        { url: '/gallery', componentFileName: 'gallery.component.html'},
         { url: '/gallery/individual', componentFileName: 'gallery.component.html'},
         { url: '/gallery/children', componentFileName: 'gallery.component.html'},
         { url: '/gallery/wedding', componentFileName: 'gallery.component.html'},
@@ -27,18 +23,20 @@ export class SeoManagementService {
         { url: '/adminPanel/ordersControl', componentFileName: 'admin-panel-orders-control.component.html'},
         { url: '/adminPanel/discountsControl', componentFileName: 'admin-panel-discounts-control.component.html' },
         { url: '/signUp', componentFileName: 'client.component.html'},
-        { url: '/signIn', componentFileName: 'client.component.html'}
+        { url: '/signIn', componentFileName: 'client.component.html'},
+        { url: '/sign/un', componentFileName: 'client.component.html'},
+        { url: '/sign/in', componentFileName: 'client.component.html'}
     ]
 
     private async getComponentsInfo (startPath: string, components: IComponentInfo[]): Promise<IComponentInfo[]> {
         const fileNames: string[] = await fsPromises.readdir(startPath);
 
-        for (const fileName of fileNames.filter(fileName => fileName !== 'node_modules' && !fileName.startsWith('.'))) {
-            const fileFullPath = path.resolve(startPath, fileName);
-            const fileStat = await fsPromises.stat(fileFullPath);
+        for ( const fileName of fileNames.filter(fileName => fileName !== 'node_modules' && !fileName.startsWith('.')) ) {
+            const fileFullPath: string = path.resolve(startPath, fileName);
+            const fileStat: Stats = await fsPromises.stat(fileFullPath);
 
             if ( fileStat.isDirectory() ) {
-                const subFolderPath = fileFullPath;
+                const subFolderPath: string = fileFullPath;
 
                 await this.getComponentsInfo(subFolderPath, components);
             } else if ( fileName.endsWith('component.html') ) {
@@ -56,9 +54,7 @@ export class SeoManagementService {
     public async createSitemap (): Promise<void> {
         const componentsInfo: IComponentInfo[] = await this.getComponentsInfo(path.join(process.cwd(), 'src'), [] as IComponentInfo[]);
 
-const sitemap=`
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-${
+const sitemap=`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${
     componentsInfo.map(componentsInfo => `
     <url>
         <loc>${ process.env.SERVER_DOMAIN }${ componentsInfo.url }</loc>
@@ -67,8 +63,7 @@ ${
         <lastmod>${ componentsInfo.changeTime.toISOString() }</lastmod>
     </url>    
 `).join("")
-}
-</urlset>
+}</urlset>
     `;
 
         await fsPromises.writeFile(path.resolve(path.join(process.cwd(), 'dist/nest-ssr/browser'), 'sitemap.xml'), sitemap);

@@ -7,5 +7,7 @@ export const environment = {
         { code: 'ru', title: 'Русский' }, 
         { code: 'en', title: 'English'}
     ] as IClientLocale[],
-    defaultLocale: 'ru'
+    defaultLocale: 'ru',
+    photographyTypes: [ 'individual', 'children', 'wedding', 'family' ],
+    signOps: [ 'up', 'in' ]
 };

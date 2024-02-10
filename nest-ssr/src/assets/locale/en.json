@@ -12,7 +12,7 @@
 		},
 		"SIGNUP": "Sign up",
 		"SIGNIN": "Sign in",
-		"NOTFOUND": "Not Found"
+		"NOTFOUND": "Resource is not found"
 	},
 	"SCROLLSNAPITEMSTEXT": {
 		"DISCOUNTS": "Discounts",
@@ -61,8 +61,8 @@
 		"SIGNERRORTEXT": "Wrong login or password"
 	},
 	"NOTFOUNDPAGE": {
-		"MAINTEXT": "The page you’re looking for doesn’t exist.",
-		"SECONDARYTEXT": "Page not found.",
+		"MAINTEXT": "The resource you are trying to open does not exist.",
+		"SECONDARYTEXT": "The requested resource is not found.",
 		"GOHOMETEXT": "Go Home"
 	},
     "CLIENTMENU": {

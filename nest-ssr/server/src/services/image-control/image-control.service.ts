@@ -9,15 +9,13 @@ import path from 'path';
 import sharp from 'sharp';
 import { fileTypeFromFile } from 'file-type';
 
-import { CommonModule } from '../../modules/common.module';
-
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 
-import { Admin, ClientCompressedImage, ImagePhotographyType } from '../../models/client.model';
+import { ClientCompressedImage, ImagePhotographyType } from '../../models/client.model';
 
 import { ICompressImageData, IRequest } from 'types/global';
-import { ICreateImageDirsOptions, IСompressedImageGetOptions } from 'types/options';
+import { ICreateImageDirsOptions, ICompressedImageGetOptions } from 'types/options';
 import { IClientCompressedImage } from 'types/models';
 
 @Injectable()
@@ -33,40 +31,23 @@ export class ImageControlService {
 
     public staticCompressedImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
 
-    public async get (options: {
-        clientInstance?: Admin,
-        find?: {
-            imageTitles?: string[],
-            includeFields?: string[],
-            rawResult: false
-        },
-        imagesLimit?: number,
-        imagesExistsCount?: number
-    }): Promise<ClientCompressedImage[]>
-    public async get (options: {
-        clientInstance?: Admin,
-        find?: {
-            imageTitles?: string[],
-            includeFields?: string[],
-            rawResult: true 
-        },
-        imagesLimit?: number,
-        imagesExistsCount?: number
-    }): Promise<IClientCompressedImage[]>
-    public async get (options: IСompressedImageGetOptions): Promise<ClientCompressedImage[] | IClientCompressedImage[]>
-    public async get (options: IСompressedImageGetOptions): Promise<ClientCompressedImage[] | IClientCompressedImage[]> {
+    public async get (options: ICompressedImageGetOptions, rawResult: false): Promise<ClientCompressedImage[]>
+    public async get (options: ICompressedImageGetOptions, rawResult: true): Promise<IClientCompressedImage[]>
+    public async get (options: ICompressedImageGetOptions, rawResult?: boolean): Promise<ClientCompressedImage[] | IClientCompressedImage[]>
+    public async get (options: ICompressedImageGetOptions, rawResult = true): Promise<ClientCompressedImage[] | IClientCompressedImage[]> {
         const findOptions: AssociationGetOptions = {
             where: [],
             order: [ [ 'uploadDate', 'DESC' ] ],
             limit: options.imagesLimit,
             offset: options.imagesExistsCount,
-            raw: true
+            raw: rawResult
         }
 
-        if ( options && options.find && options.find.imageTitles ) findOptions.where = { name: options.find.imageTitles };
-        if ( options && options.find && options.find.includeFields ) findOptions.attributes = options.find.includeFields;
-        if ( options && options.find && options.find.imageViewSize ) findOptions.where['viewSizeType'] = options.find.imageViewSize;
-        if ( options && options.find && options.find.hasOwnProperty('rawResult') ) findOptions.raw = options.find.rawResult;
+        if ( options && options.find ) {
+            if ( options.find.imageTitles ) findOptions.where = { name: options.find.imageTitles };
+            if ( options.find.includeFields ) findOptions.attributes = options.find.includeFields;
+            if ( options.find.imageViewSize ) findOptions.where['viewSizeType'] = options.find.imageViewSize;
+        }
 
         let compressedImages: ClientCompressedImage[] = null;
 
@@ -77,20 +58,11 @@ export class ImageControlService {
     }
 
     public async compressImage (request: IRequest, compressImageData: ICompressImageData, options?: sharp.SharpOptions): Promise<boolean> {
-        const supportedImageTypes: string[] = [ 'jpg', 'png', 'webp', 'avif', 'gif', 'svg', 'tiff' ];
-
         const { ext } = await fileTypeFromFile(compressImageData.inputImagePath);
 
-        if ( !supportedImageTypes.includes(ext) ) return false;
+        if ( !this.appService.supportedImageFileTypes.map(imageFileType => imageFileType.replace('image/', '')).includes(ext) ) return false;
 
-        if ( !options ) options = null; /*{
-            create: {
-                width: 300,
-                height: 300,
-                channels: 4,
-                background: { r: 255, g: 0, b: 0, alpha: 0.5 }
-            }
-        }*/
+        if ( !options ) options = {};
 
         const inputImageDirPath: string = path.dirname(compressImageData.inputImagePath);
         const inputImageName: string = path.basename(compressImageData.inputImagePath);
@@ -100,12 +72,12 @@ export class ImageControlService {
 
         const outputTempFilePath: string = this.getTempFileName(outputImagePath);
 
-        let newCompressedImage: ClientCompressedImage = null;
+        let newCompressedImageInstance: ClientCompressedImage = null;
 
         try {
             const { width, height } = await sharp(compressImageData.inputImagePath).metadata();
 
-            const semiTransparentRedBuffer: Buffer = await sharp(compressImageData.inputImagePath).jpeg({
+            const semiTransparentRedBuffer: Buffer = await sharp(compressImageData.inputImagePath, options).jpeg({
                 quality: 50,
                 progressive: true
             }).resize(Math.round(width / 2), Math.round(height / 2)).toBuffer();
@@ -113,7 +85,7 @@ export class ImageControlService {
             await fsPromises.writeFile(outputTempFilePath, semiTransparentRedBuffer);
             await fsPromises.rename(outputTempFilePath, outputImagePath);
 
-            newCompressedImage = await this.compressedImageModel.create({
+            newCompressedImageInstance = await this.compressedImageModel.create({
                 name: outputImageName,
                 dirPath: compressImageData.outputDirPath,
                 originalName: inputImageName,
@@ -124,11 +96,11 @@ export class ImageControlService {
                 description: compressImageData.imageAdditionalData.description,
             });
 
-            await request.activeClientInstance.$add('compressedImages', newCompressedImage);
+            await request.activeClientInstance.$add('compressedImages', newCompressedImageInstance);
 
             return true;
         } catch {
-            const accessResults = await Promise.allSettled([
+            const accessResults: [ PromiseSettledResult<void>, PromiseSettledResult<void> ] = await Promise.allSettled([
                 fsPromises.access(compressImageData.inputImagePath, fsPromises.constants.F_OK),
                 fsPromises.access(outputImagePath, fsPromises.constants.F_OK),
             ]);
@@ -143,9 +115,9 @@ export class ImageControlService {
 
                 await fsPromises.unlink(imagePath);
 
-                if ( newCompressedImage ) {
-                    await request.activeClientInstance.$remove('compressedImages', newCompressedImage);
-                    await newCompressedImage.destroy();
+                if ( newCompressedImageInstance ) {
+                    await request.activeClientInstance.$remove('compressedImages', newCompressedImageInstance);
+                    await newCompressedImageInstance.destroy();
                 }
             }
 
@@ -161,19 +133,19 @@ export class ImageControlService {
 
     public async createImageDirs (options?: ICreateImageDirsOptions): Promise<void> {
         if ( options ) {
-            if ( !(await this.checkFileExists(options.originalImages.dirPath)) ) await fsPromises.mkdir(options.originalImages.dirPath);
-            if ( !(await this.checkFileExists(options.originalImages.clientDirPath)) ) await fsPromises.mkdir(options.originalImages.clientDirPath);
-            if ( !(await this.checkFileExists(options.compressedImages.dirPath)) ) await fsPromises.mkdir(options.compressedImages.dirPath);
-            if ( !(await this.checkFileExists(options.compressedImages.clientDirPath)) ) await fsPromises.mkdir(options.compressedImages.clientDirPath);
+            if ( !( await this.checkFileExists(options.originalImages.dirPath) ) ) await fsPromises.mkdir(options.originalImages.dirPath);
+            if ( !( await this.checkFileExists(options.originalImages.clientDirPath) ) ) await fsPromises.mkdir(options.originalImages.clientDirPath);
+            if ( !( await this.checkFileExists(options.compressedImages.dirPath) ) ) await fsPromises.mkdir(options.compressedImages.dirPath);
+            if ( !( await this.checkFileExists(options.compressedImages.clientDirPath) ) ) await fsPromises.mkdir(options.compressedImages.clientDirPath);
         }
 
         const staticFilesImagesFullDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_full');
         const staticFilesGalleryImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail', 'gallery');
         const staticFilesHomeImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail', 'home', 'imagePhotographyTypes');
 
-        if ( !(await this.checkFileExists(staticFilesImagesFullDirPath)) ) await fsPromises.mkdir(staticFilesImagesFullDirPath);
-        if ( !(await this.checkFileExists(staticFilesGalleryImagesDirPath)) ) await fsPromises.mkdir(staticFilesGalleryImagesDirPath, { recursive: true });
-        if ( !(await this.checkFileExists(staticFilesHomeImagesDirPath)) ) await fsPromises.mkdir(staticFilesHomeImagesDirPath, { recursive: true });
+        if ( !( await this.checkFileExists(staticFilesImagesFullDirPath) ) ) await fsPromises.mkdir(staticFilesImagesFullDirPath);
+        if ( !( await this.checkFileExists(staticFilesGalleryImagesDirPath) ) ) await fsPromises.mkdir(staticFilesGalleryImagesDirPath, { recursive: true });
+        if ( !( await this.checkFileExists(staticFilesHomeImagesDirPath) ) ) await fsPromises.mkdir(staticFilesHomeImagesDirPath, { recursive: true });
 
         for ( const photographyType of this.appService.imagePhotographyTypes ) {
             const photographyTypeDirDirPath: string = path.join(staticFilesGalleryImagesDirPath, photographyType);
@@ -193,9 +165,7 @@ export class ImageControlService {
         }
     }
 
-    public async deleteImage (request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
-
+    public async deleteImage (commonServiceRef: CommonService, request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
         const compressedImageInstance: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(imagePath) } });
 
         try {

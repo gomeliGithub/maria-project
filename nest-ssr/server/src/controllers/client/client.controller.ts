@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, Res, StreamableFile } from '@nestjs/common';
 
-import { createReadStream } from 'fs';
+import { ReadStream, createReadStream } from 'fs';
 import { Response } from 'express';
 
 import { CommonModule } from '../../modules/common.module';
@@ -58,14 +58,14 @@ export class ClientController {
 
         const downloadingOriginalImageData: IDownloadingOriginalImageData = await this.clientService.downloadOriginalImage(request, { compressedImageName });
 
-        const image = createReadStream(downloadingOriginalImageData.path);
+        const imageReadStream: ReadStream = createReadStream(downloadingOriginalImageData.path);
 
         response.set({
             'Content-Type': `image/${ downloadingOriginalImageData.extension === 'jpg' ? 'jpeg' : downloadingOriginalImageData.extension }`,
             'Content-Disposition': `attachment; filename=${ encodeURIComponent(downloadingOriginalImageData.name) }`,
         });
 
-        return new StreamableFile(image);
+        return new StreamableFile(imageReadStream);
     }
 
     @Get('/getImagePhotographyTypesData/:targetPage')

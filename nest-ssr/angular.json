@@ -37,7 +37,8 @@
                             "node_modules/hammerjs/hammer.min.js"
                         ],
                         "allowedCommonJsDependencies": [
-                            "bcryptjs"
+                            "bcryptjs",
+                            "@nestjs/ng-universal/dist/tokens"
                         ]
                     },
                     "configurations": {

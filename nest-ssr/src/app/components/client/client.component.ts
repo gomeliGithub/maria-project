@@ -5,6 +5,8 @@ import { FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms'
 import { AppService } from '../../app.service';
 import { ClientService } from '../../services/client/client.service';
 
+import { environment } from '../../../environments/environment';
+
 @Component({
     selector: 'app-client',
     templateUrl: './client.component.html',
@@ -17,10 +19,12 @@ export class ClientComponent implements OnInit {
         private readonly appService: AppService,
         private readonly clientService: ClientService
     ) {
+        this.signOp = this.activateRoute.snapshot.paramMap.get('op') as 'up' | 'in';
+
+        if ( !environment.signOps.includes(this.signOp) ) this.router.navigate(['**'], { skipLocationChange: true });
+        
         const clientLoginValidators: ValidatorFn[] = [ Validators.minLength(4), Validators.maxLength(15), Validators.pattern(/^[a-zA-Z](.[a-zA-Z0-9_-]*)$/) ];
         const clientPasswordValidators: ValidatorFn[] = [ Validators.minLength(5), Validators.maxLength(20) ];
-
-        this.signOp = this.activateRoute.snapshot.paramMap.get('op') as 'up' | 'in';
         
         const formControls = {
             'clientLogin': new FormControl("", this.signOp === 'up' ? [ Validators.required ].concat(clientLoginValidators) : Validators.required),
@@ -53,7 +57,7 @@ export class ClientComponent implements OnInit {
             if ( !( evt instanceof NavigationEnd ) ) return;
             else this.url = evt.url;
             
-            if ( this.url === '/signUp' || this.url === '/signIn') window.location.reload();
+            if ( this.url === '/signUp' || this.url === '/signIn') this.appService.reloadComponent(true);
         });
         
         if ( this.appService.checkIsPlatformBrowser() ) {

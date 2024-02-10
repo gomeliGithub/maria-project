@@ -108,6 +108,8 @@ export class AdminPanelComponent implements OnInit {
     public changeImageDataFormHidden: boolean = true;
     public changingOriginalImageName: string;
 
+    public requiredImageFileTypes: string[] = [ 'image/jpg', 'image/jpeg', 'image/png' ];
+
     private _imageFile: File;
 
     public fullCompressedImagesList: IClientCompressedImage[];
@@ -174,7 +176,9 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public imageValidator (): { [ s: string ]: boolean } | null {
-        if ( this && this._imageFile && (this._imageFile.size > 104857600 || this._imageFile.name.length < 4) ) {
+        if ( this && ( ( this._imageFile && ( this._imageFile.size > 104857600 || this._imageFile.name.length < 4 ) ) 
+            || !this.requiredImageFileTypes.includes(this._imageFile.type) )
+        ) {
             this._imageFile = null;
 
             return { 'image' : true };
@@ -231,7 +235,7 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public loadAndShowImageThumbnail (event: MouseEvent): void {
-        const imageButton: HTMLButtonElement = !(event.target instanceof HTMLButtonElement) ? (event.target as HTMLButtonElement).parentElement as HTMLButtonElement : event.target as HTMLButtonElement;
+        const imageButton: HTMLButtonElement = !( event.target instanceof HTMLButtonElement ) ? ( event.target as HTMLButtonElement ).parentElement as HTMLButtonElement : event.target as HTMLButtonElement;
 
         if ( imageButton ) {
             this.adminPanelService.loadAndShowImageThumbnail(this, imageButton).subscribe({

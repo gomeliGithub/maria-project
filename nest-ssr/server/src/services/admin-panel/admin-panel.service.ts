@@ -44,9 +44,9 @@ export class AdminPanelService {
     public async checkAccess (request: IRequest, __secure_fgp: string): Promise<boolean> {
         if ( !__secure_fgp || __secure_fgp === '' ) return false;
 
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const validateClientAuthResult: boolean = await commonServiceRef.validateClient(request, [ 'admin' ], false);
+        const validateClientAuthResult: boolean = await commonServiceRef.validateClient(request, [ 'admin' ], false, commonServiceRef);
 
         return validateClientAuthResult;
     }
@@ -66,7 +66,7 @@ export class AdminPanelService {
     }
 
     public async uploadImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const activeClientLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
 
@@ -77,6 +77,8 @@ export class AdminPanelService {
         } catch {
             throw new BadRequestException(`${ request.url } "UploadImage - not valid imageMeta, login --- ${ activeClientLogin }"`);
         }
+
+        if ( !this.appService.supportedImageFileTypes.includes(imageMeta.type) ) throw new BadRequestException(`${ request.url } "UploadImage - not supported image file type, login --- ${ activeClientLogin }"`);
 
         const imageAdditionalData: IImageAdditionalData = {
             photographyType: requestBody.client.imagePhotographyType,
@@ -99,30 +101,26 @@ export class AdminPanelService {
 
         const webSocketClientId: number = requestBody.client._id;
 
-        const activeUploadClientisExists: boolean = commonServiceRef.webSocketClients.some(client => client._id === webSocketClientId);
+        const activeUploadClientIsExists: boolean = commonServiceRef.webSocketClients.some(client => client._id === webSocketClientId);
     
         let activeUploadsClientNumber: number = 0;
     
         commonServiceRef.webSocketClients.forEach(client => client.activeWriteStream ? activeUploadsClientNumber += 1 : null);
     
-        if ( activeUploadClientisExists ) {
+        if ( activeUploadClientIsExists ) {
             throw new BadRequestException(`${ request.url } "UploadImage - webSocketClient with the same id is exists, login --- ${ activeClientLogin }"`);
         }
     
         if ( activeUploadsClientNumber > 3 ) return 'PENDING';
 
-        const compressedImagesRaw: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({ clientInstance: request.activeClientInstance as Admin, find: { rawResult: true } });
-        const compressedImageRaw: IClientCompressedImage = compressedImagesRaw.length !== 0 ? compressedImagesRaw.find(image => image.originalName === path.basename(newOriginalImagePath)) : null;
+        const compressedImagesRawData: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({ clientInstance: request.activeClientInstance as Admin }, true);
+        const compressedImageRawData: IClientCompressedImage = compressedImagesRawData.length !== 0 ? compressedImagesRawData.find(image => image.originalName === path.basename(newOriginalImagePath)) : null;
 
-        if ( compressedImageRaw ) return 'FILEEXISTS';
+        if ( compressedImageRawData ) return 'FILEEXISTS';
+
+        if ( await commonServiceRef.checkFileExists(newOriginalImagePath) ) return 'FILEEXISTS';
     
-        try {
-            await fsPromises.access(newOriginalImagePath, fsPromises.constants.F_OK);
-    
-            return 'FILEEXISTS';
-        } catch { }
-    
-        const uploadedFilesCount: number = (await fsPromises.readdir(originalImagesDirClientPath)).length;
+        const uploadedFilesCount: number = ( await fsPromises.readdir(originalImagesDirClientPath) ).length;
 
         const TWENTY_MEGABYTES: number = 20000000;
     
@@ -133,7 +131,7 @@ export class AdminPanelService {
         const currentChunkNumber: number = 0;
         const uploadedSize: number = 0;
     
-        const writeStream = fs.createWriteStream(newOriginalImagePath);
+        const writeStream: fs.WriteStream = fs.createWriteStream(newOriginalImagePath);
 
         const uploadImageTimeout = setTimeout(async () => {
             const currentUploadImageStats: fs.Stats = await fsPromises.stat(newOriginalImagePath);
@@ -151,34 +149,34 @@ export class AdminPanelService {
         }, 2000);
     
         writeStream.on('error', async () => {
-            const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+            const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
 
             this._throwWebSocketError(commonServiceRef, newOriginalImagePath, webSocketClientId, imageMeta);
         });
     
         writeStream.on('finish', async () => {
-            const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+            const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
 
-            const currentClient: IWebSocketClient = commonServiceRef.webSocketClients.find(client => client._id === webSocketClientId);
+            const currentWebSockeClient: IWebSocketClient = commonServiceRef.webSocketClients.find(client => client._id === webSocketClientId);
     
             const successMessage: IWSMessage = this.createMessage('uploadImage', 'FINISH', { 
-                uploadedSize: currentClient.uploadedSize, 
+                uploadedSize: currentWebSockeClient.uploadedSize, 
                 imageMetaSize: imageMeta.size 
             });
     
             await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.WEBSOCKETSERVER_PORT }] 
-                WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentClient.login }. All chunks writed, overall size --> ${ currentClient.uploadedSize }. Image ${ imageMeta.name } uploaded`, 
+                WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentWebSockeClient.login }. All chunks writed, overall size --> ${ currentWebSockeClient.uploadedSize }. Image ${ imageMeta.name } uploaded`, 
                 false, 'webSocket'
             );
 
-            const compressResult: boolean = await commonServiceRef.compressImage(request, {
+            const compressImageResult: boolean = await commonServiceRef.compressImage(request, {
                 inputImagePath: newOriginalImagePath, 
                 outputDirPath: compressedImagesDirClientPath, 
                 originalImageSize: imageMeta.size, 
                 imageAdditionalData: imageAdditionalData
             });
 
-            if ( !compressResult ) {
+            if ( !compressImageResult ) {
                 const errorMessage: IWSMessage = this.createMessage('uploadImage', 'ERROR');
 
                 await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.WEBSOCKETSERVER_PORT }] 
@@ -186,11 +184,11 @@ export class AdminPanelService {
                     true, 'webSocket'
                 );
 
-                currentClient.connection.send(JSON.stringify(errorMessage));
-            } else currentClient.connection.send(JSON.stringify(successMessage));
+                currentWebSockeClient.connection.send(JSON.stringify(errorMessage));
+            } else currentWebSockeClient.connection.send(JSON.stringify(successMessage));
 
-            currentClient.connection.terminate();
-            currentClient.connection = null;
+            currentWebSockeClient.connection.terminate();
+            currentWebSockeClient.connection = null;
     
             commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter((client => client.connection));
         });
@@ -239,7 +237,7 @@ export class AdminPanelService {
     }
 
     public async getFullCompressedImagesList (request: IRequest, imagesLimit?: number, imagesExistsCount?: number): Promise<IFullCompressedImageData> {
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
 
         if ( !imagesExistsCount ) imagesExistsCount = 0;
         if ( !imagesLimit ) imagesLimit = 5;
@@ -257,12 +255,11 @@ export class AdminPanelService {
                     'uploadDate', 
                     'displayedOnHomePage', 
                     'displayedOnGalleryPage' 
-                ],
-                rawResult: true
+                ]
             },
             imagesLimit,
             imagesExistsCount
-        });
+        }, true);
 
         const commonCompressedImagesCount: number = await this.compressedImageModel.count();
 
@@ -275,29 +272,13 @@ export class AdminPanelService {
         return imagesData;
     }
 
-    public async getClientOrders (options: {
-        getInfoData: string,
-        type?: string,
-        fromDate?: Date,
-        untilDate?: Date,
-        status?: string,
-        ordersLimit?: number,
-        existsCount?: number
-    }): Promise<IClientOrdersInfoData>
-    public async getClientOrders (options: {
-        getInfoData?: string,
-        memberLogin: string,
-        type?: string,
-        fromDate?: Date,
-        untilDate?: Date,
-        status?: string,
-        ordersLimit?: number,
-        existsCount?: number
-    }): Promise<IClientOrdersData>
-    public async getClientOrders (options: IGetClientOrdersOptions): Promise<IClientOrdersInfoData | IClientOrdersData> {
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+    public async getClientOrders (options: IGetClientOrdersOptions, getInfoData: true): Promise<IClientOrdersInfoData>
+    public async getClientOrders (options: IGetClientOrdersOptions, getInfoData: false): Promise<IClientOrdersData>
+    public async getClientOrders (options: IGetClientOrdersOptions, getInfoData: boolean): Promise<IClientOrdersInfoData | IClientOrdersData>
+    public async getClientOrders (options: IGetClientOrdersOptions, getInfoData: boolean): Promise<IClientOrdersInfoData | IClientOrdersData> {
+        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const client: Member = await commonServiceRef.getClients(options.memberLogin, { rawResult: false }) as Member;
+        const clientInstance: Member = await commonServiceRef.getClients(options.memberLogin, false) as Member;
 
         if ( !options.status ) options.status = 'new';
         if ( !options.fromDate ) options.fromDate = (Date.now() - ms('14d')) as unknown as Date;
@@ -323,13 +304,13 @@ export class AdminPanelService {
         let clientOrdersInfoData: IClientOrdersInfoData = null;
         let clientOrders: IClientOrdersData = null;
 
-        if ( !options.getInfoData || options.getInfoData === 'false' ) {
+        if ( !getInfoData ) {
             let orders: ClientOrder[] = null;
             let commonOrdersCount: number = null;
 
-            if ( client ) {
-                orders = await client.$get('clientOrders', ordersFindOptions);
-                commonOrdersCount = await client.$count('clientOrders', { where: { status: options.status } });
+            if ( clientInstance ) {
+                orders = await clientInstance.$get('clientOrders', ordersFindOptions);
+                commonOrdersCount = await clientInstance.$count('clientOrders', { where: { status: options.status } });
             } else {
                 ordersFindOptions.attributes = null;
                 ordersFindOptions.where['memberLoginId'] = { [Op.eq]: null }
@@ -348,7 +329,7 @@ export class AdminPanelService {
                 additionalOrdersExists: commonOrdersCount > options.existsCount + orders.length && commonOrdersCount > options.ordersLimit
             }
         } else {
-            const infoData: IClientOrdersInfoDataArr[] = await commonServiceRef.getClientOrdersInfo('all', {
+            const clientOrdersInfoDataArr: IClientOrdersInfoDataArr[] = await commonServiceRef.getClientOrdersInfo('all', {
                 status: options.status,
                 fromDate: options.fromDate,
                 untilDate: options.untilDate,
@@ -359,8 +340,8 @@ export class AdminPanelService {
             const commonClientsCount: number = await this.memberModel.count();
 
             clientOrdersInfoData = {
-                infoData: infoData,
-                additionalOrdersInfoDataExists: commonClientsCount > options.existsCount + infoData.length && commonClientsCount > options.ordersLimit 
+                infoData: clientOrdersInfoDataArr,
+                additionalOrdersInfoDataExists: commonClientsCount > options.existsCount + clientOrdersInfoDataArr.length && commonClientsCount > options.ordersLimit 
             }
         }
 
@@ -376,17 +357,17 @@ export class AdminPanelService {
 
         const dateNow: number = Date.now();
 
-        let discountsRaw: IDiscount[] = await this.discountModel.findAll(options);
+        let discountsRawData: IDiscount[] = await this.discountModel.findAll(options);
 
         if ( requiredFields ) {
-            discountsRaw = discountsRaw.filter(discountData => discountData.expirationFromDate.getTime() <= dateNow && discountData.expirationToDate.getTime() >= dateNow);
-            discountsRaw.forEach(discountData => {
+            discountsRawData = discountsRawData.filter(discountData => discountData.expirationFromDate.getTime() <= dateNow && discountData.expirationToDate.getTime() >= dateNow);
+            discountsRawData.forEach(discountData => {
                 delete discountData.expirationFromDate;
                 delete discountData.expirationToDate;
             });
         }
 
-        return discountsRaw;
+        return discountsRawData;
     }
 
     public async createDiscount (request: IRequest, requestBody: IRequestBody): Promise<string> {
@@ -441,16 +422,16 @@ export class AdminPanelService {
     }
 
     public async changeClientOrderStatus (request: IRequest, requestBody: IRequestBody): Promise<void> {
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const clientOrderInstance: ClientOrder = await this.clientOrderModel.findByPk(requestBody.adminPanel.clientOrderId);
 
         if ( !clientOrderInstance ) throw new BadRequestException(`${ request.url } "ChangeClientOrderStatus - client order instance does not exists"`);
 
-        const clientInstance: Member = await commonServiceRef.getClients(requestBody.adminPanel.clientLogin, { rawResult: false }) as Member;
+        const clientInstance: Member = await commonServiceRef.getClients(requestBody.adminPanel.clientLogin, false) as Member;
 
         if ( clientInstance ) {
-            if ( !(await clientInstance.$has('clientOrders', clientOrderInstance)) ) {
+            if ( !( await clientInstance.$has('clientOrders', clientOrderInstance) ) ) {
                 throw new BadRequestException(`${ request.url } "ChangeClientOrderStatus - client order instance of client '${ requestBody.adminPanel.clientLogin }' does not exists"`);
             }
         }
@@ -459,7 +440,7 @@ export class AdminPanelService {
     }
 
     public async deleteImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
         
         const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
 
@@ -468,38 +449,37 @@ export class AdminPanelService {
 
         const compressedImages: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({
             clientInstance: request.activeClientInstance as Admin,
-            find: { includeFields: ['originalName'], rawResult: true }
-        }) as unknown as IClientCompressedImage[];
+            find: { includeFields: ['originalName'] }
+        }, true) as unknown as IClientCompressedImage[];
 
-        const compressedImageRaw: IClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
+        const compressedImageRawData: IClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
         const imageIsExists: boolean = await commonServiceRef.checkFileExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
 
-        if ( !compressedImageRaw || !imageIsExists ) {
-            throw new BadRequestException(`${ request.url } "DeleteImage - ${ !compressedImageRaw ? 'compressed image does not exists' : 'original image does not exists'}"`);
+        if ( !compressedImageRawData || !imageIsExists ) {
+            throw new BadRequestException(`${ request.url } "DeleteImage - ${ !compressedImageRawData ? 'compressed image does not exists' : 'original image does not exists'}"`);
         }
 
-        const deleteImageResult: boolean = await commonServiceRef.managePromisesCache('deleteImage', commonServiceRef.deleteImage(request, originalImagePath, activeAdminLogin));
+        const deleteImageResult: boolean = await commonServiceRef.managePromisesCache('deleteImage', commonServiceRef.deleteImage(commonServiceRef, request, originalImagePath, activeAdminLogin));
 
         if ( deleteImageResult ) return 'SUCCESS';
         else throw new InternalServerErrorException(`${ request.url } "DeleteImage - delete error"`);
     }
 
     public async changeImageDisplayTarget (request: IRequest, requestBody: IRequestBody): Promise<string> {
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
-        const originalImagePath: string = await this.validateImageControlRequests(request, requestBody, activeAdminLogin);
+        const { originalImagePath, activeAdminLogin } = await this._getOriginalImagePathWithActiveAdminLogin(commonServiceRef, request, requestBody);
 
-        const compressedImageRaw: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true }) as unknown as IClientCompressedImage;
+        const compressedImageRawData: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true }) as unknown as IClientCompressedImage;
 
         const displayTargetPage: 'home' | 'gallery' | 'original' = requestBody.adminPanel.displayTargetPage;
 
         if ( displayTargetPage === 'home' ) {
-            const homeImagesCount: number = (await fsPromises.readdir(path.join(this.staticCompressedImagesDirPath, 'home'))).length;
+            const homeImagesCount: number = ( await fsPromises.readdir(path.join(this.staticCompressedImagesDirPath, 'home')) ).length;
 
             if ( homeImagesCount >= 10 ) return 'MAXCOUNT';
         } else if ( displayTargetPage === 'gallery' ) {
-            const galleryImagesCount: number = (await fsPromises.readdir(path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageRaw.photographyType))).length;
+            const galleryImagesCount: number = ( await fsPromises.readdir(path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageRawData.photographyType)) ).length;
 
             if ( galleryImagesCount >= 15 ) return 'MAXCOUNT';
         }
@@ -509,21 +489,21 @@ export class AdminPanelService {
         if ( displayTargetPage === 'home') {
             updateValues.displayedOnHomePage = true;
 
-            if ( compressedImageRaw.displayedOnHomePage ) updateValues.displayedOnHomePage = false;
-            else if ( compressedImageRaw.displayedOnGalleryPage ) updateValues.displayedOnGalleryPage = false;
+            if ( compressedImageRawData.displayedOnHomePage ) updateValues.displayedOnHomePage = false;
+            else if ( compressedImageRawData.displayedOnGalleryPage ) updateValues.displayedOnGalleryPage = false;
         } else if ( displayTargetPage === 'gallery' ) {
             updateValues.displayedOnGalleryPage = true;
 
-            if ( compressedImageRaw.displayedOnGalleryPage ) updateValues.displayedOnGalleryPage = false;
-            else if ( compressedImageRaw.displayedOnHomePage ) updateValues.displayedOnHomePage = false;
+            if ( compressedImageRawData.displayedOnGalleryPage ) updateValues.displayedOnGalleryPage = false;
+            else if ( compressedImageRawData.displayedOnHomePage ) updateValues.displayedOnHomePage = false;
         } else if ( displayTargetPage === 'original' ) {
-            if ( compressedImageRaw.displayedOnHomePage ) updateValues.displayedOnHomePage = false;
-            else if ( compressedImageRaw.displayedOnGalleryPage ) updateValues.displayedOnGalleryPage = false;
+            if ( compressedImageRawData.displayedOnHomePage ) updateValues.displayedOnHomePage = false;
+            else if ( compressedImageRawData.displayedOnGalleryPage ) updateValues.displayedOnGalleryPage = false;
         }
 
-        const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImageRaw.name);
-        const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageRaw.photographyType, compressedImageRaw.name);
-        const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImageRaw.name);
+        const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImageRawData.name);
+        const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageRawData.photographyType, compressedImageRawData.name);
+        const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImageRawData.name);
 
         let newPath: string = '';
 
@@ -547,17 +527,15 @@ export class AdminPanelService {
         } else if ( displayTargetPage === 'original' ) newPath = compressedImageOriginalPath;
 
         await commonServiceRef.managePromisesCache('changeImageDisplayTargetRename', fsPromises.rename(oldPath, newPath));
-
         await clientCompressedImageInstance.update(updateValues);
 
         return 'SUCCESS';
     }
 
     public async changeImageData (request: IRequest, requestBody: IRequestBody): Promise<string> {
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
-        const originalImagePath: string = await this.validateImageControlRequests(request, requestBody, activeAdminLogin);
+        const { originalImagePath, activeAdminLogin } = await this._getOriginalImagePathWithActiveAdminLogin(commonServiceRef, request, requestBody);
 
         const originalImageName: string = requestBody.adminPanel.originalImageName;
 
@@ -567,11 +545,11 @@ export class AdminPanelService {
         if ( newImagePhotographyType ) {
             updateValues.photographyType = newImagePhotographyType;
 
-            const compressedImageRaw: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true }) as unknown as IClientCompressedImage;
+            const compressedImageRawData: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true }) as unknown as IClientCompressedImage;
 
-            const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImageRaw.name);
-            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageRaw.photographyType, compressedImageRaw.name);
-            const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImageRaw.name);
+            const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImageRawData.name);
+            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageRawData.photographyType, compressedImageRawData.name);
+            const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImageRawData.name);
 
             const currentPath: string = await this.getFulfilledAccessPath([
                 staticFilesHomeImagePath, 
@@ -580,7 +558,7 @@ export class AdminPanelService {
             ]);
 
             if ( currentPath !== staticFilesHomeImagePath && currentPath !== compressedImageOriginalPath ) {
-                const staticFilesGalleryImageNewPath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', newImagePhotographyType, compressedImageRaw.name);
+                const staticFilesGalleryImageNewPath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', newImagePhotographyType, compressedImageRawData.name);
 
                 await commonServiceRef.managePromisesCache('changeImageData', fsPromises.rename(staticFilesGalleryImagePath, staticFilesGalleryImageNewPath));
             }
@@ -595,25 +573,23 @@ export class AdminPanelService {
     }
 
     public async setPhotographyTypeImage (request: IRequest, requestBody: IRequestBody): Promise<string> {
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
-        const originalImagePath: string = await this.validateImageControlRequests(request, requestBody, activeAdminLogin);
+        const { originalImagePath, activeAdminLogin } = await this._getOriginalImagePathWithActiveAdminLogin(commonServiceRef, request, requestBody);
 
-        const compressedImageRaw: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true }) as unknown as IClientCompressedImage;
+        const compressedImageRawData: IClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(originalImagePath) }, raw: true }) as unknown as IClientCompressedImage;
 
-        if ( compressedImageRaw.viewSizeType !== 'horizontal' ) return 'WRONGVIEWSIZETYPE';
+        if ( compressedImageRawData.viewSizeType !== 'horizontal' ) return 'WRONGVIEWSIZETYPE';
 
         const imagePhotographyType: string = requestBody.adminPanel.imagePhotographyType;
 
-        const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImageRaw.name);
-        const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageRaw.photographyType, compressedImageRaw.name);
-        const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImageRaw.name);
+        const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImageRawData.name);
+        const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageRawData.photographyType, compressedImageRawData.name);
+        const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, activeAdminLogin, compressedImageRawData.name);
 
-        let currentPath: string = '';
-        const newPath: string = path.join(this.staticCompressedImagesDirPath, 'home', 'imagePhotographyTypes', compressedImageRaw.name);
+        const newPath: string = path.join(this.staticCompressedImagesDirPath, 'home', 'imagePhotographyTypes', compressedImageRawData.name);
 
-        currentPath = await this.getFulfilledAccessPath([
+        const currentPath = await this.getFulfilledAccessPath([
             compressedImageOriginalPath, 
             staticFilesHomeImagePath, 
             staticFilesGalleryImagePath
@@ -626,7 +602,7 @@ export class AdminPanelService {
         }
 
         await commonServiceRef.managePromisesCache('setPhotographyTypeImageCopy', fsPromises.copyFile(currentPath, newPath));
-        await this.imagePhotographyTypeModel.update({ compressedImageName: compressedImageRaw.name }, { where: { name: imagePhotographyType }});
+        await this.imagePhotographyTypeModel.update({ compressedImageName: compressedImageRawData.name }, { where: { name: imagePhotographyType }});
 
         return 'SUCCESS';
     }
@@ -639,34 +615,39 @@ export class AdminPanelService {
         await imagePhotographyTypeInstance.update({ description: photographyTypeNewDescription });
     }
 
-    public async validateImageControlRequests (request: IRequest, requestBody: IRequestBody, activeAdminLogin: string): Promise<string> {
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+    private async _getOriginalImagePathWithActiveAdminLogin (commonServiceRef: CommonService, request: IRequest, requestBody: IRequestBody): Promise<{ originalImagePath: string, activeAdminLogin: string }> {
+        const activeAdminLogin: string = await commonServiceRef.getActiveClient(request, { includeFields: 'login' });
+        const originalImagePath: string = await this._validateImageControlRequests(commonServiceRef, request, requestBody, activeAdminLogin);
 
+        return { originalImagePath, activeAdminLogin };
+    }
+
+    private async _validateImageControlRequests (commonServiceRef: CommonService, request: IRequest, requestBody: IRequestBody, activeAdminLogin: string): Promise<string> {
         const originalImageName: string = requestBody.adminPanel.originalImageName;
         const originalImagePath: string = path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName);
 
-        const compressedImages: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({
+        const compressedImagesRawData: IClientCompressedImage[] = await commonServiceRef.getCompressedImages({
             clientInstance: request.activeClientInstance as Admin,
             find: { includeFields: [ 'name', 'originalName', 'photographyType', 'displayedOnGalleryPage' ] }
-        }) as unknown as IClientCompressedImage[];
+        }) as IClientCompressedImage[];
 
-        const compressedImageRaw: IClientCompressedImage = compressedImages.find(compressedImage => compressedImage.originalName === originalImageName);
-        const imageExists: boolean = await commonServiceRef.checkFileExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
+        const compressedImageRawData: IClientCompressedImage = compressedImagesRawData.find(compressedImage => compressedImage.originalName === originalImageName);
+        const imageIsExists: boolean = await commonServiceRef.checkFileExists(path.join(this.appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
 
-        const compressedImageRawIsExists: boolean = !compressedImageRaw;
-        const originalImageRawIsExists: boolean = !imageExists;
+        const compressedImageRawIsExists: boolean = !compressedImageRawData;
+        const originalImageRawIsExists: boolean = !imageIsExists;
 
         if ( compressedImageRawIsExists || originalImageRawIsExists ) {
-            throw new BadRequestException(`${ request.url } "ValidateImageControlRequests - ${ !compressedImageRawIsExists ? 'compressed image does not exists' : 'original image does not exists'}"`);
+            throw new BadRequestException(`${ request.url } "ValidateImageControlRequests - ${ !compressedImageRawIsExists ? 'compressed image does not exists' : 'original image does not exists' }"`);
         }
 
-        if ( compressedImageRaw.displayedOnGalleryPage && (requestBody.adminPanel.displayTargetPage || requestBody.adminPanel.newImagePhotographyType) ) { 
+        if ( compressedImageRawData.displayedOnGalleryPage && ( requestBody.adminPanel.displayTargetPage || requestBody.adminPanel.newImagePhotographyType ) ) { 
             const galleryImagePaths: string[] = this.appService.imagePhotographyTypes.map(photographyType => {
-                return path.join(this.staticCompressedImagesDirPath, 'gallery', photographyType, compressedImageRaw.name);
+                return path.join(this.staticCompressedImagesDirPath, 'gallery', photographyType, compressedImageRawData.name);
             });
 
             const existingPath: string = await this.getFulfilledAccessPath(galleryImagePaths);
-            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageRaw.photographyType, compressedImageRaw.name);
+            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageRawData.photographyType, compressedImageRawData.name);
 
             if ( existingPath !== staticFilesGalleryImagePath ) throw new InternalServerErrorException(`${ request.url } "ValidateImageControlRequests - compressed image does not exists in directory"`);
         }
@@ -675,7 +656,7 @@ export class AdminPanelService {
     }
 
     public async getFulfilledAccessPath (paths: string[]): Promise<string> {
-        const accessResults = await Promise.allSettled(paths.map(path => fsPromises.access(path, fsPromises.constants.F_OK)));
+        const accessResults: PromiseSettledResult<void>[] = await Promise.allSettled(paths.map(path => fsPromises.access(path, fsPromises.constants.F_OK)));
 
         let fulfilledPath: string = null;
 

@@ -27,7 +27,9 @@
                 {{ 'CLIENTPAGE.PASSWORDINVALIDMESSAGE' | translate }}
             </div>
         </div>
-        <div class="form-check form-switch align-self-center text-center ms-2">
+        <div class="form-check form-switch align-self-center text-center ms-2"
+            [ngClass]="{ 'me-1': signOp === 'up' }"
+        >
             <input class="form-check-input" type="checkbox" role="switch" id="passwordVisibleSwitchCheck" (click)="passwordVisibleSwitch()">
             <label class="form-check-label" for="passwordVisibleSwitchCheck">
                 {{ ( 'CLIENTPAGE.' + ( !passwordIsVisible ? 'PASSWORDSHOWSWITCHTEXT' : 'PASSWORDHIDESWITCHTEXT' ) ) | translate }}

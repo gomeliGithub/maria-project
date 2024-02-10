@@ -171,7 +171,7 @@
     <div class="d-flex flex-row align-items-center text-bg-secondary text-center rounded-top">
         <div class="flex-grow-1">
             <span class="fst-italic float-start ms-2">{{ currentLoadedImageThumbnailOriginalName }}</span>
-            <span class="me-5 fw-semibold">{{ 'ADMINPANEL.IMAGETHUMBNAILCONTAINERCAPTION' | translate }}</span>
+            <span class="fw-semibold">{{ 'ADMINPANEL.IMAGETHUMBNAILCONTAINERCAPTION' | translate }}</span>
         </div>
         <button type="button" class="btn float-end text-white" (click)="switchImageThumbnailContainerVisible()"
             [ngStyle]="{
@@ -252,7 +252,7 @@
                             </div>
                         </div>
                         <div class="form-group mb-3">
-                            <input type="file" class="form-control" id="inputImage" (change)="fileChange($event)" formControlName="image">
+                            <input type="file" class="form-control" id="inputImage" [accept]="requiredImageFileTypes" formControlName="image" (change)="fileChange($event)">
                             <div class="alert alert-danger" *ngIf="uploadImageForm.controls['image'].invalid && uploadImageForm.controls['image'].touched">
                                 {{ 'ADMINPANEL.UPLOADIMAGETEXT.INVALIDSELECTIMAGE' | translate }}
                             </div>

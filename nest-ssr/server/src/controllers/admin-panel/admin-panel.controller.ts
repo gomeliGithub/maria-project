@@ -39,9 +39,7 @@ export class AdminPanelController {
             || !this.appService.imagePhotographyTypes.includes(requestBody.client.imagePhotographyType)
             || typeof requestBody.client.imageViewSizeType !== 'string' || !this.appService.imageViewSizeTypes.includes(requestBody.client.imageViewSizeType)
             || requestBody.client.imageDescription && (typeof requestBody.client.imageDescription !== 'string' || requestBody.client.imageDescription.length > 20)
-        ) {
-            throw new BadRequestException(`${ request.url } "UploadImage - invalid request body data"`);
-        }
+        ) throw new BadRequestException(`${ request.url } "UploadImage - invalid request body data"`);
 
         return this.adminPanelService.uploadImage(request, requestBody);
     }
@@ -80,14 +78,13 @@ export class AdminPanelController {
         ) throw new BadRequestException(`${ request.url } "GetClientOrders - invalid query data"`);
 
         return this.adminPanelService.getClientOrders({
-            getInfoData,
             memberLogin,
             fromDate,
             untilDate,
             status,
             ordersLimit,
             existsCount
-        });
+        }, !getInfoData || getInfoData === 'false' ? false : true);
     }
 
     @Get('/getDiscountsData')

@@ -12,7 +12,7 @@
 		},
 		"SIGNUP": "Регистрация",
 		"SIGNIN": "Вход",
-		"NOTFOUND": "Не найдено"
+		"NOTFOUND": "Ресурс не найден"
 	},
 	"SCROLLSNAPITEMSTEXT": {
 		"DISCOUNTS": "Скидки",
@@ -61,8 +61,8 @@
 		"SIGNERRORTEXT": "Неверный логин или пароль"
 	},
 	"NOTFOUNDPAGE": {
-		"MAINTEXT": "Страница, которую вы ищете, не существует.",
-		"SECONDARYTEXT": "Страница не найдена.",
+		"MAINTEXT": "Ресурс, который вы пытаетесь открыть, не существует.",
+		"SECONDARYTEXT": "Запрашиваемый ресурс не найден.",
 		"GOHOMETEXT": "На главную"
 	},
   	"CLIENTMENU": {

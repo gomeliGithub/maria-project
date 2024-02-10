@@ -1,8 +1,8 @@
-<div class="flex-grow-0 mt-5 p-3">
+<div class="mt-5 p-3">
     <h1 class="display-4">{{ 'GALLERYPAGE.HEADERTITLE' | translate }}</h1>
 </div>
-<div *ngIf="compressedImagesList; else noContentBlock" class="flex-grow-0 w-100">
-    <ngb-carousel class="carousel"
+<div *ngIf="compressedImagesList; else noContentBlock" class="col-12 py-3 shadow-lg">
+    <!-- <ngb-carousel class="carousel"
         [interval]="3000"
         [showNavigationArrows]="compressedImagesList.length > 1"
         [showNavigationIndicators]="false"
@@ -32,11 +32,9 @@
                         }"
                     >
                         <div class="input-group justify-content-center flex-nowrap w-70">
-                            <a href="/api/client/downloadOriginalImage/:{{ imageData.name }}" class="btn btn-success btn-sm" 
-                                tabindex="-1" role="button" aria-disabled="true"
-                            >
+                            <button class="btn btn-success btn-sm" type="button" (click)="downloadOriginalImage(imageData.name)">
                                 <i class="bi bi-download"></i>
-                            </a>
+                            </button>
                             <span class="input-group-text text-wrap text-bg-light fw-medium p-0 px-1 border-0 user-select-none">
                                 {{ 'GALLERYPAGE.DOWNLOADORIGINALIMAGEBUTTONTEXT' | translate }}
                             </span>
@@ -45,25 +43,69 @@
                 </div>
             </div>
         </ng-template>
-    </ngb-carousel>
+    </ngb-carousel> -->
+
+    <owl-carousel-o id="galleryImagesCarousel" [options]="galleryImagesCarouselOptions" (translated)="changeActiveCarouselItems($event)">
+        <ng-container *ngFor="let imageData of compressedImagesList">
+            <ng-template carouselSlide> <!-- [id]="slide.id" -->
+                <div class="position-relative"
+                    (mouseenter)="startLinkContainerAnimation(
+                        setCurrentLinkContainerAnimationStateIndex(imageData.name)
+                    )"
+                    (mouseleave)="startLinkContainerAnimation(
+                        setCurrentLinkContainerAnimationStateIndex(imageData.name)
+                    )"
+                >
+                    <img [src]="'/assets/images_thumbnail/gallery/' + photographyType + '/' + imageData.name"
+                        class="img-fluid rounded" alt=""
+                        [ngClass]="{ 'opacity-0': imageData.description === 'empty_image' }"
+                    >
+                    <div *ngIf="activeClientType === 'admin'" class="position-absolute top-100 start-50 d-flex flex-row justify-content-center z-1 downloadOriginalImageLinkContainer"
+                        [@link-container-animation]="linkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name)]"
+                        (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(
+                            imageData.name)
+                        )"
+                        (@link-container-animation.done)="linkContainerAnimationDone($event, setCurrentLinkContainerAnimationStateIndex(
+                            imageData.name)
+                        )"
+                        [ngStyle]="{ 
+                            'display': linkContainerAnimationDisplayValues[setCurrentLinkContainerAnimationStateIndex(imageData.name)]
+                        }"
+                    >
+                        <div class="input-group justify-content-center flex-nowrap w-70">
+                            <button class="btn btn-success btn-sm" type="button" (click)="downloadOriginalImage(imageData.name)">
+                                <i class="bi bi-download"></i>
+                            </button>
+                            <span class="input-group-text text-wrap text-bg-light fw-medium p-0 px-1 border-0 user-select-none">
+                                {{ 'GALLERYPAGE.DOWNLOADORIGINALIMAGEBUTTONTEXT' | translate }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </ng-container>
+    </owl-carousel-o>
 </div>
 <ng-template #noContentBlock>
     <div class="noContentBlock text-center text-info fs-4 p-4">
         <span>{{ 'NOIMAGESMESSAGE' | translate }}</span>
     </div>
 </ng-template>
-<div class="flex-grow-0 p-5" id="titleHeaderContainer">
-    <div class="text-bg-danger text-center p-3 h-100 rounded">
-        <h1 class="display-6" id="titleHeader">{{ photographyTypeDescription }}</h1>
+<div *ngIf="photographyTypeDescription" class="p-5" id="titleHeaderContainer">
+    <div class="text-center p-3 rounded shadow">
+        <p class="fs-3" id="titleHeader">
+            {{ photographyTypeDescription }}
+        </p>
     </div>
 </div> 
-<div class="flex-grow-1 text-center w-100">
+<div class="text-center w-100 mb-5"
+    [ngClass]="{ 'mt-5': !photographyTypeDescription }"
+>
     <button type="button" class="btn btn-outline-success btn-lg" id="orderButton" 
         (click)="changeSendOrderFormAnimationState()"
     >
         {{ 'GALLERYPAGE.ORDERBUTTONTEXT' | translate }}
     </button>
-    <hr class="border-3 mt-5 w-100"/>
 </div>
 <div class="d-flex flex-column w-50 position-absolute visible overflow-y-auto pe-auto" [@send-order-form-animation]="sendOrderFormAnimationState"
     (@send-order-form-animation.start)="sendOrderFormAnimationStarted($event)"
@@ -75,7 +117,7 @@
         <div class="form-group form-floating mb-3">
             <select class="form-control form-select" id="inputType" formControlName="orderType">
                 <option value="consultation" selected>{{ 'CLIENTORDERTYPES.CONSULTATION' | translate }}</option>
-                <option value="full" [disabled]="!activeClientIsExists || activeClientType === 'admin'">{{ 'CLIENTORDERTYPES.FULL' | translate }}</option>
+                <option value="full">{{ 'CLIENTORDERTYPES.FULL' | translate }}</option>
             </select>
             <label for="inputType" class="form-label text-wrap">{{ 'SENDORDERFORM.ORDERTYPETEXT' | translate }}</label>
             <div class="alert alert-danger" *ngIf="sendOrderForm.controls['orderType'].invalid && sendOrderForm.controls['orderType'].touched">
@@ -94,7 +136,7 @@
             </div>
         </div>
         <div class="form-group form-floating mb-3">
-            <textarea class="form-control" id="inputComment" rows="8" maxlength="30" formControlName="comment"
+            <textarea class="form-control" id="inputComment" rows="8" maxlength="800" formControlName="comment"
                 placement="top"
                 tooltipClass="custom-tooltip"
                 [ngbTooltip]="'GALLERYPAGE.HELPBLOCKS.COMMENT' | translate"

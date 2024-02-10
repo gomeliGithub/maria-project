@@ -27,12 +27,8 @@ export class SignController {
 
     @Put('/in')
     @ClientTypes('admin', 'member')
-    async signIn (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response, @Cookies('locale') clientLocale: string): Promise<string> {
-        if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password ||
-            typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
-        ) throw new BadRequestException(`${ request.url } "SignIn - invalid request body data"`);
-
-        return this.signService.signIn(requestBody.sign.clientData, response, clientLocale);
+    async signIn (@Req() request: IRequest, @Res({ passthrough: true }) response: Response, @Cookies('locale') clientLocale: string): Promise<string> {
+        return this.signService.signIn(request, response, clientLocale);
     }
 
     @Put('/out')

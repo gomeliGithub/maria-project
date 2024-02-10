@@ -68,10 +68,10 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
             state('visiable', style({ opacity: 1, transform: 'translateY(0px)' })),
             state('unvisiable', style({ opacity: 0, transform: 'translateY(200px)' })),
             transition('unvisiable => visiable', [
-                animate('1.5s ease-out', style({ opacity: 1, transform: 'translateY(0px)' }))
+                animate('0.9s 200ms ease-out', style({ opacity: 1, transform: 'translateY(0px)' }))
             ]),
             transition('visiable => unvisiable', [
-                animate('1.5s ease-out', style({ opacity: 0, transform: 'translateY(200px)' }))
+                animate('0.9s 200ms ease-out', style({ opacity: 0, transform: 'translateY(200px)' }))
             ])
         ])
     ]
@@ -201,6 +201,8 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
                 this.scrollSnapSectionViewRefs.first.nativeElement.scrollIntoView({ behavior: 'auto', block: 'start' });
 
                 this.compressedImagesDataIsLoaded = true;
+
+                this.getScrollSnapSectionsPosition();
             }
         }
     }
@@ -334,10 +336,8 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     
     public startScrollSnapSectionVisiableAnimation (index: number): void {
         if ( !this.currentScrollSnapSectionVisiableAnimationStates[index].finished ) {
-            setTimeout(() => {
-                this.currentScrollSnapSectionVisiableAnimationStates[index].state = 'visiable';
-                this.currentScrollSnapSectionVisiableAnimationStates[index].finished = true;
-            }, 500);
+            this.currentScrollSnapSectionVisiableAnimationStates[index].state = 'visiable';
+            this.currentScrollSnapSectionVisiableAnimationStates[index].finished = true;
         }
     }
 

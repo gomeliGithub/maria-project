@@ -165,7 +165,7 @@ export class AppComponent implements OnInit {
     ): void {
         if ( !this.navbarIsCollapsed ) this.navbarTogglerClick(true);
 
-        if ( !(component instanceof HomeComponent) ) {
+        if ( !( component instanceof HomeComponent ) ) {
             this.componentClass = false;
 
             // this.footerAnimationState = 'show';

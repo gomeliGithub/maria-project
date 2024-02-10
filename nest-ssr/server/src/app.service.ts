@@ -49,6 +49,7 @@ export class AppService {
     public clientOriginalImagesDir: string = path.join(process.cwd(), 'server', 'files', 'originalImages');
     public clientCompressedImagesDir: string = path.join(process.cwd(), 'server', 'files', 'compressedImages');
 
+    public supportedImageFileTypes: string[] = [ 'image/jpg', 'image/jpeg', 'image/png' ]; // [ 'jpg', 'png', 'webp', 'avif', 'gif', 'svg', 'tiff' ]
     public imagePhotographyTypes: string[] = [ 'individual', 'children', 'wedding', 'family' ];
     public imageViewSizeTypes: string[] = [ 'horizontal', 'vertical' ];
 

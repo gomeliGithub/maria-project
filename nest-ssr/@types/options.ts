@@ -11,7 +11,6 @@ export interface IGetActiveClientOptions {
 
 export interface IClientGetOptions {
     includeFields?: string[];
-    rawResult?: boolean;
     clientType?: 'admin' | 'member';
     includeOrders?: boolean;
 }
@@ -21,13 +20,12 @@ export interface IDownloadOriginalImageOptions {
     compressedImageName?: string;
 }
 
-export interface IСompressedImageGetOptions {
+export interface ICompressedImageGetOptions {
     clientInstance?: Admin;
     find?: {
         imageTitles?: string[];
         includeFields?: string[];
         imageViewSize?: string;
-        rawResult?: boolean;
     },
     imagesLimit?: number;
     imagesExistsCount?: number;

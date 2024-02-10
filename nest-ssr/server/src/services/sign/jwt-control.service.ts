@@ -39,9 +39,9 @@ export class JwtControlService {
             else return null;
         }
 
-        const client__secure_fgpHash: string = (crypto.createHmac("SHA256", request.cookies['__secure_fgp'])).digest('hex');
+        const client__secure_fgpHash: string = crypto.createHmac("SHA256", request.cookies['__secure_fgp']).digest('hex');
 
-        if ( client__secure_fgpHash !== validatedClientPayload.__secure_fgpHash || !(await this.validateRevokedToken(token)) ) {
+        if ( client__secure_fgpHash !== validatedClientPayload.__secure_fgpHash || !( await this.validateRevokedToken(token) ) ) {
             if ( throwError ) throw new UnauthorizedException(`${ request.url } "TokenValidate - secure fingerprint hash is invalid, token - ${ token }"`);
             else return null;
         }
@@ -53,16 +53,16 @@ export class JwtControlService {
         const revokedTokenInstance: JWT_token = await this.checkRevokedTokenIs(token); 
 
         if ( !revokedTokenInstance ) {
-            const token_hash: string = (crypto.createHmac("SHA256", token)).digest('hex');
+            const token_hash: string = crypto.createHmac("SHA256", token).digest('hex');
 
             await this.JWT_tokenModel.update({ revokation_date: new Date(), revoked: true }, { where: { token_hash } });
         }
     }
 
     public async saveToken (token: string): Promise<void> {
-        const token_hash: string = (crypto.createHmac("SHA256", token)).digest('hex');
+        const token_hash: string = crypto.createHmac("SHA256", token).digest('hex');
 
-        const expires_date = new Date(Date.now() + ms(process.env.JWT_EXPIRESIN_TIME));
+        const expires_date: Date = new Date(Date.now() + ms(process.env.JWT_EXPIRESIN_TIME));
 
         await this.JWT_tokenModel.create({
             token_hash,
@@ -72,7 +72,7 @@ export class JwtControlService {
     }
 
     public async validateRevokedToken (token: string): Promise<boolean> {
-        const revokedTokenInstance = await this.checkRevokedTokenIs(token);
+        const revokedTokenInstance: JWT_token = await this.checkRevokedTokenIs(token);
 
         if ( revokedTokenInstance ) {
             if ( new Date() > revokedTokenInstance.revokation_date ) return false;
@@ -80,7 +80,7 @@ export class JwtControlService {
     }
 
     public async checkRevokedTokenIs (token: string): Promise<JWT_token> {
-        const token_hash: string = (crypto.createHmac("SHA256", token)).digest('hex');
+        const token_hash: string = crypto.createHmac("SHA256", token).digest('hex');
 
         const revokedTokenInstance: JWT_token = await this.JWT_tokenModel.findOne({ where: { token_hash, revoked: true }});
 

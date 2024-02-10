@@ -1,14 +1,17 @@
-import { Component, ElementRef, HostBinding, OnDestroy, OnInit, QueryList, ViewChild, afterRender } from '@angular/core';
+import { Component, ElementRef, HostBinding, OnInit, QueryList, ViewChild } from '@angular/core';
+import { HttpResponse } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
-import { NgbSlideEvent } from '@ng-bootstrap/ng-bootstrap';
+import { OwlOptions, SlidesOutputData } from 'ngx-owl-carousel-o';
 
 import { AppService } from '../../../app/app.service';
 import { ClientService } from '../../services/client/client.service';
 
-import { AnimationEvent, IGalleryCompressedImagesData } from 'types/global';
+import { environment } from '../../../environments/environment';
+
+import { AnimationEvent } from 'types/global';
 import { IClientCompressedImage } from 'types/models';
 
 @Component({
@@ -48,10 +51,8 @@ import { IClientCompressedImage } from 'types/models';
         ])
     ]
 })
-export class GalleryComponent implements OnInit, OnDestroy {
+export class GalleryComponent implements OnInit {
     public photographyType: string;
-
-    public componentElementIsRendered: boolean = false;
 
     constructor (
         private readonly activateRoute: ActivatedRoute,
@@ -60,13 +61,9 @@ export class GalleryComponent implements OnInit, OnDestroy {
         private readonly appService: AppService,
         private readonly clientService: ClientService
     ) {
-        afterRender(() => {
-            if ( !this.componentElementIsRendered ) {
-                this.componentElementIsRendered = true;
-            }
-        });
-
         this.photographyType = this.activateRoute.snapshot.paramMap.get('photographyType');
+
+        if ( !environment.photographyTypes.includes(this.photographyType) ) this.router.navigate(['**'], { skipLocationChange: true });
 
         this.sendOrderForm = new FormGroup({
             'orderType': new FormControl("", [ Validators.required, this.orderTypeValidator ]),
@@ -75,7 +72,6 @@ export class GalleryComponent implements OnInit, OnDestroy {
         });
     }
     
-    public activeClientIsExists: boolean;
     public activeClientType: string;
 
     public sendOrderForm: FormGroup<{
@@ -90,7 +86,7 @@ export class GalleryComponent implements OnInit, OnDestroy {
 
     @ViewChild('sendOrderFormContainer', { static: false }) private readonly sendOrderFormContainerViewRef: ElementRef<HTMLDivElement>;
 
-    public compressedImagesList: IClientCompressedImage[][] = null;
+    public compressedImagesList: IClientCompressedImage[] = null; // public compressedImagesList: IClientCompressedImage[][] = null;
     public compressedImagesListType: string = null;
 
     public photographyTypeDescription: string;
@@ -100,23 +96,55 @@ export class GalleryComponent implements OnInit, OnDestroy {
     public linkContainerAnimationStates: string[] = [];
     public linkContainerAnimationDisplayValues: string[] = [];
 
-    public flatCompressedImagesList: IClientCompressedImage[];
+    // public flatCompressedImagesList: IClientCompressedImage[];
 
     public sendOrderFormAnimationState: string = 'hide';
 
     public additionalImagesExists: boolean = false;
     public currentAdditionalImagesExists: boolean = false;
 
-    public isToggleBigGallery: boolean = false;
-
     public scrollPageBottomIsFinished: boolean = false;
+
+    public galleryImagesCarouselOptions: OwlOptions = {
+        loop: true,
+        center: true,
+        mouseDrag: false,
+        touchDrag: false,
+        pullDrag: false,
+        margin: 10,
+        mergeFit: true,
+        lazyLoad: true,
+        lazyLoadEager: 8,
+        dots: false,
+        nav: true,
+        navText: [
+            '<i class="bi bi-caret-left"></i>',
+            '<i class="bi bi-caret-right"></i>'
+        ],
+        autoplay: true,
+        autoplayTimeout: 4000,
+        responsive: {
+            0: {
+                items: 2
+            },
+            400: {
+                items: 2
+            },
+            740: {
+                items: 2
+            },
+            1240: {
+                items: 4
+            }
+        }
+    }
 
     ngOnInit (): void {
         this.router.events.subscribe(evt => {
-            if ( !(evt instanceof NavigationEnd) ) return;
+            if ( !( evt instanceof NavigationEnd ) ) return;
             else this.url = evt.url;
             
-            if ( this.url.startsWith('/gallery') ) window.location.reload();
+            if ( this.url.startsWith('/gallery') ) this.appService.reloadComponent(true);
         });
 
         this.appService.getTranslations([ 'PAGETITLES.GALLERY', `IMAGEPHOTOGRAPHYTYPESFULLTEXT.${ this.photographyType.toUpperCase() }`], true).subscribe(translation => {
@@ -139,6 +167,13 @@ export class GalleryComponent implements OnInit, OnDestroy {
 
         this.getCompressedImagesData('vertical');
 
+        if ( this.appService.checkIsPlatformBrowser() ) {
+            this.clientService.getActiveClient().subscribe({
+                next: activeClientData => this.activeClientType = activeClientData ? activeClientData.type : null,
+                error: () => this.appService.createErrorModal()
+            });
+        }
+
         this.clientService.galleryImageContainerViewRefsChange.subscribe(value => this.imageContainerViewRefs = value);
 
         this.clientService.scrollPageBottomStatusChange.subscribe(value => {
@@ -152,16 +187,12 @@ export class GalleryComponent implements OnInit, OnDestroy {
         });
     }
 
-    ngOnDestroy (): void {
-        this.componentElementIsRendered = false;
-    }
-
-    public onCarouselSlide (event: NgbSlideEvent): void {
-        event;
-
+    public changeActiveCarouselItems (event: SlidesOutputData): void {
         if ( this.additionalImagesExists ) {
-            this.getCompressedImagesData('vertical', this.flatCompressedImagesList.length);
+            this.getCompressedImagesData('vertical', this.compressedImagesList.length);
         }
+
+        event;
     }
 
     public getCompressedImagesData (imageViewSize: 'horizontal' | 'vertical', currentImagesCount?: number): void {
@@ -171,50 +202,43 @@ export class GalleryComponent implements OnInit, OnDestroy {
         else this.currentAdditionalImagesExists = false;
 
         if ( !currentImagesCount ) currentImagesCount = 0;
+
+        this.clientService.getCompressedImagesData(this.photographyType, imageViewSize, currentImagesCount).subscribe({
+            next: data => {
+                if ( data.compressedImagesRaw.length !== 0 ) {
+                    if ( !this.currentAdditionalImagesExists ) {
+                        this.compressedImagesList = data.compressedImagesRaw;
+
+                        if ( data.compressedImagesRaw.length < 5 ) {
+                            this.galleryImagesCarouselOptions = { ...this.galleryImagesCarouselOptions, nav: false, center: false, loop: false, autoplay: false }
+
+                            for ( let i = 0; i < 5 - data.compressedImagesRaw.length; i++ ) {
+                                this.compressedImagesList.push({ ...this.compressedImagesList[0], description: 'empty_image' });
+                            }
+                        }
+                    } else {
+                        this.compressedImagesList.push(...data.compressedImagesRaw);
+                    }
         
-        if ( !this.currentAdditionalImagesExists ) {
-            this.clientService.getCompressedImagesData(this.photographyType, imageViewSize, currentImagesCount).subscribe({
-                next: data => {
-                    this._setCompressedImagesList(data, this.currentAdditionalImagesExists);
-                },
-                error: () => this.appService.createErrorModal()
-            });
-        } else {
-            this.clientService.getCompressedImagesData(this.photographyType, imageViewSize, currentImagesCount).subscribe({
-                next: data => {
-                    this._setCompressedImagesList(data, this.currentAdditionalImagesExists);
-                },
-                error: () => this.appService.createErrorModal()
-            });
-        }
-    }
-
-    private _setCompressedImagesList (data: IGalleryCompressedImagesData, currentAdditionalImagesExists: boolean): void {
-        if ( data.compressedImagesRaw.length !== 0 ) {
-            if ( !currentAdditionalImagesExists ) {
-                this.compressedImagesList = data.compressedImagesRaw;
-            } else {
-                this.compressedImagesList.push(...data.compressedImagesRaw);
-            }
-
-            this.isToggleBigGallery = false;
-
-            if ( data.compressedImagesRaw.length !== 0 ) {
-                if ( !currentAdditionalImagesExists ) this.flatCompressedImagesList = data.compressedImagesRaw.flat();
-                else this.flatCompressedImagesList.push(...data.compressedImagesRaw.flat());
-
-                this.flatCompressedImagesList.forEach(() => {
-                    this.linkContainerAnimationStates.push('leave');
-                    this.linkContainerAnimationDisplayValues.push('none');
-                });
-            }
-        }
-
-        this.photographyTypeDescription = data.photographyTypeDescription ? data.photographyTypeDescription : null;
-
-        this.additionalImagesExists = data.additionalImagesExists;
-
-        this.scrollPageBottomIsFinished = false;
+                    if ( data.compressedImagesRaw.length !== 0 ) {
+                        // if ( !this.currentAdditionalImagesExists ) this.compressedImagesList = data.compressedImagesRaw.flat(); // this.flatCompressedImagesList = data.compressedImagesRaw.flat();
+                        // else this.compressedImagesList.push(...data.compressedImagesRaw.flat()); // else this.flatCompressedImagesList.push(...data.compressedImagesRaw.flat());
+        
+                        this.compressedImagesList.forEach(() => { // this.flatCompressedImagesList.forEach(() => {
+                            this.linkContainerAnimationStates.push('leave');
+                            this.linkContainerAnimationDisplayValues.push('none');
+                        });
+                    }
+                }
+        
+                this.photographyTypeDescription = data.photographyTypeDescription ? data.photographyTypeDescription : null;
+        
+                this.additionalImagesExists = data.additionalImagesExists;
+        
+                this.scrollPageBottomIsFinished = false;
+            },
+            error: () => this.appService.createErrorModal()
+        });
     }
 
     public orderTypeValidator (control: FormControl<string>): { [ s: string ]: boolean } | null {
@@ -227,6 +251,32 @@ export class GalleryComponent implements OnInit, OnDestroy {
         return null;
     }
 
+    public getDownloadingOriginalImageName (response: HttpResponse<Blob>) {
+        const contentDisposition: string = response.headers.get('content-disposition');
+        const imageName: string = contentDisposition.split(';')[1].split('filename')[1].split('=')[1].trim();
+
+        return decodeURIComponent(imageName);
+    }
+
+    public downloadOriginalImage (compressedImageName: string): void {
+        this.clientService.downloadOriginalImage(compressedImageName).subscribe({
+            next: ( response: HttpResponse<Blob> ) => {
+                const imageName: string = this.getDownloadingOriginalImageName(response)
+                const binaryData: Blob[] = [];
+
+                binaryData.push(response.body);
+                
+                const downloadLink: HTMLAnchorElement = document.createElement('a');
+                
+                downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, { type: 'blob' }));
+                downloadLink.setAttribute('download', imageName);
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+            },
+            error: () => this.appService.createErrorModal()
+        });
+    }
+
     public sendOrder (): void {
         this.clientService.sendOrder(this.photographyType, this.sendOrderForm.value);
 
@@ -235,7 +285,7 @@ export class GalleryComponent implements OnInit, OnDestroy {
     }
 
     public setCurrentLinkContainerAnimationStateIndex (name: string): number { 
-        return this.flatCompressedImagesList.findIndex(compressedImageData => compressedImageData.name === name);
+        return this.compressedImagesList.findIndex(compressedImageData => compressedImageData.name === name); // return this.flatCompressedImagesList.findIndex(compressedImageData => compressedImageData.name === name);
     }
 
     public startLinkContainerAnimation (index: number): void {

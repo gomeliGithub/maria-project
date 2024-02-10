@@ -15,7 +15,6 @@ const routes: Routes = [
     { path: 'home', component: HomeComponent },
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'gallery/:photographyType', component: GalleryComponent },
-    { path: 'gallery', redirectTo: '/gallery/children', pathMatch: 'full' },
     { path: 'adminPanel/imagesControl', component: AdminPanelComponent, canActivate: [ClientGuard] },
     { path: 'adminPanel', redirectTo: '/adminPanel/imagesControl', pathMatch: 'full' },
     { path: 'adminPanel/ordersControl', component: AdminPanelOrdersControlComponent, canActivate: [ClientGuard] },

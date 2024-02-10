@@ -34,18 +34,22 @@ export class SignService {
         private readonly memberModel: typeof Member
     ) { }
 
-    public async validateClient (request: IRequest, requiredClientTypes: string[], throwError = true): Promise<boolean> {
+    public async validateClient (request: IRequest, requiredClientTypes: string[], throwError = true, commonServiceRef?: CommonService): Promise<boolean> {
         const token: string = this.jwtControlService.extractTokenFromHeader(request); 
 
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        if ( !commonServiceRef ) commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
 
         if ( request.url === '/api/sign/in' ) {
             const requestBody: IRequestBody = request.body;
 
-            const clientLogin: string = requestBody.sign.clientData.login;
+            if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password ||
+                typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
+            ) throw new BadRequestException(`${ request.url } "ValidateClient - invalid sign client data"`);
+
+            const clientLogin: string = requestBody.sign.clientData.login.trim();
             const clientPassword: string = requestBody.sign.clientData.password;
 
-            await this._signDataValidate(request, clientLogin, clientPassword);
+            request.activeClientInstance = await this._signDataValidate(commonServiceRef, request, clientLogin, clientPassword);
 
             if ( token ) await this.jwtControlService.addRevokedToken(token);
 
@@ -55,7 +59,7 @@ export class SignService {
             const clientType: string = validatedClientPayload ? validatedClientPayload.type : null;
             const clientLogin: string = validatedClientPayload ? validatedClientPayload.login : null;
 
-            const clientInstance: Admin | Member = await commonServiceRef.getClients(clientLogin, { rawResult: false }) as Admin | Member;
+            const clientInstance: Admin | Member = await commonServiceRef.getClients(clientLogin, false) as Admin | Member;
 
             if ( !clientInstance ) {
                 if ( throwError ) throw new UnauthorizedException(`${ request.url } "ValidateClient - client instance does not exists, login - ${ validatedClientPayload.login }"`);
@@ -92,12 +96,9 @@ export class SignService {
             throw new BadRequestException(`${ request.url } "${ message }"`);
         }
 
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
 
-        const clientRawData: IAdmin | IMember = await commonServiceRef.getClients(clientLogin, {
-            includeFields: [ 'login', 'fullName' ],
-            rawResult: true
-        });
+        const clientRawData: IAdmin | IMember = await commonServiceRef.getClients(clientLogin, true, { includeFields: [ 'login', 'fullName' ] });
 
         if ( clientRawData ) throw new UnauthorizedException(`${ request.url } "SignUp - client instance does not exists"`);
         
@@ -119,22 +120,15 @@ export class SignService {
         });
     }
 
-    public async signIn (clientSignData: IClientSignData, response: Response, clientLocale: string): Promise<string> {
-        const clientLogin: string = clientSignData.login.trim();
-
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
-        
-        const clientRaw: IAdmin | IMember = await commonServiceRef.getClients(clientLogin, {
-            includeFields: [ 'id', 'login', 'fullName', 'type' ],
-            rawResult: true
-        });
+    public async signIn (request: IRequest, response: Response, clientLocale: string): Promise<string> {
+        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
 
         const payload: IClient = {
-            id: clientRaw.id,
-            login: clientRaw.login,
-            type: clientRaw.type as 'admin' | 'member',
+            id: request.activeClientInstance.id,
+            login: request.activeClientInstance.login,
+            type: request.activeClientInstance.type as 'admin' | 'member',
             locale: process.env.CLIENT_DEFAULT_LOCALE,
-            fullName: clientRaw.fullName,
+            fullName: request.activeClientInstance.fullName,
             __secure_fgpHash: ""
         }
 
@@ -142,10 +136,8 @@ export class SignService {
 
         payload.__secure_fgpHash = __secure_fgpHash;
 
-        const clientInstance: Admin | Member = await commonServiceRef.getClients(clientLogin, { rawResult: false }) as Admin | Member;
-
-        await commonServiceRef.registerClientLastLoginTime(clientInstance);
-        await commonServiceRef.registerClientLastActivityTime(clientInstance);
+        await commonServiceRef.registerClientLastLoginTime(request.activeClientInstance);
+        await commonServiceRef.registerClientLastActivityTime(request.activeClientInstance);
 
         const access_token: string = this.jwtService.sign(payload);
 
@@ -187,10 +179,10 @@ export class SignService {
             return validatedClientPayload;
         }
 
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
 
         if ( validatedClientPayload ) {
-            const clientInstance: Admin | Member = await commonServiceRef.getClients(validatedClientPayload.login, { rawResult: false });
+            const clientInstance: Admin | Member = await commonServiceRef.getClients(validatedClientPayload.login, false);
 
             if ( !clientInstance ) throw new UnauthorizedException(`${ request.url } "GetActiveClient - client instance does not exists"`);
         }
@@ -200,8 +192,10 @@ export class SignService {
         if ( validatedClientPayload && options.includeFields ) {
             if ( typeof options.includeFields === 'string' ) return validatedClientPayload[options.includeFields];
             else if ( Array.isArray(options.includeFields) ) {
-                if ( options.allowedIncludedFields && options.includeFields.some(field => !options.allowedIncludedFields.includes(field)) ) {
-                    throw new BadRequestException(`${ request.url } "GetActiveClient - not allowed included field"`);
+                if ( options.allowedIncludedFields ) {
+                    const isNotAllowedIncludedField: boolean = options.includeFields.some(field => !options.allowedIncludedFields.includes(field));
+
+                    if ( isNotAllowedIncludedField ) throw new BadRequestException(`${ request.url } "GetActiveClient - not allowed included field"`);
                 }
 
                 Object.keys(validatedClientPayload).forEach(field => {
@@ -213,19 +207,14 @@ export class SignService {
         return validatedClientPayload;
     }
 
-    private async _signDataValidate (request: IRequest, clientLogin: string, clientPassword: string): Promise<void> {
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
-
-        const clientRawData: IAdmin | IMember = await commonServiceRef.getClients(clientLogin, {
-            includeFields: [ 'password' ],
-            rawResult: true
-        });
+    private async _signDataValidate (commonServiceRef: CommonService, request: IRequest, clientLogin: string, clientPassword: string): Promise<Admin | Member> {
+        const clientInstance: Admin | Member = await commonServiceRef.getClients(clientLogin, false);
 
         console.log(await bcrypt.hash('12345Admin', parseInt(process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS, 10)));
 
-        if ( !clientRawData ) throw new UnauthorizedException(`${ request.url } "_signDataValidate - client instance does not exists"`);
+        if ( !clientInstance ) throw new UnauthorizedException(`${ request.url } "_signDataValidate - client instance does not exists"`);
 
-        const passwordValid: boolean = await bcrypt.compare(clientPassword, clientRawData.password); 
+        const passwordIsValid: boolean = await bcrypt.compare(clientPassword, clientInstance.password); 
         
         
         // console.log(clientPassword); 
@@ -233,7 +222,9 @@ export class SignService {
         // console.log(await bcrypt.compare(clientPassword, client.password));
 
 
-        if ( !passwordValid ) throw new UnauthorizedException(`${ request.url } "_signDataValidate - client password invalid"`);
+        if ( !passwordIsValid ) throw new UnauthorizedException(`${ request.url } "_signDataValidate - client password invalid"`);
+
+        return clientInstance;
     }
 
     public async getBcryptHashSaltrounds (): Promise<string> {
