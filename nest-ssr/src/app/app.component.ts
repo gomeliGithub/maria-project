@@ -165,6 +165,8 @@ export class AppComponent implements OnInit {
     ): void {
         if ( !this.navbarIsCollapsed ) this.navbarTogglerClick(true);
 
+        if ( this.navbarAnimationState !== 'static' ) this.clientService.setNavbarAnimationState('static');
+
         if ( !( component instanceof HomeComponent ) ) {
             this.componentClass = false;
 
@@ -177,6 +179,8 @@ export class AppComponent implements OnInit {
         } else {
             this.componentClass = true;
             this.isHomePage = true;
+
+            this.homeService.setActiveScrollSnapSection(0);
 
             this.footerElementRef.nativeElement.classList.remove('position-relative');
             this.footerElementRef.nativeElement.classList.add('bottom-0', 'position-absolute');

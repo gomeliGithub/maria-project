@@ -24,7 +24,7 @@ export class SeoManagementService {
         { url: '/adminPanel/discountsControl', componentFileName: 'admin-panel-discounts-control.component.html' },
         { url: '/signUp', componentFileName: 'client.component.html'},
         { url: '/signIn', componentFileName: 'client.component.html'},
-        { url: '/sign/un', componentFileName: 'client.component.html'},
+        { url: '/sign/up', componentFileName: 'client.component.html'},
         { url: '/sign/in', componentFileName: 'client.component.html'}
     ]
 

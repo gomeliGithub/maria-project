@@ -113,9 +113,7 @@
     <div class="position-relative d-flex flex-row-reverse justify-content-center align-items-center pe-1"
         [@scroll-snap-item-radios-container-animation]="currentScrollSnapItemRadiosContainerAnimationState"
     >
-        <div class="z-2 ms-2"
-            [@scroll-snap-item-radios-embeded-container-animation]="currentScrollSnapItemRadiosEmbededContainerAnimationState"
-        >
+        <div class="z-2 ms-2">
             <div *ngFor="let section of scrollSnapSectionViewRefs; let i = index" class="form-check form-check-reverse"
                 [ngClass]="{
                     'mb-3': i !== scrollSnapSectionViewRefs.length - 1

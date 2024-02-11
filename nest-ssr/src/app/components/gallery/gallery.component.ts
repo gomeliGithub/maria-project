@@ -144,7 +144,7 @@ export class GalleryComponent implements OnInit {
             if ( !( evt instanceof NavigationEnd ) ) return;
             else this.url = evt.url;
             
-            if ( this.url.startsWith('/gallery') ) this.appService.reloadComponent(true);
+            if ( this.url.startsWith('/gallery') ) window.location.reload();
         });
 
         this.appService.getTranslations([ 'PAGETITLES.GALLERY', `IMAGEPHOTOGRAPHYTYPESFULLTEXT.${ this.photographyType.toUpperCase() }`], true).subscribe(translation => {

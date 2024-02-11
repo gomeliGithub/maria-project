@@ -57,7 +57,7 @@ export class ClientComponent implements OnInit {
             if ( !( evt instanceof NavigationEnd ) ) return;
             else this.url = evt.url;
             
-            if ( this.url === '/signUp' || this.url === '/signIn') this.appService.reloadComponent(true);
+            if ( this.url === '/sign/up' || this.url === '/sign/in') window.location.reload();
         });
         
         if ( this.appService.checkIsPlatformBrowser() ) {
