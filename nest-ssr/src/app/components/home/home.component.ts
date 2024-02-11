@@ -263,9 +263,7 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     public setActiveScrollSnapSection (): void {
         const scrollSnapItemRadiosArr: ElementRef<HTMLInputElement>[] = this.scrollSnapItemRadioViewRefs.toArray();
 
-        const prevActiveRadio = scrollSnapItemRadiosArr.find(el => el.nativeElement.checked === true);
-
-        if ( prevActiveRadio ) prevActiveRadio.nativeElement.checked = false;
+        scrollSnapItemRadiosArr.forEach(el => el.nativeElement.checked = false);
 
         const currentItem: ElementRef<HTMLInputElement> = scrollSnapItemRadiosArr[this.currentItem];
         
