@@ -24,7 +24,7 @@
             <span class="icon-bar bottom-bar d-block border-1" [@bottom-bar-animation]="navbarTogglerIconTriggerState"></span>
         </button>
         <div class="navbar-collapse collapse" id="navbarNavDropdown" [ngbCollapse]="navbarIsCollapsed">
-            <ul class="navbar-nav flex-grow-1 justify-content-evenly mb-2 mb-lg-0 font-family-caveat-brush-regular-cursive">
+            <ul class="navbar-nav flex-grow-1 justify-content-evenly mb-2 mb-lg-0 font-family-caveat-brush-regular">
                 <li class="nav-item me-4"> <!-- ngbDropdown display="dynamic" #homeMenu="ngbDropdown" -->
                     <a class="" class="nav-link active" aria-current="page" routerLink="/"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
@@ -258,7 +258,7 @@
                     </ul>
                 </li>
             </ul>
-            <div class="navbar-text flex-grow-0 user-select-none font-family-caveat-brush-regular-cursive">
+            <div class="navbar-text flex-grow-0 user-select-none font-family-caveat-brush-regular">
                 <span *ngIf="activeClientLogin; else noActiveClientBlock">
                     <span class="fw-bold" 
                         [ngClass]="{ 'text-success': navbarAnimationState === 'scrolled', 'text-info': navbarAnimationState === 'static' }"
@@ -273,7 +273,7 @@
                     <span class="text-warning">{{ 'CLIENTMENU.NONSIGNINTEXT' | translate }}</span>
                 </ng-template>
             </div>
-            <ul class="navbar-nav ms-2 me-3 font-family-caveat-brush-regular-cursive">
+            <ul class="navbar-nav ms-2 me-3 font-family-caveat-brush-regular">
                 <li class="nav-item" ngbDropdown display="dynamic" #changeClientLocaleMenu="ngbDropdown">
                     <button type="button" class="nav-link" id="dropdownMenuButton"
                         [ngClass]="{ 'text-info': navbarAnimationState === 'static' }"

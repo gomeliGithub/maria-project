@@ -53,7 +53,7 @@
                 (@scroll-snap-section-item-visiable-animation.start)="scrollSnapSectionItemVisiableAnimationStarted($event)"
                 (@scroll-snap-section-item-visiable-animation.done)="scrollSnapSectionItemVisiableAnimationDone($event)"
             >
-                <a class="btn d-flex flex-column text-center font-family-sue-ellen-francisco-cursive photograpyTypeLinkContainer" [routerLink]="[ '/gallery', imagePhotographyTypeData.name ]" role="button"
+                <a class="btn d-flex flex-column text-center font-family-sue-ellen-francisco-regular photograpyTypeLinkContainer" [routerLink]="[ '/gallery', imagePhotographyTypeData.name ]" role="button"
                     [ngClass]="{ 'justify-content-end': imagePhotographyTypesDataArr.length === 1 }"
                     (@mouseTrigger.start)="mouseTriggerAnimationStarted($event)"
                     [@mouseTrigger]="currentMouseTriggerStates[setCurrentMouseTriggerStateIndex(imagePhotographyTypeData.name)]"

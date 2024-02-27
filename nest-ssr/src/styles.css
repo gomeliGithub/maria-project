@@ -270,7 +270,13 @@ ngb-accordion .accordion-body {
     padding: 0 !important;
 }
 
-.font-family-sue-ellen-francisco-cursive {
+.font-family-caveat-brush-regular {
+    font-family: "Caveat Brush", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.font-family-sue-ellen-francisco-regular {
     font-family: "Sue Ellen Francisco", cursive;
     font-weight: 400;
     font-style: normal;

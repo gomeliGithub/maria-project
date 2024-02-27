@@ -30,7 +30,8 @@ export class WebSocketService {
         image: FormControl<FileList>;
         imageDescription: FormControl<string>;
     }>, slicedImageData: ArrayBuffer[], newClientId: number): void {
-        this._connection = new WebSocket(host + `/:${newClientId}`);
+        // this._connection = new WebSocket(host + `/:${newClientId}`);
+        this._connection = new WebSocket(`${ host }/:${ newClientId }`);
 
         this._connection.onopen = () => {
             this._keepAliveTimer = setInterval(() => {
