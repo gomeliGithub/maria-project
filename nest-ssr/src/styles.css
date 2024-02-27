@@ -35,8 +35,8 @@ body {
     height: 90% !important;
 }
 
-.mw-75 {
-    max-width: 75% !important;
+.mw-70 {
+    max-width: 70% !important;
 }
 
 app-root a.nav-link, app-root a.dropdown-item {
@@ -268,4 +268,30 @@ ngb-accordion .accordion-button {
 
 ngb-accordion .accordion-body {
     padding: 0 !important;
+}
+
+.font-family-sue-ellen-francisco-cursive {
+    font-family: "Sue Ellen Francisco", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.font-family-pacifico-regular {
+    font-family: "Pacifico", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.font-family-dancing-script-bold {
+    font-family: "Dancing Script", cursive;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.font-family-roboto-mono-light {
+    font-family: "Roboto Mono", monospace;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
 }

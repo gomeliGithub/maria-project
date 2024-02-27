@@ -1,5 +1,5 @@
-<div class="mt-5 p-3">
-    <h1 class="display-4">{{ 'GALLERYPAGE.HEADERTITLE' | translate }}</h1>
+<div class="mt-5 p-3 font-family-dancing-script-bold">
+    <h1 class="display-4 user-select-none">{{ 'GALLERYPAGE.HEADERTITLE' | translate }}</h1>
 </div>
 <div *ngIf="compressedImagesList; else noContentBlock" class="col-12 py-3 shadow-lg">
     <!-- <ngb-carousel class="carousel"
@@ -93,7 +93,7 @@
 </ng-template>
 <div *ngIf="photographyTypeDescription" class="p-5" id="titleHeaderContainer">
     <div class="text-center p-3 rounded shadow">
-        <p class="fs-3" id="titleHeader">
+        <p class="fs-3 font-family-roboto-mono-light" id="titleHeader">
             {{ photographyTypeDescription }}
         </p>
     </div>

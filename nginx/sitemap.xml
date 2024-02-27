@@ -42,7 +42,7 @@
     </url>    
 
     <url>
-        <loc>http://45.128.205.220/sign/un</loc>
+        <loc>http://45.128.205.220/sign/up</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
         <lastmod>2024-02-10T21:14:48.781Z</lastmod>
@@ -87,14 +87,14 @@
         <loc>http://45.128.205.220/home</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2024-02-10T21:15:48.987Z</lastmod>
+        <lastmod>2024-02-11T12:40:28.391Z</lastmod>
     </url>    
 
     <url>
         <loc>http://45.128.205.220/</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2024-02-10T21:15:48.987Z</lastmod>
+        <lastmod>2024-02-11T12:40:28.391Z</lastmod>
     </url>    
 </urlset>
     

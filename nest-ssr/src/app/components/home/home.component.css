@@ -14,9 +14,17 @@
 }
 
 #aboutSection {
-    height: 70% !important;
+    height: 78% !important;
     padding-bottom: 12rem !important;
     scroll-snap-align: start !important;
+}
+
+#aboutSection p:first-child {
+    text-indent: 0 !important;
+}
+
+#aboutSection p {
+    text-indent: 10%;
 }
 
 .section {
@@ -68,12 +76,8 @@ and (-webkit-device-pixel-ratio: 2) {
         margin-bottom: 1rem !important;
     }
 
-    #aboutSection {
-        padding-bottom: 6rem !important;
-    }
-
     #aboutContainer > img {
-        max-width: 100% !important;
+        max-width: 80% !important;
     }
 }
 
@@ -189,9 +193,21 @@ and (-webkit-device-pixel-ratio: 2) {
     }
 }
 
+@media screen and (max-width: 1513px) {
+    #aboutContainer > div {
+        overflow-y: scroll !important;
+    }
+}
+
 @media screen and (min-width: 1400px) {
     :host ::ng-deep #discountsCarousel {
         min-height: 280px;
+    }
+}
+
+@media screen and (max-width: 1560px) {
+    #aboutContainer > div {
+        justify-content: start !important;
     }
 }
 
