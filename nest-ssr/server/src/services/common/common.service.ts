@@ -164,4 +164,10 @@ export class CommonService {
         if ( targetPage === 'gallery' ) return clientServiceRef.getImagePhotographyTypesData(requiredFields, targetPage, photographyTypeName);
         else return clientServiceRef.getImagePhotographyTypesData(requiredFields, targetPage);
     }
+
+    public async throwWebSocketError (commonServiceRef: CommonService, newOriginalImagePath: string, webSocketClientId: number, imageMetaSize: number) {
+        const adminPanelServiceRef: AdminPanelService = await this.appService.getServiceRef(AdminPanelModule, AdminPanelService);
+
+        return adminPanelServiceRef.throwWebSocketError(commonServiceRef, newOriginalImagePath, webSocketClientId, imageMetaSize);
+    }
 }

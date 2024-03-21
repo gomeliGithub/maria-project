@@ -90,8 +90,6 @@ export class WebSocketService {
         };
 
         this._connection.onclose = () => {
-            console.log("Соединение с сервером закрыто");
-            
             this._connection = null;
 
             clearInterval(this._keepAliveTimer);

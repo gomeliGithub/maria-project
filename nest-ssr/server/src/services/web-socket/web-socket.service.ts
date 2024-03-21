@@ -22,7 +22,8 @@ export class WebSocketService {
         private readonly adminPanelService: AdminPanelService
     ) {
         this.socketServer.on('connection', async ( connection, request ) => {
-            const webSocketClientId: number = parseFloat(request.url.substring(2));
+            const splittedURL: string[] = request.url.split('/');
+            const webSocketClientId: number = parseFloat(splittedURL[splittedURL.length - 1].substring(2));
 
             if ( isNaN(webSocketClientId) ) {
                 connection.terminate();
@@ -31,10 +32,11 @@ export class WebSocketService {
             }
 
             const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
-
             const currentWebSocketClient: IWebSocketClient = commonServiceRef.webSocketClients.find(client => client._id === webSocketClientId);
 
             if ( !currentWebSocketClient ) {
+                await commonServiceRef.throwWebSocketError(commonServiceRef, currentWebSocketClient.imagePath, webSocketClientId, currentWebSocketClient.imageMetaSize);
+                
                 connection.terminate();
 
                 return;
@@ -42,15 +44,19 @@ export class WebSocketService {
 
             currentWebSocketClient.connection = connection;
 
+            const timeoutInterval = this.setIntervalStart();
+
             this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] New connection established. WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentWebSocketClient.login }`, false, 'webSocket');
                 
             connection.on('message', async ( data, isBinary ) => this.connectionOnMessageHandler(currentWebSocketClient, webSocketClientId, data, isBinary));
 
-            connection.on('close', async () => this.connectionOnCloseHandler(currentWebSocketClient));
+            connection.on('close', async () => {
+                this.connectionOnCloseHandler(currentWebSocketClient);
+                
+                clearInterval(await timeoutInterval);
+            });
 
             connection.on('error', async () => this.connectionOnErrorHandler(currentWebSocketClient));
-
-            this.setIntervalStart();
         });
 
         this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } Socket server running on port ${ this.webSocketServerPort }`, false, 'http');
@@ -102,10 +108,10 @@ export class WebSocketService {
         commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter(client => client._id !== currentWebSocketClient._id);
     }
 
-    public async setIntervalStart () {
+    public async setIntervalStart (): Promise<NodeJS.Timeout> {
         let timer: number = 0;
 
-        setInterval(() => {
+        return setInterval(() => {
             timer++;
         
             try {
