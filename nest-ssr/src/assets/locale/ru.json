@@ -122,7 +122,7 @@
 		},
 		"NODISCOUNTSMESSAGE": "Скидок пока нет",
 		"DELETEIMAGESUCCESSMESSAGE": "Изображение успешно удалено",
-		"MAXCOUNTONHOMEPAGEMESSAGE": "Максимальное количество изображений на главной странице",
+		"MAXCOUNTONHOMEPAGEMESSAGE": "Отображено максимальное количество изображений",
 		"TABLECAPTION": "Управление изображениями",
 		"SECONDTABLECAPTION": "Управление данными для типов съёмок",
 		"CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTON": "Изменить описание",

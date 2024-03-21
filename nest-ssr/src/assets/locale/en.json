@@ -122,7 +122,7 @@
 		},
 		"NODISCOUNTSMESSAGE": "No discounts yet",
 		"DELETEIMAGESUCCESSMESSAGE": "Image deleted successfully",
-		"MAXCOUNTONHOMEPAGEMESSAGE": "Maximum number of images on the home page",
+		"MAXCOUNTONHOMEPAGEMESSAGE": "Maximum number of images displayed",
 		"TABLECAPTION": "Image management",
 		"SECONDTABLECAPTION": "Manage data for photography types",
 		"CHANGEPHOTOGRAPHYTYPEDESCRIPTIONBUTTON": "Change description",
