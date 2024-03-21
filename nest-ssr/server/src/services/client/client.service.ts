@@ -299,7 +299,7 @@ export class ClientService {
 
         let tokenIsValid: boolean = false;
 
-        if ( await this.jwtControlService.tokenValidate(request, token) ) tokenIsValid = true;
+        if ( await this.jwtControlService.tokenValidate(request, token, false) ) tokenIsValid = true;
 
         if ( token && tokenIsValid ) {
             decodedToken = this.jwtService.decode(token) as IClient;
