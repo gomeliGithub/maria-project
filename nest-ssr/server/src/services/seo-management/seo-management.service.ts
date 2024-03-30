@@ -13,7 +13,6 @@ export class SeoManagementService {
 
     public routes = [
         { url: '/home', componentFileName: 'home.component.html' },
-        { url: '/', componentFileName: 'home.component.html' },
         { url: '/gallery/individual', componentFileName: 'gallery.component.html'},
         { url: '/gallery/children', componentFileName: 'gallery.component.html'},
         { url: '/gallery/wedding', componentFileName: 'gallery.component.html'},
