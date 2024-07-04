@@ -163,18 +163,24 @@ export class AdminPanelService {
             }
 
             case 'MAXCOUNT': {
+                this.setSpinnerHiddenStatus(true);
+
                 this._appService.createWarningModal(this._appService.getTranslations('ADMINPANEL.MAXCOUNTONHOMEPAGEMESSAGE')); 
 
                 break;
             }
 
-            case 'PENDING': { 
+            case 'PENDING': {
+                this.setSpinnerHiddenStatus(true);
+
                 this._appService.createWarningModal(this._appService.getTranslations('UPLOADIMAGERESPONSES.PENDING')); 
                     
                 break; 
             }
 
             case 'WRONGDISPLAYTYPE': {
+                this.setSpinnerHiddenStatus(true);
+                
                 this._appService.createWarningModal(this._appService.getTranslations('UPLOADIMAGERESPONSES.WRONGDISPLAYTYPE')); 
 
                 break;

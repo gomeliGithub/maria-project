@@ -485,10 +485,12 @@ export class AdminPanelComponent implements OnInit {
                         this.fullCompressedImagesList[imageIndexNumber].displayedOnHomePage = false; // 0
                         this.fullCompressedImagesList[imageIndexNumber].displayedOnGalleryPage = false; // 0
 
-                        switch ( displayTargetPage ) {
-                            case 'home': { this.fullCompressedImagesList[imageIndexNumber].displayedOnHomePage = true; break; } // 1
-                            case 'gallery': { this.fullCompressedImagesList[imageIndexNumber].displayedOnGalleryPage = true; break; } // 1
-                            case 'original': { break; }
+                        if ( responseText === 'SUCCESS' ) {
+                            switch ( displayTargetPage ) {
+                                case 'home': { this.fullCompressedImagesList[imageIndexNumber].displayedOnHomePage = true; break; } // 1
+                                case 'gallery': { this.fullCompressedImagesList[imageIndexNumber].displayedOnGalleryPage = true; break; } // 1
+                                case 'original': { break; }
+                            }
                         }
                     },
                     error: () => {
