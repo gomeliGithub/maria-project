@@ -1,5 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { Response } from 'express';
@@ -8,127 +7,95 @@ import * as bcrypt from 'bcrypt';
 
 import { CommonModule } from '../../modules/common.module';
 
+import { PrismaService } from '../../../prisma/prisma.service';
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 import { JwtControlService } from '../../services/sign/jwt-control.service';
 
-import { Admin, Member } from '../../models/client.model';
-
 import { generate__secure_fgp } from './sign.generateKeys';
 
-import { IClient, IRequest, IRequestBody } from 'types/global';
-import { IClientSignData } from 'types/sign';
-import { IGetActiveClientOptions } from 'types/options';
-import { IAdmin, IMember } from 'types/models';
+import { IRequest, IRequestBody } from 'types/global';
+import { IClientSignData, IJWTPayload } from 'types/sign';
+import { IAdminWithoutRelationFields, IMemberWithoutRelationFields } from 'types/models';
 
 @Injectable()
 export class SignService {
     constructor (
-        private readonly appService: AppService,
-        private readonly jwtService: JwtService,
-        private readonly jwtControlService: JwtControlService,
+        private readonly _prisma: PrismaService,
+        private readonly _jwtService: JwtService,
 
-        @InjectModel(Admin) 
-        private readonly adminModel: typeof Admin,
-        @InjectModel(Member) 
-        private readonly memberModel: typeof Member
+        private readonly _appService: AppService,
+        private readonly _jwtControlService: JwtControlService
     ) { }
 
     public async validateClient (request: IRequest, requiredClientTypes: string[], throwError = true, commonServiceRef?: CommonService): Promise<boolean> {
-        const token: string = this.jwtControlService.extractTokenFromHeader(request); 
-
-        if ( !commonServiceRef ) commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        if ( !commonServiceRef ) commonServiceRef = await this._appService.getServiceRef(CommonModule, CommonService);
 
         if ( request.url === '/api/sign/in' ) {
+            const token: string | undefined = this._jwtControlService.extractTokenFromHeader(request, false);
+
             const requestBody: IRequestBody = request.body;
 
-            if ( !requestBody.sign || !requestBody.sign.clientData || !requestBody.sign.clientData.login || !requestBody.sign.clientData.password ||
-                typeof requestBody.sign.clientData.login !== 'string' || typeof requestBody.sign.clientData.password !== 'string'
-            ) throw new BadRequestException(`${ request.url } "ValidateClient - invalid sign client data"`);
+            const clientLogin: string = ( requestBody.sign?.clientData as IClientSignData ).login.trim();
+            const clientPassword: string = ( requestBody.sign?.clientData as IClientSignData ).password.trim();
 
-            const clientLogin: string = requestBody.sign.clientData.login.trim();
-            const clientPassword: string = requestBody.sign.clientData.password;
+            request.activeClientData = this._getActiveClientData(await this._clientSignDataValidate(commonServiceRef, request, clientLogin, clientPassword))
 
-            request.activeClientInstance = await this._signDataValidate(commonServiceRef, request, clientLogin, clientPassword);
-
-            if ( token ) await this.jwtControlService.addRevokedToken(token);
+            if ( token && await this._jwtControlService.checkTokenIsExists(token) ) await this._jwtControlService.addRevokedToken(token);
 
             return true;
         } else {
-            const validatedClientPayload: IClient = await this.jwtControlService.tokenValidate(request, token, throwError);
-            const clientType: string = validatedClientPayload ? validatedClientPayload.type : null;
-            const clientLogin: string = validatedClientPayload ? validatedClientPayload.login : null;
+            const token: string | undefined = this._jwtControlService.extractTokenFromHeader(request); 
 
-            const clientInstance: Admin | Member = await commonServiceRef.getClients(clientLogin, false) as Admin | Member;
+            const validatedClientPayload: IJWTPayload | null = token ? await this._jwtControlService.tokenValidate(request, token, throwError) : null;
+            const clientType: string | null = validatedClientPayload !== null ? validatedClientPayload.type : null;
+            const clientLogin: string | null = validatedClientPayload !== null ? validatedClientPayload.login : null;
 
-            if ( !clientInstance ) {
-                if ( throwError ) throw new UnauthorizedException(`${ request.url } "ValidateClient - client instance does not exists, login - ${ validatedClientPayload.login }"`);
+            const existingClientData: IAdminWithoutRelationFields | IMemberWithoutRelationFields | null = await commonServiceRef.checkAnyClientDataExists(clientLogin);
+
+            if ( existingClientData === null ) {
+                if ( throwError ) throw new UnauthorizedException(`${ request.url } "ValidateClient - client instance does not exists, login - ${ validatedClientPayload !== null ? validatedClientPayload.login : '' }"`);
                 else return false;
             }
 
-            request.activeClientInstance = clientInstance;
+            request.activeClientData = this._getActiveClientData(existingClientData);
 
             return requiredClientTypes.some(requiredClientType => requiredClientType === clientType);
         }
     }
 
-    public async signUp (request: IRequest, clientData: IClientSignData, isNewAdmin = false): Promise<void> {
-        const clientLogin: string = clientData.login.trim();
-        const clientPassword: string = clientData.password;
-        const clientFullName: string = clientData.fullName.trim();
-        const clientEmail: string = clientData.email.trim();
+    public async signUp (request: IRequest, clientData: IClientSignData): Promise<void> {
+        const { login, password, fullName, email } = clientData;
 
-        const loginPattern: RegExp = /^[a-zA-Z](.[a-zA-Z0-9_-]*)$/;
-        const emailPattern: RegExp = /^[^\s()<>@,;:\/]+@\w[\w\.-]+\.[a-z]{2,}$/i;
+        const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
 
-        // clientPassword.length < 4
-        const isIncorrectLogin: boolean = !loginPattern.test(clientLogin) || clientLogin.length < 4 || clientLogin.length > 15;
-        const isIncorrectFullName: boolean = clientFullName.length < 3 || clientFullName.length > 25;
-        const isIncorrectEmail: boolean = !emailPattern.test(clientEmail);
-
-        if ( isIncorrectLogin || isIncorrectFullName || ( clientEmail && isIncorrectEmail ) ) {
-            let message: string = null;
-            
-            if ( isIncorrectLogin ) message = 'SignUp - incorrect login';
-            else if ( isIncorrectFullName ) message = 'SignUp - incorrect full name';
-            else if ( isIncorrectEmail ) message = 'SignUp - incorrect email';
-
-            throw new BadRequestException(`${ request.url } "${ message }"`);
-        }
-
-        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
-
-        const clientRawData: IAdmin | IMember = await commonServiceRef.getClients(clientLogin, true, { includeFields: [ 'login', 'fullName' ] });
-
-        if ( clientRawData ) throw new UnauthorizedException(`${ request.url } "SignUp - client instance does not exists"`);
+        const existingClientData: IAdminWithoutRelationFields | IMemberWithoutRelationFields | null = await commonServiceRef.checkAnyClientDataExists(login.trim());
         
-        // const clientPasswordHash: string = await bcrypt.hash(clientPassword, process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS);
+        if ( existingClientData === null ) throw new UnauthorizedException(`${ request.url } "SignUp - client instance does not exists"`);
+        
+        const passwordHash: string = await bcrypt.hash(password.trim(), parseInt(process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS as string, 10));
 
-        if ( isNewAdmin ) await this.adminModel.create({
-            login: clientLogin,
-            password: clientPassword,
-            fullName: clientFullName,
-            email: clientEmail,
-            type: 'admin'
-        });
-        else await this.memberModel.create({
-            login: clientLogin,
-            password: clientPassword,
-            fullName: clientFullName,
-            email: clientEmail,
-            type: 'member'
+        await this._prisma.member.create({ 
+            data: {
+                login: login.trim(),
+                password: passwordHash,
+                fullName: ( fullName as string ).trim(),
+                email: ( email as string ).trim()
+            }
         });
     }
 
     public async signIn (request: IRequest, response: Response, clientLocale: string): Promise<string> {
-        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
+        const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
 
-        const payload: IClient = {
-            id: request.activeClientInstance.id,
-            login: request.activeClientInstance.login,
-            type: request.activeClientInstance.type as 'admin' | 'member',
-            locale: process.env.CLIENT_DEFAULT_LOCALE,
-            fullName: request.activeClientInstance.fullName,
+        const payload: IJWTPayload = {
+            id: ( request.activeClientData as IJWTPayload ).id,
+            login: ( request.activeClientData as IJWTPayload ).login,
+            type: ( request.activeClientData as IJWTPayload ).type,
+            locale: process.env.CLIENT_DEFAULT_LOCALE as string,
+            fullName: ( request.activeClientData as IJWTPayload ).fullName,
+            email: ( request.activeClientData as IJWTPayload ).email,
+            signUpDate: ( request.activeClientData as IJWTPayload ).signUpDate,
             __secure_fgpHash: ""
         }
 
@@ -136,98 +103,103 @@ export class SignService {
 
         payload.__secure_fgpHash = __secure_fgpHash;
 
-        await commonServiceRef.registerClientLastLoginTime(request.activeClientInstance);
-        await commonServiceRef.registerClientLastActivityTime(request.activeClientInstance);
+        await commonServiceRef.registerClientLastLoginTime(request.activeClientData as IJWTPayload);
+        await commonServiceRef.registerClientLastActivityTime(request.activeClientData as IJWTPayload);
 
-        const access_token: string = this.jwtService.sign(payload);
+        const access_token: string = this._jwtService.sign(payload);
 
-        await this.jwtControlService.saveToken(access_token);
+        await this._jwtControlService.saveToken(access_token);
 
-        response.cookie('__secure_fgp', __secure_fgp, this.appService.cookieSerializeOptions);
+        response.cookie('__secure_fgp', __secure_fgp, this._appService.cookieSerializeOptions);
 
-        if ( !clientLocale ) response.cookie('locale', process.env.CLIENT_DEFAULT_LOCALE, this.appService.cookieSerializeOptions);
+        if ( !clientLocale ) response.cookie('locale', process.env.CLIENT_DEFAULT_LOCALE, this._appService.cookieSerializeOptions);
 
         return access_token;
     }
 
     public async signOut (request: IRequest): Promise<void> {
-        const token: string = this.jwtControlService.extractTokenFromHeader(request);
+        const token: string | undefined = this._jwtControlService.extractTokenFromHeader(request);
 
         if ( !token || token === '' ) throw new UnauthorizedException(`${ request.url } "SignOut - invalid or does not exists token"`);
 
-        return this.jwtControlService.addRevokedToken(token);
+        return this._jwtControlService.addRevokedToken(token);
     }
 
-    public async getActiveClient (request: IRequest): Promise<IClient>
-    public async getActiveClient (request: IRequest, options?: { includeFields?: string, allowedIncludedFields?: string[] }): Promise<string>
-    public async getActiveClient (request: IRequest, options?: { includeFields?: string[], allowedIncludedFields?: string[], response?: Response, clientLocale?: string }): Promise<IClient>
-    public async getActiveClient (request: IRequest, options?: { includeFields?: string | string[], allowedIncludedFields?: string[] }): Promise<string | IClient>
-    public async getActiveClient (request: IRequest, options?: IGetActiveClientOptions): Promise<string | IClient> {
-        const token: string = this.jwtControlService.extractTokenFromHeader(request);
 
-        let validatedClientPayload: IClient = null;
+    public async getActiveClient (request: IRequest, response: Response, clientLocale: string): Promise<IJWTPayload> {
+        const token: string | undefined = this._jwtControlService.extractTokenFromHeader(request);
+
+        let validatedClientPayload: IJWTPayload | null = null;
 
         try {
-            validatedClientPayload = await this.jwtControlService.tokenValidate(request, token);
+            if ( token ) validatedClientPayload = await this._jwtControlService.tokenValidate(request, token);
         } catch { }
 
-        if ( !validatedClientPayload || !token || token === '' ) {
-            if ( options.response && ( !options.clientLocale || options.clientLocale === '' ) ) options.response.cookie('locale', process.env.CLIENT_DEFAULT_LOCALE, this.appService.cookieSerializeOptions);
+        if ( validatedClientPayload === null || !token || token === '' ) {
+            if ( response && ( !clientLocale || clientLocale === '' ) ) response.cookie('locale', process.env.CLIENT_DEFAULT_LOCALE, this._appService.cookieSerializeOptions);
 
-            if ( options.response ) validatedClientPayload = { locale: options.clientLocale && options.clientLocale !== '' ? options.clientLocale : null };
+            if ( response ) validatedClientPayload = {
+                id: null,
+                login: null,
+                type: null,
+                fullName: null,
+                email: null,
+                signUpDate: null,
+                locale: clientLocale && clientLocale !== '' ? clientLocale : null 
+            };
 
-            return validatedClientPayload;
+            return validatedClientPayload as IJWTPayload;
         }
 
-        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
+        const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
 
         if ( validatedClientPayload ) {
-            const clientInstance: Admin | Member = await commonServiceRef.getClients(validatedClientPayload.login, false);
+            const existingClientData: IAdminWithoutRelationFields | IMemberWithoutRelationFields | null = await commonServiceRef.checkAnyClientDataExists(validatedClientPayload.login as string);
 
-            if ( !clientInstance ) throw new UnauthorizedException(`${ request.url } "GetActiveClient - client instance does not exists"`);
+            if ( existingClientData === null ) throw new UnauthorizedException(`${ request.url } "GetActiveClient - client instance does not exists"`);
         }
-            
-        if ( !options ) options = {};
 
-        if ( validatedClientPayload && options.includeFields ) {
-            if ( typeof options.includeFields === 'string' ) return validatedClientPayload[options.includeFields];
-            else if ( Array.isArray(options.includeFields) ) {
-                if ( options.allowedIncludedFields ) {
-                    const isNotAllowedIncludedField: boolean = options.includeFields.some(field => !options.allowedIncludedFields.includes(field));
-
-                    if ( isNotAllowedIncludedField ) throw new BadRequestException(`${ request.url } "GetActiveClient - not allowed included field"`);
-                }
-
-                Object.keys(validatedClientPayload).forEach(field => {
-                    !options.includeFields.includes(field) ? delete validatedClientPayload[field] : null;
-                });
-            }
-        }
+        validatedClientPayload.id = null;
+        
+        delete validatedClientPayload.exp;
+        delete validatedClientPayload.iat;
 
         return validatedClientPayload;
     }
 
-    private async _signDataValidate (commonServiceRef: CommonService, request: IRequest, clientLogin: string, clientPassword: string): Promise<Admin | Member> {
-        const clientInstance: Admin | Member = await commonServiceRef.getClients(clientLogin, false);
+    private async _clientSignDataValidate (commonServiceRef: CommonService, request: IRequest, clientLogin: string, clientPassword: string): Promise<IAdminWithoutRelationFields | IMemberWithoutRelationFields> {
+        const existingClientData: IAdminWithoutRelationFields | IMemberWithoutRelationFields | null = await commonServiceRef.checkAnyClientDataExists(clientLogin);
 
-        console.log(await bcrypt.hash('12345Admin', parseInt(process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS, 10)));
+        console.log(await bcrypt.hash('12345Admin', parseInt(process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS as string, 10)));
 
-        if ( !clientInstance ) throw new UnauthorizedException(`${ request.url } "_signDataValidate - client instance does not exists"`);
+        if ( existingClientData === null ) throw new UnauthorizedException(`${ request.url } "_clientSignDataValidate - client instance does not exists"`);
 
-        const passwordIsValid: boolean = await bcrypt.compare(clientPassword, clientInstance.password); 
+        const passwordIsValid: boolean = await bcrypt.compare(clientPassword, existingClientData.password); 
         
+
         
         // console.log(clientPassword); 
         // console.log(client.password);
         // console.log(await bcrypt.compare(clientPassword, client.password));
 
 
-        if ( !passwordIsValid ) throw new UnauthorizedException(`${ request.url } "_signDataValidate - client password invalid"`);
+        
+        if ( !passwordIsValid ) throw new UnauthorizedException(`${ request.url } "_clientSignDataValidate - client password invalid"`);
 
-        return clientInstance;
+        return existingClientData;
     }
 
-    public async getBcryptHashSaltrounds (): Promise<string> {
-        return process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS;
+    private _getActiveClientData (validatedClientData: IAdminWithoutRelationFields | IMemberWithoutRelationFields): IJWTPayload {
+        const activeClientData: IJWTPayload = {
+            id: validatedClientData.id,
+            login: validatedClientData.login,
+            type: validatedClientData.type,
+            fullName: validatedClientData.fullName,
+            email: validatedClientData.email,
+            locale: null,
+            signUpDate: validatedClientData.signUpDate
+        };
+
+        return activeClientData;
     }
 }

@@ -9,11 +9,7 @@ import { IWSMessage } from 'types/web-socket';
     providedIn: 'root'
 })
 export class WebSocketService {
-    constructor (
-        private readonly appService: AppService
-    ) { }
-
-    private _connection: WebSocket;
+    private _connection: WebSocket | null;
 
     private _keepAliveTimer: any;
 
@@ -24,11 +20,15 @@ export class WebSocketService {
     public progressBarValue: number = 0;
     public componentClass: string;
 
+    constructor (
+        private readonly _appService: AppService
+    ) { }
+
     public on (host: string, uploadImageForm: FormGroup<{
-        imagePhotographyType: FormControl<string>;
-        imageViewSizeType: FormControl<string>;
-        image: FormControl<FileList>;
-        imageDescription: FormControl<string>;
+        imagePhotographyType: FormControl<string | null>;
+        imageDisplayType: FormControl<string | null>;
+        image: FormControl<FileList | null>;
+        imageDescription: FormControl<string | null>;
     }>, slicedImageData: ArrayBuffer[], newClientId: number): void {
         // this._connection = new WebSocket(host + `/:${newClientId}`);
         this._connection = new WebSocket(`${ host }/:${ newClientId }`);
@@ -56,14 +56,14 @@ export class WebSocketService {
                         this.progressBarVisible = false;
                         this.componentClass = '';
 
-                        this._connection.close();
+                        ( this._connection as WebSocket ).close();
 
-                        this.appService.createErrorModal();
+                        this._appService.createErrorModal();
                     }, 2000);
                 } else if ( message.text === 'FINISH' ) {
-                    this._connection.close();
+                    ( this._connection as WebSocket ).close();
 
-                    this.progressBarValue = message.percentUploaded;
+                    this.progressBarValue = message.percentUploaded as number;
 
                     this._clearUploadImageData(uploadImageForm);
 
@@ -73,12 +73,12 @@ export class WebSocketService {
                         this.progressBarVisible = false;
                         this.componentClass = '';
 
-                        this.appService.createSuccessModal(this.appService.getTranslations('UPLOADIMAGERESPONSES.FINISH'));
+                        this._appService.createSuccessModal(this._appService.getTranslations('UPLOADIMAGERESPONSES.FINISH'));
 
                         window.location.reload();
                     }, 1000);
                 } else if ( message.text === 'SUCCESS' ) {
-                    this.progressBarValue = message.percentUploaded;
+                    this.progressBarValue = message.percentUploaded as number;
 
                     this.sendImage(this._slicedImageData, this._currentChunkNumber += 1);
                 }
@@ -109,10 +109,10 @@ export class WebSocketService {
     }
 
     private _clearUploadImageData (uploadImageForm: FormGroup<{
-        imagePhotographyType: FormControl<string>;
-        imageViewSizeType: FormControl<string>;
-        image: FormControl<FileList>;
-        imageDescription: FormControl<string>;
+        imagePhotographyType: FormControl<string | null>;
+        imageDisplayType: FormControl<string | null>;
+        image: FormControl<FileList | null>;
+        imageDescription: FormControl<string | null>;
     }>) {
         uploadImageForm.reset();
 

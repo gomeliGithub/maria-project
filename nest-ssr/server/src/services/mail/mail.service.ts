@@ -37,7 +37,7 @@ export class MailService {
             const transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo> = nodemailer.createTransport(mailer_transportConfig);
     
             let text: string = body;
-            let html: string = undefined;
+            let html: string | undefined = undefined;
 
             const textWOTags: string = this._removeTags(text);
     

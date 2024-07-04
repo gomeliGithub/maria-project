@@ -1,15 +1,15 @@
-<form [formGroup]="signForm" class="mt-5 p-3 w-50" id="signForm" novalidate (submit)="sign()">
+<form [formGroup]="signForm" class="mt-5 p-3 w-50" id="signForm" novalidate (submit)="signFormSubmit()">
     <div class="form-group input-group mb-3">
         <div class="form-floating">
             <input type="text" class="form-control" id="inputLogin" placeholder="login" formControlName="clientLogin">
             <label for="inputLogin" class="form-label text-wrap">
-                {{ signOp === 'up' ? ('LOGINFORM.LOGINLABELTEXT' | translate) : ('LOGINFORM.LOGINLABELTEXT' | translate | replace:' *':'') }}
+                {{ signOperation === 'up' ? ('LOGINFORM.LOGINLABELTEXT' | translate) : ('LOGINFORM.LOGINLABELTEXT' | translate | replace:' *':'') }}
             </label>
             <div class="alert alert-danger" *ngIf="signForm.controls['clientLogin'].invalid && signForm.controls['clientLogin'].touched">
                 {{ 'CLIENTPAGE.LOGININVALIDMESSAGE' | translate }}
             </div>
         </div>
-        <span *ngIf="signOp === 'up'" class="input-group-text fs-3"
+        <span *ngIf="signOperation === 'up'" class="input-group-text fs-3"
             placement="auto"
             tooltipClass="custom-tooltip"
             [ngbTooltip]="'CLIENTPAGE.HELPBLOCKS.LOGIN' | translate"
@@ -21,21 +21,21 @@
         <div class="form-floating">
             <input [type]="!passwordIsVisible ? 'password' : 'text'" class="form-control" id="inputPassword" placeholder="password" formControlName="clientPassword">
             <label for="inputPassword" class="form-label text-wrap">
-                {{ signOp === 'up' ? ('LOGINFORM.PASSWORDLABELTEXT' | translate) : ('LOGINFORM.PASSWORDLABELTEXT' | translate | replace:' *':'') }}
+                {{ signOperation === 'up' ? ('LOGINFORM.PASSWORDLABELTEXT' | translate) : ('LOGINFORM.PASSWORDLABELTEXT' | translate | replace:' *':'') }}
             </label>
             <div class="alert alert-danger" *ngIf="signForm.controls['clientPassword'].invalid && signForm.controls['clientPassword'].touched">
                 {{ 'CLIENTPAGE.PASSWORDINVALIDMESSAGE' | translate }}
             </div>
         </div>
         <div class="form-check form-switch align-self-center text-center ms-2"
-            [ngClass]="{ 'me-1': signOp === 'up' }"
+            [ngClass]="{ 'me-1': signOperation === 'up' }"
         >
             <input class="form-check-input" type="checkbox" role="switch" id="passwordVisibleSwitchCheck" (click)="passwordVisibleSwitch()">
             <label class="form-check-label" for="passwordVisibleSwitchCheck">
                 {{ ( 'CLIENTPAGE.' + ( !passwordIsVisible ? 'PASSWORDSHOWSWITCHTEXT' : 'PASSWORDHIDESWITCHTEXT' ) ) | translate }}
             </label>
         </div>
-        <span *ngIf="signOp === 'up'" class="input-group-text fs-3"
+        <span *ngIf="signOperation === 'up'" class="input-group-text fs-3"
             placement="auto"
             tooltipClass="custom-tooltip"
             [ngbTooltip]="'CLIENTPAGE.HELPBLOCKS.PASSWORD' | translate"
@@ -43,7 +43,7 @@
             <i class="bi bi-info-circle"></i>
         </span>
     </div>
-    <div *ngIf="signOp === 'up'" class="form-group input-group mb-3">
+    <div *ngIf="signOperation === 'up' && signForm.controls['clientFullName']" class="form-group input-group mb-3">
         <div class="form-floating">
             <input type="text" class="form-control" id="inputFullName" placeholder="fullName" formControlName="clientFullName">
             <label for="inputFullName" class="form-label text-wrap">{{ 'LOGINFORM.FULLNAMELABELTEXT' | translate }}</label>
@@ -59,7 +59,7 @@
             <i class="bi bi-info-circle"></i>
         </span>
     </div>
-    <div *ngIf="signOp === 'up'" class="form-group input-group mb-3">
+    <div *ngIf="signOperation === 'up' && signForm.controls['clientEmail']" class="form-group input-group mb-3">
         <div class="form-floating">
             <input type="email" class="form-control" id="inputEmail" placeholder="email" formControlName="clientEmail">
             <label for="inputEmail" class="form-label text-wrap">Email</label>
@@ -77,19 +77,19 @@
     </div>
     <div class="form-group d-flex flex-column flex-wrap justify-content-center align-content-center">
         <button class="btn btn-primary" [disabled]="signForm.invalid">
-            {{signOp === 'up' ? ('CLIENTMENU.SIGNUPTEXT' | translate): ('CLIENTMENU.SIGNINTEXT' | translate) }} 
+            {{ signOperation === 'up' ? ('CLIENTMENU.SIGNUPTEXT' | translate): ('CLIENTMENU.SIGNINTEXT' | translate) }} 
         </button>
         <div class="mt-2 text-center">
-            <span *ngIf="signOp === 'up'; else signInSpan" class="fw-bold">
+            <span *ngIf="signOperation === 'up'; else signInSpan" class="fw-bold">
                 {{ 'CLIENTPAGE.ACCOUNTHAVEMESSAGES.HAVE' | translate }}
-                (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" routerLink="/signIn" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" [routerLink]="[ '/sign/in' ]">
                     {{ 'CLIENTMENU.SIGNINTEXT' | translate }}
                 </a>)
             </span>
             <ng-template #signInSpan>  
                 <span class="fw-bold">
                     {{ 'CLIENTPAGE.ACCOUNTHAVEMESSAGES.HAVENT' | translate }} 
-                    (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" routerLink="/signUp" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                    (<a class="link-offset-3 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-100-hover" [routerLink]="[ '/sign/up' ]">
                         {{ 'CLIENTMENU.SIGNUPTEXT' | translate }}
                     </a>)
                 </span>

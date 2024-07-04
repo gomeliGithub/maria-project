@@ -3,8 +3,6 @@ import * as crypto from 'crypto';
 import { __secure_fgpData, ISignVerifyKeys } from 'types/sign';
 
 export function generateSignVerifyKeys (): ISignVerifyKeys {
-    const results: ISignVerifyKeys = null;
-
     const keys = crypto.generateKeyPairSync("ec", {
         namedCurve: "secp256k1",
         //modulusLength: '1024',
@@ -18,8 +16,10 @@ export function generateSignVerifyKeys (): ISignVerifyKeys {
         }
     });
 
-    results.publicKey = keys.publicKey;
-    results.privateKey = keys.privateKey;
+    const results: ISignVerifyKeys = {
+        publicKey: keys.publicKey,
+        privateKey: keys.privateKey
+    };
 
     return results;
 }

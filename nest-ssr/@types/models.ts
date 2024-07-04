@@ -1,74 +1,24 @@
-export interface IAdmin {
-    id?: number;
-    login?: string;
-    password?: string;
-    type?: string;
-    fullName?: string;
-    email?: string;
-    signUpDate?: Date;
-    lastSignInDate?: Date;
-    lastActiveDate?: Date;
-    compressedImages?: IClientCompressedImage[];
-}
+import { Prisma, Admin, Member, CompressedImage, ImagePhotographyType, ClientOrder, Discount, JWT } from "@prisma/client";
 
-export interface IMember {
-    id?: number;
-    login?: string;
-    password?: string;
-    type?: string;
-    fullName?: string;
-    email?: string;
-    signUpDate?: Date;
-    lastSignInDate?: Date;
-    lastActiveDate?: Date;
-    compressedImages?: IClientCompressedImage[];
-}
+export interface IAdmin extends Admin, Prisma.AdminGetPayload<{ include: { compressedImages: true } }> { }
+export interface IAdminWithoutRelationFields extends Admin { }
 
-export interface IClientCompressedImage {
-    name?: string;
-    dirPath?: string;
-    originalName?: string;
-    originalDirPath?: string;
-    originalSize?: number;
-    photographyType?: string;
-    viewSizeType?: string;
-    description?: string;
-    uploadDate?: Date;
-    displayedOnHomePage?: number;
-    displayedOnGalleryPage?: number;
-    adminLogin?: string;
-    memberLogin?: string;
-    admin?: IAdmin;
-    member?: IMember;
+export interface IMember extends Member, Prisma.MemberGetPayload<{ include: { clientOrders: true } }> { }
+export interface IMemberWithClientOrdersCount extends Member {
+    _count: {
+        clientOrders: number;
+    };
 }
+export interface IMemberWithoutRelationFields extends Member { }
 
-export interface IJWT_token {
-    token_hash?: string;
-    issued_date?: Date;
-    expires_date?: Date;
-    revokation_date?: Date;
-    revoked?: boolean;
-}
+export interface ICompressedImage extends CompressedImage, Prisma.CompressedImageGetPayload<{ include: { admin: true } }> { }
+export interface ICompressedImageWithoutRelationFields extends CompressedImage { }
 
-export interface IImagePhotographyType {
-    name: string;
-    description?: string;
-    compressedImageName?: string;
-}
+export interface IImagePhotographyType extends ImagePhotographyType { }
 
-export interface IClientOrder {
-    id?: number;
-    photographyType: string;
-    type: string;
-    phoneNumber: string;
-    comment?: string;
-    createdDate: Date;
-    status?: string;
-}
+export interface IClientOrder extends ClientOrder, Prisma.ClientOrderGetPayload<{ include: { member: true } }> { }
+export interface IClientOrderWithoutRelationFields extends ClientOrder { }
 
-export interface IDiscount {
-    id?: number;
-    content: string;
-    expirationFromDate?: Date;
-    expirationToDate?: Date;
-}
+export interface IDiscount extends Discount { }
+
+export interface IJWT extends JWT { }

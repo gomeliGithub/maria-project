@@ -8,12 +8,16 @@ import { AppService } from './app.service';
 import { generateCookieSecret, generateJWT_SecretCode } from './services/sign/sign.generateKeys';
 
 import { HttpExceptionFilter } from './filters/http-exception/http-exception.filter';
+
 import { CacheInterceptor } from './interceptors/cache/cache.interceptor';
+import { BigIntInterceptor } from './interceptors/big-int/big-int.interceptor';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
         logger: ['error', 'warn', 'log']
     });
+
+    app.enableShutdownHooks();
 
     process.env.JWT_SECRETCODE = generateJWT_SecretCode();
     process.env.COOKIE_SECRET = generateCookieSecret();
@@ -31,9 +35,9 @@ async function bootstrap() {
     const appService = app.get(AppService);
 
     app.useGlobalFilters(new HttpExceptionFilter(appService));
-    app.useGlobalInterceptors(new CacheInterceptor());
+    app.useGlobalInterceptors(new CacheInterceptor(), new BigIntInterceptor());
 
-    await app.listen(process.env.PORT ?? process.env.SERVER_API_PORT);
+    await app.listen(process.env.PORT as string); // process.env.SERVER_API_PORT ?? process.env.PORT as string
 }
 
 declare const __non_webpack_require__: NodeRequire;

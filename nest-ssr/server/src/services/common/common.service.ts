@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 
+import { Client_type } from '@prisma/client';
+
 import sharp from 'sharp';
 
 import { ClientModule } from '../../modules/client.module';
@@ -14,22 +16,21 @@ import { SignService } from '../../services/sign/sign.service';
 import { ImageControlService } from '../../services/image-control/image-control.service';
 import { AdminPanelService } from '../admin-panel/admin-panel.service';
 
-import { Admin, Member, ClientCompressedImage } from '../../models/client.model';
-
-import { IClient, IClientOrdersInfoDataArr, ICompressImageData, IRequest } from 'types/global';
-import { IClientGetOptions, ICreateImageDirsOptions, IGetActiveClientOptions, IGetClientOrdersOptions, ICompressedImageGetOptions } from 'types/options';
+import { IClientOrdersInfoDataArr, ICompressImageData, IRequest } from 'types/global';
+import { IClientGetOptions, ICreateImageDirsOptions, IGetClientOrdersOptions, ICompressedImageGetOptions } from 'types/options';
 import { IWebSocketClient } from 'types/web-socket';
-import { IAdmin, IClientCompressedImage, IImagePhotographyType, IMember } from 'types/models';
+import { IAdmin, IAdminWithoutRelationFields, ICompressedImageWithoutRelationFields, IImagePhotographyType, IMember, IMemberWithClientOrdersCount, IMemberWithoutRelationFields } from 'types/models';
+import { IJWTPayload } from 'types/sign';
 
 @Injectable()
 export class CommonService {
-    constructor (
-        private readonly appService: AppService
-    ) { }
-
     public webSocketClients: IWebSocketClient[] = [];
     public promisesCache: { [ x: string ]: { pendingPromises: Promise<any>[], count: number } } = { };
     public adminPanelImageOperationKeys: string[] = [ 'deleteImage', 'changeImageDisplayTargetRename', 'changeImageData', 'setPhotographyTypeImageUnlink', 'setPhotographyTypeImageCopy' ];
+
+    constructor (
+        private readonly _appService: AppService
+    ) { }
 
     public async managePromisesCache (key: string, promise: Promise<any>): Promise<any> {
         if ( !this.promisesCache[key] ) {
@@ -62,24 +63,34 @@ export class CommonService {
     }
 
     public async validateClient (request: IRequest, requiredClientTypes: string[], throwError = true, commonServiceRef?: CommonService): Promise<boolean> {
-        const signServiceRef: SignService = await this.appService.getServiceRef(SignModule, SignService);
+        const signServiceRef: SignService = await this._appService.getServiceRef(SignModule, SignService);
 
         return signServiceRef.validateClient(request, requiredClientTypes, throwError, commonServiceRef);
     }
 
-    public async getClients (loginList: string, rawResult?: false, options?: IClientGetOptions): Promise<Admin | Member>
-    public async getClients (loginList: string, rawResult?: true, options?: IClientGetOptions): Promise<IAdmin | IMember>
-    public async getClients (loginList: string[], rawResult?: false, options?: IClientGetOptions): Promise<Admin[] | Member[]>
-    public async getClients (loginList: string[], rawResult?: true, options?: IClientGetOptions): Promise<IAdmin[] | IMember[]>
-    public async getClients (loginList: 'full', rawResult?: false, options?: IClientGetOptions): Promise<Member[]>
-    public async getClients (loginList: 'full', rawResult?: true, options?: IClientGetOptions): Promise<IMember[]>
-    public async getClients (loginList: string | string[], rawResult?: false, options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[]>
-    public async getClients (loginList: string | string[], rawResult?: true, options?: IClientGetOptions): Promise<IAdmin | IMember | IAdmin[] | IMember[]>
-    public async getClients (loginList: string | string[], rawResult?: boolean, options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[] | IAdmin | IMember | IAdmin[] | IMember[]>
-    public async getClients (loginList: string | string[], rawResult = false, options?: IClientGetOptions): Promise<Admin | Member | Admin[] | Member[] | IAdmin | IMember | IAdmin[] | IMember[]> {
-        const clientServiceRef: ClientService = await this.appService.getServiceRef(ClientModule, ClientService);
+    public async getClientsData (clientType: 'member'): Promise<IMember | IMemberWithClientOrdersCount | IMemberWithoutRelationFields | IMember[] | IMemberWithClientOrdersCount[] | IMemberWithoutRelationFields[] | null>
+    public async getClientsData (clientType: 'admin'): Promise<IAdmin | IAdminWithoutRelationFields | IAdmin[] | IAdminWithoutRelationFields[] | null>
+    public async getClientsData (clientType: 'member', loginList?: string): Promise<IMember | IMemberWithClientOrdersCount | IMemberWithoutRelationFields | null>
+    public async getClientsData (clientType: 'admin', loginList?: string): Promise<IAdmin | IAdminWithoutRelationFields | null>
+    public async getClientsData (clientType: 'member', loginList?: string[]): Promise<IMember[] | IMemberWithClientOrdersCount[] | IMemberWithoutRelationFields[]>
+    public async getClientsData (clientType: 'admin', loginList?: string[]): Promise<IAdmin[] | IAdminWithoutRelationFields[]>
+    public async getClientsData (clientType: 'member', loginList?: string, options?: IClientGetOptions): Promise<IMember | IMemberWithClientOrdersCount | IMemberWithoutRelationFields | null>
+    public async getClientsData (clientType: 'admin', loginList?: string, options?: IClientGetOptions): Promise<IAdmin | IAdminWithoutRelationFields | null>
+    public async getClientsData (clientType: 'member', loginList?: string[], options?: IClientGetOptions): Promise<IMember[] | IMemberWithClientOrdersCount[] | IMemberWithoutRelationFields[]>
+    public async getClientsData (clientType: 'admin', loginList?: string[], options?: IClientGetOptions): Promise<IAdmin[] | IAdminWithoutRelationFields[]>
+    public async getClientsData (clientType: Client_type, loginList?: string | string[], options?: IClientGetOptions)
+    : Promise<IMember | IMemberWithClientOrdersCount | IMemberWithoutRelationFields | IAdmin | IAdminWithoutRelationFields | IMember[] | IMemberWithClientOrdersCount[] | IMemberWithoutRelationFields[] | IAdmin[] | IAdminWithoutRelationFields[] | null>
+    public async getClientsData (clientType: Client_type, loginList?: string | string[], options?: IClientGetOptions)
+    : Promise<IMember | IMemberWithClientOrdersCount | IMemberWithoutRelationFields | IAdmin | IAdminWithoutRelationFields | IMember[] | IMemberWithClientOrdersCount[] | IMemberWithoutRelationFields[] | IAdmin[] | IAdminWithoutRelationFields[] | null> {
+        const clientServiceRef: ClientService = await this._appService.getServiceRef(ClientModule, ClientService);
 
-        return clientServiceRef.get(loginList, rawResult, options);
+        return clientServiceRef.getClientsData(clientType, loginList, options);
+    }
+
+    public async checkAnyClientDataExists (login: string | null): Promise<IAdminWithoutRelationFields | IMemberWithoutRelationFields | null> {
+        const clientServiceRef: ClientService = await this._appService.getServiceRef(ClientModule, ClientService);
+
+        return clientServiceRef.checkAnyClientDataExists(login);
     }
 
     public async getClientOrdersInfo (loginList: string, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr>
@@ -87,68 +98,61 @@ export class CommonService {
     public async getClientOrdersInfo (loginList: 'all', options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
     public async getClientOrdersInfo (loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
     public async getClientOrdersInfo (loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[]> {
-        const clientServiceRef: ClientService = await this.appService.getServiceRef(ClientModule, ClientService);
+        const clientServiceRef: ClientService = await this._appService.getServiceRef(ClientModule, ClientService);
 
         return clientServiceRef.getClientOrdersInfo(loginList, options);
     }
 
-    public async registerClientLastActivityTime (clientInstance: Admin | Member): Promise<void> {
-        const clientServiceRef: ClientService = await this.appService.getServiceRef(ClientModule, ClientService);
+    public async registerClientLastActivityTime (clientData: IJWTPayload): Promise<void> {
+        const clientServiceRef: ClientService = await this._appService.getServiceRef(ClientModule, ClientService);
 
-        return clientServiceRef.registerClientLastActivityTime(clientInstance);
+        return clientServiceRef.registerClientLastActivityTime(clientData);
     }
 
-    public async registerClientLastLoginTime (clientInstance: Admin | Member): Promise<void> {
-        const clientServiceRef = await this.appService.getServiceRef(ClientModule, ClientService);
+    public async registerClientLastLoginTime (clientData: IJWTPayload): Promise<void> {
+        const clientServiceRef = await this._appService.getServiceRef(ClientModule, ClientService);
 
-        return clientServiceRef.registerClientLastLoginTime(clientInstance);
+        return clientServiceRef.registerClientLastLoginTime(clientData);
     }
 
-    public async getActiveClient (request: IRequest): Promise<IClient>
-    public async getActiveClient (request: IRequest, options?: { includeFields?: string, allowedIncludedFields?: string[] }): Promise<string>
-    public async getActiveClient (request: IRequest, options?: { includeFields?: string[], allowedIncludedFields?: string[], response?: Response, clientLocale?: string }): Promise<IClient>
-    public async getActiveClient (request: IRequest, options?: { includeFields?: string | string[], allowedIncludedFields?: string[] }): Promise<string | IClient>
-    public async getActiveClient (request: IRequest, options?: IGetActiveClientOptions): Promise<string | IClient> {
-        const signServiceRef = await this.appService.getServiceRef(SignModule, SignService);
+    public async getActiveClient (request: IRequest, response: Response, clientLocale: string): Promise<IJWTPayload> {
+        const signServiceRef = await this._appService.getServiceRef(SignModule, SignService);
 
-        return signServiceRef.getActiveClient(request, options);
+        return signServiceRef.getActiveClient(request, response, clientLocale);
     }
 
     public async createImageDirs (options?: ICreateImageDirsOptions): Promise<void> {
-        const imageControlServiceRef: ImageControlService = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
+        const imageControlServiceRef: ImageControlService = await this._appService.getServiceRef(ImageControlModule, ImageControlService);
 
         return imageControlServiceRef.createImageDirs(options);
     }
 
     public async compressImage (request: IRequest, compressImageData: ICompressImageData, options?: sharp.SharpOptions): Promise<boolean> {
-        const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
+        const imageControlServiceRef = await this._appService.getServiceRef(ImageControlModule, ImageControlService);
         
         return imageControlServiceRef.compressImage(request, compressImageData, options);
     }
 
-    public async getCompressedImages (options: ICompressedImageGetOptions, rawResult: false): Promise<ClientCompressedImage[]>
-    public async getCompressedImages (options: ICompressedImageGetOptions, rawResult: true): Promise<IClientCompressedImage[]>
-    public async getCompressedImages (options: ICompressedImageGetOptions, rawResult?: boolean): Promise<ClientCompressedImage[] | IClientCompressedImage[]>
-    public async getCompressedImages (options: ICompressedImageGetOptions, rawResult = true): Promise<ClientCompressedImage[] | IClientCompressedImage[]> {
-        const imageControlServiceRef: ImageControlService = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
+    public async getCompressedImages (options: ICompressedImageGetOptions): Promise<ICompressedImageWithoutRelationFields[]> {
+        const imageControlServiceRef: ImageControlService = await this._appService.getServiceRef(ImageControlModule, ImageControlService);
 
-        return imageControlServiceRef.get(options, rawResult);
+        return imageControlServiceRef.getCompressedImages(options);
     }
 
     public async checkFileExists (filePath: string): Promise<boolean> {
-        const imageControlServiceRef: ImageControlService = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
+        const imageControlServiceRef: ImageControlService = await this._appService.getServiceRef(ImageControlModule, ImageControlService);
 
         return imageControlServiceRef.checkFileExists(filePath);
     }
 
     public async getFulfilledAccessPath (paths: string[]): Promise<string> {
-        const adminPanelServiceRef: AdminPanelService = await this.appService.getServiceRef(AdminPanelModule, AdminPanelService);
+        const adminPanelServiceRef: AdminPanelService = await this._appService.getServiceRef(AdminPanelModule, AdminPanelService);
 
         return adminPanelServiceRef.getFulfilledAccessPath(paths);
     }
 
     public async deleteImage (commonServiceRef: CommonService, request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
-        const imageControlServiceRef = await this.appService.getServiceRef(ImageControlModule, ImageControlService);
+        const imageControlServiceRef = await this._appService.getServiceRef(ImageControlModule, ImageControlService);
 
         return imageControlServiceRef.deleteImage(commonServiceRef, request, imagePath, clientLogin);
     }
@@ -159,14 +163,14 @@ export class CommonService {
     public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType>
     public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin' | 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType>
     public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin' | 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType> {
-        const clientServiceRef = await this.appService.getServiceRef(ClientModule, ClientService);
+        const clientServiceRef = await this._appService.getServiceRef(ClientModule, ClientService);
 
         if ( targetPage === 'gallery' ) return clientServiceRef.getImagePhotographyTypesData(requiredFields, targetPage, photographyTypeName);
         else return clientServiceRef.getImagePhotographyTypesData(requiredFields, targetPage);
     }
 
     public async throwWebSocketError (commonServiceRef: CommonService, newOriginalImagePath: string, webSocketClientId: number, imageMetaSize: number) {
-        const adminPanelServiceRef: AdminPanelService = await this.appService.getServiceRef(AdminPanelModule, AdminPanelService);
+        const adminPanelServiceRef: AdminPanelService = await this._appService.getServiceRef(AdminPanelModule, AdminPanelService);
 
         return adminPanelServiceRef.throwWebSocketError(commonServiceRef, newOriginalImagePath, webSocketClientId, imageMetaSize);
     }

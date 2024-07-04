@@ -1,14 +1,15 @@
 import { Component, ElementRef, HostBinding, HostListener, Inject, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
 
 import { Subscription } from 'rxjs';
-import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateService } from '@ngx-translate/core';
+import { NgbDropdown, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DeviceDetectorService } from 'ngx-device-detector';
 
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
+import { PricesComponent } from './components/prices/prices.component';
 import { ClientComponent } from './components/client/client.component';
 import { AdminPanelComponent } from './components/admin-panel/admin-panel.component';
 import { AdminPanelOrdersControlComponent } from './components/admin-panel-orders-control/admin-panel-orders-control.component';
@@ -22,11 +23,14 @@ import { HomeService } from './services/home/home.service';
 import { environment } from '../environments/environment';
 
 import { IClientLocale } from 'types/global';
+import { RouterModule } from '@angular/router';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
+    standalone: true,
+    imports: [ CommonModule, TranslateModule, NgbModule, RouterModule ],
     animations: [
         trigger('navbar-toggler-icon-trigger', [
             transition('collapsed <=> expanded', [
@@ -99,7 +103,9 @@ export class AppComponent implements OnInit {
 
         private readonly translateService: TranslateService,
         private readonly deviceService: DeviceDetectorService
-    ) { }
+    ) { 
+
+    }
 
     public componentElementIsRendered: boolean = false;
     
@@ -110,7 +116,7 @@ export class AppComponent implements OnInit {
     public navbarIsCollapsed: boolean = true;
     public navbarTogglerIconTriggerState: string = 'collapsed';
     public navbarAnimationState: string = 'static';
-    public prevNavbarAnimationState: string = null;
+    public prevNavbarAnimationState: string | null;
 
     public discountsDataIsExists: boolean = false;
 
@@ -125,10 +131,10 @@ export class AppComponent implements OnInit {
 
     public readonly locales: IClientLocale[] = environment.locales;
 
-    public activeClientLogin: string;
-    public activeClientType: string;
-    public activeClientLocale: string;
-    public activeClientFullName: string;
+    public activeClientLogin: string | null;
+    public activeClientType: string | null;
+    public activeClientLocale: string | null;
+    public activeClientFullName: string | null;
 
     ngOnInit (): void {
         if ( this.appService.checkIsPlatformBrowser() ) {
@@ -160,7 +166,7 @@ export class AppComponent implements OnInit {
         }
     }
 
-    public onRouterOutlet (component: HomeComponent | GalleryComponent | ClientComponent | AdminPanelComponent | AdminPanelOrdersControlComponent 
+    public onRouterOutlet (component: HomeComponent | GalleryComponent | PricesComponent | ClientComponent | AdminPanelComponent | AdminPanelOrdersControlComponent 
         | AdminPanelDiscountsControlComponent | NotFoundComponent
     ): void {
         if ( !this.navbarIsCollapsed ) this.navbarTogglerClick(true);
@@ -184,6 +190,13 @@ export class AppComponent implements OnInit {
 
             this.footerElementRef.nativeElement.classList.remove('position-relative');
             this.footerElementRef.nativeElement.classList.add('bottom-0', 'position-absolute');
+        }
+
+        if ( component instanceof PricesComponent ) {
+            component.navbarElementRef = this.navbarElementRef;
+        } else {
+            this.navbarElementRef.nativeElement.classList.remove('sticky-bottom');
+            this.navbarElementRef.nativeElement.classList.add('fixed-top');
         }
     }
 
@@ -227,7 +240,7 @@ export class AppComponent implements OnInit {
         if ( open ) {
             this.dropdowns.toArray().forEach(el => el.close());
     
-            hoveredDropdown.open();
+            if ( hoveredDropdown ) hoveredDropdown.open();
         } else hoveredDropdown ? hoveredDropdown.close() : this.dropdowns.toArray().forEach(el => el.close());
     }
 

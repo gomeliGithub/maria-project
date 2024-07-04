@@ -1,18 +1,32 @@
-import { Response } from 'express';
+import { Client_order_status, Image_display_type, Image_photography_type, Prisma } from "@prisma/client";
+import { DefaultArgs } from "@prisma/client/runtime/library";
 
-import { Admin } from "server/src/models/client.model";
-
-export interface IGetActiveClientOptions {
-    includeFields?: string | string[];
-    allowedIncludedFields?: string[];
-    clientLocale?: string;
-    response?: Response;
-}
+import { IJWTPayload } from "./sign";
 
 export interface IClientGetOptions {
-    includeFields?: string[];
-    clientType?: 'admin' | 'member';
-    includeOrders?: boolean;
+    selectFields?: Prisma.MemberSelect<DefaultArgs>;
+    selectCompressedImagesFields?: Prisma.CompressedImageSelect<DefaultArgs>;
+    orders?: {
+        include: boolean,
+        includeCount?: boolean,
+        whereStatus?: Client_order_status
+    }
+    compressedImages?: IClientGetCompressedImagesOptions;
+    skip?: number;
+    take?: number;
+}
+
+export interface IClientGetCompressedImagesOptions {
+    include: boolean,
+    selectFields?: Prisma.CompressedImageSelect<DefaultArgs>;
+    whereNameArr?: string[],
+    // whereDisplayType?: Image_display_type,
+    wherePhotographyTypes?: Image_photography_type[],
+    whereDisplayTypes?: Image_display_type[],
+    skip?: number;
+    take?: number;
+    dateFrom?: Date;
+    dateUntil?: Date;
 }
 
 export interface IDownloadOriginalImageOptions {
@@ -21,14 +35,18 @@ export interface IDownloadOriginalImageOptions {
 }
 
 export interface ICompressedImageGetOptions {
-    clientInstance?: Admin;
+    clientData?: IJWTPayload;
     find?: {
         imageTitles?: string[];
-        includeFields?: string[];
-        imageViewSize?: string;
+        selectFields?: Prisma.CompressedImageSelect<DefaultArgs>;
+        // imageDisplayType?: Image_display_type;
+        photographyTypes?: Image_photography_type[];
+        displayTypes?: Image_display_type[];
     },
     imagesLimit?: number;
     imagesExistsCount?: number;
+    dateFrom?: Date;
+    dateUntil?: Date;
 }
 
 export interface IModalCreateOptions {
@@ -58,11 +76,19 @@ export interface ICreateImageDirsOptions {
 }
 
 export interface IGetClientOrdersOptions {
-    getInfoData?: string;
     memberLogin?: string;
     fromDate?: Date;
     untilDate?: Date;
-    status?: string;
+    status?: Client_order_status;
     ordersLimit?: number;
     existsCount?: number;
+}
+
+export interface IGetFullCompressedImagesDataOptions {
+    imagesLimit?: number;
+    imagesExistsCount?: number;
+    dateFrom?: Date;
+    dateUntil?: Date;
+    photographyTypes?: string[];
+    displayTypes?: string[];
 }

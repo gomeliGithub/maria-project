@@ -15,12 +15,17 @@ import { ImageSizePipe } from '../pipes/image-size/image-size.pipe';
 import { BooleanPipe } from '../pipes/boolean/boolean.pipe';
 
 @NgModule({
-    declarations: [ AdminPanelComponent, AdminPanelOrdersControlComponent, AdminPanelDiscountsControlComponent, ClientOrdersComponent, ImageSizePipe, BooleanPipe ],
     imports: [
         CommonModule,
         ReactiveFormsModule,
         TranslateModule.forChild(),
-        NgbModule
+        NgbModule,
+        AdminPanelComponent,
+        AdminPanelOrdersControlComponent,
+        AdminPanelDiscountsControlComponent,
+        ClientOrdersComponent,
+        ImageSizePipe,
+        BooleanPipe
     ],
     providers: [AdminPanelService]
 })

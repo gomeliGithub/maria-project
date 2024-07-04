@@ -7,10 +7,13 @@ import { IRequest, IRequestBody } from 'types/global';
 
 @Injectable()
 export class SignGuard implements CanActivate {
-    constructor(private signService: SignService, private reflector: Reflector) { }
+    constructor(
+        private readonly _signService: SignService, 
+        private readonly _reflector: Reflector
+    ) { }
 
     async canActivate (context: ExecutionContext): Promise<boolean> {
-        const clientTypes: string[] = this.reflector.getAllAndOverride<string[]>('client-types', [
+        const clientTypes: string[] = this._reflector.getAllAndOverride<string[]>('client-types', [
             context.getHandler(),
             context.getClass()
         ]);
@@ -23,6 +26,6 @@ export class SignGuard implements CanActivate {
         if ( !clientTypes ) return true;
         if ( request.url !== '/api/sign/in' && !request.cookies['__secure_fgp'] ) throw new UnauthorizedException(`${ request.url } "SignGuard - cookie __secure_fgp does not exists"`);
 
-        return this.signService.validateClient(request, clientTypes);
+        return this._signService.validateClient(request, clientTypes);
     }
 }

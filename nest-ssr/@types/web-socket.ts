@@ -11,7 +11,7 @@ export interface IWebSocketClient {
     imageMetaSize: number,
     imagePath: string,
     lastkeepalive: number,
-    connection: WebSocket,
+    connection: WebSocket | null,
     uploadImageTimeout: NodeJS.Timeout
 }
 

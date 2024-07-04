@@ -1,27 +1,26 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectModel } from '@nestjs/sequelize';
 
 import * as crypto from 'crypto';
 import ms from 'ms';
 
-import { JWT_token } from '../../models/sign.model';
+import { PrismaService } from '../../../prisma/prisma.service';
 
-import { IClient, IRequest } from 'types/global';
+import { IRequest } from 'types/global';
+import { IJWTPayload } from 'types/sign';
+import { IJWT } from 'types/models';
 
 @Injectable()
 export class JwtControlService {
     constructor (
-        private readonly jwtService: JwtService,
-
-        @InjectModel(JWT_token) 
-        private readonly JWT_tokenModel: typeof JWT_token
+        private readonly _prisma: PrismaService,
+        private readonly _jwtService: JwtService
     ) { }
 
     public extractTokenFromHeader (request: IRequest, throwError = true): string | undefined {
         const [ type, token ] = request.headers.authorization?.split(' ') ?? [];
 
-        if ( request.url !== "/api/sign/up" && request.url !== "/api/sign/in" && request.url !== "/api/sign/getActiveClient" && request.url !== "/api/sign/out" && !token ) {
+        if ( !( request.url in [ '/api/sign/up', '/api/sign/in', '/api/sign/getActiveClient', '/api/sign/out' ] ) && !token ) {
             if ( throwError ) throw new UnauthorizedException(`${ request.url } "ExtractTokenFromHeader - access token does not exists"`);
             else return undefined;
         }
@@ -29,11 +28,11 @@ export class JwtControlService {
         return type === 'Bearer' ? token : undefined;
     }
 
-    public async tokenValidate (request: IRequest, token: string, throwError = true): Promise<IClient> {
-        let validatedClientPayload: IClient = null;
+    public async tokenValidate (request: IRequest, token: string, throwError = true): Promise<IJWTPayload | null> {
+        let validatedClientPayload: IJWTPayload | null = null;
 
         try {
-            validatedClientPayload = await this.jwtService.verifyAsync<IClient>(token);
+            validatedClientPayload = await this._jwtService.verifyAsync<IJWTPayload>(token);
         } catch {
             if ( throwError ) throw new UnauthorizedException(`${ request.url } "TokenValidate - access token is invalid, token - ${ token }"`);
             else return null;
@@ -41,7 +40,7 @@ export class JwtControlService {
 
         const client__secure_fgpHash: string = crypto.createHmac("SHA256", request.cookies['__secure_fgp']).digest('hex');
 
-        if ( client__secure_fgpHash !== validatedClientPayload.__secure_fgpHash || !( await this.validateRevokedToken(token) ) ) {
+        if ( client__secure_fgpHash !== validatedClientPayload.__secure_fgpHash || !( await this._validateRevokedToken(token) ) ) {
             if ( throwError ) throw new UnauthorizedException(`${ request.url } "TokenValidate - secure fingerprint hash is invalid, token - ${ token }"`);
             else return null;
         }
@@ -50,40 +49,58 @@ export class JwtControlService {
     }
 
     public async addRevokedToken (token: string): Promise<void> {
-        const revokedTokenInstance: JWT_token = await this.checkRevokedTokenIs(token); 
+        const revokedTokenData: IJWT | null = await this.checkRevokedTokenIs(token);
 
-        if ( !revokedTokenInstance ) {
+        if ( revokedTokenData === null ) {
             const token_hash: string = crypto.createHmac("SHA256", token).digest('hex');
 
-            await this.JWT_tokenModel.update({ revokation_date: new Date(), revoked: true }, { where: { token_hash } });
+            await this._prisma.jWT.update({ where: { token_hash }, 
+                data: { 
+                    revokation_date: new Date(Date.now()), 
+                    revoked: true 
+                } 
+            });
         }
     }
 
     public async saveToken (token: string): Promise<void> {
         const token_hash: string = crypto.createHmac("SHA256", token).digest('hex');
 
-        const expires_date: Date = new Date(Date.now() + ms(process.env.JWT_EXPIRESIN_TIME));
+        const expires_date: Date = new Date(Date.now() + ms(process.env.JWT_EXPIRESIN_TIME as string));
 
-        await this.JWT_tokenModel.create({
-            token_hash,
-            expires_date,
-            revokation_date: expires_date
+        await this._prisma.jWT.create({ 
+            data: { 
+                token_hash,
+                expires_date,
+                revokation_date: expires_date
+            }
         });
     }
 
-    public async validateRevokedToken (token: string): Promise<boolean> {
-        const revokedTokenInstance: JWT_token = await this.checkRevokedTokenIs(token);
+    private async _validateRevokedToken (token: string): Promise<boolean> {
+        const revokedTokenData: IJWT | null = await this.checkRevokedTokenIs(token);
 
-        if ( revokedTokenInstance ) {
-            if ( new Date() > revokedTokenInstance.revokation_date ) return false;
-        } else return true;
+        if ( revokedTokenData ) {
+            if ( new Date(Date.now()) > revokedTokenData.revokation_date ) return false;
+        }
+
+        return true;
     }
 
-    public async checkRevokedTokenIs (token: string): Promise<JWT_token> {
+    public async checkRevokedTokenIs (token: string): Promise<IJWT | null> {
         const token_hash: string = crypto.createHmac("SHA256", token).digest('hex');
 
-        const revokedTokenInstance: JWT_token = await this.JWT_tokenModel.findOne({ where: { token_hash, revoked: true }});
+        const revokedTokenData: IJWT | null = await this._prisma.jWT.findFirst({ where: { token_hash, revoked: true } });
 
-        return revokedTokenInstance;
+        return revokedTokenData;
+    }
+
+    public async checkTokenIsExists (token: string): Promise<boolean> {
+        const token_hash: string = crypto.createHmac("SHA256", token).digest('hex');
+
+        const jwtData: IJWT | null = await this._prisma.jWT.findUnique({ where: { token_hash } });
+
+        if ( jwtData !== null ) return true;
+        else return false;
     }
 }

@@ -52,3 +52,23 @@ and (-webkit-device-pixel-ratio: 2) {
     border-bottom-right-radius: var(--bs-border-radius) !important;
     border-bottom-left-radius: var(--bs-border-radius) !important;
 }
+
+#uploadImageAccordion.accordion .accordion-item {
+    border: 0 !important;
+}
+
+#uploadImageAccordion .accordion-button::after {
+    flex-shrink: 0;
+    width: auto !important;
+    height: auto !important;
+    margin-left: auto !important;
+    content: normal !important;
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    background-size: auto auto !important;
+    transition: none !important;
+}
+
+#uploadImageAccordion .accordion-button:focus {
+    box-shadow: none !important;
+}

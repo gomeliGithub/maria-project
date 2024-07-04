@@ -12,14 +12,16 @@ import { ClientService } from '../services/client/client.service';
 import { ReplacePipe } from '../pipes/replace/replace.pipe';
 
 @NgModule({
-    declarations: [ ClientComponent, ReplacePipe ],
     imports: [
         CommonModule,
         RouterModule,
         ReactiveFormsModule,
         TranslateModule.forChild(),
-        NgbModule
+        NgbModule,
+        ClientComponent,
+        ReplacePipe
     ],
-    providers: [ClientService]
+    providers: [ClientService],
+    exports: [ ClientComponent, ReplacePipe ]
 })
 export class ClientModule { }

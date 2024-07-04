@@ -40,7 +40,7 @@ export class AppService {
         return this.isPlatformServer;
     }
 
-    public getMetaNameTag (property: string): HTMLMetaElement {
+    public getMetaNameTag (property: string): HTMLMetaElement | null {
         return this.meta.getTag(`name="${ property }"` );
     }
 
@@ -56,7 +56,7 @@ export class AppService {
     }
 
     public async reloadComponent (self: boolean, urlToNavigateTo?: string, reloadPage = true): Promise<void> {
-        const url: string = self ? this.router.url : urlToNavigateTo;
+        const url: string | undefined = self ? this.router.url : urlToNavigateTo;
 
         return this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
             this.router.navigate([url]).then(() => {
@@ -65,7 +65,7 @@ export class AppService {
         })
     }
 
-    public createRequestHeaders (): HttpHeaders {
+    public createAuthHeaders (): HttpHeaders | null {
         const token: string | null = localStorage.getItem('access_token');
 
         const headers = new HttpHeaders().set('Authorization', token ? `Bearer ${ token }` : "");
@@ -137,7 +137,7 @@ export class AppService {
     public getTranslations <asyncParameter extends boolean = false> (keys: string, async?: asyncParameter): asyncParameter extends true ? Observable<string> : string;
     public getTranslations <asyncParameter extends boolean = false> (keys: string[], async?: asyncParameter): asyncParameter extends true ? Observable<string[]> : string[];
     public getTranslations (keys: string | string[], async = false): Observable<string | string[]> | string | string[] {
-        if (async) return this.translateService.get(keys).pipe(map(translations => typeof translations === 'object' ? Object.entries(translations).map(keyValueArr => keyValueArr[1]) : translations)) as Observable<string | string[]>;
+        if ( async ) return this.translateService.get(keys).pipe(map(translations => typeof translations === 'object' ? Object.entries(translations).map(keyValueArr => keyValueArr[1]) : translations)) as Observable<string | string[]>;
         else return this.translateService.instant(keys);
     }
 }

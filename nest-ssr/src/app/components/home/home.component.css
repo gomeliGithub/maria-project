@@ -166,6 +166,7 @@ and (-webkit-device-pixel-ratio: 2) {
 
     #aboutContainer > img {
         height: auto !important;
+        max-width: 80% !important;
     }
 
     #aboutContainer > div {

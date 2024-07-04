@@ -62,6 +62,9 @@ Thumbs.db
 *.jpeg
 *.png
 
+# Database
+databaseDumps
+
 # Config
 /config
 .env.*

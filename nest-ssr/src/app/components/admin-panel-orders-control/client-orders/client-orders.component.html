@@ -1,4 +1,4 @@
-<div class="d-flex flex-row justify-content-center align-items-center flex-wrap w-75 mt-5">
+<div *ngIf="clientOrdersInfoData" class="d-flex flex-row justify-content-center align-items-center flex-wrap w-75 mt-5">
     <div *ngFor="let orderInfoData of clientOrdersInfoData; let i = index" class="" [ngClass]="{ 'me-3': i !== clientOrdersInfoData.length - 1 }">
         <button type="button" class="btn btn-primary position-relative" [attr.client-login]="orderInfoData.login" (click)="getClientOrders($event, true)" 
             #getClientOrdersButton
@@ -48,7 +48,14 @@
                 <td class="p-4">{{ clientOrder.photographyType }}</td>
                 <td class="p-4">{{ clientOrder.type }}</td>
                 <td class="w-25 p-4">{{ clientOrder.phoneNumber }}</td>
-                <td class="p-4">{{ clientOrder.comment }}</td>
+                <td class="p-4">
+                    <ng-template [ngIf]="clientOrder.comment !== null" [ngIfElse]="clientOrderCommentEmptyText">
+                        {{ clientOrder.comment }}
+                    </ng-template>
+                    <ng-template #clientOrderCommentEmptyText>
+                        <i class="bi bi-dash-lg"></i>
+                    </ng-template>
+                </td>
                 <td class="p-4">{{ clientOrder.createdDate | date:"d.M.yy, H:mm" }}</td>
                 <td *ngIf="currentSelectedOrdersStatusType === 'new'" class="p-4">
                     <button class="btn btn-secondary btn-sm" type="button" (click)="changeClientOrderStatus($event)">

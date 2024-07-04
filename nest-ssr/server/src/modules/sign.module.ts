@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { SequelizeModule } from '@nestjs/sequelize';
+
+import { PrismaModule } from './prisma.module';
 
 import { AppService } from '../app.service';
 
@@ -9,11 +10,8 @@ import { SignService } from '../services/sign/sign.service';
 import { SignGuard } from '../guards/sign/sign.guard';
 import { JwtControlService } from '../services/sign/jwt-control.service';
 
-import { JWT_token } from '../models/sign.model';
-import { Admin, Member } from '../models/client.model';
-
 @Module({
-    imports: [ SequelizeModule.forFeature([ JWT_token, Admin, Member ]) ],
+    imports: [ PrismaModule ],
     providers: [ AppService, SignService, JwtControlService, {
         provide: APP_GUARD,
         useClass: SignGuard,

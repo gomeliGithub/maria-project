@@ -3,12 +3,13 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { AppService } from '../../app.service';
 
 @Pipe({
-    name: 'boolean'
+    name: 'boolean',
+    standalone: true
 })
 export class BooleanPipe implements PipeTransform {
-    constructor (private readonly appService: AppService) { }
+    constructor (private readonly _appService: AppService) { }
     
-    transform (value: number): string {
-        return Boolean(value) === true ? this.appService.getTranslations('ADMINPANEL.BOOLEANTRUETEXT') : this.appService.getTranslations('ADMINPANEL.BOOLEANFALSETEXT');
+    transform (value: boolean): string {
+        return Boolean(value) === true ? this._appService.getTranslations('ADMINPANEL.BOOLEANTRUETEXT') : this._appService.getTranslations('ADMINPANEL.BOOLEANFALSETEXT');
     }
 }

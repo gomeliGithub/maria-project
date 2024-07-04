@@ -1,6 +1,8 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { FormControl, FormGroup } from '@angular/forms';
+
+import { Client_order_status, Client_order_type } from '@prisma/client';
 
 import { Observable, map } from 'rxjs';
 
@@ -14,22 +16,22 @@ import { WebSocketService } from '../web-socket/web-socket.service';
 
 import { environment } from '../../../environments/environment';
 
-import { IClientOrdersData, IClientOrdersInfoData, IFullCompressedImageData } from 'types/global';
-import { IGetClientOrdersOptions } from 'types/options';
-import { IDiscount } from 'types/models';
+import { IClientOrdersData, IClientOrdersInfoData, IClientOrdersInfoDataArr, IFullCompressedImageData } from 'types/global';
+import { IGetClientOrdersOptions, IGetFullCompressedImagesDataOptions } from 'types/options';
+import { IClientOrderWithoutRelationFields, IDiscount } from 'types/models';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AdminPanelService {
-    constructor (
-        private readonly http: HttpClient,
-
-        private readonly appService: AppService,
-        private readonly webSocketService: WebSocketService
-    ) { }
-
     private readonly _socketServerHost: string = environment.webSocketServerURL;
+
+    constructor (
+        private readonly _http: HttpClient,
+
+        private readonly _appService: AppService,
+        private readonly _webSocketService: WebSocketService
+    ) { }
 
     public spinnerHiddenStatusChange: EventEmitter<boolean> = new EventEmitter();
 
@@ -37,58 +39,78 @@ export class AdminPanelService {
         this.spinnerHiddenStatusChange.emit(value);
     }
 
-    public getFullCompressedImagesData (imagesLimit?: number, imagesExistsCount?: number): Observable<IFullCompressedImageData> {
-        const headers: HttpHeaders = this.appService.createRequestHeaders();
-
+    public getFullCompressedImagesData (getParams?: IGetFullCompressedImagesDataOptions): Observable<IFullCompressedImageData> {
         let params: HttpParams = new HttpParams();
 
-        params = params.append('imagesLimit', imagesLimit ?? '');
-        params = params.append('imagesExistsCount', imagesExistsCount ?? '');
+        if ( getParams ) {
+            params = params.append('imagesLimit', getParams.imagesLimit ? getParams.imagesLimit : '');
+            params = params.append('imagesExistsCount', getParams.imagesExistsCount ? getParams.imagesExistsCount : '');
+            params = params.append('dateFrom', getParams.dateFrom ? getParams.dateFrom.toUTCString() : '');
+            params = params.append('dateUntil', getParams.dateUntil ? getParams.dateUntil.toUTCString() : '');
+            params = params.append('photographyTypes', getParams.photographyTypes ? JSON.stringify(getParams.photographyTypes) : '');
+            params = params.append('displayTypes', getParams.displayTypes ? JSON.stringify(getParams.displayTypes) : '');
+        }
 
-        return this.http.get<IFullCompressedImageData>('/api/admin-panel/getFullCompressedImagesList', { params, headers, withCredentials: true });
+        return this._http.get<IFullCompressedImageData>('/api/admin-panel/getFullCompressedImagesList', { params, headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true });
     }
 
-    public loadAndShowImageThumbnail (componentThis: AdminPanelComponent, imageButton: HTMLButtonElement): Observable<Blob> {
-        const originalImageName: string = imageButton.getAttribute('originalImageName');
+    public loadAndShowImageThumbnail (componentThis: AdminPanelComponent, imageButton: HTMLButtonElement): Observable<Blob> | null {
+        const originalImageName: string | null = imageButton.getAttribute('originalImageName');
 
-        if ( originalImageName ) {
-            const headers: HttpHeaders = this.appService.createRequestHeaders();
-
+        if ( originalImageName !== null ) {
             componentThis.currentLoadedImageThumbnailOriginalName = originalImageName;
             componentThis.spinnerHidden = false;
 
-            return this.http.get('/api/admin-panel/getImageThumbnail', { 
+            return this._http.get('/api/admin-panel/getImageThumbnail', { 
                 params: {
                     originalName: originalImageName
-                },  headers, responseType: 'blob', withCredentials: true
+                },  headers: this._appService.createAuthHeaders() ?? { }, responseType: 'blob', withCredentials: true
             });
-        }
+        } else return null;
     }
 
-    public getClientOrders (options: {
-        getInfoData: string,
-        fromDate?: Date,
-        untilDate?: Date,
-        status?: string,
-        ordersLimit?: number,
-        existsCount: number
-    }): Observable<IClientOrdersInfoData>
-    public getClientOrders (options: {
-        getInfoData?: string,
-        memberLogin: string,
-        fromDate?: Date,
-        untilDate?: Date,
-        status?: string,
-        ordersLimit?: number,
-        existsCount: number
-    }): Observable<IClientOrdersData>
-    public getClientOrders (options: IGetClientOrdersOptions): Observable<IClientOrdersInfoData | IClientOrdersData> {
-        const headers: HttpHeaders = this.appService.createRequestHeaders();
+    public getClientOrders (options: IGetClientOrdersOptions): Observable<IClientOrdersData> {
+        const params: HttpParams = this._createGetClientOrdersParams(options);
 
+        return this._http.get<IClientOrdersData>('/api/admin-panel/getClientOrders', { params, headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true }).pipe(map(data => {
+            ( data as IClientOrdersData ).orders = ( data as IClientOrdersData ).orders.map(clientOrder => {
+                Object.keys(clientOrder).forEach(field => {
+                    if ( field === 'createdDate' ) clientOrder[field] = new Date(clientOrder[field]);
+                    if ( field === 'photographyType' ) switch ( clientOrder[field] ) {
+                        case 'individual': { clientOrder[field] = this._appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL'); break; }
+                        case 'children': { clientOrder[field] = this._appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.CHILDREN'); break; }
+                        case 'wedding': { clientOrder[field] = this._appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.WEDDING'); break; }
+                        case 'family': { clientOrder[field] = this._appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.FAMILY'); break; }
+                    }
+                    if ( field === 'type') {
+                        switch ( clientOrder[field] ) {
+                            case 'consultation': { clientOrder[field] = this._appService.getTranslations('CLIENTORDERTYPES.CONSULTATION') as Client_order_type; break; }
+                            case 'full': { clientOrder[field] = this._appService.getTranslations('CLIENTORDERTYPES.FULL') as Client_order_type; break; }
+                        }
+                    }
+                    if ( field === 'status' ) switch ( clientOrder[field] ) {
+                        case 'new': { clientOrder[field] = this._appService.getTranslations('CLIENTORDERSTATUSES.NEW') as Client_order_status; break; }
+                        case 'processed': { clientOrder[field] = this._appService.getTranslations('CLIENTORDERSTATUSES.PROCESSED') as Client_order_status; break; }
+                    }
+                });
+
+                return clientOrder;
+            });
+                
+            return data;
+        }));
+    }
+
+    public getClientOrdersInfoData (options: IGetClientOrdersOptions): Observable<IClientOrdersInfoData> {
+        const params: HttpParams = this._createGetClientOrdersParams(options);
+
+        return this._http.get<IClientOrdersInfoData>('/api/admin-panel/getClientOrdersInfoData', { params, headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true });
+    }
+
+    private _createGetClientOrdersParams (options: IGetClientOrdersOptions): HttpParams {
         let params: HttpParams = new HttpParams();
 
         if ( options ) {
-            params = params.append('getInfoData', options.getInfoData ?? '');
             params = params.append('memberLogin', options.memberLogin ?? '');
             params = params.append('fromDate', options.fromDate ? options.fromDate.toDateString() : '');
             params = params.append('untilDate', options.untilDate ? options.untilDate.toDateString() : '');
@@ -97,56 +119,26 @@ export class AdminPanelService {
             params = params.append('ordersLimit', options.ordersLimit ?? '');
         }
 
-        return this.http.get<IClientOrdersInfoData | IClientOrdersData>('/api/admin-panel/getClientOrders', { params, headers, withCredentials: true }).pipe(map(data => {
-            if ( !options.getInfoData || options.getInfoData === 'false' ) {
-                (data as IClientOrdersData).orders = (data as IClientOrdersData).orders.map(clientOrder => {
-                    Object.keys(clientOrder).forEach(field => {
-                        if ( field === 'createdDate') clientOrder[field] = new Date(clientOrder[field]);
-                        if ( field === 'photographyType' ) switch ( clientOrder[field] ) {
-                            case 'individual': { clientOrder[field] = this.appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL'); break; }
-                            case 'children': { clientOrder[field] = this.appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.CHILDREN'); break; }
-                            case 'wedding': { clientOrder[field] = this.appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.WEDDING'); break; }
-                            case 'family': { clientOrder[field] = this.appService.getTranslations('IMAGEPHOTOGRAPHYTYPES.FAMILY'); break; }
-                        }
-                        if ( field === 'type') {
-                            switch ( clientOrder[field] ) {
-                                case 'consultation': { clientOrder[field] = this.appService.getTranslations('CLIENTORDERTYPES.CONSULTATION'); break; }
-                                case 'full': { clientOrder[field] = this.appService.getTranslations('CLIENTORDERTYPES.FULL'); break; }
-                            }
-                        }
-                        if ( field === 'status' ) switch ( clientOrder[field] ) {
-                            case 'new': { clientOrder[field] = this.appService.getTranslations('CLIENTORDERSTATUSES.NEW'); break; }
-                            case 'processed': { clientOrder[field] = this.appService.getTranslations('CLIENTORDERSTATUSES.PROCESSED'); break; }
-                        }
-                    });
-
-                    return clientOrder;
-                });
-            }
-                
-            return data;
-        }));
+        return params;
     }
-
-    public changeClientOrderStatus (clientOrderId: number, clientLogin: string): Observable<void> {
-        const headers: HttpHeaders = this.appService.createRequestHeaders();
-        
-        return this.http.put<void>('/api/admin-panel/changeClientOrderStatus', { adminPanel: {
+    
+    public changeClientOrderStatus (clientOrderId: number, clientLogin: string): Observable<void> { 
+        return this._http.put<void>('/api/admin-panel/changeClientOrderStatus', { adminPanel: {
             clientOrderId,
             clientLogin
-        }} , { headers, withCredentials: true });
+        }} , { headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true });
     }
 
     public uploadImage (formFile: File, uploadImageForm: FormGroup<{
-        imagePhotographyType: FormControl<string>;
-        imageViewSizeType: FormControl<string>;
-        image: FormControl<FileList>;
-        imageDescription: FormControl<string>;
+        imagePhotographyType: FormControl<string | null>;
+        imageDisplayType: FormControl<string | null>;
+        image: FormControl<FileList | null>;
+        imageDescription: FormControl<string | null>;
     }>, newClientId: number): void {
         const reader = new FileReader();
 
         reader.onload = event => {
-            const fileData: ArrayBuffer = (event.target as FileReader).result as ArrayBuffer;
+            const fileData: ArrayBuffer = ( event.target as FileReader ).result as ArrayBuffer;
 
             const slicedImageData: ArrayBuffer[] = [];
 
@@ -154,7 +146,7 @@ export class AdminPanelService {
                 slicedImageData.push(fileData.slice(i, i + 100000));
             } 
 
-            this.webSocketService.on(this._socketServerHost, uploadImageForm, slicedImageData, newClientId);
+            this._webSocketService.on(this._socketServerHost, uploadImageForm, slicedImageData, newClientId);
         }
 
         reader.readAsArrayBuffer(formFile);
@@ -165,41 +157,40 @@ export class AdminPanelService {
             case 'SUCCESS': {
                 this.setSpinnerHiddenStatus(true);
 
-                if ( operationName !== 'delete' ) this.appService.createSuccessModal();
+                if ( operationName !== 'delete' ) this._appService.createSuccessModal();
                 
                 break; 
             }
 
             case 'MAXCOUNT': {
-                this.appService.createWarningModal(this.appService.getTranslations('ADMINPANEL.MAXCOUNTONHOMEPAGEMESSAGE')); 
+                this._appService.createWarningModal(this._appService.getTranslations('ADMINPANEL.MAXCOUNTONHOMEPAGEMESSAGE')); 
 
                 break;
             }
 
             case 'PENDING': { 
-                this.appService.createWarningModal(this.appService.getTranslations('UPLOADIMAGERESPONSES.PENDING')); 
+                this._appService.createWarningModal(this._appService.getTranslations('UPLOADIMAGERESPONSES.PENDING')); 
                     
                 break; 
             }
 
             case 'WRONGVIEWSIZETYPE': {
-                this.appService.createWarningModal(this.appService.getTranslations('UPLOADIMAGERESPONSES.WRONGVIEWSIZETYPE')); 
+                this._appService.createWarningModal(this._appService.getTranslations('UPLOADIMAGERESPONSES.WRONGVIEWSIZETYPE')); 
 
                 break;
             }
         }
     }
 
-    public getClientOrdersInfoData (componentThis: AdminPanelOrdersControlComponent | ClientOrdersComponent, existsCountZero = false): void {
-        let existsCount: number = null;
+    public getNextClientOrdersInfoData (componentThis: AdminPanelOrdersControlComponent | ClientOrdersComponent, existsCountZero = false): void {
+        let existsCount: number | null = null;
 
         if ( !componentThis.additionalOrdersInfoDataExists ) existsCount = 0;
         else existsCount = componentThis.getClientOrdersButtonViewRefs.length;
 
         if ( existsCountZero ) componentThis.additionalOrdersInfoDataExists = false;
 
-        this.getClientOrders({
-            getInfoData: 'true',
+        this.getClientOrdersInfoData({
             status: componentThis.currentSelectedOrdersStatusType,
             ordersLimit: 2,
             existsCount: existsCount
@@ -208,29 +199,29 @@ export class AdminPanelService {
                 if ( !componentThis.additionalOrdersInfoDataExists
                     && (existsCountZero || componentThis.prevCurrentSelectedOrdersStatusType !== componentThis.currentSelectedOrdersStatusType) 
                 ) componentThis.clientOrdersInfoData = clientOrdersInfoData.infoData && clientOrdersInfoData.infoData.length !== 0 ? clientOrdersInfoData.infoData : null;
-                else componentThis.clientOrdersInfoData.push(...clientOrdersInfoData.infoData);
+                else ( componentThis.clientOrdersInfoData as IClientOrdersInfoDataArr[] ).push(...clientOrdersInfoData.infoData);
 
                 componentThis.additionalOrdersInfoDataExists = clientOrdersInfoData.additionalOrdersInfoDataExists;
             },
-            error: () => this.appService.createErrorModal()
+            error: () => this._appService.createErrorModal()
         });
     }
 
-    public getClientOrdersData (componentThis: AdminPanelOrdersControlComponent | ClientOrdersComponent, event?: MouseEvent, existsCountZero = false) {
-        const target: HTMLDivElement = event ? event.target as HTMLDivElement : null;
+    public getNextClientOrdersData (componentThis: AdminPanelOrdersControlComponent | ClientOrdersComponent, event?: MouseEvent, existsCountZero = false) {
+        const target: HTMLDivElement | null = event ? event.target as HTMLDivElement : null;
 
-        let clientLogin: string = null;
+        let clientLogin: string | null = null;
 
-        if ( existsCountZero ) {
+        if ( existsCountZero && target !== null ) {
             clientLogin = target.getAttribute('client-login');
 
-            componentThis.currentSelectedClientLogin = clientLogin !== 'guest' ? clientLogin : this.appService.getTranslations('ADMINPANEL.GUESTLOGINTEXT');
+            componentThis.currentSelectedClientLogin = clientLogin !== 'guest' ? clientLogin as string : this._appService.getTranslations('ADMINPANEL.GUESTLOGINTEXT');
         }
 
-        if ( !componentThis.currentSelectedClientLogin ) componentThis.currentSelectedClientLogin = this.appService.getTranslations('ADMINPANEL.GUESTLOGINTEXT');
+        if ( !componentThis.currentSelectedClientLogin ) componentThis.currentSelectedClientLogin = this._appService.getTranslations('ADMINPANEL.GUESTLOGINTEXT');
 
-        let memberLogin: string = null;
-        let existsCount: number = null;
+        let memberLogin: string | null = null;
+        let existsCount: number | null = null;
 
         if ( componentThis.currentSelectedClientLogin ) {
             memberLogin = existsCountZero ? clientLogin : componentThis.currentSelectedClientLogin === 'Гость' ? 'guest' : componentThis.currentSelectedClientLogin
@@ -242,9 +233,8 @@ export class AdminPanelService {
         if ( existsCountZero ) componentThis.additionalOrdersExists = false;
 
         this.getClientOrders({
-            getInfoData: 'false',
             status: componentThis.currentSelectedOrdersStatusType,
-            memberLogin,
+            memberLogin: memberLogin as string,
             ordersLimit: 2,
             existsCount
         }).subscribe({
@@ -252,84 +242,76 @@ export class AdminPanelService {
                 if ( !componentThis.additionalOrdersExists
                     && (existsCountZero || componentThis.prevCurrentSelectedOrdersStatusType !== componentThis.currentSelectedOrdersStatusType) 
                 ) componentThis.clientOrders = clientOrdersData.orders && clientOrdersData.orders.length !== 0 ? clientOrdersData.orders : null;
-                else componentThis.clientOrders.push(...clientOrdersData.orders);
+                else ( componentThis.clientOrders as IClientOrderWithoutRelationFields[] ).push(...clientOrdersData.orders);
 
                 componentThis.additionalOrdersExists = clientOrdersData.additionalOrdersExists;
             },
-            error: () => this.appService.createErrorModal()
+            error: () => this._appService.createErrorModal()
         });
     }
 
     public getDiscountsData (): Observable<IDiscount[]> {
-        const headers: HttpHeaders = this.appService.createRequestHeaders();
-
-        return this.http.get<IDiscount[]>('/api/admin-panel/getDiscountsData', { headers, withCredentials: true });
+        return this._http.get<IDiscount[]>('/api/admin-panel/getDiscountsData', { headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true });
     }
 
     public createDiscount (componentThis: AdminPanelDiscountsControlComponent, discountContent: string, fromDate: Date, toDate: Date): void {
-        const headers: HttpHeaders = this.appService.createRequestHeaders();
-
         componentThis.spinnerHidden = false;
 
-        this.http.post('/api/admin-panel/createDiscount', { 
+        this._http.post('/api/admin-panel/createDiscount', { 
             adminPanel: {
                 discountContent,
                 fromDate,
                 toDate
             }
-        }, { responseType: 'text', headers, withCredentials: true }).subscribe({
+        }, { responseType: 'text', headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true }).subscribe({
             next: responseText => {
                 if ( responseText === 'MAXCOUNT' ) {
                     componentThis.spinnerHidden = true;
 
-                    this.appService.createWarningModal(this.appService.getTranslations('ADMINPANEL.CHANGEDISCOUNTMAXCOUNTMESSAGE'));
+                    this._appService.createWarningModal(this._appService.getTranslations('ADMINPANEL.CHANGEDISCOUNTMAXCOUNTMESSAGE'));
                 } else if ( responseText === 'SUCCESS' ) window.location.reload();
             },
             error: () => {
                 componentThis.spinnerHidden = true;
 
-                this.appService.createErrorModal()
+                this._appService.createErrorModal()
             }
         });
     }
 
     public changeDiscountData (componentThis: AdminPanelDiscountsControlComponent, newDiscountContent: string, newFromDate: Date, newToDate: Date, discountId: number): void {
-        const headers: HttpHeaders = this.appService.createRequestHeaders();
-
         componentThis.spinnerHidden = false;
 
-        this.http.put<void>('/api/admin-panel/changeDiscountData', {
+        this._http.put<void>('/api/admin-panel/changeDiscountData', {
             adminPanel: {
                 newDiscountContent,
                 newFromDate,
                 newToDate,
                 discountId
             }
-        }, { headers, withCredentials: true }).subscribe({
+        }, { headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true }).subscribe({
             next: () => window.location.reload(),
             error: () => {
                 componentThis.spinnerHidden = true;
 
-                this.appService.createErrorModal()
+                this._appService.createErrorModal()
             }
         });
     }
 
     public deleteDiscount (componentThis: AdminPanelDiscountsControlComponent, discountId: number): void {
-        const headers: HttpHeaders = this.appService.createRequestHeaders();
-
         componentThis.spinnerHidden = false;
 
-        this.http.delete<void>('/api/admin-panel/deleteDiscount', { 
+        this._http.delete<void>('/api/admin-panel/deleteDiscount', { 
             params: {
                 discountId
-            }, headers, withCredentials: true
+            }, headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true
         }).subscribe({
             next: () => window.location.reload(),
             error: () => {
                 componentThis.spinnerHidden = true;
 
-                this.appService.createErrorModal()
+                this._appService.createErrorModal()
             }
         });
     }

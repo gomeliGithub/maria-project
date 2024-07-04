@@ -43,7 +43,7 @@ app-root a.nav-link, app-root a.dropdown-item {
     cursor: pointer;
 }
 
-app-home, app-gallery, app-client, app-admin-panel, app-admin-panel-orders-control, app-admin-panel-discounts-control, app-not-found {
+app-home, app-gallery, app-prices, app-client, app-admin-panel, app-admin-panel-orders-control, app-admin-panel-discounts-control, app-not-found {
     height: 100% !important;
     width: 100% !important;
     position: relative !important;
@@ -59,7 +59,7 @@ app-home {
     overflow-x: hidden !important;
 }
 
-app-gallery, app-admin-panel-orders-control, app-admin-panel-discounts-control {
+app-gallery, app-prices, app-admin-panel-orders-control, app-admin-panel-discounts-control {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -68,6 +68,11 @@ app-gallery, app-admin-panel-orders-control, app-admin-panel-discounts-control {
 
 app-gallery {
     height: auto !important;
+}
+
+app-prices {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
 }
 
 app-client {

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { WebSocketServer } from 'ws';
+import { WebSocketServer, WebSocket } from 'ws';
 
 import fsPromises from 'fs/promises';
 
@@ -13,16 +13,16 @@ import { IWSMessage, IWebSocketClient } from 'types/web-socket';
 
 @Injectable()
 export class WebSocketService {
-    public webSocketServerPort: number = parseInt(process.env.WEBSOCKETSERVER_PORT, 10);
+    public webSocketServerPort: number = parseInt(process.env.WEBSOCKETSERVER_PORT as string, 10);
 
-    private socketServer = new WebSocketServer({ port: this.webSocketServerPort });
+    private _socketServer = new WebSocketServer({ port: this.webSocketServerPort });
 
     constructor (
         private readonly appService: AppService,
         private readonly adminPanelService: AdminPanelService
     ) {
-        this.socketServer.on('connection', async ( connection, request ) => {
-            const splittedURL: string[] = request.url.split('/');
+        this._socketServer.on('connection', async ( connection, request ) => {
+            const splittedURL: string[] = ( request.url as string ).split('/');
             const webSocketClientId: number = parseFloat(splittedURL[splittedURL.length - 1].substring(2));
 
             if ( isNaN(webSocketClientId) ) {
@@ -32,10 +32,10 @@ export class WebSocketService {
             }
 
             const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
-            const currentWebSocketClient: IWebSocketClient = commonServiceRef.webSocketClients.find(client => client._id === webSocketClientId);
+            const currentWebSocketClient: IWebSocketClient | undefined = commonServiceRef.webSocketClients.find(client => client._id === webSocketClientId);
 
             if ( !currentWebSocketClient ) {
-                await commonServiceRef.throwWebSocketError(commonServiceRef, currentWebSocketClient.imagePath, webSocketClientId, currentWebSocketClient.imageMetaSize);
+                await commonServiceRef.throwWebSocketError(commonServiceRef, ' - ', webSocketClientId, 0); // (commonServiceRef, currentWebSocketClient.imagePath, webSocketClientId, currentWebSocketClient.imageMetaSize)
                 
                 connection.terminate();
 
@@ -84,7 +84,7 @@ export class WebSocketService {
                     currentWebSocketClient.currentChunkNumber += 1;
 
                     if ( currentWebSocketClient.uploadedSize === currentWebSocketClient.imageMetaSize ) currentWebSocketClient.activeWriteStream.end();
-                    else currentWebSocketClient.connection.send(JSON.stringify(message));
+                    else ( currentWebSocketClient.connection as WebSocket ).send(JSON.stringify(message));
                 });
             }
         }
@@ -118,7 +118,7 @@ export class WebSocketService {
                 this.appService.getServiceRef(CommonModule, CommonService).then(commonServiceRef => {
                     commonServiceRef.webSocketClients.forEach(client => {
                         if ( ( Date.now() - client.lastkeepalive ) > 12000 ) {
-                            client.connection.terminate();
+                            ( client.connection as WebSocket ).terminate();
             
                             client.connection = null;
                 

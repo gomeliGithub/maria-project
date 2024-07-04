@@ -3,10 +3,11 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { AppService } from '../../app.service';
 
 @Pipe({
-    name: 'imageSize'
+    name: 'imageSize',
+    standalone: true
 })
 export class ImageSizePipe implements PipeTransform {
-    constructor (private readonly appService: AppService) { }
+    constructor (private readonly _appService: AppService) { }
 
     transform (value: number, decimals: number = 2): string {
         const kb: number = 1024;
@@ -14,14 +15,14 @@ export class ImageSizePipe implements PipeTransform {
 
 		const sizeNumber: number = Math.floor(Math.log(value) / Math.log(kb));
         
-        let resultSizeName: string;
+        let resultSizeName: string = '';
 
         switch ( sizeNumber ) {
-            case 0: { resultSizeName = this.appService.getTranslations('ADMINPANEL.IMAGESIZES.BYTE'); break; }
-            case 1: { resultSizeName = this.appService.getTranslations('ADMINPANEL.IMAGESIZES.KBYTE'); break; }
-            case 2: { resultSizeName = this.appService.getTranslations('ADMINPANEL.IMAGESIZES.MBYTE'); break; }
-            case 3: { resultSizeName = this.appService.getTranslations('ADMINPANEL.IMAGESIZES.GBYTE'); break; }
-            case 4: { resultSizeName = this.appService.getTranslations('ADMINPANEL.IMAGESIZES.TBYTE'); break; }
+            case 0: { resultSizeName = this._appService.getTranslations('ADMINPANEL.IMAGESIZES.BYTE'); break; }
+            case 1: { resultSizeName = this._appService.getTranslations('ADMINPANEL.IMAGESIZES.KBYTE'); break; }
+            case 2: { resultSizeName = this._appService.getTranslations('ADMINPANEL.IMAGESIZES.MBYTE'); break; }
+            case 3: { resultSizeName = this._appService.getTranslations('ADMINPANEL.IMAGESIZES.GBYTE'); break; }
+            case 4: { resultSizeName = this._appService.getTranslations('ADMINPANEL.IMAGESIZES.TBYTE'); break; }
         }
 
         return `${ parseFloat((value / Math.pow(kb, sizeNumber)).toFixed(dm)) } ${ resultSizeName }`;

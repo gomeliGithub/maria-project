@@ -1,0 +1,111 @@
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Admin {
+    id                            Int                      @id @default(autoincrement())
+    login                         String                   @unique
+    password                      String
+    type                          Client_type              @default(admin)
+    fullName                      String
+    email                         String?
+    signUpDate                    DateTime                 @default(now())
+    lastSignInDate                DateTime?
+    lastActiveDate                DateTime?
+    compressedImages              CompressedImage[]
+}
+
+model Member {
+    id                            Int                      @id @default(autoincrement())
+    login                         String                   @unique
+    password                      String
+    type                          Client_type              @default(member)
+    fullName                      String
+    email                         String?
+    signUpDate                    DateTime                 @default(now())
+    lastSignInDate                DateTime?
+    lastActiveDate                DateTime?
+    clientOrders                  ClientOrder[]
+}
+
+model CompressedImage {
+    name                          String                   @id
+    dirPath                       String
+    originalName                  String
+    originalDirPath               String
+    originalSize                  Int
+    photographyType               Image_photography_type
+    displayType                   Image_display_type
+    description                   String?
+    uploadDate                    DateTime                 @default(now())
+    displayedOnHomePage           Boolean                  @default(false)
+    displayedOnGalleryPage        Boolean                  @default(false)
+    admin                         Admin                    @relation(fields: [adminId], references: [id])
+    adminId                       Int
+}
+
+model ImagePhotographyType {
+    name                          String                   @id
+    description                   String?                  @db.VarChar(1000)
+    compressedImageOriginalName   String?                  @unique
+    compressedImageName           String?                  @unique
+}
+
+model ClientOrder {
+    id                            BigInt                   @id @db.UnsignedBigInt
+    photographyType               String
+    type                          Client_order_type
+    phoneNumber                   String
+    comment                       String?
+    createdDate                   DateTime                 @default(now())
+    status                        Client_order_status      @default(new)
+    member                        Member?                  @relation(fields: [memberId], references: [id])
+    memberId                      Int?
+}
+
+model Discount {
+    id                            BigInt                   @id @db.UnsignedBigInt
+    content                       String
+    expirationFromDate            DateTime
+    expirationToDate              DateTime
+}
+
+model JWT {
+    token_hash                    String                   @id
+    issued_date                   DateTime                 @default(now())
+    expires_date                  DateTime
+    revokation_date               DateTime
+    revoked                       Boolean                  @default(false)
+}
+
+enum Client_type {
+    admin
+    member
+}
+
+enum Image_photography_type {
+    individual
+    children
+    wedding
+    family
+}
+
+enum Image_display_type {
+    horizontal
+    vertical
+}
+
+enum Client_order_type {
+    consultation
+    full
+}
+
+enum Client_order_status {
+    new
+    processed
+}

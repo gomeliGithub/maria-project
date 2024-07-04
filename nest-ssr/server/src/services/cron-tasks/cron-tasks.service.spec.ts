@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SeoManagementService } from './seo-management.service';
+import { SeoManagementService } from './cron-tasks.service';
 
 describe('SeoManagementService', () => {
     let service: SeoManagementService;

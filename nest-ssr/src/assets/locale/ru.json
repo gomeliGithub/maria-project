@@ -4,6 +4,7 @@
 	"PAGETITLES": {
 		"HOME": "Главная",
 		"GALLERY": "Портфолио",
+		"PRICES": "Прайс-лист",
 		"ADMINPANEL": {
 			"MAIN": "Панель администратора",
 			"IMAGESCONTROL": "Управление фото",
@@ -40,6 +41,62 @@
 			"COMMENT": "Ваш комментарий или пожелание к заказу."
 		},
 		"CLIENTORDERSUCCESSMESSAGE": "Заказ успешно отправлен. Я с вами свяжусь в ближайшее время"
+	},
+	"PRICESPAGE": {
+		"STANDARDPACKAGETITLE": "ПАКЕТ STANDART",
+		"MAXIMUMPACKAGETITLE": "ПАКЕТ MAXIMUM",
+		"INDIVIDUAL": {
+			"STANDARDPACKAGE": {
+				"PART1": "Длительность съемки 1 час",
+				"PART2": "30+ фото",
+				"PART3": "Цветокоррекция, лёгкая ретушь",
+				"PART4": "Срок выполнения 10-14 дней",
+				"PART5": "70 BYN"
+			}
+		}, 
+		"CHILDREN": {
+			"STANDARDPACKAGE": {
+				"PART1": "Длительность съемки 1 часа",
+				"PART2": "30+ фото",
+				"PART3": "Цветокоррекция, лёгкая ретушь",
+				"PART4": "Срок выполнения 10-14 дней",
+				"PART5": "50 BYN"
+			}
+		}, 
+		"WEDDING": {
+			"STANDARDPACKAGE": {
+				"PART1": "Длительность съемки 3 часа",
+				"PART2": "100+ фото",
+				"PART3": "Цветокоррекция, лёгкая ретушь",
+				"PART4": "Аренда фотостудии ВКЛЮЧЕНА в стоимость",
+				"PART5": "Срок выполнения 10-14 дней",
+				"PART6": "450 BYN"
+			},
+			"MAXIMUMPACKAGE": {
+				"PART1": "Длительность съемки от 3 до 8 часов",
+				"PART2": "300+ фото",
+				"PART3": "Цветокоррекция, лёгкая ретушь",
+				"PART4": "Аренда фотостудии ВКЛЮЧЕНА в стоимость",
+				"PART5": "Срок выполнения 10-14 дней",
+				"PART6": "1000 BYN"
+			}
+		}, 
+		"FAMILY": {
+			"STANDARDPACKAGE": {
+				"PART1": "Длительность съемки 1 час",
+				"PART2": "30+ фото",
+				"PART3": "Цветокоррекция, лёгкая ретушь",
+				"PART4": "Срок выполнения 10-14 дней",
+				"PART5": "100 BYN"
+			},
+			"MAXIMUMPACKAGE": {
+				"PART1": "Длительность съемки 3 часа",
+				"PART2": "60+ фото",
+				"PART3": "Цветокоррекция, лёгкая ретушь",
+				"PART4": "Срок выполнения 10-14 дней",
+				"PART5": "300 BYN"
+			}
+		}
 	},
 	"CLIENTPAGE": {
 		"PASSWORDSHOWSWITCHTEXT": "Показать пароль",
@@ -98,7 +155,7 @@
 		}
 	},
 	"UPLOADIMAGERESPONSES": {
-		"WRONGVIEWSIZETYPE": "Не подходящяя ориентация изображения",
+		"WRONGDISPLAYTYPE": "Не подходящяя ориентация изображения",
 		"PENDING": "Сервер занят. Повторите попытку позже",
 		"FILEEXISTS": "Изображение с таким именем уже загружено",
 		"MAXCOUNT": "Загружено максимальное количество изображений",
@@ -131,16 +188,26 @@
 		"CHANGEDISCOUNTEXPIRATIONDATECHANGEBUTTONTEXT": "Изменить",
 		"CHANGEDISCOUNTEXPIRATIONDATEDELETEBUTTON": "Удалить скидку",
 		"CHANGEDISCOUNTMAXCOUNTMESSAGE": "Максимальное количество скидок 3",
+		"SEARCHIMAGESFORM": {
+			"INPUTSDATETEXT": "Дата загрузки",
+			"INPUTDATEFROMLABELTEXT": "От",
+			"INPUTDATEUNTILLABELTEXT": "До",
+			"INPUTPHOTOGRAPHYTYPETEXT": "Типы съёмок",
+			"INPUTDISPLAYTYPETEXT": "Типы отображения",
+			"ACCORDIONTITLETEXT": "Поиск изображений",
+			"SUBMITBUTTONTEXT": "Найти",
+			"RESETBUTTONTEXT": "Очистить критерии поиска"
+		},
 		"TABLECOLTITLES": {
 			"ORIGINALNAME": "Оригинальное имя",
 			"ORIGINALSIZE": "Размер оригинального изображения",
 			"IMAGEPHOTOGRAPHYTYPE": "Тип съёмки",
-			"VIEWSIZETYPE": "Размер отображения",
+			"DISPLAYTYPE": "Размер отображения",
 			"UPLOADAT": "Загружен",
 			"ONHOMEPAGE": "Отображён на главной",
 			"ONGALLERYPAGE": "Отображён на галерее",
 			"IMAGEPHOTOGRAPHYTYPEDESCRIPTION": "Описание",
-			"IMAGEPHOTOGRAPHYTYPECOMPRESSEDIMAGENAME": "Имя сжатого изображения"
+			"IMAGEPHOTOGRAPHYTYPEORIGINALIMAGENAME": "Оригинальное имя изображения"
 		},
 		"CLIENTORDERSTABLECOLTITLES": {
 			"IMAGEPHOTOGRAPHYTYPE": "Тип съёмки",
@@ -161,7 +228,6 @@
 		"SELECTEDCLIENTTEXT": "Выбранный клиент: ",
 		"IMAGECONTROLTEXT": {
 			"TITLE": "Управление",
-			"CHANGEBUTTON": "Изменить тип съёмки или описание",
 			"DELETEBUTTON": "Удалить",
 			"MOVETOHOMEPAGEBUTTON": "На главную",
 			"MOVETOGALLERYPAGEBUTTON": "В галерею",
@@ -174,16 +240,14 @@
 			}
 		},
 		"CHANGEIMAGEDATATEXT": {
-			"PHOTOGRAPHYTYPE": "Тип съёмки",
-			"VIEWSIZETYPE": "Размер отображения",
-			"DESCRIPTION": "Индивидуальное описание фото",
-			"CHANGEBUTTON": "Изменить"
+			"PLACEHOLDERTEXT": "Текст отсутствует",
+			"CHANGEBUTTON": "Подтвердить изменения"
 		},
 		"UPLOADIMAGETEXT": {
 			"PHOTOGRAPHYTYPE": "Тип съёмки *",
-			"VIEWSIZETYPE": "Размер отображения *",
+			"DISPLAYTYPE": "Размер отображения *",
 			"INVALIDPHOTOGRAPHYTYPE": "Не выбран тип съёмки",
-			"INVALIDVIEWSIZETYPE": "Не выбран размер отображения",
+			"INVALIDDISPLAYTYPE": "Не выбран размер отображения",
 			"INVALIDSELECTIMAGE": "Не выбрано изображение",
 			"DESCRIPTION": "Индивидуальное описание фото",
 			"BUTTON": "Загрузить новое изображение"
@@ -215,7 +279,7 @@
 		"WEDDING": "Свадебная съёмка", 
 		"FAMILY": "Семейная съёмка"
 	},
-	"IMAGEVIEWSIZETYPES": {
+	"IMAGEDISPLAYTYPES": {
 		"HORIZONTAL": "Горизонтальный",
 		"VERTICAL": "Вертикальный"
 	},

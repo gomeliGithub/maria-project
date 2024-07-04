@@ -1,10 +1,15 @@
 import { Component, ElementRef, HostBinding, OnInit, QueryList, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { HttpResponse } from '@angular/common/http';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
-import { OwlOptions, SlidesOutputData } from 'ngx-owl-carousel-o';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { TranslateModule } from '@ngx-translate/core';
+
+import { CarouselModule, OwlOptions, SlidesOutputData } from 'ngx-owl-carousel-o';
 
 import { AppService } from '../../../app/app.service';
 import { ClientService } from '../../services/client/client.service';
@@ -12,10 +17,12 @@ import { ClientService } from '../../services/client/client.service';
 import { environment } from '../../../environments/environment';
 
 import { AnimationEvent } from 'types/global';
-import { IClientCompressedImage } from 'types/models';
+import { ICompressedImageWithoutRelationFields } from 'types/models';
 
 @Component({
     selector: 'app-gallery',
+    standalone: true,
+    imports: [ CommonModule, ReactiveFormsModule, NgbModule, CarouselModule, TranslateModule ],
     templateUrl: './gallery.component.html',
     styleUrls: ['./gallery.component.css'],
     animations: [
@@ -54,42 +61,20 @@ import { IClientCompressedImage } from 'types/models';
 export class GalleryComponent implements OnInit {
     public photographyType: string;
 
-    constructor (
-        private readonly activateRoute: ActivatedRoute,
-        private readonly router: Router,
-
-        private readonly appService: AppService,
-        private readonly clientService: ClientService
-    ) {
-        this.photographyType = this.activateRoute.snapshot.paramMap.get('photographyType');
-
-        if ( !environment.photographyTypes.includes(this.photographyType) ) this.router.navigate(['**'], { skipLocationChange: true });
-
-        this.sendOrderForm = new FormGroup({
-            'orderType': new FormControl("", [ Validators.required, this.orderTypeValidator ]),
-            'clientPhoneNumber': new FormControl("", [ Validators.required, Validators.pattern(/(?:\+|\d)[\d\-\(\) ]{9,}\d/g) ]),
-            'comment': new FormControl("", Validators.maxLength(30))
-        });
-    }
-    
-    public activeClientType: string;
+    public activeClientType: string | null;
 
     public sendOrderForm: FormGroup<{
-        orderType: FormControl<string>,
-        clientPhoneNumber: FormControl<string>,
-        comment: FormControl<string>
+        orderType: FormControl<string | null>,
+        clientPhoneNumber: FormControl<string | null>,
+        comment: FormControl<string | null>
     }>;
-
-    @HostBinding('className') componentClass: string;
 
     public imageContainerViewRefs: QueryList<ElementRef<HTMLDivElement>>;
 
-    @ViewChild('sendOrderFormContainer', { static: false }) private readonly sendOrderFormContainerViewRef: ElementRef<HTMLDivElement>;
+    public compressedImagesList: ICompressedImageWithoutRelationFields[] | null = null; // public compressedImagesList: IClientCompressedImage[][] = null;
+    public compressedImagesListType: string | null = null;
 
-    public compressedImagesList: IClientCompressedImage[] = null; // public compressedImagesList: IClientCompressedImage[][] = null;
-    public compressedImagesListType: string = null;
-
-    public photographyTypeDescription: string;
+    public photographyTypeDescription: string | null;
 
     public url: string;
 
@@ -139,18 +124,40 @@ export class GalleryComponent implements OnInit {
         }
     }
 
+    constructor (
+        private readonly _activateRoute: ActivatedRoute,
+        private readonly _router: Router,
+
+        private readonly _appService: AppService,
+        private readonly _clientService: ClientService
+    ) {
+        this.photographyType = this._activateRoute.snapshot.paramMap.get('photographyType') as string;
+
+        if ( !( this.photographyType in environment.photographyTypes ) ) this._router.navigate(['**'], { skipLocationChange: true });
+
+        this.sendOrderForm = new FormGroup({
+            'orderType': new FormControl("", [ Validators.required, this.orderTypeValidator ]),
+            'clientPhoneNumber': new FormControl("", [ Validators.required, Validators.pattern(/(?:\+|\d)[\d\-\(\) ]{9,}\d/g) ]),
+            'comment': new FormControl("", Validators.maxLength(30))
+        });
+    }
+
+    @HostBinding('className') componentClass: string;
+
+    @ViewChild('sendOrderFormContainer', { static: false }) private readonly sendOrderFormContainerViewRef: ElementRef<HTMLDivElement>;
+
     ngOnInit (): void {
-        this.router.events.subscribe(evt => {
+        this._router.events.subscribe(evt => {
             if ( !( evt instanceof NavigationEnd ) ) return;
             else this.url = evt.url;
             
             if ( this.url.startsWith('/gallery') ) window.location.reload();
         });
 
-        this.appService.getTranslations([ 'PAGETITLES.GALLERY', `IMAGEPHOTOGRAPHYTYPESFULLTEXT.${ this.photographyType.toUpperCase() }`], true).subscribe(translation => {
-            this.appService.setTitle(`${ translation[0] } - ${ translation[1] }`);
+        this._appService.getTranslations([ 'PAGETITLES.GALLERY', `IMAGEPHOTOGRAPHYTYPESFULLTEXT.${ this.photographyType.toUpperCase() }`], true).subscribe(translation => {
+            this._appService.setTitle(`${ translation[0] } - ${ translation[1] }`);
 
-            let photographyTypeMetaKeyword: string = null;
+            let photographyTypeMetaKeyword: string = '';
 
             switch ( this.photographyType ) {
                 case 'children': { photographyTypeMetaKeyword = 'детский фотограф'; break; }
@@ -159,29 +166,29 @@ export class GalleryComponent implements OnInit {
                 case 'wedding': { photographyTypeMetaKeyword = 'свадебный фотограф'; break; }
             }
 
-            const keywordsMetaNameTag: HTMLMetaElement = this.appService.getMetaNameTag('keywords');
-            const keywordsMetaNameTagContent: string = keywordsMetaNameTag.getAttribute('content');
+            const keywordsMetaNameTag: HTMLMetaElement = this._appService.getMetaNameTag('keywords') as HTMLMetaElement;
+            const keywordsMetaNameTagContent: string = keywordsMetaNameTag.getAttribute('content') as string;
 
             keywordsMetaNameTag.setAttribute('content', `${ keywordsMetaNameTagContent }, ${ photographyTypeMetaKeyword }`);
         });
 
         this.getCompressedImagesData('vertical');
 
-        if ( this.appService.checkIsPlatformBrowser() ) {
-            this.clientService.getActiveClient().subscribe({
+        if ( this._appService.checkIsPlatformBrowser() ) {
+            this._clientService.getActiveClient().subscribe({
                 next: activeClientData => this.activeClientType = activeClientData ? activeClientData.type : null,
-                error: () => this.appService.createErrorModal()
+                error: () => this._appService.createErrorModal()
             });
         }
 
-        this.clientService.galleryImageContainerViewRefsChange.subscribe(value => this.imageContainerViewRefs = value);
+        this._clientService.galleryImageContainerViewRefsChange.subscribe(value => this.imageContainerViewRefs = value);
 
-        this.clientService.scrollPageBottomStatusChange.subscribe(value => {
+        this._clientService.scrollPageBottomStatusChange.subscribe(value => {
             if ( value ) {
                 if ( this.additionalImagesExists && !this.scrollPageBottomIsFinished ) {
                     this.scrollPageBottomIsFinished = true;
 
-                    this.clientService.setScrollPageBottomStatus(false);
+                    this._clientService.setScrollPageBottomStatus(false);
                 }
             }
         });
@@ -189,7 +196,7 @@ export class GalleryComponent implements OnInit {
 
     public changeActiveCarouselItems (event: SlidesOutputData): void {
         if ( this.additionalImagesExists ) {
-            this.getCompressedImagesData('vertical', this.compressedImagesList.length);
+            this.getCompressedImagesData('vertical', ( this.compressedImagesList as ICompressedImageWithoutRelationFields[]).length);
         }
 
         event;
@@ -203,7 +210,7 @@ export class GalleryComponent implements OnInit {
 
         if ( !currentImagesCount ) currentImagesCount = 0;
 
-        this.clientService.getCompressedImagesData(this.photographyType, imageViewSize, currentImagesCount).subscribe({
+        this._clientService.getCompressedImagesData(this.photographyType, imageViewSize, currentImagesCount).subscribe({
             next: data => {
                 if ( data.compressedImagesRaw.length !== 0 ) {
                     if ( !this.currentAdditionalImagesExists ) {
@@ -217,14 +224,14 @@ export class GalleryComponent implements OnInit {
                             }
                         }
                     } else {
-                        this.compressedImagesList.push(...data.compressedImagesRaw);
+                        ( this.compressedImagesList as ICompressedImageWithoutRelationFields[]).push(...data.compressedImagesRaw);
                     }
         
                     if ( data.compressedImagesRaw.length !== 0 ) {
                         // if ( !this.currentAdditionalImagesExists ) this.compressedImagesList = data.compressedImagesRaw.flat(); // this.flatCompressedImagesList = data.compressedImagesRaw.flat();
                         // else this.compressedImagesList.push(...data.compressedImagesRaw.flat()); // else this.flatCompressedImagesList.push(...data.compressedImagesRaw.flat());
         
-                        this.compressedImagesList.forEach(() => { // this.flatCompressedImagesList.forEach(() => {
+                        ( this.compressedImagesList as ICompressedImageWithoutRelationFields[]).forEach(() => { // this.flatCompressedImagesList.forEach(() => {
                             this.linkContainerAnimationStates.push('leave');
                             this.linkContainerAnimationDisplayValues.push('none');
                         });
@@ -237,7 +244,7 @@ export class GalleryComponent implements OnInit {
         
                 this.scrollPageBottomIsFinished = false;
             },
-            error: () => this.appService.createErrorModal()
+            error: () => this._appService.createErrorModal()
         });
     }
 
@@ -252,19 +259,19 @@ export class GalleryComponent implements OnInit {
     }
 
     public getDownloadingOriginalImageName (response: HttpResponse<Blob>) {
-        const contentDisposition: string = response.headers.get('content-disposition');
+        const contentDisposition: string = response.headers.get('content-disposition') as string;
         const imageName: string = contentDisposition.split(';')[1].split('filename')[1].split('=')[1].trim();
 
         return decodeURIComponent(imageName);
     }
 
     public downloadOriginalImage (compressedImageName: string): void {
-        this.clientService.downloadOriginalImage(compressedImageName).subscribe({
+        this._clientService.downloadOriginalImage(compressedImageName).subscribe({
             next: ( response: HttpResponse<Blob> ) => {
                 const imageName: string = this.getDownloadingOriginalImageName(response)
                 const binaryData: Blob[] = [];
 
-                binaryData.push(response.body);
+                binaryData.push(response.body as Blob);
                 
                 const downloadLink: HTMLAnchorElement = document.createElement('a');
                 
@@ -273,19 +280,19 @@ export class GalleryComponent implements OnInit {
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
             },
-            error: () => this.appService.createErrorModal()
+            error: () => this._appService.createErrorModal()
         });
     }
 
     public sendOrder (): void {
-        this.clientService.sendOrder(this.photographyType, this.sendOrderForm.value);
+        this._clientService.sendOrder(this.photographyType, this.sendOrderForm.value);
 
         this.sendOrderForm.reset();
         this.changeSendOrderFormAnimationState();
     }
 
     public setCurrentLinkContainerAnimationStateIndex (name: string): number { 
-        return this.compressedImagesList.findIndex(compressedImageData => compressedImageData.name === name); // return this.flatCompressedImagesList.findIndex(compressedImageData => compressedImageData.name === name);
+        return ( this.compressedImagesList as ICompressedImageWithoutRelationFields[] ).findIndex(compressedImageData => compressedImageData.name === name); // return this.flatCompressedImagesList.findIndex(compressedImageData => compressedImageData.name === name);
     }
 
     public startLinkContainerAnimation (index: number): void {

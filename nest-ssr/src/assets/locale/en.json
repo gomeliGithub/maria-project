@@ -4,6 +4,7 @@
 	"PAGETITLES": {
 		"HOME": "Home",
 		"GALLERY": "Portfolio",
+		"PRICES": "Price list",
 		"ADMINPANEL": {
 			"MAIN": "Admin panel",
 			"IMAGESCONTROL": "Images control",
@@ -40,6 +41,62 @@
 			"COMMENT": "Your comment or request for your order."
 		},
 		"CLIENTORDERSUCCESSMESSAGE": "The order has been sent successfully. I will contact you shortly"
+	},
+	"PRICESPAGE": {
+		"STANDARDPACKAGETITLE": "PACKAGE STANDART",
+		"MAXIMUMPACKAGETITLE": "PACKAGE MAXIMUM",
+		"INDIVIDUAL": {
+			"STANDARDPACKAGE": {
+				"PART1": "Shooting duration 1 hour",
+				"PART2": "30+ photos",
+				"PART3": "Color correction, light retouching",
+				"PART4": "Completion time 10-14 days",
+				"PART5": "70 BYN"
+			}
+		}, 
+		"CHILDREN": {
+			"STANDARDPACKAGE": {
+				"PART1": "Shooting duration 1 hour",
+				"PART2": "30+ photos",
+				"PART3": "Color correction, light retouching",
+				"PART4": "Completion time 10-14 days",
+				"PART5": "50 BYN"
+			}
+		}, 
+		"WEDDING": {
+			"STANDARDPACKAGE": {
+				"PART1": "Shooting duration 3 hours",
+				"PART2": "100+ photos",
+				"PART3": "Color correction, light retouching",
+				"PART4": "Photo studio rental INCLUDED in the price",
+				"PART5": "Completion time 10-14 days",
+				"PART6": "450 BYN"
+			},
+			"MAXIMUMPACKAGE": {
+				"PART1": "Shooting duration from 3 to 8 hours",
+				"PART2": "300+ photos",
+				"PART3": "Color correction, light retouching",
+				"PART4": "Photo studio rental INCLUDED in the price",
+				"PART5": "Completion time 10-14 days",
+				"PART6": "1000 BYN"
+			}
+		}, 
+		"FAMILY": {
+			"STANDARDPACKAGE": {
+				"PART1": "Shooting duration 1 hour",
+				"PART2": "30+ photos",
+				"PART3": "Color correction, light retouching",
+				"PART4": "Completion time 10-14 days",
+				"PART5": "100 BYN"
+			},
+			"MAXIMUMPACKAGE": {
+				"PART1": "Shooting duration 3 hours",
+				"PART2": "60+ photos",
+				"PART3": "Color correction, light retouching",
+				"PART4": "Completion time 10-14 days",
+				"PART5": "300 BYN"
+			}
+		}
 	},
 	"CLIENTPAGE": {
 		"PASSWORDSHOWSWITCHTEXT": "Show password",
@@ -98,7 +155,7 @@
 		}
 	},
 	"UPLOADIMAGERESPONSES": {
-		"WRONGVIEWSIZETYPE": "Inappropriate image orientation",
+		"WRONGDISPLAYTYPE": "Inappropriate image orientation",
 		"PENDING": "The server is busy. Please try again later",
 		"FILEEXISTS": "A image with the same name has already been uploaded",
 		"MAXCOUNT": "Maximum number of images uploaded",
@@ -131,16 +188,26 @@
 		"CHANGEDISCOUNTEXPIRATIONDATECHANGEBUTTONTEXT": "Change",
 		"CHANGEDISCOUNTEXPIRATIONDATEDELETEBUTTON": "Удалить",
 		"CHANGEDISCOUNTMAXCOUNTMESSAGE": "Maximum number of discounts 3",
+		"SEARCHIMAGESFORM": {
+			"INPUTSDATETEXT": "Date of upload",
+			"INPUTDATEFROMLABELTEXT": "From",
+			"INPUTDATEUNTILLABELTEXT": "Until",
+			"INPUTPHOTOGRAPHYTYPETEXT": "Photography types",
+			"INPUTDISPLAYTYPETEXT": "Display types",
+			"ACCORDIONTITLETEXT": "Search images",
+			"SUBMITBUTTONTEXT": "Search",
+			"RESETBUTTONTEXT": "Clear definition criteria"
+		},
 		"TABLECOLTITLES": {
 			"ORIGINALNAME": "Original name",
 			"ORIGINALSIZE": "Original image size",
 			"IMAGEPHOTOGRAPHYTYPE": "Photography type",
-			"VIEWSIZETYPE": "View size type",
+			"DISPLAYTYPE": "View size type",
 			"UPLOADAT": "Upload at",
 			"ONHOMEPAGE": "Displayed on Home page",
 			"ONGALLERYPAGE": "Displayed on Gallery page",
 			"IMAGEPHOTOGRAPHYTYPEDESCRIPTION": "Description",
-			"IMAGEPHOTOGRAPHYTYPECOMPRESSEDIMAGENAME": "Compressed image name"
+			"IMAGEPHOTOGRAPHYTYPEORIGINALIMAGENAME": "Original image name"
 		},
 		"CLIENTORDERSTABLECOLTITLES": {
 			"IMAGEPHOTOGRAPHYTYPE": "Photography type",
@@ -161,7 +228,6 @@
 		"SELECTEDCLIENTTEXT": "Selected client: ",
 		"IMAGECONTROLTEXT": {
 			"TITLE": "Control",
-			"CHANGEBUTTON": "Change Photography type or description",
 			"DELETEBUTTON": "Delete",
 			"MOVETOHOMEPAGEBUTTON": "To the home",
 			"MOVETOGALLERYPAGEBUTTON": "To the gallery",
@@ -174,16 +240,14 @@
 			}
 		},
 		"CHANGEIMAGEDATATEXT": {
-			"PHOTOGRAPHYTYPE": "Photography type",
-			"VIEWSIZETYPE": "View size type",
-			"DESCRIPTION": "Individual image description",
-			"CHANGEBUTTON": "Change"
+			"PLACEHOLDERTEXT": "No text",
+			"CHANGEBUTTON": "Confirm changes"
 		},
 		"UPLOADIMAGETEXT": {
 			"PHOTOGRAPHYTYPE": "Photography type *",
-			"VIEWSIZETYPE": "View size type *",
+			"DISPLAYTYPE": "View size type *",
 			"INVALIDPHOTOGRAPHYTYPE": "Photography type not selected",
-			"INVALIDVIEWSIZETYPE": "View size not selected",
+			"INVALIDDISPLAYTYPE": "View size not selected",
 			"INVALIDSELECTIMAGE": "No image selected",
 			"DESCRIPTION": "Individual image description",
 			"BUTTON": "Upload new image"
@@ -215,7 +279,7 @@
 		"WEDDING": "Wedding photography", 
 		"FAMILY": "Family photography"
 	},
-	"IMAGEVIEWSIZETYPES": {
+	"IMAGEDISPLAYTYPES": {
 		"HORIZONTAL": "Horizontal",
 		"VERTICAL": "Vertical"
 	},

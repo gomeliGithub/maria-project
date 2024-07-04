@@ -1,25 +1,24 @@
 import { ElementRef, EventEmitter, Injectable, QueryList } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 
 import { Observable, forkJoin } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-
-import * as bcryptjs from 'bcryptjs';
 
 import { AppService } from '../../app.service';
 
 import { IClientBrowser, IGalleryCompressedImagesData } from 'types/global';
 import { IClientSignData } from 'types/sign';
-import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
+import { ICompressedImageWithoutRelationFields, IDiscount, IImagePhotographyType } from 'types/models';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ClientService {
     constructor (
-        private readonly translateService: TranslateService,
-        private readonly http: HttpClient,
-        private readonly appService: AppService
+        private readonly _http: HttpClient,
+        private readonly _translateService: TranslateService,
+
+        private readonly _appService: AppService
     ) { }
 
     public scrollPageBottomStatusChange: EventEmitter<boolean> = new EventEmitter();
@@ -37,7 +36,7 @@ export class ClientService {
         this.navbarAnimationStateChange.emit(value);
     }
 
-    public setPrevNavbarAnimationStateChange (value: string): void { 
+    public setPrevNavbarAnimationStateChange (value: string | undefined): void { 
         this.prevNavbarAnimationStateChange.emit(value);
     }
 
@@ -50,115 +49,95 @@ export class ClientService {
     }
 
     public getActiveClient (): Observable<IClientBrowser> {
-        const headers: HttpHeaders = this.appService.createRequestHeaders();
-
-        return this.http.get<IClientBrowser>('/api/sign/getActiveClient', { headers, withCredentials: true });
+        return this._http.get<IClientBrowser>('/api/sign/getActiveClient', { headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true });
     }
 
     public sign (signFormValue: Partial<{
-        clientLogin: string;
-        clientPassword: string;
-        clientFullName: string;
-        clientEmail?: string;
-    }>, signOp: 'up' | 'in'): void {
-        this._getBcrypt_hash_saltrounds().subscribe(async bcrypt_hash_saltrounds => {
-            const { clientLogin, clientPassword, clientFullName, clientEmail } = signFormValue;
+        clientLogin: string | null;
+        clientPassword: string | null;
+        clientFullName: string | null;
+        clientEmail?: string | null;
+    }>, signOperation: 'up' | 'in'): void {
+        const { clientLogin, clientPassword, clientFullName, clientEmail } = signFormValue;
 
-            // const clientPasswordHash: string = await bcryptjs.hash(clientPassword, parseInt(bcrypt_hash_saltrounds, 10));
+        const clientData: IClientSignData = {
+            login: clientLogin as string,
+            password: clientPassword as string
+        }
 
-            const clientData: IClientSignData = {
-                login: clientLogin,
-                password: signOp === 'up' ? await bcryptjs.hash(clientPassword, parseInt(bcrypt_hash_saltrounds, 10)) : clientPassword
-            }
+        if ( signOperation === 'up') {
+            clientData.fullName = clientFullName as string;
+            clientData.email = clientEmail as string;
 
-            const headers: HttpHeaders = this.appService.createRequestHeaders();
-
-            if ( signOp === 'up') {
-                clientData.fullName = clientFullName;
-                clientData.email = clientEmail;
-
-                this.http.post('/api/sign/up', { 
-                    sign: { clientData }
-                }, { headers, withCredentials: true }).subscribe({
-                    next: () => this.appService.reloadComponent(false, '/signIn'),
-                    error: () => this.appService.createErrorModal(this.appService.getTranslations('CLIENTPAGE.SIGNERRORTEXT'))
-                });
-            } else this.http.put('/api/sign/in', { 
+            this._http.post('/api/sign/up', { 
                 sign: { clientData }
-            }, { responseType: 'text', headers, withCredentials: true }).subscribe({
-                next: access_token => {
-                    localStorage.setItem('access_token', access_token);
-
-                    this.appService.reloadComponent(false, '');
-                },
-                error: () => this.appService.createErrorModal(this.appService.getTranslations('CLIENTPAGE.SIGNERRORTEXT'))
+            }, { headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true }).subscribe({
+                next: () => this._appService.reloadComponent(false, '/sign/in'),
+                error: () => this._appService.createErrorModal(this._appService.getTranslations('CLIENTPAGE.SIGNERRORTEXT'))
             });
+        } else this._http.put('/api/sign/in', { 
+            sign: { clientData }
+        }, { responseType: 'text', headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true }).subscribe({
+            next: access_token => {
+                localStorage.setItem('access_token', access_token);
+
+                this._appService.reloadComponent(false, '');
+            },
+            error: () => this._appService.createErrorModal(this._appService.getTranslations('CLIENTPAGE.SIGNERRORTEXT'))
         });
     }
 
-    private _getBcrypt_hash_saltrounds (): Observable<string> {
-        return this.http.get('/api/sign/getBcryptHashSaltrounds', { responseType: 'text', withCredentials: true });
-    }
-
-    public getCompressedImagesData (imagesType: 'home', imageViewSize: 'horizontal' | 'vertical'): Observable<IClientCompressedImage[]>
-    public getCompressedImagesData (imagesType: string, imageViewSize: 'horizontal' | 'vertical', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData>
-    public getCompressedImagesData (imagesType: 'home' | string, imageViewSize: 'horizontal' | 'vertical', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData | IClientCompressedImage[]> {
-        return this.http.get<IGalleryCompressedImagesData | IClientCompressedImage[]>(`/api/client/getCompressedImagesData/:${ imagesType }`, { params: {
-            imageViewSize,
-            imagesExistsCount
+    public getCompressedImagesData (imagesType: 'home', imageDisplayType: 'horizontal' | 'vertical'): Observable<ICompressedImageWithoutRelationFields[]>
+    public getCompressedImagesData (imagesType: string, imageDisplayType: 'horizontal' | 'vertical', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData>
+    public getCompressedImagesData (imagesType: 'home' | string, imageDisplayType: 'horizontal' | 'vertical', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData | ICompressedImageWithoutRelationFields[]> {
+        return this._http.get<IGalleryCompressedImagesData | ICompressedImageWithoutRelationFields[]>(`/api/client/getCompressedImagesData/:${ imagesType }`, { params: {
+            imageDisplayType,
+            imagesExistsCount: imagesExistsCount as number
         }});
     }
 
     public getImagePhotographyTypesData (targetPage: 'home'): Observable<IImagePhotographyType[][]>
     public getImagePhotographyTypesData (targetPage: 'admin'): Observable<IImagePhotographyType[]>
     public getImagePhotographyTypesData (targetPage: 'home' | 'admin'): Observable<IImagePhotographyType[][] | IImagePhotographyType[]> {
-        return this.http.get<IImagePhotographyType[][] | IImagePhotographyType[]>(`/api/client/getImagePhotographyTypesData/:${ targetPage }`);
+        return this._http.get<IImagePhotographyType[][] | IImagePhotographyType[]>(`/api/client/getImagePhotographyTypesData/:${ targetPage }`);
     }
 
     public getDiscountsData (): Observable<IDiscount[]> {
-        return this.http.get<IDiscount[]>('/api/client/getDiscountsData');
+        return this._http.get<IDiscount[]>('/api/client/getDiscountsData');
     }
 
     public downloadOriginalImage (compressedImageName: string): Observable<HttpResponse<Blob>> {
-        const headers: HttpHeaders = this.appService.createRequestHeaders();
-
-        return this.http.get(`/api/client/downloadOriginalImage/:${ compressedImageName }`, { responseType: 'blob', observe: 'response', headers, withCredentials: true });
+        return this._http.get(`/api/client/downloadOriginalImage/:${ compressedImageName }`, { responseType: 'blob', observe: 'response', headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true });
     }
 
     public sendOrder (photographyType: string, sendOrderFormValue: Partial<{
-        orderType: string;
-        clientPhoneNumber: string;
-        comment: string;
+        orderType: string | null;
+        clientPhoneNumber: string | null;
+        comment: string | null;
     }>): void {
-        const headers = this.appService.createRequestHeaders();
-
         const { orderType, clientPhoneNumber, comment } = sendOrderFormValue;
 
-        this.http.post('/api/client/createOrder', {
+        this._http.post('/api/client/createOrder', {
             client: {
                 imagePhotographyType: photographyType,
                 orderType,
                 clientPhoneNumber,
                 comment
             }
-        }, { headers: headers, withCredentials: true }).subscribe({
-            next: () => this.appService.createSuccessModal(this.appService.getTranslations('GALLERYPAGE.CLIENTORDERSUCCESSMESSAGE')),
-            error: () => this.appService.createErrorModal()
+        }, { headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true }).subscribe({
+            next: () => this._appService.createSuccessModal(this._appService.getTranslations('GALLERYPAGE.CLIENTORDERSUCCESSMESSAGE')),
+            error: () => this._appService.createErrorModal()
         });
     }
 
     public signOut (): Observable<void> {
-        const headers = this.appService.createRequestHeaders();
-
-        return this.http.put<void>('/api/sign/out', { }, { headers: headers, withCredentials: true });
+        return this._http.put<void>('/api/sign/out', { }, { headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true });
     }
 
     public changeClientLocale (newLocale: string) {
-        const headers = this.appService.createRequestHeaders();
-
         return forkJoin([ 
-            this.http.post('/api/client/changeLocale', { sign: { newLocale } }, { responseType: 'text', headers, withCredentials: true }),
-            this.translateService.use(newLocale)
+            this._http.post('/api/client/changeLocale', { sign: { newLocale } }, { responseType: 'text', headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true }),
+            this._translateService.use(newLocale)
         ]);
     }
 }

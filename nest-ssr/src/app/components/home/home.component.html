@@ -104,7 +104,7 @@
         </div>
     </div>
 </div>
-<div *ngIf="compressedImagesList && imagePhotographyTypes" class="position-fixed top-50 translate-middle z-2" id="scrollSnapItemRadiosContainer"
+<div *ngIf="compressedImagesList || imagePhotographyTypes" class="position-fixed top-50 translate-middle z-2" id="scrollSnapItemRadiosContainer"
     (mouseenter)="startScrollSnapItemRadiosContainerAnimation('enter')"
     (mouseleave)="startScrollSnapItemRadiosContainerAnimation('leave')"
 >

@@ -1,68 +1,91 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { AssociationGetOptions } from 'sequelize-typescript';
+
+import { Image_photography_type } from '@prisma/client';
 
 import { Buffer } from 'node:buffer';
 import fsPromises from 'fs/promises';
 import path from 'path';
 
 import sharp from 'sharp';
-import { fileTypeFromFile } from 'file-type';
+import { FileTypeResult, fileTypeFromFile } from 'file-type';
 
+import { CommonModule } from '../../modules/common.module';
+
+import { PrismaService } from '../../../prisma/prisma.service';
 import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 
-import { ClientCompressedImage, ImagePhotographyType } from '../../models/client.model';
-
 import { ICompressImageData, IRequest } from 'types/global';
-import { ICreateImageDirsOptions, ICompressedImageGetOptions } from 'types/options';
-import { IClientCompressedImage } from 'types/models';
+import { ICreateImageDirsOptions, ICompressedImageGetOptions, IClientGetOptions, IClientGetCompressedImagesOptions } from 'types/options';
+import { IAdmin, ICompressedImageWithoutRelationFields } from 'types/models';
+import { IJWTPayload } from 'types/sign';
 
 @Injectable()
 export class ImageControlService {
-    constructor (
-        private readonly appService: AppService,
+    public staticCompressedImagesDirPath: string = path.join(this._appService.staticFilesDirPath, 'images_thumbnail');
 
-        @InjectModel(ClientCompressedImage) 
-        private readonly compressedImageModel: typeof ClientCompressedImage,
-        @InjectModel(ImagePhotographyType)
-        private readonly imagePhotographyTypeModel: typeof ImagePhotographyType
+    constructor (
+        private readonly _prisma: PrismaService,
+
+        private readonly _appService: AppService
     ) { }
 
-    public staticCompressedImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail');
+    public async getCompressedImages (options: ICompressedImageGetOptions): Promise<ICompressedImageWithoutRelationFields[]> {
+        const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
 
-    public async get (options: ICompressedImageGetOptions, rawResult: false): Promise<ClientCompressedImage[]>
-    public async get (options: ICompressedImageGetOptions, rawResult: true): Promise<IClientCompressedImage[]>
-    public async get (options: ICompressedImageGetOptions, rawResult?: boolean): Promise<ClientCompressedImage[] | IClientCompressedImage[]>
-    public async get (options: ICompressedImageGetOptions, rawResult = true): Promise<ClientCompressedImage[] | IClientCompressedImage[]> {
-        const findOptions: AssociationGetOptions = {
-            where: [],
-            order: [ [ 'uploadDate', 'DESC' ] ],
-            limit: options.imagesLimit,
-            offset: options.imagesExistsCount,
-            raw: rawResult
+        const clientGetOptions: IClientGetOptions = {
+            compressedImages: { 
+                include: true,
+                skip: options.imagesExistsCount,
+                take: options.imagesLimit,
+                dateFrom: options.dateFrom,
+                dateUntil: options.dateUntil
+            }
         }
 
-        if ( options && options.find ) {
-            if ( options.find.imageTitles ) findOptions.where = { name: options.find.imageTitles };
-            if ( options.find.includeFields ) findOptions.attributes = options.find.includeFields;
-            if ( options.find.imageViewSize ) findOptions.where['viewSizeType'] = options.find.imageViewSize;
+        if ( options && options.find ) { 
+            if ( options.find.imageTitles ) ( clientGetOptions.compressedImages as IClientGetCompressedImagesOptions ).whereNameArr = options.find.imageTitles;
+            if ( options.find.selectFields ) ( clientGetOptions.compressedImages as IClientGetCompressedImagesOptions ).selectFields = options.find.selectFields;
+            // if ( options.find.imageDisplayType ) ( clientGetOptions.compressedImages as IClientGetCompressedImagesOptions ).whereDisplayType = options.find.imageDisplayType;
+            if ( options.find.photographyTypes ) ( clientGetOptions.compressedImages as IClientGetCompressedImagesOptions ).wherePhotographyTypes = options.find.photographyTypes;
+            if ( options.find.displayTypes ) ( clientGetOptions.compressedImages as IClientGetCompressedImagesOptions ).whereDisplayTypes = options.find.displayTypes;
         }
 
-        let compressedImages: ClientCompressedImage[] = null;
+        let compressedImagesData: ICompressedImageWithoutRelationFields[] | null = null;
 
-        if ( options.clientInstance) compressedImages = await options.clientInstance.$get('compressedImages', findOptions);
-        else compressedImages = await this.compressedImageModel.findAll(findOptions);
+        if ( options.clientData ) compressedImagesData = ( await commonServiceRef.getClientsData('admin', options.clientData.login as string, clientGetOptions) as IAdmin ).compressedImages as ICompressedImageWithoutRelationFields[];
+        else compressedImagesData = await this._prisma.compressedImage.findMany({ 
+            skip: options && options.imagesExistsCount,
+            take: options && options.imagesLimit,
+            select: options && options.find && options.find.selectFields ? options.find.selectFields : undefined,
+            where: {
+                name: options && options.find && options.find.imageTitles ? { in: options.find.imageTitles } : undefined,
+                // displayType: options && options.find && options.find.imageDisplayType ? options.find.imageDisplayType : undefined,
+                photographyType: options && options.find && options.find.photographyTypes ? {
+                    in: options.find.photographyTypes
+                } : undefined,
+                displayType: options && options.find && options.find.displayTypes ? {
+                    in: options.find.displayTypes
+                } : undefined,
+                uploadDate: options && options.dateFrom && options.dateUntil ? {
+                    gte: options.dateFrom,
+                    lte: options.dateUntil
+                } : undefined
+            },
+            orderBy: {
+                uploadDate: 'desc'
+            }
+        });
 
-        return compressedImages;
+        return compressedImagesData as ICompressedImageWithoutRelationFields[];
     }
 
     public async compressImage (request: IRequest, compressImageData: ICompressImageData, options?: sharp.SharpOptions): Promise<boolean> {
-        const { ext } = await fileTypeFromFile(compressImageData.inputImagePath);
+        const { ext } = ( await fileTypeFromFile(compressImageData.inputImagePath) as FileTypeResult );
 
-        if ( !this.appService.supportedImageFileTypes.map(imageFileType => imageFileType.replace('image/', '')).includes(ext) ) return false;
+        if ( !this._appService.supportedImageFileTypes.map(imageFileType => imageFileType.replace('image/', '')).includes(ext) ) return false;
 
-        if ( !options ) options = {};
+        if ( !options ) options = { };
 
         const inputImageDirPath: string = path.dirname(compressImageData.inputImagePath);
         const inputImageName: string = path.basename(compressImageData.inputImagePath);
@@ -72,7 +95,7 @@ export class ImageControlService {
 
         const outputTempFilePath: string = this.getTempFileName(outputImagePath);
 
-        let newCompressedImageInstance: ClientCompressedImage = null;
+        let updatedClient: IAdmin | null = null;
 
         try {
             const { width, height } = await sharp(compressImageData.inputImagePath).metadata();
@@ -80,23 +103,29 @@ export class ImageControlService {
             const semiTransparentRedBuffer: Buffer = await sharp(compressImageData.inputImagePath, options).jpeg({
                 quality: 50,
                 progressive: true
-            }).resize(Math.round(width / 2), Math.round(height / 2)).toBuffer();
+            }).resize(Math.round(width as number / 2), Math.round(height as number / 2)).toBuffer();
 
             await fsPromises.writeFile(outputTempFilePath, semiTransparentRedBuffer);
             await fsPromises.rename(outputTempFilePath, outputImagePath);
 
-            newCompressedImageInstance = await this.compressedImageModel.create({
-                name: outputImageName,
-                dirPath: compressImageData.outputDirPath,
-                originalName: inputImageName,
-                originalDirPath: inputImageDirPath,
-                originalSize: compressImageData.originalImageSize,
-                photographyType: compressImageData.imageAdditionalData.photographyType,
-                viewSizeType: compressImageData.imageAdditionalData.viewSizeType,
-                description: compressImageData.imageAdditionalData.description,
+            updatedClient = await this._prisma.admin.update({
+                data: { 
+                    compressedImages: { 
+                        create: {
+                            name: outputImageName,
+                            dirPath: compressImageData.outputDirPath,
+                            originalName: inputImageName,
+                            originalDirPath: inputImageDirPath,
+                            originalSize: compressImageData.originalImageSize,
+                            photographyType: compressImageData.imageAdditionalData.photographyType,
+                            displayType: compressImageData.imageAdditionalData.displayType,
+                            description: compressImageData.imageAdditionalData.description
+                        }
+                    }
+                },
+                where: { id: ( request.activeClientData as IJWTPayload ).id as number },
+                include: { compressedImages: true }
             });
-
-            await request.activeClientInstance.$add('compressedImages', newCompressedImageInstance);
 
             return true;
         } catch {
@@ -115,9 +144,15 @@ export class ImageControlService {
 
                 await fsPromises.unlink(imagePath);
 
-                if ( newCompressedImageInstance ) {
-                    await request.activeClientInstance.$remove('compressedImages', newCompressedImageInstance);
-                    await newCompressedImageInstance.destroy();
+                let existingCompressedImage: ICompressedImageWithoutRelationFields | undefined = undefined;
+
+                if ( updatedClient ) existingCompressedImage = updatedClient.compressedImages.find(data => data.name === outputImageName);
+
+                if ( existingCompressedImage ) {
+                    await this._prisma.admin.update({
+                        data: { compressedImages: { delete: { name: existingCompressedImage.name } } },
+                        where: { id: ( request.activeClientData as IJWTPayload ).id as number }
+                    });
                 }
             }
 
@@ -139,19 +174,19 @@ export class ImageControlService {
             if ( !( await this.checkFileExists(options.compressedImages.clientDirPath) ) ) await fsPromises.mkdir(options.compressedImages.clientDirPath);
         }
 
-        const staticFilesImagesFullDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_full');
-        const staticFilesGalleryImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail', 'gallery');
-        const staticFilesHomeImagesDirPath: string = path.join(this.appService.staticFilesDirPath, 'images_thumbnail', 'home', 'imagePhotographyTypes');
+        const staticFilesImagesFullDirPath: string = path.join(this._appService.staticFilesDirPath, 'images_full');
+        const staticFilesGalleryImagesDirPath: string = path.join(this._appService.staticFilesDirPath, 'images_thumbnail', 'gallery');
+        const staticFilesHomeImagesDirPath: string = path.join(this._appService.staticFilesDirPath, 'images_thumbnail', 'home', 'imagePhotographyTypes');
 
         if ( !( await this.checkFileExists(staticFilesImagesFullDirPath) ) ) await fsPromises.mkdir(staticFilesImagesFullDirPath);
         if ( !( await this.checkFileExists(staticFilesGalleryImagesDirPath) ) ) await fsPromises.mkdir(staticFilesGalleryImagesDirPath, { recursive: true });
         if ( !( await this.checkFileExists(staticFilesHomeImagesDirPath) ) ) await fsPromises.mkdir(staticFilesHomeImagesDirPath, { recursive: true });
 
-        for ( const photographyType of this.appService.imagePhotographyTypes ) {
-            const photographyTypeDirDirPath: string = path.join(staticFilesGalleryImagesDirPath, photographyType);
-            const photographyTypeDirIsExists: boolean = await this.checkFileExists(photographyTypeDirDirPath);
+        for ( const photographyType in Image_photography_type ) {
+            const photographyTypeDirPath: string = path.join(staticFilesGalleryImagesDirPath, photographyType);
+            const photographyTypeDirIsExists: boolean = await this.checkFileExists(photographyTypeDirPath);
 
-            if ( !photographyTypeDirIsExists ) await fsPromises.mkdir(photographyTypeDirDirPath);
+            if ( !photographyTypeDirIsExists ) await fsPromises.mkdir(photographyTypeDirPath);
         }
     }
 
@@ -166,12 +201,14 @@ export class ImageControlService {
     }
 
     public async deleteImage (commonServiceRef: CommonService, request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
-        const compressedImageInstance: ClientCompressedImage = await this.compressedImageModel.findOne({ where: { originalName: path.basename(imagePath) } });
+        const compressedImageData: ICompressedImageWithoutRelationFields | null = await this._prisma.compressedImage.findFirst({ where: { originalName: path.basename(imagePath) } });
+
+        if ( compressedImageData === null ) return false;
 
         try {
-            const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImageInstance.name);
-            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageInstance.photographyType, compressedImageInstance.name);
-            const compressedImageOriginalPath: string = path.join(this.appService.clientCompressedImagesDir, clientLogin, compressedImageInstance.name);
+            const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImageData.name);
+            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageData.photographyType, compressedImageData.name);
+            const compressedImageOriginalPath: string = path.join(this._appService.clientCompressedImagesDir, clientLogin, compressedImageData.name);
 
             const currentCompressedImagePath: string = await commonServiceRef.getFulfilledAccessPath([
                 staticFilesHomeImagePath, 
@@ -179,9 +216,8 @@ export class ImageControlService {
                 compressedImageOriginalPath
             ]);
 
-            await request.activeClientInstance.$remove('compressedImages', compressedImageInstance);
-            await compressedImageInstance.destroy();
-            await this.imagePhotographyTypeModel.update({ compressedImageName: null }, { where: { compressedImageName: compressedImageInstance.name } });
+            await this._prisma.admin.update({ data: { compressedImages: { delete: { name: compressedImageData.name } } }, where: { id: ( request.activeClientData as IJWTPayload ).id as number } });
+            await this._prisma.imagePhotographyType.update({ data: { compressedImageOriginalName: null }, where: { compressedImageOriginalName: compressedImageData.name } });
             await fsPromises.unlink(imagePath);
             await fsPromises.unlink(currentCompressedImagePath);
 

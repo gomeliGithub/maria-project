@@ -37,12 +37,14 @@ export class AppService {
     public httpErrorLogFilePath: string = join(process.cwd(), 'server', 'logs', '_httpErrorServer.log');
     public webSocketLogFilePath: string = join(process.cwd(), 'server', 'logs', '_webSocketServer.log');
     public webSocketErrorLogFilePath: string = join(process.cwd(), 'server', 'logs', '_webSocketErrorServer.log');
+    public internalLogFilePath: string = join(process.cwd(), 'server', 'logs', '_internalServer.log');
+    public internalErrorLogFilePath: string = join(process.cwd(), 'server', 'logs', '_internalErrorServer.log');
 
     public cookieSerializeOptions: ICookieSerializeOptions = {
         httpOnly: true,
-        maxAge: ms(process.env.COOKIE_MAXAGE_TIME),
+        maxAge: ms(process.env.COOKIE_MAXAGE_TIME as string),
         sameSite: 'strict',
-        secure: false,
+        secure: true,
         priority: 'high'
     }
 
@@ -50,11 +52,6 @@ export class AppService {
     public clientCompressedImagesDir: string = path.join(process.cwd(), 'server', 'files', 'compressedImages');
 
     public supportedImageFileTypes: string[] = [ 'image/jpg', 'image/jpeg', 'image/png' ]; // [ 'jpg', 'png', 'webp', 'avif', 'gif', 'svg', 'tiff' ]
-    public imagePhotographyTypes: string[] = [ 'individual', 'children', 'wedding', 'family' ];
-    public imageViewSizeTypes: string[] = [ 'horizontal', 'vertical' ];
-
-    public clientOrderTypes: string[] = [ 'consultation', 'full' ];
-    public clientOrdersStatuses: string[] = [ 'new', 'processed' ];
 
     public async getServiceRef ( module: typeof AdminPanelModule, service: typeof AdminPanelService): Promise<AdminPanelService>
     public async getServiceRef ( module: typeof ClientModule, service: typeof ClientService): Promise<ClientService>
@@ -69,24 +66,27 @@ export class AppService {
         return serviceRef;
     }
 
-    public logLineAsync (logLine: string, error: boolean, logType: 'http' | 'webSocket'): Promise<void> {
+    public logLineAsync (logLine: string, error: boolean, logType: 'http' | 'webSocket' | 'internal'): Promise<void> {
         return new Promise<void>( (resolve, reject) => {
             const logDT = new Date();
 
             const time: string = logDT.toLocaleDateString() + " " + logDT.toLocaleTimeString();
             const fullLogLine: string = time + " " + logLine;
 
-            let logFilePath: string = null;
+            let logFilePath: string | null = null;
 
             if ( logType === 'http' ) {
                 logFilePath = !error ? this.logFilePath : this.httpErrorLogFilePath;
             } else if ( logType === 'webSocket' ) {
                 logFilePath = !error ? this.webSocketLogFilePath : this.webSocketErrorLogFilePath;
+            } else if ( logType === 'internal' ) {
+                logFilePath = !error ? this.internalLogFilePath : this.internalErrorLogFilePath;
             }
         
-            console.log(fullLogLine);
+            if ( !error ) console.info(fullLogLine);
+            else console.error(fullLogLine);
         
-            fs.open(logFilePath, 'a+', (err, logFd) => {
+            fs.open(logFilePath as string, 'a+', (err, logFd) => {
                 if ( err ) 
                     reject(err);
                 else    

@@ -37,8 +37,8 @@
                             "node_modules/hammerjs/hammer.min.js"
                         ],
                         "allowedCommonJsDependencies": [
-                            "bcryptjs",
-                            "@nestjs/ng-universal/dist/tokens"
+                            "@nestjs/ng-universal/dist/tokens",
+                            "@prisma/client"
                         ]
                     },
                     "configurations": {
@@ -143,7 +143,6 @@
                             "@nestjs/websockets/socket-module",
                             "cache-manager",
                             "bcrypt",
-                            "bcryptjs",
                             "sharp",
                             "@nestjs/common",
                             "@nestjs/core",

@@ -1,7 +1,10 @@
 import { AfterContentChecked, AfterRenderPhase, AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChildren, afterRender} from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { TranslateModule } from '@ngx-translate/core';
 import { DeviceDetectorService, DeviceInfo } from 'ngx-device-detector';
 
 import { AppService } from '../../app.service';
@@ -9,10 +12,13 @@ import { ClientService } from '../../services/client/client.service';
 import { HomeService } from '../../services/home/home.service';
 
 import { AnimationEvent } from 'types/global';
-import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
+import { ICompressedImageWithoutRelationFields, IDiscount, IImagePhotographyType } from 'types/models';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-home',
+    standalone: true,
+    imports: [ CommonModule, NgbModule, RouterModule, TranslateModule ],
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.css'],
     animations: [
@@ -67,32 +73,7 @@ import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/
 export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChecked, OnDestroy {
     public componentElementIsRendered: boolean = false;
     
-    public deviceInfo: DeviceInfo = null;
-
-    constructor (
-        private readonly router: Router,
-        private readonly changeDetector: ChangeDetectorRef,
-        
-        private readonly deviceService: DeviceDetectorService,
-
-        private readonly appService: AppService,
-        private readonly clientService: ClientService,
-        private readonly homeService: HomeService,
-    ) {
-        afterRender(() => {
-            if ( !this.componentElementIsRendered && this.scrollSnapItemRadioViewRefs.length !== 0 ) {
-                this.currentItem = 0;
-
-                this.setActiveScrollSnapSection();
-
-                this.componentElementIsRendered = true;
-            }
-        }, { phase: AfterRenderPhase.Read });
-    }
-
-    @ViewChildren('scrollSnapSection', { read: ElementRef<HTMLDivElement> }) public readonly scrollSnapSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
-    @ViewChildren('scrollSnapVisiableAnimationSection', { read: ElementRef<HTMLDivElement> }) public readonly scrollSnapVisiableAnimationSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
-    @ViewChildren('scrollSnapItemRadio', { read: ElementRef<HTMLInputElement> }) private readonly scrollSnapItemRadioViewRefs: QueryList<ElementRef<HTMLInputElement>>;
+    public deviceInfo: DeviceInfo | null = null;
 
     public isMobileDevice: boolean = false;
     public isTabletDevice: boolean = false;
@@ -114,57 +95,84 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
 
     public currentScrollSnapSectionVisiableAnimationStates: { state: string, finished: boolean }[] = [];
 
-    public compressedImagesList: IClientCompressedImage[];
+    public compressedImagesList: ICompressedImageWithoutRelationFields[] | null;
 
-    public discountsData: IDiscount[];
+    public discountsData: IDiscount[] | null;
 
-    public imagePhotographyTypes: IImagePhotographyType[][];
-    public flatImagePhotographyTypes: IImagePhotographyType[];
+    public imagePhotographyTypes: IImagePhotographyType[][] | null;
+    public flatImagePhotographyTypes: IImagePhotographyType[] | null;
+
+    constructor (
+        private readonly _router: Router,
+        private readonly _changeDetector: ChangeDetectorRef,
+        
+        private readonly _deviceService: DeviceDetectorService,
+
+        private readonly _appService: AppService,
+        private readonly _clientService: ClientService,
+        private readonly _homeService: HomeService,
+    ) {
+        afterRender(() => {
+            if ( !this.componentElementIsRendered && this.scrollSnapItemRadioViewRefs.length !== 0 ) {
+                this.currentItem = 0;
+
+                this.setActiveScrollSnapSection();
+
+                this.componentElementIsRendered = true;
+            }
+        }, { phase: AfterRenderPhase.Read });
+    }
+
+    @ViewChildren('scrollSnapSection', { read: ElementRef<HTMLDivElement> }) public readonly scrollSnapSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
+    @ViewChildren('scrollSnapVisiableAnimationSection', { read: ElementRef<HTMLDivElement> }) public readonly scrollSnapVisiableAnimationSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
+    @ViewChildren('scrollSnapItemRadio', { read: ElementRef<HTMLInputElement> }) private readonly scrollSnapItemRadioViewRefs: QueryList<ElementRef<HTMLInputElement>>;
 
     ngOnInit (): void {
-        this.appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => {
-            this.appService.setTitle(translation);
+        this._appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => {
+            this._appService.setTitle(translation);
         });
 
-        this.router.events.subscribe(evt => {
+        this._router.events.subscribe(evt => {
             if ( !(evt instanceof NavigationEnd) ) return;
             else {
-                if ( !evt.url.startsWith('/') ) this.clientService.setNavbarAnimationState('static');
+                if ( !evt.url.startsWith('/') ) this._clientService.setNavbarAnimationState('static');
             }
         });
 
-        this.clientService.getCompressedImagesData('home', 'horizontal').subscribe({
+        this._clientService.getCompressedImagesData('home', 'horizontal').subscribe({
             next: imagesData => this.compressedImagesList = imagesData.length !== 0 ? imagesData : null,
-            error: () => this.appService.createErrorModal()
+            error: () => this._appService.createErrorModal()
         });
 
-        this.clientService.getDiscountsData().subscribe({
+        this._clientService.getDiscountsData().subscribe({
             next: discountsData => {
                 this.discountsData = discountsData.length !== 0 ? discountsData : null;
 
-                if ( this.discountsData ) this.homeService.setDiscountsDataIsExists(true);
+                if ( this.discountsData ) this._homeService.setDiscountsDataIsExists(true);
             },
-            error: () => this.appService.createErrorModal()
+            error: () => this._appService.createErrorModal()
         });
 
-        this.clientService.getImagePhotographyTypesData('home').subscribe({
+        this._clientService.getImagePhotographyTypesData('home').subscribe({
             next: imagePhotographyTypesData => {
                 this.imagePhotographyTypes = imagePhotographyTypesData.length !== 0 ? imagePhotographyTypesData: null;
 
-                this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
-                this.flatImagePhotographyTypes.forEach(() => {
-                    this.currentMouseTriggerStates.push('leave');
-                    this.currentLinkButtonContainerAnimationStates.push('leave');
-                });
-    
-                this.imagePhotographyTypes.forEach(() => this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false }));
-    
-                this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false });
+                if ( this.imagePhotographyTypes !== null ) {
+                    this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
+                    this.flatImagePhotographyTypes.forEach(() => {
+                        this.currentMouseTriggerStates.push('leave');
+                        this.currentLinkButtonContainerAnimationStates.push('leave');
+                    });
+        
+                    ( this.imagePhotographyTypes as IImagePhotographyType[][] ).forEach(() => this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false }));
+        
+                    this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false });
+                }
             },
-            error: () => this.appService.createErrorModal()
+            error: () => this._appService.createErrorModal()
         });
 
-        this.homeService.activeScrollSnapSectionChange.subscribe(value => {
+        this._homeService.activeScrollSnapSectionChange.subscribe(value => {
             if ( value === 0 ) this.currentItem = 0;
 
             this.getScrollSnapSectionsPosition();
@@ -181,11 +189,11 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
 
         this.currentScrollSnapItemRadiosContainerAnimationState = 'enter';
 
-        this.changeDetector.detectChanges();
+        this._changeDetector.detectChanges();
     }
 
     ngAfterViewChecked (): void {
-        if ( this.appService.checkIsPlatformBrowser() ) {
+        if ( this._appService.checkIsPlatformBrowser() ) {
             if ( this.compressedImagesList && !this.compressedImagesDataIsLoaded ) {
                 this.scrollSnapSectionViewRefs.first.nativeElement.scrollIntoView({ behavior: 'auto', block: 'start' });
 
@@ -202,10 +210,10 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     }
 
     @HostListener('scroll', [ '$event' ]) public onScroll ($event: any): void {
-        if ( $event.srcElement.scrollTop > 50 ) this.clientService.setNavbarAnimationState('scrolled');
-        else this.clientService.setNavbarAnimationState('static');
+        if ( $event.srcElement.scrollTop > 50 ) this._clientService.setNavbarAnimationState('scrolled');
+        else this._clientService.setNavbarAnimationState('static');
 
-        this.clientService.setPrevNavbarAnimationStateChange(null);
+        this._clientService.setPrevNavbarAnimationStateChange(undefined);
 
         /* if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 1 ) {
             this.clientService.setFooterAnimationState('show');
@@ -219,11 +227,11 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     }
 
     public setDeviceInfo (): void {
-        this.deviceInfo = this.deviceService.getDeviceInfo();
+        this.deviceInfo = this._deviceService.getDeviceInfo();
         
-        this.isMobileDevice = this.deviceService.isMobile();
-        this.isTabletDevice = this.deviceService.isTablet();
-        this.isDesktopDevice = this.deviceService.isDesktop();
+        this.isMobileDevice = this._deviceService.isMobile();
+        this.isTabletDevice = this._deviceService.isTablet();
+        this.isDesktopDevice = this._deviceService.isDesktop();
     }
 
     public getScrollSnapSectionsPosition (): void {
@@ -342,12 +350,12 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     }
 
     public setCurrentMouseTriggerStateIndex (name: string): number { 
-        return this.flatImagePhotographyTypes.findIndex(imagePhotographyTypeData => imagePhotographyTypeData.name === name);
+        return ( this.flatImagePhotographyTypes as IImagePhotographyType[] ).findIndex(imagePhotographyTypeData => imagePhotographyTypeData.name === name);
     }
 
     public mouseTriggerAnimationStarted (event: AnimationEvent): void {
         const mouseTriggerElement: HTMLDivElement = event.element as HTMLDivElement;
-        const indexNumber: number = parseInt(mouseTriggerElement.parentElement.getAttribute('mouse-trigger-state-index'), 10);
+        const indexNumber: number = parseInt(( mouseTriggerElement.parentElement as HTMLElement ).getAttribute('mouse-trigger-state-index') as string, 10);
 
         if ( event.toState === 'leave' ) this.currentLinkButtonContainerAnimationStates[indexNumber] = 'leave';
         if ( event.toState === 'enter' ) this.currentLinkButtonContainerAnimationStates[indexNumber] = 'enter';

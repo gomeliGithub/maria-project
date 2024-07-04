@@ -1,5 +1,6 @@
-import { inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { ActivatedRouteSnapshot, CanActivateFn, RouterStateSnapshot } from '@angular/router';
 
 import { map } from 'rxjs';
@@ -9,15 +10,17 @@ import { AppService } from '../../app.service';
 export const ClientGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     route;
     state;
-    
+
+    const platformId: Object = inject(PLATFORM_ID);
     const http: HttpClient = inject(HttpClient);
 
     const appService: AppService = inject(AppService);
 
-    if ( appService.checkIsPlatformBrowser() ) {
-        const headers: HttpHeaders = appService.createRequestHeaders();
-
-        return http.get<boolean>('/api/admin-panel/checkAccess', { headers, withCredentials: true }).pipe(map(checkAccessResult => {
+    const isBrowser: boolean = isPlatformBrowser(platformId);
+    const isServer: boolean = isPlatformServer(platformId);
+    
+    if ( isBrowser ) {
+        return http.get<boolean>('/api/admin-panel/checkAccess', { headers: appService.createAuthHeaders() ?? { }, withCredentials: true }).pipe(map(checkAccessResult => {
             if ( checkAccessResult ) return true;
             else {
                 appService.reloadComponent(false, '/', false);
@@ -25,7 +28,9 @@ export const ClientGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state:
                 return false;
             }
         }));
-    } else if ( appService.checkIsPlatformServer() ) {
+    } else if ( isServer ) {
         return true;
     }
+
+    return true;
 };

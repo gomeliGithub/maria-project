@@ -1,3 +1,5 @@
+import { Image_photography_type } from "@prisma/client";
+
 import { IClientLocale } from "types/global";
 
 export const environment = {
@@ -8,6 +10,6 @@ export const environment = {
         { code: 'en', title: 'English'}
     ] as IClientLocale[],
     defaultLocale: 'ru',
-    photographyTypes: [ 'individual', 'children', 'wedding', 'family' ],
+    photographyTypes: Image_photography_type,
     signOps: [ 'up', 'in' ]
 };

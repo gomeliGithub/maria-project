@@ -10,45 +10,49 @@ import { ClientService } from '../../services/client/client.service';
 import { CommonService } from '../../services/common/common.service';
 
 import { ClientTypes } from '../../decorators/client.types.decorator';
+import { Cookies } from '../../decorators/cookies.decorator';
 
 import { IDownloadingOriginalImageData, IGalleryCompressedImagesData, IRequest, IRequestBody } from 'types/global';
-import { IClientCompressedImage, IDiscount, IImagePhotographyType } from 'types/models';
+import { ICompressedImageWithoutRelationFields, IDiscount, IImagePhotographyType } from 'types/models';
+import { $Enums } from '@prisma/client';
 
 @Controller('/client')
 export class ClientController {
     constructor(
-        private readonly appService: AppService,
-        private readonly clientService: ClientService
+        private readonly _appService: AppService,
+        private readonly _clientService: ClientService
     ) { }
 
     @Get('/getCompressedImagesData/:imagesType')
     public async getCompressedImagesData (@Req() request: IRequest, @Param('imagesType') imagesType: string,
-        @Query('imageViewSize') imageViewSize: string, @Query('imagesExistsCount') imagesExistsCount: string
-    ): Promise<IGalleryCompressedImagesData | IClientCompressedImage[]> {
-        const thumbnailImageTypes: string[] = [ 'home' ].concat(this.appService.imagePhotographyTypes);
+        @Query('imageDisplayType') imageDisplayType: string | null, @Query('imagesExistsCount') imagesExistsCount: string | null
+    ): Promise<IGalleryCompressedImagesData | ICompressedImageWithoutRelationFields[]> {
+        const thumbnailImageTypes: string[] = [ 'home' ]; 
+        
+        for ( const data in $Enums.Image_photography_type ) thumbnailImageTypes.push(data);
 
         imagesType = imagesType.substring(1);
 
-        const imagesExistsCountInt: number = parseInt(imagesExistsCount, 10);
+        const imagesExistsCountInt: number = parseInt(imagesExistsCount as string, 10);
 
-        imageViewSize = imageViewSize === 'undefined' || imageViewSize === 'null' ? null : imageViewSize;
+        imageDisplayType = imageDisplayType === 'undefined' || imageDisplayType === 'null' ? null : imageDisplayType;
         imagesExistsCount = imagesExistsCount === 'undefined' || imagesExistsCount === 'null' ? null : imagesExistsCount;
 
         if ( !thumbnailImageTypes.includes(imagesType) 
-            || imageViewSize && !this.appService.imageViewSizeTypes.includes(imageViewSize) 
+            || imageDisplayType && !( imageDisplayType in $Enums.Image_display_type )
             || imagesExistsCount && Number.isNaN(imagesExistsCountInt) 
         ) throw new BadRequestException(`${ request.url } "GetCompressedImagesData - invalid param data"`);
 
-        const commonServiceRef = await this.appService.getServiceRef(CommonModule, CommonService);
+        const commonServiceRef = await this._appService.getServiceRef(CommonModule, CommonService);
 
         await commonServiceRef.createImageDirs();
         
-        return this.clientService.getCompressedImagesData(imagesType as 'home' | string, imageViewSize as 'horizontal' | 'vertical', imagesExistsCountInt);
+        return this._clientService.getCompressedImagesData(imagesType as 'home' | string, imageDisplayType as $Enums.Image_display_type, imagesExistsCountInt);
     }
 
     @Get('/getDiscountsData')
     public async getDiscountsData (): Promise<IDiscount[]> {
-        return this.clientService.getDiscountsData();
+        return this._clientService.getDiscountsData();
     }
 
     @Get('/downloadOriginalImage/:compressedImageName')
@@ -56,7 +60,7 @@ export class ClientController {
     public async downloadOriginalImage (@Req() request: IRequest, @Param('compressedImageName') compressedImageName: string, @Res({ passthrough: true }) response: Response): Promise<StreamableFile> {
         compressedImageName = compressedImageName.substring(1);
 
-        const downloadingOriginalImageData: IDownloadingOriginalImageData = await this.clientService.downloadOriginalImage(request, { compressedImageName });
+        const downloadingOriginalImageData: IDownloadingOriginalImageData = await this._clientService.downloadOriginalImage(request, { compressedImageName });
 
         const imageReadStream: ReadStream = createReadStream(downloadingOriginalImageData.path);
 
@@ -76,34 +80,33 @@ export class ClientController {
 
         const requiredFields: string[] = targetPage === 'home' ? [ 'name', 'compressedImageName' ] : [ 'name', 'description', 'compressedImageName' ];
 
-        return this.clientService.getImagePhotographyTypesData(requiredFields, targetPage);
+        return this._clientService.getImagePhotographyTypesData(requiredFields, targetPage);
     }
 
     @Post('/changeLocale')
     public async changeLocale (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string> {
-        if ( !requestBody.sign.newLocale || typeof requestBody.sign.newLocale !== 'string' ) throw new BadRequestException('ChangeLocale - invalid new locale');
+        if ( !requestBody.sign || !requestBody.sign.newLocale || typeof requestBody.sign.newLocale !== 'string' ) throw new BadRequestException('ChangeLocale - invalid new locale');
 
         const locales: string[] = [ 'ru', 'en' ];
 
         if ( !locales.includes(requestBody.sign.newLocale) ) throw new BadRequestException(`${ request.url } "ChangeLocale - invalid new locale"`);
         
-        return this.clientService.changeLocale(request, requestBody.sign.newLocale, response);
+        return this._clientService.changeLocale(request, requestBody.sign.newLocale, response);
     }
 
     @Post('/createOrder')
-    public async createOrder (@Req() request: IRequest, @Body() requestBody: IRequestBody): Promise<void> {
+    public async createOrder (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response, @Cookies('locale') clientLocale: string): Promise<void> {
         const phoneNumberPattern: RegExp = /(?:\+|\d)[\d\-\(\) ]{9,}\d/g;
 
-        if ( !requestBody.client || !requestBody.client.imagePhotographyType || !this.appService.imagePhotographyTypes.includes(requestBody.client.imagePhotographyType)
+        if ( !requestBody.client || !requestBody.client.imagePhotographyType || !( requestBody.client.imagePhotographyType in $Enums.Image_photography_type )
             || !requestBody.client.orderType || !requestBody.client.clientPhoneNumber
-            || typeof requestBody.client.orderType !== 'string' || requestBody.client.orderType === '' 
-            || !this.appService.clientOrderTypes.includes(requestBody.client.orderType)
+            || typeof requestBody.client.orderType !== 'string' || !( requestBody.client.orderType in $Enums.Client_order_type )
             || !phoneNumberPattern.test(requestBody.client.clientPhoneNumber)
             || requestBody.client.comment && (typeof requestBody.client.comment !== 'string' 
                 || requestBody.client.comment === '' || requestBody.client.comment.length > 30
             )
         ) throw new BadRequestException(`${ request.url } "CreateOrder - invalid request body data"`);
 
-        return this.clientService.createOrder(request, requestBody);
+        return this._clientService.createOrder(request, requestBody, response, clientLocale);
     }
 }

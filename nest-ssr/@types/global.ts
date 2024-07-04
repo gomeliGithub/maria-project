@@ -1,8 +1,9 @@
 import { Request } from "express";
 
-import { IClientSignData } from "./sign";
-import { IClientCompressedImage, IClientOrder } from "./models";
-import { Admin, Member } from "server/src/models/client.model";
+import { Client_order_type, Image_display_type, Image_photography_type } from "@prisma/client";
+
+import { IClientSignData, IJWTPayload } from "./sign";
+import { IClientOrderWithoutRelationFields, ICompressedImageWithoutRelationFields } from "./models";
 
 export interface ICookieSerializeOptions {
     domain?: string;
@@ -16,7 +17,7 @@ export interface ICookieSerializeOptions {
 
 export interface IRequest extends Request {
     session: null;
-    activeClientInstance?: Admin | Member;
+    activeClientData?: IJWTPayload;
 }
 
 export interface IRequestBody {
@@ -27,51 +28,44 @@ export interface IRequestBody {
         clientData?: IClientSignData;
         newLocale?: string;
     },
-    client?: {
-        _id: number;
-        uploadImageMeta: string;
-        imagePhotographyType: string;
-        imageViewSizeType: string;
-        imageDescription?: string;
-
-        orderType: string;
-        clientPhoneNumber: string;
-        comment?: string;
-    },
-    adminPanel?: {
-        originalImageName: string;
-        displayTargetPage: 'home' | 'gallery' | 'original';
-        newImagePhotographyType?: string; 
-        newImageDescription?: string;
-        imagePhotographyType?: string;
-        newImageViewSizeType?: string;
-
-        clientOrderId?: number;
-        clientLogin?: string;
-
-        photographyTypeName?: string;
-        photographyTypeNewDescription?: string;
-
-        discountContent?: string; 
-        fromDate?: Date; 
-        toDate?: Date;
-
-        newDiscountContent?: string;
-        newFromDate?: Date;
-        newToDate?: Date;
-        discountId?: number;
-    }
+    client?: IClientRequestBody,
+    adminPanel?: IAdminPanelRequestBody
 }
 
-export interface IClient {
-    id?: number;
-    login?: string;
-    type?: 'admin' | 'member';
-    locale: string;
-    fullName?: string;
-    __secure_fgpHash?: string;
-    iat?: number;
-    exp?: number;
+export interface IAdminPanelRequestBody {
+    originalImageName: string;
+    displayTargetPage: 'home' | 'gallery' | 'original';
+    newImagePhotographyType?: Image_photography_type; 
+    newImageDescription?: string;
+    imagePhotographyType?: Image_photography_type;
+    newImageDisplayType?: Image_display_type;
+
+    clientOrderId?: number;
+    clientLogin?: string;
+
+    photographyTypeName?: Image_photography_type;
+    photographyTypeNewDescription?: string;
+
+    discountContent?: string; 
+    fromDate?: Date; 
+    toDate?: Date;
+
+    newDiscountContent?: string;
+    newFromDate?: Date;
+    newToDate?: Date;
+    discountId?: number;
+}
+
+export interface IClientRequestBody {
+    _id: number;
+    uploadImageMeta: string;
+    imagePhotographyType: Image_photography_type;
+    imageDisplayType: Image_display_type;
+    imageDescription?: string;
+
+    orderType: Client_order_type;
+    clientPhoneNumber: string;
+    comment?: string;
 }
 
 export interface IClientBrowser {
@@ -87,13 +81,13 @@ export interface IClientLocale {
 }
 
 export interface IFullCompressedImageData {
-    imagesList: IClientCompressedImage[];
+    imagesList: ICompressedImageWithoutRelationFields[];
     count: number;
     additionalImagesIsExists: boolean;
 }
 
 export interface IGalleryCompressedImagesData {
-    compressedImagesRaw: IClientCompressedImage[]; // compressedImagesRaw: IClientCompressedImage[][];
+    compressedImagesRaw: ICompressedImageWithoutRelationFields[]; // compressedImagesRaw: IClientCompressedImage[][];
     photographyTypeDescription: string;
     additionalImagesExists: boolean;
 }
@@ -106,8 +100,8 @@ export interface ICompressImageData {
 }
 
 export interface IImageAdditionalData {
-    photographyType: string;
-    viewSizeType: string;
+    photographyType: Image_photography_type;
+    displayType: Image_display_type;
     description?: string;
 }
 
@@ -128,7 +122,7 @@ export interface IClientOrdersInfoDataArr {
 }
 
 export interface IClientOrdersData {
-    orders: IClientOrder[];
+    orders: IClientOrderWithoutRelationFields[];
     additionalOrdersExists: boolean;
 }
 
