@@ -174,8 +174,8 @@ export class AdminPanelService {
                 break; 
             }
 
-            case 'WRONGVIEWSIZETYPE': {
-                this._appService.createWarningModal(this._appService.getTranslations('UPLOADIMAGERESPONSES.WRONGVIEWSIZETYPE')); 
+            case 'WRONGDISPLAYTYPE': {
+                this._appService.createWarningModal(this._appService.getTranslations('UPLOADIMAGERESPONSES.WRONGDISPLAYTYPE')); 
 
                 break;
             }

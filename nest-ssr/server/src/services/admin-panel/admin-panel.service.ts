@@ -632,12 +632,12 @@ export class AdminPanelService {
         ]);
 
         if ( displayTargetPage === 'home' ) {
-            if ( existingCompressedImageData.displayType !== 'horizontal' ) return 'WRONGVIEWSIZETYPE';
+            if ( existingCompressedImageData.displayType !== 'horizontal' ) return 'WRONGDISPLAYTYPE';
     
             newPath = staticFilesHomeImagePath;
             }
         else if ( displayTargetPage === 'gallery' ) {
-            if ( existingCompressedImageData.displayType !== 'vertical' ) return 'WRONGVIEWSIZETYPE';
+            if ( existingCompressedImageData.displayType !== 'vertical' ) return 'WRONGDISPLAYTYPE';
     
             newPath = staticFilesGalleryImagePath;
         } else if ( displayTargetPage === 'original' ) newPath = compressedImageOriginalPath;
@@ -701,7 +701,7 @@ export class AdminPanelService {
 
         if ( existingCompressedImageData === null ) throw new BadRequestException(`${ request.url } "SetPhotographyTypeImage - 'compressed image does not exists'"`);
 
-        if ( existingCompressedImageData.displayType !== 'horizontal' ) return 'WRONGVIEWSIZETYPE';
+        if ( existingCompressedImageData.displayType !== 'horizontal' ) return 'WRONGDISPLAYTYPE';
 
         const imagePhotographyType: string = requestBody.adminPanel?.imagePhotographyType as Image_photography_type;
 

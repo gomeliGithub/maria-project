@@ -45,7 +45,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             errorMessage = exception.message;
         } else {
             httpStatus = 500;
-            errorMessage = [
+            errorMessage = exception.message ?? [
                 'Sorry! Something went to wrong. Please try again later',
             ];
         }

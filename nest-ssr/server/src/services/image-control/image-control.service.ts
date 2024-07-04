@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { Image_photography_type } from '@prisma/client';
+import { Image_photography_type, ImagePhotographyType } from '@prisma/client';
 
 import { Buffer } from 'node:buffer';
 import fsPromises from 'fs/promises';
@@ -217,7 +217,11 @@ export class ImageControlService {
             ]);
 
             await this._prisma.admin.update({ data: { compressedImages: { delete: { name: compressedImageData.name } } }, where: { id: ( request.activeClientData as IJWTPayload ).id as number } });
-            await this._prisma.imagePhotographyType.update({ data: { compressedImageOriginalName: null }, where: { compressedImageOriginalName: compressedImageData.name } });
+
+            const existingImagePhotographyType: ImagePhotographyType | null = await this._prisma.imagePhotographyType.findFirst({ where: { compressedImageName: compressedImageData.name } });
+
+            if ( existingImagePhotographyType !== null )await this._prisma.imagePhotographyType.update({ data: { compressedImageOriginalName: null, compressedImageName: null }, where: { compressedImageName: compressedImageData.name } });
+
             await fsPromises.unlink(imagePath);
             await fsPromises.unlink(currentCompressedImagePath);
 
