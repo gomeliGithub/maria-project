@@ -592,11 +592,11 @@ export class AdminPanelService {
         if ( displayTargetPage === 'home' ) {
             const homeImagesCount: number = ( await fsPromises.readdir(path.join(this.staticCompressedImagesDirPath, 'home')) ).length;
 
-            if ( homeImagesCount >= 10 ) return 'MAXCOUNT';
+            if ( homeImagesCount >= 50 ) return 'MAXCOUNT';
         } else if ( displayTargetPage === 'gallery' ) {
             const galleryImagesCount: number = ( await fsPromises.readdir(path.join(this.staticCompressedImagesDirPath, 'gallery', existingCompressedImageData.photographyType)) ).length;
 
-            if ( galleryImagesCount >= 15 ) return 'MAXCOUNT';
+            if ( galleryImagesCount >= 55 ) return 'MAXCOUNT';
         }
 
         const compressedImageUpdateArgs: Prisma.CompressedImageUpdateArgs<DefaultArgs> = {
