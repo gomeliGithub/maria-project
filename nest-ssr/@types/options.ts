@@ -20,7 +20,6 @@ export interface IClientGetCompressedImagesOptions {
     include: boolean,
     selectFields?: Prisma.CompressedImageSelect<DefaultArgs>;
     whereNameArr?: string[],
-    // whereDisplayType?: Image_display_type,
     wherePhotographyTypes?: Image_photography_type[],
     whereDisplayTypes?: Image_display_type[],
     skip?: number;
@@ -39,7 +38,6 @@ export interface ICompressedImageGetOptions {
     find?: {
         imageTitles?: string[];
         selectFields?: Prisma.CompressedImageSelect<DefaultArgs>;
-        // imageDisplayType?: Image_display_type;
         photographyTypes?: Image_photography_type[];
         displayTypes?: Image_display_type[];
     },

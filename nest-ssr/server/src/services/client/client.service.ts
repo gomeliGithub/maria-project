@@ -65,7 +65,6 @@ export class ClientService {
                     admin: false,
                     adminId: false
                 },
-                // imageDisplayType: imageDisplayType,
                 displayTypes: [ imageDisplayType ]
             },
             imagesLimit: imagesType !== 'home' ? imagesLimit : undefined,
@@ -88,7 +87,7 @@ export class ClientService {
 
             return {
                 compressedImagesRaw: compressedImagesData, // reducedCompressedImagesRaw, 
-                photographyTypeDescription: ( await this.getImagePhotographyTypesData([ 'name', 'description' ], 'gallery', imagesType) ).description as string,
+                photographyTypeDescription: ( await this.getImagePhotographyTypesData('gallery', false, imagesType) ).description as string,
                 additionalImagesExists: commonCompressedImagesCount > ( imagesExistsCount as number ) + compressedImagesData.length && commonCompressedImagesCount > imagesLimit
             }
         }
@@ -110,7 +109,7 @@ export class ClientService {
         };
 
         if ( options.imagePath ) {
-            const existingCompressedImageData: ICompressedImageWithoutRelationFields | null = await this._prisma.compressedImage.findFirst({ where: { name: path.basename(options.imagePath) } });
+            const existingCompressedImageData: ICompressedImageWithoutRelationFields | null = await this._prisma.compressedImage.findUnique({ where: { name: path.basename(options.imagePath) } });
 
             if ( existingCompressedImageData !== null ) {
                 downloadingOriginalImageData.name = existingCompressedImageData.originalName;
@@ -118,7 +117,7 @@ export class ClientService {
                 downloadingOriginalImageData.extension = path.extname(path.basename(existingCompressedImageData.originalName)).replace('.', '');
             } else throw new BadRequestException(`${ request.url } "DownloadOriginalImage - original image does not exists"`);
         } else if ( options.compressedImageName ) {
-            const existingCompressedImageData: ICompressedImageWithoutRelationFields | null = await this._prisma.compressedImage.findFirst({ where: { name: options.compressedImageName } });
+            const existingCompressedImageData: ICompressedImageWithoutRelationFields | null = await this._prisma.compressedImage.findUnique({ where: { name: options.compressedImageName } });
 
             if ( existingCompressedImageData !== null ) {
                 downloadingOriginalImageData.name = existingCompressedImageData.originalName;
@@ -130,18 +129,18 @@ export class ClientService {
         return downloadingOriginalImageData;
     }
 
-    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home'): Promise<IImagePhotographyType[][]>
-    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'admin'): Promise<IImagePhotographyType[]>
-    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin'): Promise<IImagePhotographyType[][] | IImagePhotographyType[]>
-    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType>
-    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin' | 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType>
-    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin' | 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType> {
+    public async getImagePhotographyTypesData (targetPage: 'home', includeDescription: boolean): Promise<IImagePhotographyType[][]>
+    public async getImagePhotographyTypesData (targetPage: 'admin', includeDescription: boolean): Promise<IImagePhotographyType[]>
+    public async getImagePhotographyTypesData (targetPage: 'home' | 'admin', includeDescription: boolean): Promise<IImagePhotographyType[][] | IImagePhotographyType[]>
+    public async getImagePhotographyTypesData (targetPage: 'gallery', includeDescription: boolean, photographyTypeName?: string): Promise<IImagePhotographyType>
+    public async getImagePhotographyTypesData (targetPage: 'home' | 'admin' | 'gallery', includeDescription: boolean, photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType>
+    public async getImagePhotographyTypesData (targetPage: 'home' | 'admin' | 'gallery', includeDescription: boolean, photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType> {
         const photographyTypesData: IImagePhotographyType[] = await this._prisma.imagePhotographyType.findMany({ 
             select: {
                 name: true,
                 compressedImageOriginalName: true,
                 compressedImageName: true,
-                description: requiredFields.includes('description')
+                description: includeDescription
             }
         });
 
@@ -173,8 +172,8 @@ export class ClientService {
 
         if ( await this._jwtControlService.tokenValidate(request, token as string, false) ) tokenIsValid = true;
 
-        if ( token && tokenIsValid ) {
-            decodedToken = this._jwtService.decode(token) as IJWTPayload;
+        if ( tokenIsValid ) {
+            decodedToken = this._jwtService.decode(token as string) as IJWTPayload;
 
             const dateNow: Date = new Date(Date.now());
 
@@ -187,13 +186,13 @@ export class ClientService {
             delete decodedToken.exp;
 
             updatedAccess_token = this._jwtService.sign(decodedToken, { expiresIn: tokenExpiresIn });
-        }
 
-        const cookieSerializeOptions: ICookieSerializeOptions = this._appService.cookieSerializeOptions;
+            const cookieSerializeOptions: ICookieSerializeOptions = this._appService.cookieSerializeOptions;
 
-        cookieSerializeOptions.maxAge = ms(( token as string ) && tokenIsValid ? `${ tokenExpiresIn as number }s` : process.env.COOKIE_MAXAGE_TIME as string);
+            cookieSerializeOptions.maxAge = ms(`${ tokenExpiresIn as number }s`);
 
-        response.cookie('locale', newLocale, cookieSerializeOptions);
+            response.cookie('locale', newLocale, cookieSerializeOptions);
+        } else throw new BadRequestException(`${ request.url } "ChangeLocale - token is invalid"`);
 
         return updatedAccess_token as string;
     }
@@ -205,8 +204,6 @@ export class ClientService {
 
         const { clientPhoneNumber, comment } = requestBody.client as IClientRequestBody;
         let { imagePhotographyType, orderType } = requestBody.client as IClientRequestBody;
-
-        // if ( orderType === 'full' && !request.activeClientData ) throw new UnauthorizedException(`${ request.url } "CreateOrder - clientInstance does not exists, login --- ${ activeClientLogin ?? '-' }"`);
 
         const dateNow: Date = new Date(Date.now());
         const id: number = parseInt(`${ dateNow.getFullYear() }${ dateNow.getMonth() }${ dateNow.getHours() }${ dateNow.getMinutes() }${ dateNow.getSeconds() }`, 10);
@@ -323,9 +320,22 @@ export class ClientService {
             }
 
             if ( loginList ) {
-                if ( !Array.isArray(loginList) ) clients = await this._prisma.member.findFirst(findArgs as Prisma.MemberFindManyArgs<DefaultArgs> | Prisma.MemberFindFirstArgs<DefaultArgs>);
-                else await this._prisma.member.findMany(findArgs as Prisma.MemberFindManyArgs<DefaultArgs> | Prisma.MemberFindFirstArgs<DefaultArgs>);
-            } else await this._prisma.member.findMany(findArgs as Prisma.MemberFindManyArgs<DefaultArgs> | Prisma.MemberFindFirstArgs<DefaultArgs>);
+                if ( !Array.isArray(loginList) ) {
+                    if ( !( ( findArgs as Prisma.MemberFindFirstArgs<DefaultArgs> ).where as Prisma.MemberWhereInput ) ) {
+                        ( ( findArgs as Prisma.MemberFindFirstArgs<DefaultArgs> ).where as Prisma.MemberWhereInput ) = {
+                            login: loginList
+                        };
+                    }
+
+                    clients = await this._prisma.member.findFirst(findArgs as Prisma.MemberFindFirstArgs<DefaultArgs>);
+                } else {
+                    ( ( ( findArgs as Prisma.MemberFindManyArgs<DefaultArgs> ).where as Prisma.MemberWhereInput ).login as Prisma.StringFilter<"Member"> ) = {
+                        in: loginList
+                    };
+                    
+                    clients = await this._prisma.member.findMany(findArgs as Prisma.MemberFindManyArgs<DefaultArgs>);
+                }
+            } else clients = await this._prisma.member.findMany(findArgs as Prisma.MemberFindManyArgs<DefaultArgs>);
         } else if ( clientType === 'admin' ) {
             if ( options ) {
                 if ( options.compressedImages ) {
@@ -338,7 +348,6 @@ export class ClientService {
                             select: options.compressedImages.selectFields,
                             where: {
                                 name: { in: options.compressedImages.whereNameArr },
-                                // displayType: options.compressedImages.whereDisplayType,
                                 photographyType: { in: options.compressedImages.wherePhotographyTypes },
                                 displayType: { in: options.compressedImages.whereDisplayTypes },
                                 uploadDate: options.compressedImages.dateFrom && options.compressedImages.dateUntil ? {
@@ -355,9 +364,23 @@ export class ClientService {
             }
 
             if ( loginList ) {
-                if ( !Array.isArray(loginList) ) clients = await this._prisma.admin.findFirst(findArgs as Prisma.AdminFindManyArgs<DefaultArgs> | Prisma.AdminFindFirstArgs<DefaultArgs>);
-                else await this._prisma.admin.findMany(findArgs as Prisma.AdminFindManyArgs<DefaultArgs> | Prisma.AdminFindFirstArgs<DefaultArgs>);
-            } else await this._prisma.admin.findMany(findArgs as Prisma.AdminFindManyArgs<DefaultArgs> | Prisma.AdminFindFirstArgs<DefaultArgs>);
+                if ( !Array.isArray(loginList) ) {
+                    if ( !( ( findArgs as Prisma.AdminFindFirstArgs<DefaultArgs> ).where as Prisma.AdminWhereInput ) ) {
+                        ( ( findArgs as Prisma.AdminFindFirstArgs<DefaultArgs> ).where as Prisma.AdminWhereInput ) = {
+                            login: loginList
+                        };
+                    }
+
+                    clients = await this._prisma.admin.findFirst(findArgs as Prisma.AdminFindFirstArgs<DefaultArgs>);
+                }
+                else {
+                    ( ( ( findArgs as Prisma.AdminFindManyArgs<DefaultArgs> ).where as Prisma.AdminWhereInput ).login as Prisma.StringFilter<"Admin"> ) = {
+                        in: loginList
+                    };
+
+                    clients = await this._prisma.admin.findMany(findArgs as Prisma.AdminFindManyArgs<DefaultArgs>);
+                }
+            } else clients = await this._prisma.admin.findMany(findArgs as Prisma.AdminFindManyArgs<DefaultArgs>);
         }
 
         return clients;
@@ -377,9 +400,9 @@ export class ClientService {
 
     public async getClientOrdersInfo (loginList: string, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr>
     public async getClientOrdersInfo (loginList: string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
-    public async getClientOrdersInfo (loginList: 'all', options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
-    public async getClientOrdersInfo (loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
-    public async getClientOrdersInfo (loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[]> {
+    public async getClientOrdersInfo (loginList: null, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (loginList: string | string[] | null, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (loginList: string | string[] | null, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[]> {
         const memberIncludeClientOrderCount: Prisma.MemberInclude<DefaultArgs> = {
             _count: {
                 select: {
@@ -404,17 +427,12 @@ export class ClientService {
 
         let clientsOrdersInfoData: IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[] | null = null;
 
-        if ( loginList === 'all' ) {
+        if ( loginList === null ) {
             const clientsData: IMemberWithClientOrdersCount[] = ( await this._prisma.member.findMany(clientFindManyArgs) as IMemberWithClientOrdersCount[] );
 
-            if ( !clientsOrdersInfoData ) clientsOrdersInfoData = [];
+            if ( clientsOrdersInfoData === null ) clientsOrdersInfoData = [];
 
-            if ( options.existsCount === 0 ) {
-                ( ( ( ( clientFindManyArgs.include as Prisma.MemberInclude<DefaultArgs> )._count as Prisma.MemberCountOutputTypeDefaultArgs<DefaultArgs> )
-                .select?.clientOrders as Prisma.MemberCountOutputTypeCountClientOrdersArgs<DefaultArgs> ).where as Prisma.ClientOrderWhereInput ).memberId = {
-                    equals: undefined
-                };
-
+            if ( !options.existsCount || options.existsCount === 0 ) {
                 ( ( ( ( clientFindManyArgs.include as Prisma.MemberInclude<DefaultArgs> )._count as Prisma.MemberCountOutputTypeDefaultArgs<DefaultArgs> )
                 .select?.clientOrders as Prisma.MemberCountOutputTypeCountClientOrdersArgs<DefaultArgs> ).where?.memberId as Prisma.IntNullableFilter<"ClientOrder"> ).equals = null;
 

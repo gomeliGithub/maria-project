@@ -3,14 +3,14 @@
         <loc>http://localhost/adminPanel</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2024-06-30T15:40:15.277Z</lastmod>
+        <lastmod>2024-07-08T17:21:45.772Z</lastmod>
     </url>    
 
     <url>
         <loc>http://localhost/adminPanel/imagesControl</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2024-06-30T15:40:15.277Z</lastmod>
+        <lastmod>2024-07-08T17:21:45.772Z</lastmod>
     </url>    
 
     <url>
@@ -80,7 +80,7 @@
         <loc>http://localhost/prices</loc>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
-        <lastmod>2024-07-04T10:45:10.608Z</lastmod>
+        <lastmod>2024-07-08T16:54:50.280Z</lastmod>
     </url>    
 </urlset>
     

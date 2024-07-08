@@ -1,7 +1,7 @@
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { NgbModule, NgbSlideEvent } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCarousel, NgbModule, NgbSlideEvent } from '@ng-bootstrap/ng-bootstrap';
 
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -22,6 +22,8 @@ export class PricesComponent implements OnInit {
     public ngbCarouselActiveId: number = 0;
     public ngbCarouselElementClassesdAreActive: boolean = false;
 
+    @ViewChild('ngbCarousel', { static: true }) private readonly _ngbCarousel: NgbCarousel;
+
     constructor (
         private readonly _appService: AppService
     ) { }
@@ -33,9 +35,11 @@ export class PricesComponent implements OnInit {
 
         this.navbarElementRef.nativeElement.classList.remove('fixed-top');
         this.navbarElementRef.nativeElement.classList.add('sticky-bottom');
+
+        this._ngbCarousel.slide.subscribe(event => this._beforeNgbCarouselSlide(event));
     }
 
-    public beforeNgbCarouselSlide (event: NgbSlideEvent): void {
+    private _beforeNgbCarouselSlide (event: NgbSlideEvent): void {
         this.ngbCarouselActiveId = parseInt(event.current.replace('ngb-slide-', ''), 10);
 
         if ( [ 2, 3 ].includes(this.ngbCarouselActiveId) ) {

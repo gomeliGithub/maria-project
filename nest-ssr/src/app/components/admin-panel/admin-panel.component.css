@@ -35,6 +35,13 @@ and (-webkit-device-pixel-ratio: 2) {
     }
 }
 
+@media screen and (max-width: 497px) {
+    #searchImagesForm button:first-child {
+        margin-right: 0 !important;
+        margin-bottom: .25rem !important;
+    }
+}
+
 :host ::ng-deep .imagePhotographyTypeDescriptionAccordion .accordion-button {
     padding: 0.2rem 1rem;
 }

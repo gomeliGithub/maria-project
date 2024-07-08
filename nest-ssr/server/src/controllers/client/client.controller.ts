@@ -78,9 +78,7 @@ export class ClientController {
         
         if ( !targetPage || ( targetPage !== 'home' && targetPage !== 'admin' ) ) throw new BadRequestException(`${ request.url } "GetImagePhotographyTypesData - invalid target page"`);
 
-        const requiredFields: string[] = targetPage === 'home' ? [ 'name', 'compressedImageName' ] : [ 'name', 'description', 'compressedImageName' ];
-
-        return this._clientService.getImagePhotographyTypesData(requiredFields, targetPage);
+        return this._clientService.getImagePhotographyTypesData(targetPage, targetPage === 'home' ? false : true);
     }
 
     @Post('/changeLocale')

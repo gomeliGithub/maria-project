@@ -407,7 +407,7 @@ export class AdminPanelService {
 
         let clientOrdersInfoData: IClientOrdersInfoData | null = null;
 
-        const clientOrdersInfoDataArr: IClientOrdersInfoDataArr[] = await commonServiceRef.getClientOrdersInfo('all', {
+        const clientOrdersInfoDataArr: IClientOrdersInfoDataArr[] = await commonServiceRef.getClientOrdersInfo(null, {
             status: options.status,
             fromDate: options.fromDate,
             untilDate: options.untilDate,

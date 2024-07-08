@@ -239,6 +239,12 @@ and (-webkit-device-pixel-ratio: 2) {
     }
 }
 
+@media screen and (min-width: 768px) and (max-width: 1208px) {
+    app-admin-panel {
+        margin-top: 7rem !important;
+    }
+}
+
 textarea {
     resize: none;
     height: 150px !important;

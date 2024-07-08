@@ -95,9 +95,9 @@ export class CommonService {
 
     public async getClientOrdersInfo (loginList: string, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr>
     public async getClientOrdersInfo (loginList: string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
-    public async getClientOrdersInfo (loginList: 'all', options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
-    public async getClientOrdersInfo (loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
-    public async getClientOrdersInfo (loginList: string | string[], options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[]> {
+    public async getClientOrdersInfo (loginList: null, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (loginList: string | string[] | null, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr[]>
+    public async getClientOrdersInfo (loginList: string | string[] | null, options: IGetClientOrdersOptions): Promise<IClientOrdersInfoDataArr | IClientOrdersInfoDataArr[]> {
         const clientServiceRef: ClientService = await this._appService.getServiceRef(ClientModule, ClientService);
 
         return clientServiceRef.getClientOrdersInfo(loginList, options);
@@ -157,16 +157,16 @@ export class CommonService {
         return imageControlServiceRef.deleteImage(commonServiceRef, request, imagePath, clientLogin);
     }
 
-    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home'): Promise<IImagePhotographyType[][]>
-    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'admin'): Promise<IImagePhotographyType[]>
-    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin'): Promise<IImagePhotographyType[][] | IImagePhotographyType[]>
-    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType>
-    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin' | 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType>
-    public async getImagePhotographyTypesData (requiredFields: string[], targetPage: 'home' | 'admin' | 'gallery', photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType> {
+    public async getImagePhotographyTypesData (targetPage: 'home', includeDescription: boolean): Promise<IImagePhotographyType[][]>
+    public async getImagePhotographyTypesData (targetPage: 'admin', includeDescription: boolean): Promise<IImagePhotographyType[]>
+    public async getImagePhotographyTypesData (targetPage: 'home' | 'admin', includeDescription: boolean): Promise<IImagePhotographyType[][] | IImagePhotographyType[]>
+    public async getImagePhotographyTypesData (targetPage: 'gallery', includeDescription: boolean, photographyTypeName?: string): Promise<IImagePhotographyType>
+    public async getImagePhotographyTypesData (targetPage: 'home' | 'admin' | 'gallery', includeDescription: boolean, photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType>
+    public async getImagePhotographyTypesData (targetPage: 'home' | 'admin' | 'gallery', includeDescription: boolean, photographyTypeName?: string): Promise<IImagePhotographyType[][] | IImagePhotographyType[] | IImagePhotographyType> {
         const clientServiceRef = await this._appService.getServiceRef(ClientModule, ClientService);
 
-        if ( targetPage === 'gallery' ) return clientServiceRef.getImagePhotographyTypesData(requiredFields, targetPage, photographyTypeName);
-        else return clientServiceRef.getImagePhotographyTypesData(requiredFields, targetPage);
+        if ( targetPage === 'gallery' ) return clientServiceRef.getImagePhotographyTypesData(targetPage, includeDescription, photographyTypeName);
+        else return clientServiceRef.getImagePhotographyTypesData(targetPage, includeDescription);
     }
 
     public async throwWebSocketError (commonServiceRef: CommonService, newOriginalImagePath: string, webSocketClientId: number, imageMetaSize: number) {

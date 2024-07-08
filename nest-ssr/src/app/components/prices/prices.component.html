@@ -1,13 +1,12 @@
-<ngb-carousel [showNavigationArrows]="true" [showNavigationIndicators]="true" [interval]="0" class="col-9 col-sm-9 col-md-3 col-lg-7 col-xl-6 col-xxl-3" id="ngbCarousel" #ngbCarousel="ngbCarousel" 
-    (slide)="beforeNgbCarouselSlide($event)"
-
+<ngb-carousel [showNavigationArrows]="true" [showNavigationIndicators]="true" [interval]="0" [animation]="false" class="col-9 col-sm-9 col-md-5 col-lg-7 col-xl-4 col-xxl-4" id="ngbCarousel" #ngbCarousel="ngbCarousel" 
     [ngClass]="{
         
         'col-sm-11': ngbCarouselElementClassesdAreActive,
-        'col-md-7': ngbCarouselElementClassesdAreActive,
+        'col-md-9': ngbCarouselElementClassesdAreActive,
         
-        'col-xl-10': ngbCarouselElementClassesdAreActive,
-        'col-xxl-6': ngbCarouselElementClassesdAreActive
+        'col-xl-8': ngbCarouselElementClassesdAreActive,
+        'col-xxl-8': ngbCarouselElementClassesdAreActive,
+        'twoImagesOnSlide': ngbCarouselElementClassesdAreActive
     }"
 > <!-- col-md-8 -->
     <!--
@@ -18,7 +17,7 @@
         'col-xl-10': ngbCarouselElementClassesdAreActive,
         'col-xxl-6': ngbCarouselElementClassesdAreActive
     -->
-    <ng-template ngbSlide>
+    <ng-template ngbSlide [id]="'ngb-slide-0'">
         <div class="">
             <img src="/assets/images_full/pricesPage/171925284936020.jpg" class="img-fluid rounded" alt="Random first slide" />
             <div class="d-flex flex-column justify-content-start align-items-center position-absolute top-50 start-50 translate-middle h-100 w-100 px-3 overflow-y-auto text-white">
@@ -52,7 +51,7 @@
             </div>
         </div>
     </ng-template>
-    <ng-template ngbSlide>
+    <ng-template ngbSlide [id]="'ngb-slide-1'">
         <div class="">
             <img src="/assets/images_full/pricesPage/1719252831594684.jpg" class="img-fluid rounded" alt="Random second slide" />
             <div class="d-flex flex-column justify-content-start align-items-center position-absolute top-50 start-50 translate-middle h-100 w-100 px-3 overflow-y-auto text-white">
@@ -91,7 +90,7 @@
 
 
 
-    <ng-template ngbSlide>
+    <ng-template ngbSlide [id]="'ngb-slide-2'">
         <div class="d-flex flex-row justify-content-center align-items-center multipleImagesSlide">
             <div class="position-relative w-50 me-1">
                 <img src="/assets/images_full/pricesPage/1719765454806540.jpg" class="img-fluid rounded" alt="Random third slide" />
@@ -165,7 +164,7 @@
             </div>
         </div>
     </ng-template>
-    <ng-template ngbSlide>
+    <ng-template ngbSlide [id]="'ngb-slide-3'">
         <div class="d-flex flex-row justify-content-center align-items-center multipleImagesSlide">
             <div class="position-relative w-50 me-1">
                 <img src="/assets/images_full/pricesPage/1719252821310521.jpg" class="img-fluid rounded" alt="Random fourth slide" />
