@@ -582,7 +582,6 @@ export class AdminPanelService {
         const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
 
         const { originalImagePath, activeAdminLogin } = await this._getOriginalImagePathWithActiveAdminLogin(commonServiceRef, request, requestBody, response, clientLocale);
-
         const existingCompressedImageData: ICompressedImageWithoutRelationFields | null = await this._prisma.compressedImage.findFirst({ where: { originalName: path.basename(originalImagePath) } });
 
         if ( existingCompressedImageData === null ) throw new BadRequestException(`${ request.url } "ChangeImageDisplayTarget - 'compressed image does not exists'"`);
@@ -592,11 +591,11 @@ export class AdminPanelService {
         if ( displayTargetPage === 'home' ) {
             const homeImagesCount: number = ( await fsPromises.readdir(path.join(this.staticCompressedImagesDirPath, 'home')) ).length;
 
-            if ( homeImagesCount >= 50 ) return 'MAXCOUNT';
+            if ( homeImagesCount >= 20 ) return 'MAXCOUNT';
         } else if ( displayTargetPage === 'gallery' ) {
             const galleryImagesCount: number = ( await fsPromises.readdir(path.join(this.staticCompressedImagesDirPath, 'gallery', existingCompressedImageData.photographyType)) ).length;
 
-            if ( galleryImagesCount >= 55 ) return 'MAXCOUNT';
+            if ( galleryImagesCount >= 25 ) return 'MAXCOUNT';
         }
 
         const compressedImageUpdateArgs: Prisma.CompressedImageUpdateArgs<DefaultArgs> = {
@@ -605,7 +604,7 @@ export class AdminPanelService {
         };
 
         if ( displayTargetPage === 'home') {
-                compressedImageUpdateArgs.data.displayedOnHomePage = true;
+            compressedImageUpdateArgs.data.displayedOnHomePage = true;
     
             if ( existingCompressedImageData.displayedOnHomePage ) compressedImageUpdateArgs.data.displayedOnHomePage = false;
             else if ( existingCompressedImageData.displayedOnGalleryPage ) compressedImageUpdateArgs.data.displayedOnGalleryPage = false;
@@ -635,7 +634,7 @@ export class AdminPanelService {
             if ( existingCompressedImageData.displayType !== 'horizontal' ) return 'WRONGDISPLAYTYPE';
     
             newPath = staticFilesHomeImagePath;
-            }
+        }
         else if ( displayTargetPage === 'gallery' ) {
             if ( existingCompressedImageData.displayType !== 'vertical' ) return 'WRONGDISPLAYTYPE';
     
@@ -790,7 +789,7 @@ export class AdminPanelService {
         if ( ( existingCompressedImageData as ICompressedImageWithoutRelationFields ).displayedOnGalleryPage && ( [ 'home', 'gallery', 'original' ].includes(requestBody.adminPanel?.displayTargetPage as string)
             || ( requestBody.adminPanel?.newImagePhotographyType as string ) in Image_photography_type
         ) ) { 
-            const galleryImagePaths: string[] = [ ];
+            const galleryImagePaths: string[] = [ path.join(this.staticCompressedImagesDirPath, 'home') ];
 
             for ( const data in Image_photography_type ) {
                 galleryImagePaths.push(path.join(this.staticCompressedImagesDirPath, 'gallery', data, ( existingCompressedImageData as ICompressedImageWithoutRelationFields ).name));

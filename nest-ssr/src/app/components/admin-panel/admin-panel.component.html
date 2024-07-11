@@ -132,7 +132,7 @@
                             </textarea>
                         </div>
                     </td>
-                    <td>{{ compressedImage.uploadDate | date:"d.M.yy, H:mm" }}</td>
+                    <td class="text-nowrap">{{ compressedImage.uploadDate | date:"d.M.yy, H:mm" }}</td>
                     <td class="fw-bold" [ngClass]="{
                         'text-success': compressedImage.displayedOnHomePage === true, 
                         'text-danger': compressedImage.displayedOnHomePage === false
