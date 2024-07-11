@@ -87,7 +87,7 @@ export interface IFullCompressedImageData {
 }
 
 export interface IGalleryCompressedImagesData {
-    compressedImagesRaw: ICompressedImageWithoutRelationFields[]; // compressedImagesRaw: IClientCompressedImage[][];
+    compressedImagesDataList: ICompressedImageWithoutRelationFields[]; // compressedImagesRaw: IClientCompressedImage[][];
     photographyTypeDescription: string;
     additionalImagesExists: boolean;
 }

@@ -1,4 +1,4 @@
-import { AfterContentChecked, AfterRenderPhase, AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChildren, afterRender} from '@angular/core';
+import { AfterContentChecked, AfterRenderPhase, AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID, QueryList, ViewChildren, afterRender} from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
@@ -13,7 +13,7 @@ import { HomeService } from '../../services/home/home.service';
 
 import { AnimationEvent } from 'types/global';
 import { ICompressedImageWithoutRelationFields, IDiscount, IImagePhotographyType } from 'types/models';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 
 @Component({
     selector: 'app-home',
@@ -71,6 +71,9 @@ import { CommonModule } from '@angular/common';
     ]
 })
 export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChecked, OnDestroy {
+    public isPlatformBrowser: boolean;
+    public isPlatformServer: boolean;
+
     public componentElementIsRendered: boolean = false;
     
     public deviceInfo: DeviceInfo | null = null;
@@ -103,6 +106,8 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     public flatImagePhotographyTypes: IImagePhotographyType[] | null;
 
     constructor (
+        @Inject(PLATFORM_ID) private readonly platformId: string,
+
         private readonly _router: Router,
         private readonly _changeDetector: ChangeDetectorRef,
         
@@ -112,6 +117,9 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
         private readonly _clientService: ClientService,
         private readonly _homeService: HomeService,
     ) {
+        this.isPlatformBrowser = isPlatformBrowser(this.platformId);
+        this.isPlatformServer = isPlatformServer(this.platformId);
+        
         afterRender(() => {
             if ( !this.componentElementIsRendered && this.scrollSnapItemRadioViewRefs.length !== 0 ) {
                 this.currentItem = 0;
@@ -193,7 +201,7 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     }
 
     ngAfterViewChecked (): void {
-        if ( this._appService.checkIsPlatformBrowser() ) {
+        if ( this.isPlatformBrowser ) {
             if ( this.compressedImagesList && !this.compressedImagesDataIsLoaded ) {
                 this.scrollSnapSectionViewRefs.first.nativeElement.scrollIntoView({ behavior: 'auto', block: 'start' });
 

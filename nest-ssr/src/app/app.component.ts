@@ -1,5 +1,6 @@
-import { Component, ElementRef, HostBinding, HostListener, Inject, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { Component, ElementRef, HostBinding, HostListener, Inject, OnInit, PLATFORM_ID, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { CommonModule, DOCUMENT, isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
 
 import { Subscription } from 'rxjs';
@@ -21,8 +22,8 @@ import { HomeService } from './services/home/home.service';
 
 import { environment } from '../environments/environment';
 
-import { IClientLocale } from 'types/global';
-import { RouterModule } from '@angular/router';
+import { IClientLocale, IGalleryCompressedImagesData } from 'types/global';
+import { ICompressedImageWithoutRelationFields } from 'types/models';
 
 @Component({
     selector: 'app-root',
@@ -93,18 +94,8 @@ import { RouterModule } from '@angular/router';
     ]
 })
 export class AppComponent implements OnInit {
-    constructor (
-        @Inject(DOCUMENT) private readonly document: Document,
-        
-        private readonly appService: AppService,
-        private readonly clientService: ClientService,
-        private readonly homeService: HomeService,
-
-        private readonly translateService: TranslateService,
-        private readonly deviceService: DeviceDetectorService
-    ) { 
-
-    }
+    public isPlatformBrowser: boolean;
+    public isPlatformServer: boolean;
 
     public componentElementIsRendered: boolean = false;
     
@@ -134,35 +125,60 @@ export class AppComponent implements OnInit {
     public activeClientType: string | null;
     public activeClientLocale: string | null;
     public activeClientFullName: string | null;
+    
+    private _galleryIndividualCompressedImagesData: IGalleryCompressedImagesData;
+    private _galleryChildrenCompressedImagesData: IGalleryCompressedImagesData;
+    private _galleryWeddingCompressedImagesData: IGalleryCompressedImagesData;
+    private _galleryFamilyCompressedImagesData: IGalleryCompressedImagesData;
+
+    constructor (
+        @Inject(PLATFORM_ID) private readonly platformId: string,
+        @Inject(DOCUMENT) private readonly document: Document,
+        
+        private readonly _appService: AppService,
+        private readonly _clientService: ClientService,
+        private readonly _homeService: HomeService,
+
+        private readonly _translateService: TranslateService,
+        private readonly _deviceService: DeviceDetectorService
+    ) { 
+        this.isPlatformBrowser = isPlatformBrowser(this.platformId);
+        this.isPlatformServer = isPlatformServer(this.platformId);
+    }
 
     ngOnInit (): void {
-        if ( this.appService.checkIsPlatformBrowser() ) {
-            this.clientService.getActiveClient().subscribe({
+        if ( this.isPlatformBrowser ) {
+            this._clientService.getActiveClient().subscribe({
                 next: activeClientData => {
                     this.activeClientLogin = activeClientData ? activeClientData.login : null;
                     this.activeClientType = activeClientData ? activeClientData.type : null;
                     this.activeClientFullName = activeClientData ? activeClientData.fullName : null;
                     this.activeClientLocale = activeClientData ? activeClientData.locale : null;
 
-                    if ( this.activeClientLocale ) this.translateService.use(this.activeClientLocale);
+                    if ( this.activeClientLocale ) this._translateService.use(this.activeClientLocale);
                     else {
-                        this.translateService.use(environment.defaultLocale);
+                        this._translateService.use(environment.defaultLocale);
                         this.activeClientLocale = environment.defaultLocale;
                     }
 
                     this.document.documentElement.lang = this.activeClientLocale ?? environment.defaultLocale;
                 },
-                error: () => this.appService.createErrorModal()
+                error: () => this._appService.createErrorModal()
             });
 
-            this.isMobileDevice = this.deviceService.isMobile();
+            this.isMobileDevice = this._deviceService.isMobile();
 
-            this.clientService.navbarAnimationStateChange.subscribe(value => this.navbarAnimationState = value);
-            this.clientService.prevNavbarAnimationStateChange.subscribe(value => this.prevNavbarAnimationState = value);
+            this._clientService.navbarAnimationStateChange.subscribe(value => this.navbarAnimationState = value);
+            this._clientService.prevNavbarAnimationStateChange.subscribe(value => this.prevNavbarAnimationState = value);
             // this.clientService.footerAnimationStateChange.subscribe(value => this.footerAnimationState = value);
 
-            this.homeService.discountsDataIsExistsChange.subscribe(value => this.discountsDataIsExists = value);
+            this._homeService.discountsDataIsExistsChange.subscribe(value => this.discountsDataIsExists = value);
         }
+
+        this._clientService.getCompressedImagesData('individual', 'vertical', 0).subscribe(data => this._galleryIndividualCompressedImagesData = data);
+        this._clientService.getCompressedImagesData('children', 'vertical', 0).subscribe(data => this._galleryChildrenCompressedImagesData = data);
+        this._clientService.getCompressedImagesData('wedding', 'vertical', 0).subscribe(data => this._galleryWeddingCompressedImagesData = data);
+        this._clientService.getCompressedImagesData('family', 'vertical', 0).subscribe(data => this._galleryFamilyCompressedImagesData = data);
     }
 
     public onRouterOutlet (component: HomeComponent | GalleryComponent | ClientComponent | AdminPanelComponent | AdminPanelOrdersControlComponent 
@@ -170,7 +186,7 @@ export class AppComponent implements OnInit {
     ): void {
         if ( !this.navbarIsCollapsed ) this.navbarTogglerClick(true);
 
-        if ( this.navbarAnimationState !== 'static' ) this.clientService.setNavbarAnimationState('static');
+        if ( this.navbarAnimationState !== 'static' ) this._clientService.setNavbarAnimationState('static');
 
         if ( !( component instanceof HomeComponent ) ) {
             this.componentClass = false;
@@ -181,11 +197,55 @@ export class AppComponent implements OnInit {
             this.footerElementRef.nativeElement.classList.add('position-relative');
 
             this.isHomePage = false;
+
+            if ( component instanceof GalleryComponent ) {
+                let compressedImagesList: ICompressedImageWithoutRelationFields[] | null = null;
+                let additionalImagesExists: boolean = false;
+                let photographyTypeDescription: string | null = null;
+
+                switch ( component.photographyType ) {
+                    case 'individual': {
+                        compressedImagesList = this._galleryIndividualCompressedImagesData.compressedImagesDataList;
+                        additionalImagesExists = this._galleryIndividualCompressedImagesData.additionalImagesExists;
+                        photographyTypeDescription = this._galleryIndividualCompressedImagesData.photographyTypeDescription ? this._galleryIndividualCompressedImagesData.photographyTypeDescription : null;
+
+                        break; 
+                    }
+
+                    case 'children': {
+                        compressedImagesList = this._galleryChildrenCompressedImagesData.compressedImagesDataList;
+                        additionalImagesExists = this._galleryChildrenCompressedImagesData.additionalImagesExists;
+                        photographyTypeDescription = this._galleryChildrenCompressedImagesData.photographyTypeDescription ? this._galleryChildrenCompressedImagesData.photographyTypeDescription : null;
+                        
+                        break; 
+                    }
+
+                    case 'wedding': {
+                        compressedImagesList = this._galleryWeddingCompressedImagesData.compressedImagesDataList;
+                        additionalImagesExists = this._galleryWeddingCompressedImagesData.additionalImagesExists;
+                        photographyTypeDescription = this._galleryWeddingCompressedImagesData.photographyTypeDescription ? this._galleryWeddingCompressedImagesData.photographyTypeDescription : null;
+
+                        break; 
+                    }
+
+                    case 'family': {
+                        compressedImagesList = this._galleryFamilyCompressedImagesData.compressedImagesDataList;
+                        additionalImagesExists = this._galleryFamilyCompressedImagesData.additionalImagesExists;
+                        photographyTypeDescription = this._galleryFamilyCompressedImagesData.photographyTypeDescription ? this._galleryFamilyCompressedImagesData.photographyTypeDescription : null;
+
+                        break; 
+                    }
+                }
+
+                component.compressedImagesList = compressedImagesList;
+                component.additionalImagesExists = additionalImagesExists;
+                component.photographyTypeDescription = photographyTypeDescription ? photographyTypeDescription : null;
+            }
         } else {
             this.componentClass = true;
             this.isHomePage = true;
 
-            this.homeService.setActiveScrollSnapSection(0);
+            this._homeService.setActiveScrollSnapSection(0);
 
             this.footerElementRef.nativeElement.classList.remove('position-relative');
             this.footerElementRef.nativeElement.classList.add('bottom-0', 'position-absolute');
@@ -199,7 +259,7 @@ export class AppComponent implements OnInit {
         else this.navbarAnimationState = 'static';
 
         if ( $event.srcElement.scrollTop > $event.srcElement.scrollHeight - $event.srcElement.offsetHeight - 1 ) {
-            this.clientService.setScrollPageBottomStatus(true);
+            this._clientService.setScrollPageBottomStatus(true);
         }
 
         this.prevNavbarAnimationState = null;
@@ -242,7 +302,7 @@ export class AppComponent implements OnInit {
 
     public changeActiveScrollSnapSection (event: MouseEvent): void {
         if ( !this.isHomePage ) {
-            this.appService.reloadComponent(false, '/', false).then(() => setTimeout(() => this.goToActiveScrollSnapSection(event), 1000));
+            this._appService.reloadComponent(false, '/', false).then(() => setTimeout(() => this.goToActiveScrollSnapSection(event), 1000));
         } else {
             if ( this.isMobileDevice ) this.navbarTogglerClick(true);
 
@@ -255,7 +315,7 @@ export class AppComponent implements OnInit {
 
         const scrollSnapSectionPositionIndex: number = parseInt(targetRadio.id.replace('defaultCheck', ''), 10);
 
-        this.homeService.setActiveScrollSnapSection(scrollSnapSectionPositionIndex);
+        this._homeService.setActiveScrollSnapSection(scrollSnapSectionPositionIndex);
     }
 
     public goToPageTop (event: MouseEvent): void {
@@ -264,14 +324,14 @@ export class AppComponent implements OnInit {
 
             if ( this.isMobileDevice ) this.navbarTogglerClick(true);
 
-            setTimeout(() => this.homeService.setActiveScrollSnapSection(0), 500);
+            setTimeout(() => this._homeService.setActiveScrollSnapSection(0), 500);
         }
     }
 
     public signOut (): Subscription {
-        return this.clientService.signOut().subscribe({
-            next: () => this.appService.reloadComponent(false, '/'),
-            error: () => this.appService.createErrorModal(this.appService.getTranslations('DEFAULTERRORMESSAGE')) 
+        return this._clientService.signOut().subscribe({
+            next: () => this._appService.reloadComponent(false, '/'),
+            error: () => this._appService.createErrorModal(this._appService.getTranslations('DEFAULTERRORMESSAGE')) 
         });
     }
 
@@ -280,7 +340,7 @@ export class AppComponent implements OnInit {
 
         const newLocale: string = localeButton.id;
 
-        this.clientService.changeClientLocale(newLocale).subscribe({
+        this._clientService.changeClientLocale(newLocale).subscribe({
             next: data => {
                 this.document.documentElement.lang = newLocale;
 
@@ -288,9 +348,9 @@ export class AppComponent implements OnInit {
 
                 this.activeClientLocale = newLocale;
 
-                this.appService.createSuccessModal(this.appService.getTranslations('CHANGECLIENTLOCALESUCCESSMESSAGE'));
+                this._appService.createSuccessModal(this._appService.getTranslations('CHANGECLIENTLOCALESUCCESSMESSAGE'));
             },
-            error: () => this.appService.createErrorModal()
+            error: () => this._appService.createErrorModal()
         });
     }
 }

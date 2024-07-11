@@ -1,5 +1,5 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ElementRef, HostListener, Inject, OnInit, PLATFORM_ID, ViewChild } from '@angular/core';
+import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { NgbCalendar, NgbDate, NgbDateParserFormatter, NgbDateStruct, NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -19,6 +19,9 @@ import { IDiscount } from 'types/models';
     host: { ngSkipHydration: 'true' }
 })
 export class AdminPanelDiscountsControlComponent implements OnInit {
+    public isPlatformBrowser: boolean;
+    public isPlatformServer: boolean;
+
     public createDiscountForm: FormGroup<{
         discountContent: FormControl<string | null>;
         discountExpirationDate: FormControl<string | null>;
@@ -42,12 +45,17 @@ export class AdminPanelDiscountsControlComponent implements OnInit {
     public spinnerHidden: boolean = true;
 
     constructor (
+        @Inject(PLATFORM_ID) private readonly platformId: string,
+
         private readonly _calendar: NgbCalendar,
         public readonly formatter: NgbDateParserFormatter,
 
         private readonly _appService: AppService,
         private readonly _adminPanelService: AdminPanelService
-    ) { 
+    ) {
+        this.isPlatformBrowser = isPlatformBrowser(this.platformId);
+        this.isPlatformServer = isPlatformServer(this.platformId);
+        
         this.createDiscountForm = new FormGroup({
             'discountContent': new FormControl("", [ Validators.required, Validators.maxLength(50) ]),
             'discountExpirationDate': new FormControl("", Validators.required)
@@ -67,7 +75,7 @@ export class AdminPanelDiscountsControlComponent implements OnInit {
     }
 
     ngOnInit (): void {
-        if ( this._appService.checkIsPlatformBrowser() ) {
+        if ( this.isPlatformBrowser ) {
             this._appService.getTranslations('PAGETITLES.ADMINPANEL.DISCOUNTSCONTROL', true).subscribe(translation => this._appService.setTitle(translation));
 
             this._adminPanelService.getDiscountsData().subscribe(discounts => {

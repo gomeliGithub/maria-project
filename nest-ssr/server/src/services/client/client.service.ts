@@ -39,7 +39,7 @@ export class ClientService {
         private readonly _mailService: MailService
     ) { }
 
-    public async getCompressedImagesData (imagesType: 'home' | string, imageDisplayType: Image_display_type, imagesExistsCount?: number): Promise<IGalleryCompressedImagesData | ICompressedImageWithoutRelationFields[]> {
+    public async getCompressedImagesData (imagesType: 'home' | string, imageDisplayType: Image_display_type, imagesExistsCount: number): Promise<IGalleryCompressedImagesData | ICompressedImageWithoutRelationFields[]> {
         const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
 
         const imagesPath: string = imagesType === 'home' ? path.join(this.compressedImagesDirPath, imagesType) : path.join(this.compressedImagesDirPath, 'gallery', imagesType);
@@ -86,7 +86,7 @@ export class ClientService {
 
 
             return {
-                compressedImagesRaw: compressedImagesData, // reducedCompressedImagesRaw, 
+                compressedImagesDataList: compressedImagesData, // reducedCompressedImagesRaw, 
                 photographyTypeDescription: ( await this.getImagePhotographyTypesData('gallery', false, imagesType) ).description as string,
                 additionalImagesExists: commonCompressedImagesCount > ( imagesExistsCount as number ) + compressedImagesData.length && commonCompressedImagesCount > imagesLimit
             }
@@ -171,7 +171,7 @@ export class ClientService {
         let tokenIsValid: boolean = false;
 
         if ( await this._jwtControlService.tokenValidate(request, token as string, false) ) tokenIsValid = true;
-        
+
         const cookieSerializeOptions: ICookieSerializeOptions = this._appService.cookieSerializeOptions;
 
         if ( request.activeClientData ) {

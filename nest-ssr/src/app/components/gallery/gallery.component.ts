@@ -1,9 +1,11 @@
-import { Component, ElementRef, HostBinding, OnInit, QueryList, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ElementRef, HostBinding, Inject, OnInit, PLATFORM_ID, QueryList, ViewChild } from '@angular/core';
+import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HttpResponse } from '@angular/common/http';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+
+import { Image_display_type, Image_photography_type } from '@prisma/client';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -59,7 +61,10 @@ import { ICompressedImageWithoutRelationFields } from 'types/models';
     ]
 })
 export class GalleryComponent implements OnInit {
-    public photographyType: string;
+    public isPlatformBrowser: boolean;
+    public isPlatformServer: boolean;
+
+    public photographyType: Image_photography_type;
 
     public activeClientType: string | null;
 
@@ -71,8 +76,9 @@ export class GalleryComponent implements OnInit {
 
     public imageContainerViewRefs: QueryList<ElementRef<HTMLDivElement>>;
 
+    // public firstGetCompressedImagesDataRequest;
+
     public compressedImagesList: ICompressedImageWithoutRelationFields[] | null = null; // public compressedImagesList: IClientCompressedImage[][] = null;
-    public compressedImagesListType: string | null = null;
 
     public photographyTypeDescription: string | null;
 
@@ -125,13 +131,18 @@ export class GalleryComponent implements OnInit {
     }
 
     constructor (
+        @Inject(PLATFORM_ID) private readonly _platformId: string,
+        
         private readonly _activateRoute: ActivatedRoute,
         private readonly _router: Router,
 
         private readonly _appService: AppService,
         private readonly _clientService: ClientService
     ) {
-        this.photographyType = this._activateRoute.snapshot.paramMap.get('photographyType') as string;
+        this.isPlatformBrowser = isPlatformBrowser(this._platformId);
+        this.isPlatformServer = isPlatformServer(this._platformId);
+        
+        this.photographyType = this._activateRoute.snapshot.paramMap.get('photographyType') as Image_photography_type;
 
         if ( !( this.photographyType in environment.photographyTypes ) ) this._router.navigate(['**'], { skipLocationChange: true });
 
@@ -172,9 +183,7 @@ export class GalleryComponent implements OnInit {
             keywordsMetaNameTag.setAttribute('content', `${ keywordsMetaNameTagContent }, ${ photographyTypeMetaKeyword }`);
         });
 
-        this.getCompressedImagesData('vertical');
-
-        if ( this._appService.checkIsPlatformBrowser() ) {
+        if ( this.isPlatformBrowser ) {
             this._clientService.getActiveClient().subscribe({
                 next: activeClientData => this.activeClientType = activeClientData ? activeClientData.type : null,
                 error: () => this._appService.createErrorModal()
@@ -202,32 +211,28 @@ export class GalleryComponent implements OnInit {
         event;
     }
 
-    public getCompressedImagesData (imageViewSize: 'horizontal' | 'vertical', currentImagesCount?: number): void {
-        this.compressedImagesListType = imageViewSize;
-
+    public getCompressedImagesData (imageDisplayType: Image_display_type, currentImagesCount: number): void {
         if ( this.additionalImagesExists ) this.currentAdditionalImagesExists = true;
         else this.currentAdditionalImagesExists = false;
 
-        if ( !currentImagesCount ) currentImagesCount = 0;
-
-        this._clientService.getCompressedImagesData(this.photographyType, imageViewSize, currentImagesCount).subscribe({
+        this._clientService.getCompressedImagesData(this.photographyType, imageDisplayType, currentImagesCount).subscribe({
             next: data => {
-                if ( data.compressedImagesRaw.length !== 0 ) {
+                if ( data.compressedImagesDataList.length !== 0 ) {
                     if ( !this.currentAdditionalImagesExists ) {
-                        this.compressedImagesList = data.compressedImagesRaw;
+                        this.compressedImagesList = data.compressedImagesDataList;
 
-                        if ( data.compressedImagesRaw.length < 5 ) {
+                        if ( data.compressedImagesDataList.length < 5 ) {
                             this.galleryImagesCarouselOptions = { ...this.galleryImagesCarouselOptions, nav: false, center: false, loop: false, autoplay: false }
 
-                            for ( let i = 0; i < 5 - data.compressedImagesRaw.length; i++ ) {
+                            for ( let i = 0; i < 5 - data.compressedImagesDataList.length; i++ ) {
                                 this.compressedImagesList.push({ ...this.compressedImagesList[0], description: 'empty_image' });
                             }
                         }
                     } else {
-                        ( this.compressedImagesList as ICompressedImageWithoutRelationFields[]).push(...data.compressedImagesRaw);
+                        ( this.compressedImagesList as ICompressedImageWithoutRelationFields[]).push(...data.compressedImagesDataList);
                     }
         
-                    if ( data.compressedImagesRaw.length !== 0 ) {
+                    if ( data.compressedImagesDataList.length !== 0 ) {
                         // if ( !this.currentAdditionalImagesExists ) this.compressedImagesList = data.compressedImagesRaw.flat(); // this.flatCompressedImagesList = data.compressedImagesRaw.flat();
                         // else this.compressedImagesList.push(...data.compressedImagesRaw.flat()); // else this.flatCompressedImagesList.push(...data.compressedImagesRaw.flat());
         

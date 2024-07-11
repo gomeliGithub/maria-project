@@ -1,5 +1,5 @@
-import { Component, ElementRef, OnInit, QueryList, ViewChildren } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ElementRef, Inject, OnInit, PLATFORM_ID, QueryList, ViewChildren } from '@angular/core';
+import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 
 import { Client_order_status } from '@prisma/client';
 
@@ -23,6 +23,9 @@ import { IClientOrderWithoutRelationFields } from 'types/models';
     host: { ngSkipHydration: 'true' }
 })
 export class AdminPanelOrdersControlComponent implements OnInit {
+    public isPlatformBrowser: boolean;
+    public isPlatformServer: boolean;
+
     public clientOrdersInfoData: IClientOrdersInfoDataArr[] | null;
     public clientOrders: IClientOrderWithoutRelationFields[] | null;
     public additionalOrdersExists: boolean = false;
@@ -35,15 +38,20 @@ export class AdminPanelOrdersControlComponent implements OnInit {
     public spinnerHidden: boolean = true;
 
     constructor (
+        @Inject(PLATFORM_ID) private readonly platformId: string,
+
         private readonly _appService: AppService,
         private readonly _adminPanelService: AdminPanelService
-    ) { }
+    ) { 
+        this.isPlatformBrowser = isPlatformBrowser(this.platformId);
+        this.isPlatformServer = isPlatformServer(this.platformId);
+    }
 
     @ViewChildren('clientOrder', { read: ElementRef<HTMLTableRowElement> }) public readonly clientOrderViewRefs: QueryList<ElementRef<HTMLTableRowElement>>;
     @ViewChildren('getClientOrdersButton', { read: ElementRef<HTMLButtonElement> }) public readonly getClientOrdersButtonViewRefs: QueryList<ElementRef<HTMLButtonElement>>;
 
     ngOnInit (): void {
-        if ( this._appService.checkIsPlatformBrowser() ) {
+        if ( this.isPlatformBrowser ) {
             this._appService.getTranslations('PAGETITLES.ADMINPANEL.ORDERSCONTROL', true).subscribe(translation => this._appService.setTitle(translation));
 
             this._adminPanelService.getNextClientOrdersInfoData(this, true);

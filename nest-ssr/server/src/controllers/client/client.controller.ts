@@ -35,8 +35,8 @@ export class ClientController {
 
         const imagesExistsCountInt: number = parseInt(imagesExistsCount as string, 10);
 
-        imageDisplayType = imageDisplayType === 'undefined' || imageDisplayType === 'null' ? null : imageDisplayType;
-        imagesExistsCount = imagesExistsCount === 'undefined' || imagesExistsCount === 'null' ? null : imagesExistsCount;
+        imageDisplayType = imageDisplayType === 'undefined' ? null : imageDisplayType;
+        imagesExistsCount = imagesExistsCount === 'undefined' ? null : imagesExistsCount;
 
         if ( !thumbnailImageTypes.includes(imagesType) 
             || imageDisplayType && !( imageDisplayType in $Enums.Image_display_type )

@@ -1,6 +1,5 @@
-import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -16,29 +15,13 @@ import { IModalCreateOptions } from 'types/options';
     providedIn: 'root'
 })
 export class AppService {
-    public isPlatformBrowser: boolean;
-    public isPlatformServer: boolean;
-
     constructor (
-        @Inject(PLATFORM_ID) private readonly platformId: string,
-        
         private readonly meta: Meta, 
         private readonly platformTitle: Title,
         private readonly router: Router,
         private readonly translateService: TranslateService,
         private readonly modalService: NgbModal
-    ) { 
-        this.isPlatformBrowser = isPlatformBrowser(this.platformId);
-        this.isPlatformServer = isPlatformServer(this.platformId);
-    }
-
-    public checkIsPlatformBrowser (): boolean {
-        return this.isPlatformBrowser;
-    }
-
-    public checkIsPlatformServer (): boolean {
-        return this.isPlatformServer;
-    }
+    ) { }
 
     public getMetaNameTag (property: string): HTMLMetaElement | null {
         return this.meta.getTag(`name="${ property }"` );

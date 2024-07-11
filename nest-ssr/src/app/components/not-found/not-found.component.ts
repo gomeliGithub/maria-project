@@ -1,5 +1,5 @@
-import { Component, Inject, OnInit, Optional } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Inject, OnInit, Optional, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 import { RESPONSE } from '@nestjs/ng-universal/dist/tokens';
@@ -17,12 +17,20 @@ import { AppService } from '../../app.service';
     styleUrls: ['./not-found.component.css']
 })
 export class NotFoundComponent implements OnInit {
+    public isPlatformBrowser: boolean;
+    public isPlatformServer: boolean;
+
     constructor (
+        @Inject(PLATFORM_ID) private readonly platformId: string,
+
         @Optional() @Inject(RESPONSE) res: Response,
 
         private readonly _appService: AppService
     ) {
-        if ( this._appService.checkIsPlatformServer() ) {
+        this.isPlatformBrowser = isPlatformBrowser(this.platformId);
+        this.isPlatformServer = isPlatformServer(this.platformId);
+        
+        if ( this.isPlatformServer ) {
             res.status(404);
         }
     }

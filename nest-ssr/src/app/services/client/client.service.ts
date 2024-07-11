@@ -1,6 +1,8 @@
 import { ElementRef, EventEmitter, Injectable, QueryList } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 
+import { Image_display_type, Image_photography_type } from '@prisma/client';
+
 import { Observable, forkJoin } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -87,9 +89,9 @@ export class ClientService {
         });
     }
 
-    public getCompressedImagesData (imagesType: 'home', imageDisplayType: 'horizontal' | 'vertical'): Observable<ICompressedImageWithoutRelationFields[]>
-    public getCompressedImagesData (imagesType: string, imageDisplayType: 'horizontal' | 'vertical', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData>
-    public getCompressedImagesData (imagesType: 'home' | string, imageDisplayType: 'horizontal' | 'vertical', imagesExistsCount?: number): Observable<IGalleryCompressedImagesData | ICompressedImageWithoutRelationFields[]> {
+    public getCompressedImagesData (imagesType: 'home', imageDisplayType: Image_display_type): Observable<ICompressedImageWithoutRelationFields[]>
+    public getCompressedImagesData (imagesType: Image_photography_type, imageDisplayType: Image_display_type, imagesExistsCount?: number): Observable<IGalleryCompressedImagesData>
+    public getCompressedImagesData (imagesType: 'home' | Image_photography_type, imageDisplayType: Image_display_type, imagesExistsCount?: number): Observable<IGalleryCompressedImagesData | ICompressedImageWithoutRelationFields[]> {
         return this._http.get<IGalleryCompressedImagesData | ICompressedImageWithoutRelationFields[]>(`/api/client/getCompressedImagesData/:${ imagesType }`, { params: {
             imageDisplayType,
             imagesExistsCount: imagesExistsCount as number

@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component, ElementRef, HostBinding, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnInit, PLATFORM_ID, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
@@ -62,6 +62,9 @@ import { IGetFullCompressedImagesDataOptions } from 'types/options';
     host: { ngSkipHydration: 'true' }
 })
 export class AdminPanelComponent implements OnInit {
+    public isPlatformBrowser: boolean;
+    public isPlatformServer: boolean;
+
     public uploadImageForm: FormGroup<{
         imagePhotographyType: FormControl<string | null>;
         imageDisplayType: FormControl<string | null>;
@@ -124,6 +127,8 @@ export class AdminPanelComponent implements OnInit {
     public spinnerHidden: boolean = true;
 
     constructor (
+        @Inject(PLATFORM_ID) private readonly platformId: string,
+
         private readonly _http: HttpClient,
         private readonly _changeDetectorRef: ChangeDetectorRef,
 
@@ -132,6 +137,9 @@ export class AdminPanelComponent implements OnInit {
         private readonly _clientService: ClientService,
         private readonly _webSocketService: WebSocketService
     ) {
+        this.isPlatformBrowser = isPlatformBrowser(this.platformId);
+        this.isPlatformServer = isPlatformServer(this.platformId);
+        
         this.uploadImageForm = new FormGroup({
             'imagePhotographyType': new FormControl("", [ Validators.required, this.imagePhotographyTypeValidator ]),
             'imageDisplayType': new FormControl("", [ Validators.required, this.imageDisplayTypeValidator ]),
@@ -164,7 +172,7 @@ export class AdminPanelComponent implements OnInit {
     private readonly imagePhotographyTypeDescriptionViewRefs: QueryList<ElementRef<HTMLInputElement>>;
 
     ngOnInit (): void {
-        if ( this._appService.checkIsPlatformBrowser() ) {
+        if ( this.isPlatformBrowser ) {
             this._appService.getTranslations('PAGETITLES.ADMINPANEL.IMAGESCONTROL', true).subscribe(translation => this._appService.setTitle(translation));
 
             for ( const data in Image_photography_type ) {

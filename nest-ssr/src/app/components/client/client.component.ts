@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 
@@ -19,6 +19,9 @@ import { ClientService } from '../../services/client/client.service';
     styleUrls: ['./client.component.css']
 })
 export class ClientComponent implements OnInit {
+    public isPlatformBrowser: boolean;
+    public isPlatformServer: boolean;
+
     public signOperation: 'in' | 'up';
 
     public signForm: FormGroup<{
@@ -31,11 +34,16 @@ export class ClientComponent implements OnInit {
     public passwordIsVisible: boolean = false;
 
     constructor (
+        @Inject(PLATFORM_ID) private readonly platformId: string,
+
         private readonly _activateRoute: ActivatedRoute,
 
         private readonly _appService: AppService,
         private readonly _clientService: ClientService
     ) {
+        this.isPlatformBrowser = isPlatformBrowser(this.platformId);
+        this.isPlatformServer = isPlatformServer(this.platformId);
+        
         this._activateRoute.url.subscribe(url => {
             this.signOperation = url.join(' ') as 'in' | 'up';
             
@@ -57,7 +65,7 @@ export class ClientComponent implements OnInit {
     }
 
     ngOnInit (): void {
-        if ( this._appService.checkIsPlatformBrowser() ) {
+        if ( this.isPlatformBrowser ) {
             this._appService.getTranslations(`PAGETITLES.${ this.signOperation === 'up' ? 'SIGNUP' : 'SIGNIN' }`, true).subscribe({
                 next: translation => this._appService.setTitle(translation),
                 error: () => this._appService.createErrorModal()
