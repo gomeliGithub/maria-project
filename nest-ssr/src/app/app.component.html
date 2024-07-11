@@ -6,12 +6,6 @@
     (mouseleave)="menuMove(false)"
 >
     <div class="container-fluid">
-        <!-- <a class="navbar-brand" routerLink="/"
-            [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
-        >
-            <img src="favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
-            Mashulik
-        </a> -->
         <button class="navbar-toggler" id="navbarTogglerButton" type="button" aria-controls="navbarNavDropdown"
             [@navbar-toggler-icon-trigger]="navbarTogglerIconTriggerState"
             (click)="changeNavbarTogglerIconTriggerState()"
@@ -24,8 +18,8 @@
             <span class="icon-bar bottom-bar d-block border-1" [@bottom-bar-animation]="navbarTogglerIconTriggerState"></span>
         </button>
         <div class="navbar-collapse collapse" id="navbarNavDropdown" [ngbCollapse]="navbarIsCollapsed">
-            <ul class="navbar-nav flex-grow-1 justify-content-evenly mb-2 mb-lg-0 font-family-caveat-brush-regular">
-                <li class="nav-item me-4"> <!-- ngbDropdown display="dynamic" #homeMenu="ngbDropdown" -->
+            <ul class="navbar-nav flex-grow-1 justify-content-evenly align-content-center flex-wrap w-100 font-family-caveat-brush-regular">
+                <li class="nav-item">
                     <a class="" class="nav-link active" aria-current="page" [routerLink]="[ '/' ]"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
                         (click)="goToPageTop($event)"
@@ -35,77 +29,9 @@
                         </span>
                         {{ 'PAGETITLES.HOME' | translate }}
                     </a>
-
-                    <!-- <div class="btn-group">
-                        <a class="" type="button" class="" aria-current="page" routerLink="/"
-                            [ngClass]="{
-                                'nav-link active': true,
-                                'text-white': navbarAnimationState === 'static' && isHomePage 
-                            }"
-                            (click)="goToPageTop($event)"
-                        >
-                            <span class="fs-5">
-                                <i class="bi bi-house"></i>
-                            </span>
-                            {{ 'PAGETITLES.HOME' | translate }}
-                        </a>
-                        <div class="btn-group" ngbDropdown role="group" display="dynamic" #homeMenu="ngbDropdown">
-                            <a type="button" class="btn dropdown-toggle-split mt-auto" id="homeMenuButton"
-                                [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
-                                ngbDropdownToggle
-                                (mouseenter)="menuMove(true, homeMenu)"
-                            >
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="homeMenuButton" ngbDropdownMenu (mouseleave)="menuMove(false, homeMenu)">
-                                <button *ngFor="let section of scrollSnapSectionViewRefs; let i = index" class="" [id]="'defaultCheck' + i" ngbDropdownItem (click)="changeActiveScrollSnapSection($event)">
-                                    <span class="fs-5">
-                                        <i class="bi bi-link-45deg"></i>
-                                    </span>
-                                    {{ discountsDataIsExists ? 
-                                    ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate ) : 
-                                    ( i >= 1 ? 
-                                        ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 2 ) ) | translate ) :
-                                        ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate )
-                                    ) 
-                                    }}
-                                </button>
-                            </div>
-                        </div>
-                    </div> -->
-
-                    <!-- <a class="nav-link" type="button" id="homeMenuButton"
-                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
-                        ngbDropdownToggle
-                        (mouseenter)="menuMove(true, homeMenu)"
-                    >
-                        <span class="fs-5">
-                            <i class="bi bi-house"></i>
-                        </span>
-                        {{ 'PAGETITLES.HOME' | translate }}
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="homeMenuButton" ngbDropdownMenu (mouseleave)="menuMove(false, homeMenu)">
-                        <li *ngFor="let section of scrollSnapSectionViewRefs; let i = index">
-                            <button type="button" ngbDropdownItem (click)="">
-                                <span class="fs-5">
-                                    <i class="bi bi-link-45deg"></i>
-                                </span>
-                                {{ ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( i + 1 ) ) | translate }}
-                            </button>
-                        </li>
-                    </ul> -->
-
                 </li>
-
-
-
-
-
-
-
-
-
                 <li *ngIf="discountsDataIsExists" class="nav-item">
-                    <button class="nav-link me-4" id="defaultCheck1"
+                    <button class="nav-link" id="defaultCheck1"
                         [ngClass]="{ 
                             'text-white': navbarAnimationState === 'static' && isHomePage
                         }"
@@ -117,8 +43,8 @@
                         {{ ( 'SCROLLSNAPITEMSTEXT.DISCOUNTS' ) | translate }}
                     </button>
                 </li>
-                <li class="nav-item">
-                    <button class="nav-link me-4" [id]="'defaultCheck' + ( discountsDataIsExists ? 2 : 1 )"
+                <li class="nav-item homeScrollSnapChild">
+                    <button class="nav-link" [id]="'defaultCheck' + ( discountsDataIsExists ? 2 : 1 )"
                         [ngClass]="{ 
                             'text-white': navbarAnimationState === 'static' && isHomePage
                         }"
@@ -130,7 +56,7 @@
                         {{ ( 'SCROLLSNAPITEMSTEXT.PORTFOLIOOVERVIEW' ) | translate }}
                     </button>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item homeScrollSnapChild">
                     <button class="nav-link" [id]="'defaultCheck' + ( discountsDataIsExists ? 4 : 3 )"
                         [ngClass]="{ 
                             'text-white': navbarAnimationState === 'static' && isHomePage
@@ -143,54 +69,6 @@
                         {{ ( 'SCROLLSNAPITEMSTEXT.ABOUTME' ) | translate }}
                     </button>
                 </li>
-                <li class="nav-item">
-                    <a class="" class="nav-link active" aria-current="page" [routerLink]="[ '/prices' ]"
-                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
-                    >
-                        <span class="fs-5">
-                            <i class="bi bi-wallet2"></i>
-                        </span>
-                        {{ 'PAGETITLES.PRICES' | translate }}
-                    </a>
-                </li>
-
-
-
-
-
-
-
-                <!-- <li *ngFor="let section of scrollSnapSectionViewRefs; let i = index; let isFirst = first; let isLast = last" class="nav-item">
-                    <button class="nav-link" [id]="'defaultCheck' + ( i + 1 )" (click)="changeActiveScrollSnapSection($event)"
-                        [ngClass]="{ 
-                            'me-4': !isLast,
-                            'me-5': isLast,
-                            'text-white': navbarAnimationState === 'static' && isHomePage
-                        }"
-                    >
-                        <span class="fs-5">
-                            <i class="bi bi-house-fill"></i>
-                        </span>
-                        {{ discountsDataIsExists ? 
-                            ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( scrollSnapItemRadiosIndex + 1 ) ) | translate ) : 
-                            ( i === 0 ? 
-                                ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( scrollSnapItemRadiosIndex + 2 ) ) | translate ) :
-                                ( ( 'HOMEPAGE.SCROLLSNAPITEMRADIOSTEXT.PART' + ( scrollSnapItemRadiosIndex + 1 ) ) | translate )
-                            ) 
-                        }}
-                    </button>
-                </li> -->
-
-                <!-- <li class="nav-item me-4">
-                    <a class="nav-link" routerLink="/gallery"
-                        [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }"
-                    >
-                        <span class="fs-5">
-                            <i class="bi bi-images"></i>
-                        </span>
-                        {{ 'PAGETITLES.GALLERY' | translate }}
-                    </a>
-                </li> -->
                 <li *ngIf="activeClientType && activeClientType === 'admin'" class="nav-item me-4" ngbDropdown display="dynamic" #adminPanelMenu="ngbDropdown">
                     <button class="nav-link" type="button" id="adminPanelMenuButton"
                         [ngClass]="{ 'text-white': navbarAnimationState === 'static' && isHomePage }" 
@@ -268,7 +146,7 @@
                     </ul>
                 </li>
             </ul>
-            <div class="navbar-text flex-grow-0 user-select-none font-family-caveat-brush-regular">
+            <div class="navbar-text flex-grow-0 user-select-none text-end font-family-caveat-brush-regular">
                 <span *ngIf="activeClientLogin; else noActiveClientBlock">
                     <span class="fw-bold" 
                         [ngClass]="{ 'text-success': navbarAnimationState === 'scrolled', 'text-info': navbarAnimationState === 'static' }"
@@ -283,7 +161,7 @@
                     <span class="text-warning">{{ 'CLIENTMENU.NONSIGNINTEXT' | translate }}</span>
                 </ng-template>
             </div>
-            <ul class="navbar-nav ms-2 me-3 font-family-caveat-brush-regular">
+            <ul class="navbar-nav ms-2 me-3 text-end float-end font-family-caveat-brush-regular">
                 <li class="nav-item" ngbDropdown display="dynamic" #changeClientLocaleMenu="ngbDropdown">
                     <button type="button" class="nav-link" id="dropdownMenuButton"
                         [ngClass]="{ 'text-info': navbarAnimationState === 'static' }"

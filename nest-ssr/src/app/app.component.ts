@@ -9,7 +9,6 @@ import { DeviceDetectorService } from 'ngx-device-detector';
 
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
-import { PricesComponent } from './components/prices/prices.component';
 import { ClientComponent } from './components/client/client.component';
 import { AdminPanelComponent } from './components/admin-panel/admin-panel.component';
 import { AdminPanelOrdersControlComponent } from './components/admin-panel-orders-control/admin-panel-orders-control.component';
@@ -166,7 +165,7 @@ export class AppComponent implements OnInit {
         }
     }
 
-    public onRouterOutlet (component: HomeComponent | GalleryComponent | PricesComponent | ClientComponent | AdminPanelComponent | AdminPanelOrdersControlComponent 
+    public onRouterOutlet (component: HomeComponent | GalleryComponent | ClientComponent | AdminPanelComponent | AdminPanelOrdersControlComponent 
         | AdminPanelDiscountsControlComponent | NotFoundComponent
     ): void {
         if ( !this.navbarIsCollapsed ) this.navbarTogglerClick(true);
@@ -190,13 +189,6 @@ export class AppComponent implements OnInit {
 
             this.footerElementRef.nativeElement.classList.remove('position-relative');
             this.footerElementRef.nativeElement.classList.add('bottom-0', 'position-absolute');
-        }
-
-        if ( component instanceof PricesComponent ) {
-            component.navbarElementRef = this.navbarElementRef;
-        } else {
-            this.navbarElementRef.nativeElement.classList.remove('sticky-bottom');
-            this.navbarElementRef.nativeElement.classList.add('fixed-top');
         }
     }
 

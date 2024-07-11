@@ -42,7 +42,7 @@
 		},
 		"CLIENTORDERSUCCESSMESSAGE": "The order has been sent successfully. I will contact you shortly"
 	},
-	"PRICESPAGE": {
+	"PRICESCONTAINER": {
 		"STANDARDPACKAGETITLE": "PACKAGE STANDART",
 		"MAXIMUMPACKAGETITLE": "PACKAGE MAXIMUM",
 		"INDIVIDUAL": {

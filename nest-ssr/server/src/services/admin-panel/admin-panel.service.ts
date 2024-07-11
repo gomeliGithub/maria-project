@@ -787,8 +787,8 @@ export class AdminPanelService {
             throw new BadRequestException(`${ request.url } "ValidateImageControlRequests - ${ !compressedImageIsExists ? 'compressed image does not exists' : 'original image does not exists' }"`);
         }
 
-        if ( ( existingCompressedImageData as ICompressedImageWithoutRelationFields ).displayedOnGalleryPage && ( requestBody.adminPanel?.displayTargetPage as 'home' | 'gallery' | 'original' 
-            || requestBody.adminPanel?.newImagePhotographyType as Image_photography_type
+        if ( ( existingCompressedImageData as ICompressedImageWithoutRelationFields ).displayedOnGalleryPage && ( [ 'home', 'gallery', 'original' ].includes(requestBody.adminPanel?.displayTargetPage as string)
+            || ( requestBody.adminPanel?.newImagePhotographyType as string ) in Image_photography_type
         ) ) { 
             const galleryImagePaths: string[] = [ ];
 
@@ -800,7 +800,9 @@ export class AdminPanelService {
             const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', ( existingCompressedImageData as ICompressedImageWithoutRelationFields ).photographyType, 
             ( existingCompressedImageData as ICompressedImageWithoutRelationFields ).name);
 
-            if ( existingPath !== staticFilesGalleryImagePath ) throw new InternalServerErrorException(`${ request.url } "ValidateImageControlRequests - compressed image does not exists in directory"`);
+            if ( existingPath !== staticFilesGalleryImagePath ) {
+                throw new InternalServerErrorException(`${ request.url } "ValidateImageControlRequests - compressed image '${ ( existingCompressedImageData as ICompressedImageWithoutRelationFields ).name }' does not exists in directory"`);
+            }
         }
         
         return originalImagePath;

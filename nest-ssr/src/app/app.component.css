@@ -20,3 +20,13 @@
 .nav-item.dropdown .nav-link:focus-visible  {
     box-shadow: none;
 }
+
+@media screen and (max-width: 768px) {
+    #navbarNavDropdown {
+        font-size: calc(1.3rem + .6vw) !important;
+    }
+
+    .homeScrollSnapChild {
+        margin-left: 1rem !important;
+    }
+}

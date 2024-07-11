@@ -186,9 +186,9 @@ export class AdminPanelController {
     public async changeImageDisplayTarget (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response, @Cookies('locale') clientLocale: string): Promise<string> {
         const displayTargetsPage: string[] = [ 'home', 'gallery', 'original' ];
 
-        if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName || !requestBody.adminPanel.displayTargetPage
-            || ( requestBody.adminPanel.originalImageName && typeof requestBody.adminPanel.originalImageName !== 'string' ) 
-            || ( requestBody.adminPanel.displayTargetPage && !displayTargetsPage.includes(requestBody.adminPanel.displayTargetPage) )
+        if ( !requestBody.adminPanel || !requestBody.adminPanel.originalImageName || !requestBody.adminPanel.displayTargetPage || !requestBody.adminPanel.newImagePhotographyType
+            || typeof requestBody.adminPanel.originalImageName !== 'string'
+            || !displayTargetsPage.includes(requestBody.adminPanel.displayTargetPage)
         ) throw new BadRequestException(`${ request.url } "ChangeImageDisplayTarget - invalid request body data"`);
 
         return this._adminPanelService.changeImageDisplayTarget(request, requestBody, response, clientLocale);

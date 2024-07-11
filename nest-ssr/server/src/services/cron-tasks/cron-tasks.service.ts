@@ -19,7 +19,6 @@ export class CronTasksService {
         { url: '/gallery/children', componentFileName: 'gallery.component.html' },
         { url: '/gallery/wedding', componentFileName: 'gallery.component.html' },
         { url: '/gallery/family', componentFileName: 'gallery.component.html' },
-        { url: '/prices', componentFileName: 'prices.component.html' },
         { url: '/adminPanel', componentFileName: 'admin-panel.component.html' },
         { url: '/adminPanel/imagesControl', componentFileName: 'admin-panel.component.html' },
         { url: '/adminPanel/ordersControl', componentFileName: 'admin-panel-orders-control.component.html' },

@@ -161,7 +161,7 @@ export class ClientService {
         return photographyTypesDataRawDataFinalResult;
     }
 
-    public async changeLocale (request: IRequest, newLocale: string, response: Response): Promise<string> {
+    public async changeLocale (request: IRequest, newLocale: string, response: Response): Promise<string | null> {
         const token: string | undefined = this._jwtControlService.extractTokenFromHeader(request, false);
 
         let decodedToken: IJWTPayload | null = null;
@@ -171,30 +171,31 @@ export class ClientService {
         let tokenIsValid: boolean = false;
 
         if ( await this._jwtControlService.tokenValidate(request, token as string, false) ) tokenIsValid = true;
+        
+        const cookieSerializeOptions: ICookieSerializeOptions = this._appService.cookieSerializeOptions;
 
-        if ( tokenIsValid ) {
-            decodedToken = this._jwtService.decode(token as string) as IJWTPayload;
+        if ( request.activeClientData ) {
+            if ( tokenIsValid ) { 
+                decodedToken = this._jwtService.decode(token as string) as IJWTPayload;
 
-            const dateNow: Date = new Date(Date.now());
+                const dateNow: Date = new Date(Date.now());
 
-            const tokenExpiresAt: number = new Date(ms(`${ decodedToken.exp }s`)).getTime();
-            tokenExpiresIn = Math.round(new Date(tokenExpiresAt - dateNow.getTime()).getTime() / 1000);
+                const tokenExpiresAt: number = new Date(ms(`${ decodedToken.exp }s`)).getTime();
+                tokenExpiresIn = Math.round(new Date(tokenExpiresAt - dateNow.getTime()).getTime() / 1000);
 
-            decodedToken.locale = newLocale;
+                decodedToken.locale = newLocale;
 
-            delete decodedToken.iat;
-            delete decodedToken.exp;
+                delete decodedToken.iat;
+                delete decodedToken.exp;
 
-            updatedAccess_token = this._jwtService.sign(decodedToken, { expiresIn: tokenExpiresIn });
+                updatedAccess_token = this._jwtService.sign(decodedToken, { expiresIn: tokenExpiresIn });
+                cookieSerializeOptions.maxAge = request.activeClientData ? ms(`${ tokenExpiresIn as number }s`) : cookieSerializeOptions.maxAge;
+            } else throw new BadRequestException(`${ request.url } "ChangeLocale - token is invalid"`);
+        }
 
-            const cookieSerializeOptions: ICookieSerializeOptions = this._appService.cookieSerializeOptions;
+        response.cookie('locale', newLocale, cookieSerializeOptions);
 
-            cookieSerializeOptions.maxAge = ms(`${ tokenExpiresIn as number }s`);
-
-            response.cookie('locale', newLocale, cookieSerializeOptions);
-        } else throw new BadRequestException(`${ request.url } "ChangeLocale - token is invalid"`);
-
-        return updatedAccess_token as string;
+        return updatedAccess_token as string | null;
     }
 
     public async createOrder (request: IRequest, requestBody: IRequestBody, response: Response, clientLocale: string): Promise<void> {

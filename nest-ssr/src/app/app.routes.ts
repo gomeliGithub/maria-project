@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 
 import { HomeComponent } from './components/home/home.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
-import { PricesComponent } from './components/prices/prices.component';
 import { AdminPanelComponent } from './components/admin-panel/admin-panel.component';
 import { AdminPanelOrdersControlComponent } from './components/admin-panel-orders-control/admin-panel-orders-control.component';
 import { AdminPanelDiscountsControlComponent } from './components/admin-panel-discounts-control/admin-panel-discounts-control.component';
@@ -22,7 +21,6 @@ export const routes: Routes = [
         ]
     },
     { path: 'gallery/:photographyType', component: GalleryComponent },
-    { path: 'prices', component: PricesComponent},
     { path: 'adminPanel/imagesControl', component: AdminPanelComponent, canActivate: [ClientGuard] },
     { path: 'adminPanel', redirectTo: '/adminPanel/imagesControl', pathMatch: 'full' },
     { path: 'adminPanel/ordersControl', component: AdminPanelOrdersControlComponent, canActivate: [ClientGuard] },

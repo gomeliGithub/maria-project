@@ -82,7 +82,7 @@ export class ClientController {
     }
 
     @Post('/changeLocale')
-    public async changeLocale (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string> {
+    public async changeLocale (@Req() request: IRequest, @Body() requestBody: IRequestBody, @Res({ passthrough: true }) response: Response): Promise<string | null> {
         if ( !requestBody.sign || !requestBody.sign.newLocale || typeof requestBody.sign.newLocale !== 'string' ) throw new BadRequestException('ChangeLocale - invalid new locale');
 
         const locales: string[] = [ 'ru', 'en' ];
