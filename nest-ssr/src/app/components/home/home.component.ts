@@ -48,16 +48,6 @@ import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/comm
                 animate('0.2s 400ms ease', style({ opacity: 1, transform: 'translate(-50%, -80%) scale(1)' }))
             ])
         ]),
-        trigger('scroll-snap-item-radios-container-animation', [
-            state('enter', style({ transform: 'translateX(-11.5em)' })),
-            state('leave', style({ transform: 'translateX(0px)' })),
-            transition('enter => leave', [
-                animate('0.5s ease', style({ transform: 'translateX(0px)' }))
-            ]),
-            transition('leave => enter', [
-                animate('0.8s ease-in', style({ transform: 'translateX(-11.5em)' }))
-            ])
-        ]),
         trigger('scroll-snap-section-item-visiable-animation', [
             state('visiable', style({ opacity: 1, transform: 'translateY(0px)' })),
             state('unvisiable', style({ opacity: 0, transform: 'translateY(200px)' })),
@@ -85,7 +75,6 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     public compressedImagesDataIsLoaded: boolean = false;
 
     public scrollSnapSectionsPosition: { offsetTop: number, offsetHeight: number, offsetTopMod: number, indexNumber: number }[];
-    public currentItem: number;
 
     public scrollSnapVisiableAnimationSectionsPosition: { offsetTop: number, offsetHeight: number }[];
 
@@ -93,8 +82,6 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     
     public currentMouseTriggerStates: string[] = [];
     public currentLinkButtonContainerAnimationStates: string[] = [];
-
-    public currentScrollSnapItemRadiosContainerAnimationState: string = 'leave';
 
     public currentScrollSnapSectionVisiableAnimationStates: { state: string, finished: boolean }[] = [];
 
@@ -121,11 +108,7 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
         this.isPlatformServer = isPlatformServer(this.platformId);
         
         afterRender(() => {
-            if ( !this.componentElementIsRendered && this.scrollSnapItemRadioViewRefs.length !== 0 ) {
-                this.currentItem = 0;
-
-                this.setActiveScrollSnapSection();
-
+            if ( !this.componentElementIsRendered ) {
                 this.componentElementIsRendered = true;
             }
         }, { phase: AfterRenderPhase.Read });
@@ -133,7 +116,6 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
 
     @ViewChildren('scrollSnapSection', { read: ElementRef<HTMLDivElement> }) public readonly scrollSnapSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
     @ViewChildren('scrollSnapVisiableAnimationSection', { read: ElementRef<HTMLDivElement> }) public readonly scrollSnapVisiableAnimationSectionViewRefs: QueryList<ElementRef<HTMLDivElement>>;
-    @ViewChildren('scrollSnapItemRadio', { read: ElementRef<HTMLInputElement> }) private readonly scrollSnapItemRadioViewRefs: QueryList<ElementRef<HTMLInputElement>>;
 
     ngOnInit (): void {
         this._appService.getTranslations('PAGETITLES.HOME', true).subscribe(translation => {
@@ -181,10 +163,7 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
         });
 
         this._homeService.activeScrollSnapSectionChange.subscribe(value => {
-            if ( value === 0 ) this.currentItem = 0;
-
             this.getScrollSnapSectionsPosition();
-            this.setActiveScrollSnapSection();
 
             const scrollSnapSectionPosition = this.scrollSnapSectionsPosition[value];
 
@@ -194,8 +173,6 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
 
     ngAfterContentChecked (): void {
         this.setDeviceInfo();
-
-        this.currentScrollSnapItemRadiosContainerAnimationState = 'enter';
 
         this._changeDetector.detectChanges();
     }
@@ -243,7 +220,7 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
     }
 
     public getScrollSnapSectionsPosition (): void {
-        this.scrollSnapSectionsPosition = this.scrollSnapSectionViewRefs.toArray().map((section, i) => { 
+        this.scrollSnapSectionsPosition = this.scrollSnapSectionViewRefs.toArray().map(( section, i ) => { 
             return { 
                 offsetTop: section.nativeElement.offsetTop,
                 offsetHeight: section.nativeElement.offsetHeight,
@@ -260,40 +237,16 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
         const currentMiddlePosition: number = currentScrollTop + componentElement.offsetHeight / 2;
 
         if ( currentScrollTop === 0 ) {
-            this.currentItem = 0;
-
-            this.setActiveScrollSnapSection();
+            
         } else {
             for ( let i = 0; i < this.scrollSnapSectionsPosition.length; i++ ) {
                 if ( currentMiddlePosition > this.scrollSnapSectionsPosition[i].offsetTop && 
                     currentMiddlePosition < this.scrollSnapSectionsPosition[i].offsetTopMod
                 ) {
-                    this.currentItem = i;
-
-                    this.setActiveScrollSnapSection();
+                    
                 }
             }
         }
-    }
-
-    public setActiveScrollSnapSection (): void {
-        const scrollSnapItemRadiosArr: ElementRef<HTMLInputElement>[] = this.scrollSnapItemRadioViewRefs.toArray();
-
-        scrollSnapItemRadiosArr.forEach(el => el.nativeElement.checked = false);
-
-        const currentItem: ElementRef<HTMLInputElement> = scrollSnapItemRadiosArr[this.currentItem];
-        
-        if ( currentItem ) currentItem.nativeElement.checked = true;
-
-        this.currentItem = this.currentItem += 1;
-    }
-
-    public changeActiveScrollSnapSection (event: MouseEvent): void {
-        const targetRadio: HTMLInputElement = event.target as HTMLInputElement;
-
-        const scrollSnapSectionPosition = this.scrollSnapSectionsPosition[parseInt(targetRadio.id.replace('defaultCheck', ''), 10)];
-
-        this.scrollSnapSectionViewRefs.toArray()[scrollSnapSectionPosition.indexNumber].nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     public getScrollSnapVisiableAnimationSectionsPosition (): void {
@@ -315,10 +268,6 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
                 setTimeout(() => this.startScrollSnapSectionVisiableAnimation(index), 500);
             }
         });
-    }
-
-    public startScrollSnapItemRadiosContainerAnimation (toState: string): void {
-        this.currentScrollSnapItemRadiosContainerAnimationState = toState;
     }
 
     public startMouseTriggerAnimation (index: number): void {

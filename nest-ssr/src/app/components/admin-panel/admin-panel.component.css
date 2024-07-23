@@ -1,3 +1,41 @@
+@media screen and (max-width: 497px), only screen 
+and (width: 393px) 
+and (height: 852px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 430px) 
+and (height: 932px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 390px) 
+and (height: 844px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 428px) 
+and (height: 926px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 812px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 2),
+only screen 
+and (width: 414px) 
+and (height: 896px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (width: 375px) 
+and (height: 667px) 
+and (-webkit-device-pixel-ratio: 2) {
+    #searchImagesForm button:first-child {
+        margin-right: 0 !important;
+        margin-bottom: .25rem !important;
+    }
+}
+
 @media screen and (max-width: 768px), only screen 
 and (width: 393px) 
 and (height: 852px) 
@@ -35,10 +73,59 @@ and (-webkit-device-pixel-ratio: 2) {
     }
 }
 
-@media screen and (max-width: 497px) {
-    #searchImagesForm button:first-child {
-        margin-right: 0 !important;
-        margin-bottom: .25rem !important;
+@media (max-width: 1199px) {
+    .compressedImageData {
+        flex-direction: column !important;
+        align-content: normal !important;
+        flex-wrap: nowrap !important;
+    }
+}
+
+@media (min-width: 576px) {
+    #compressedImagesDataContainer img {
+        max-height: 680px;
+    }
+}
+
+@media (min-width: 768px) {
+    #compressedImagesDataContainer img {
+        max-height: 350px;
+    }
+}
+
+@media (min-width: 992px) { 
+    #compressedImagesDataContainer img {
+        max-height: 450px;
+    }
+}
+
+@media (min-width: 1200px) { 
+    #compressedImagesDataContainer img {
+        max-height: 550px;
+    }
+
+    .compressedImageData {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        align-content: space-between !important;
+    }
+}
+
+@media (min-width: 1400px) { 
+    #compressedImagesDataContainer img {
+        max-height: 670px;
+    }
+}
+
+@media (min-width: 1800px) { 
+    #compressedImagesDataContainer img {
+        max-height: 850px;
+    }
+}
+
+@media (min-width: 2100px) { 
+    #compressedImagesDataContainer img {
+        max-height: 950px;
     }
 }
 

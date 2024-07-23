@@ -202,7 +202,7 @@
 			"ORIGINALNAME": "Оригинальное имя",
 			"ORIGINALSIZE": "Размер оригинального изображения",
 			"IMAGEPHOTOGRAPHYTYPE": "Тип съёмки",
-			"DISPLAYTYPE": "Размер отображения",
+			"DISPLAYTYPE": "Тип отображения",
 			"UPLOADAT": "Загружен",
 			"ONHOMEPAGE": "Отображён на главной",
 			"ONGALLERYPAGE": "Отображён на галерее",
@@ -240,14 +240,15 @@
 			}
 		},
 		"CHANGEIMAGEDATATEXT": {
+			"SHOWDATABUTTONTOOLTIP": "Скрыть / Показать данные",
 			"PLACEHOLDERTEXT": "Текст отсутствует",
 			"CHANGEBUTTON": "Подтвердить изменения"
 		},
 		"UPLOADIMAGETEXT": {
 			"PHOTOGRAPHYTYPE": "Тип съёмки *",
-			"DISPLAYTYPE": "Размер отображения *",
+			"DISPLAYTYPE": "Тип отображения *",
 			"INVALIDPHOTOGRAPHYTYPE": "Не выбран тип съёмки",
-			"INVALIDDISPLAYTYPE": "Не выбран размер отображения",
+			"INVALIDDISPLAYTYPE": "Не выбран тип отображения",
 			"INVALIDSELECTIMAGE": "Не выбрано изображение",
 			"DESCRIPTION": "Индивидуальное описание фото",
 			"BUTTON": "Загрузить новое изображение"

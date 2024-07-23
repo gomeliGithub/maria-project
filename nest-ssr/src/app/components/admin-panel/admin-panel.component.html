@@ -70,178 +70,222 @@
 		</div>
 	</div>
 </div>
-<div class="table-responsive vh-50" id="listContainer">
-    <form [formGroup]="changeImageDataForm" class="w-100" novalidate (submit)="changeImageData($event)">
-        <table *ngIf="fullCompressedImagesListCount !== 0; else noContentBlock" class="table caption-top table-borderless table-hover text-center align-middle">
-            <caption>{{ 'ADMINPANEL.TABLECAPTION' | translate }}</caption>
-            <thead>
-                <tr>
-                    <th scope="col"></th>
-                    <th scope="col">#</th>
-                    <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALNAME' | translate }}</th>
-                    <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALSIZE' | translate }}</th>
-                    <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPE' | translate }}</th>
-                    <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.DISPLAYTYPE' | translate }}</th>
-                    <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPEDESCRIPTION' | translate }}</th>
-                    <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.UPLOADAT' | translate }}</th>
-                    <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ONHOMEPAGE' | translate }}</th>
-                    <th scope="col">{{ 'ADMINPANEL.TABLECOLTITLES.ONGALLERYPAGE' | translate }}</th>
-                </tr>
-            </thead>
-            <tbody *ngIf="compressedImagesDataIsLoaded">
-                <tr *ngFor="let compressedImage of fullCompressedImagesList; let i = index" class=""
-                    @images-table-rows-animation
-                    (@images-table-rows-animation.start)="imagesTableRowsAnimationStarted($event)"
-                    (@images-table-rows-animation.done)="imagesTableRowsAnimationDone($event)"
+<div *ngIf="fullCompressedImagesListCount !== 0; else noContentBlock" class="w-100 mt-3" id="compressedImagesDataContainer">
+    <form [formGroup]="changeImageDataForm" *ngIf="compressedImagesDataIsLoaded" class="w-100 d-flex flex-row flex-wrap justify-content-center" novalidate
+        [ngClass]="{ 'pe-none': changeImageDataFormElementPEIsNone }"
+        (submit)="changeImageData($event)"
+    >
+        <div *ngFor="let compressedImage of fullCompressedImagesList; let i = index" class="position-relative p-2"
+            [@compressed-image-containers-animation]="compressedImageContainersAnimationCurrentStates[i]"
+            (@compressed-image-containers-animation.start)="compressedImageContainersAnimationStarted($event)"
+            (@compressed-image-containers-animation.done)="compressedImageContainersAnimationDone($event)"
+            @compressed-image-containers-delete-animation
+            (compressed-image-containers-delete-animation.start)="compressedImageContainersDeleteAnimationStarted(i)"
+        >
+            <ng-template [ngIf]="compressedImageThumbnailUrls[i]">
+                <div class="position-absolute bottom-0 start-0 w-100 z-1">
+                    <button type="button" class="btn btn-lg text-info"
+                        placement="auto"
+                        [ngbTooltip]="'ADMINPANEL.CHANGEIMAGEDATATEXT.SHOWDATABUTTONTOOLTIP' | translate"
+                        container="body"
+                        (click)="compressedImageDataContainerClick(i)"
+                    >
+                        <i class="bi bi-pencil-square"></i>
+                </button>
+                </div>
+                <img [src]="compressedImageThumbnailUrls[i]" class="img-fluid" alt="" [ngClass]="{ 'opacity-25': compressedImageDataContainersAnimationCurrentStates[i] === 'showed' }">
+                <div class="position-absolute top-50 start-50 translate-middle d-flex px-3 pt-2 h-100 w-100 compressedImageData invisible"
+                    [@compressed-image-data-containers-animation]="compressedImageDataContainersAnimationCurrentStates[i]"
+                    (@compressed-image-data-containers-animation.start)="compressedImageDataContainersAnimationStarted($event)"
+                    (@compressed-image-data-containers-animation.done)="compressedImageDataContainersAnimationDone($event)"
                 >
-                    <td>
-                        <button type="button" class="btn" [attr.originalImageName]="compressedImage.originalName" (click)="loadAndShowImageThumbnail($event)">
-                            <i class="bi bi-image"></i>
-                        </button>
-                    </td>
-                    <th scope="row">{{ i + 1 }}</th>
-                    <td>{{ compressedImage.originalName }}</td>
-                    <td>{{ compressedImage.originalSize | imageSize }}</td>
-                    <td>
-                        <div formArrayName="newImagePhotographyType">
-                            <select class="form-control form-select" [id]="'inputChangePhotographyType_' + i" [formControlName]="i"
-                                (change)="changeImageFormControlChange('newImagePhotographyType', i)"
-                            >
-                                <option value="individual">{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</option>
-                                <option value="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</option>
-                                <option value="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</option>
-                                <option value="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</option>
-                            </select>
-                        </div>
-                    </td>
-                    <td [ngSwitch]="compressedImage.displayType">
-                        <div formArrayName="newImageDisplayType">
-                            <select class="form-control form-select" [id]="'inputChangeDisplayType_' + i" [formControlName]="i"
-                                (change)="changeImageFormControlChange('newImageDisplayType', i)"
-                            >
-                                <option value="horizontal">{{ 'IMAGEDISPLAYTYPES.HORIZONTAL' | translate }}</option>
-                                <option value="vertical">{{ 'IMAGEDISPLAYTYPES.VERTICAL' | translate }}</option>
-                            </select>
-                        </div>
-                    </td>
-                    <td>
-                        <div formArrayName="newImageDescription">
-                            <textarea class="form-control text-center" [id]="'inputChangeImageDescription_' + i" [formControlName]="i" [placeholder]="'ADMINPANEL.CHANGEIMAGEDATATEXT.PLACEHOLDERTEXT' | translate"
-                                (change)="changeImageFormControlChange('newImageDescription', i)"
-                            >
-                            </textarea>
-                        </div>
-                    </td>
-                    <td class="text-nowrap">{{ compressedImage.uploadDate | date:"d.M.yy, H:mm" }}</td>
-                    <td class="fw-bold" [ngClass]="{
-                        'text-success': compressedImage.displayedOnHomePage === true, 
-                        'text-danger': compressedImage.displayedOnHomePage === false
-                    }">
-                        {{ compressedImage.displayedOnHomePage | boolean }}
-                    </td>
-                    <td class="fw-bold" [ngClass]="{ 
-                        'text-success': compressedImage.displayedOnGalleryPage === true, 
-                        'text-danger': compressedImage.displayedOnGalleryPage === false
-                    }">
-                        {{ compressedImage.displayedOnGalleryPage | boolean }}
-                    </td>
-                    <td>
-                        <div class="" ngbDropdown display="dynamic">
-                            <button class="btn btn-secondary" type="button" ngbDropdownToggle>
-                                {{ 'ADMINPANEL.IMAGECONTROLTEXT.TITLE' | translate }}
-                            </button>
-                            <ul class="dropdown-menu border-0 bg-transparent" id="imageControlButtonList" ngbDropdownMenu>
-                                <li class="text-bg-danger">
-                                    <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" 
-                                        [attr.image-index-number]="i" 
-                                        ngbDropdownItem
-                                        (click)="deleteImage($event)"
+                    <div class="pb-3 w-100 d-flex flex-column">
+                        <ul class="w-100 list-group list-group-horizontal justify-content-between overflow-x-auto" id="imageControlButtonList">
+                            <li class="list-group-item text-bg-success" [hidden]="changeImageDataFormSubmitButtonsHiddenStatus[i]">
+                                <button class="btn" type="submit" [attr.originalImageName]="compressedImage.originalName" [disabled]="changeImageDataForm.invalid"
+                                    placement="auto"
+                                    [ngbTooltip]="'ADMINPANEL.CHANGEIMAGEDATATEXT.CHANGEBUTTON' | translate"
+                                    container="body"
+                                >
+                                    <span class="">
+                                        <i class="bi bi-check-square"></i>
+                                    </span>
+                                </button>
+                            </li>
+                            <li class="list-group-item text-bg-danger">
+                                <button class="btn" type="button" [attr.originalImageName]="compressedImage.originalName"
+                                    [attr.image-index-number]="i"
+                                    placement="auto"
+                                    [ngbTooltip]="'ADMINPANEL.IMAGECONTROLTEXT.DELETEBUTTON' | translate"
+                                    container="body"
+                                    (click)="deleteImage($event, i)"
+                                >
+                                    <span class="">
+                                        <i class="bi bi-trash"></i>
+                                    </span>
+                                </button>
+                            </li>
+                            <li *ngIf="compressedImage.displayedOnHomePage === false" class="list-group-item text-bg-warning">
+                                <button class="btn" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'home'"
+                                    [attr.image-index-number]="i"
+                                    placement="auto"
+                                    [ngbTooltip]="'ADMINPANEL.IMAGECONTROLTEXT.MOVETOHOMEPAGEBUTTON' | translate"
+                                    container="body"
+                                    (click)="changeImageDisplayTarget($event)"
+                                >
+                                    <span class="">
+                                        <i class="bi bi-house-add"></i>
+                                    </span>
+                                </button>
+                            </li>
+                            <li *ngIf="compressedImage.displayedOnGalleryPage === false" class="list-group-item text-bg-warning">
+                                <button class="btn" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'gallery'"
+                                    [attr.image-index-number]="i"
+                                    placement="auto"
+                                    [ngbTooltip]="'ADMINPANEL.IMAGECONTROLTEXT.MOVETOGALLERYPAGEBUTTON' | translate"
+                                    container="body"
+                                    (click)="changeImageDisplayTarget($event)"
+                                >
+                                    <span class="">
+                                        <i class="bi bi-images"></i>
+                                    </span>
+                                </button>
+                            </li>
+                            <li *ngIf="compressedImage.displayedOnHomePage === true || compressedImage.displayedOnGalleryPage === true" class="list-group-item text-bg-warning">                       
+                                <button class="btn" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'original'"
+                                    [attr.image-index-number]="i"
+                                    placement="auto"
+                                    [ngbTooltip]="'ADMINPANEL.IMAGECONTROLTEXT.MOVETOARCHIVEBUTTON' | translate"
+                                    container="body"
+                                    (click)="changeImageDisplayTarget($event)"
+                                >
+                                    <span class="">
+                                        <i class="bi bi-archive"></i>
+                                    </span>
+                                </button>
+                            </li>
+                            <ng-template ngFor let-photographyTypeData [ngForOf]="imagePhotographyTypesData" let-i="index">
+                                <li class="list-group-item text-bg-secondary">
+                                    <button class="btn" type="button" [attr.originalImageName]="compressedImage.originalName" 
+                                        [attr.imagePhotographyType]="photographyTypeData.name"
+                                        placement="auto"
+                                        [ngbTooltip]="'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.' + photographyTypeData.name + 'BUTTONTEXT' | uppercase | translate"
+                                        container="body"
+                                        (click)="setPhotographyTypeImage($event)"
                                     >
-                                        <span class="flex-grow-1">
-                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.DELETEBUTTON' | translate }}
-                                        </span>
-                                        <span class="ms-2">
-                                            <i class="bi bi-trash"></i>
+                                        <span class="">
+                                            <i class="bi bi-camera"></i>
                                         </span>
                                     </button>
                                 </li>
-                                <li *ngIf="compressedImage.displayedOnHomePage === false" class="text-bg-warning">
-                                    <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'home'"
-                                        [attr.image-index-number]="i"
-                                        ngbDropdownItem (click)="changeImageDisplayTarget($event)"
-                                    >
-                                        <span class="flex-grow-1">
-                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.MOVETOHOMEPAGEBUTTON' | translate }}
-                                        </span>
-                                        <span class="ms-2">
-                                            <i class="bi bi-house-add"></i>
-                                        </span>
-                                    </button>
-                                </li>
-                                <li *ngIf="compressedImage.displayedOnGalleryPage === false" class="text-bg-warning">
-                                    <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'gallery'"
-                                        [attr.image-index-number]="i"
-                                        ngbDropdownItem (click)="changeImageDisplayTarget($event)"
-                                    >
-                                        <span class="flex-grow-1">
-                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.MOVETOGALLERYPAGEBUTTON' | translate }}
-                                        </span>
-                                        <span class="ms-2">
-                                            <i class="bi bi-images"></i>
-                                        </span>
-                                    </button>
-                                </li>
-                                <li *ngIf="compressedImage.displayedOnHomePage === true || compressedImage.displayedOnGalleryPage === true" class="text-bg-warning">                          
-                                    <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" [attr.targetPage]="'original'"
-                                        [attr.image-index-number]="i"
-                                        ngbDropdownItem (click)="changeImageDisplayTarget($event)"
-                                    >
-                                        <span class="flex-grow-1">
-                                            {{ 'ADMINPANEL.IMAGECONTROLTEXT.MOVETOARCHIVEBUTTON' | translate }}
-                                        </span>
-                                        <span class="ms-2">
-                                            <i class="bi bi-archive"></i>
-                                        </span>
-                                    </button>
-                                </li>
-                                <ng-template ngFor let-photographyTypeData [ngForOf]="imagePhotographyTypesData" let-i="index">
-                                    <li class="text-bg-secondary">
-                                        <button class="d-flex flex-row btn btn-sm fw-medium" type="button" [attr.originalImageName]="compressedImage.originalName" 
-                                            [attr.imagePhotographyType]="photographyTypeData.name" ngbDropdownItem (click)="setPhotographyTypeImage($event)"
-                                        >
-                                            <span class="flex-grow-1">
-                                                {{ 'ADMINPANEL.IMAGECONTROLTEXT.SETPHOTOGRAPHYTYPEIMAGE.' + photographyTypeData.name + 'BUTTONTEXT' | uppercase | translate }}
-                                            </span>
-                                            <span class="ms-2">
-                                                <i class="bi bi-camera"></i>
-                                            </span>
-                                        </button>
-                                    </li>
-                                </ng-template>
-                            </ul>
+                            </ng-template>
+                        </ul>
+                    </div>
+                    <div class="w-100 my-2 fw-semibold overflow-x-hidden overflow-y-auto">
+                        <div class="row g-2 mb-2 w-100">
+                            <div class="col row">
+                                <label [for]="'staticOriginalName_' + i" class="col-sm-7 col-form-label">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALNAME' | translate }}</label>
+                                <div class="col-sm-5">
+                                    <input type="text" readonly class="form-control-plaintext form-control-lg" [id]="'staticOriginalName_' + i" [value]="compressedImage.originalName">
+                                </div>
+                            </div>
+                            <div class="col row">
+                                <label [for]="'staticOriginalSize_' + i" class="col-sm-8 col-form-label">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALSIZE' | translate }}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" readonly class="form-control-plaintext form-control-lg" [id]="'staticOriginalSize_' + i" [value]="compressedImage.originalSize | imageSize">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group text-center mt-1">
-                            <button class="btn btn-success p-0" [attr.originalImageName]="compressedImage.originalName" [hidden]="changeImageDataFormSubmitButtonsHiddenStatus[i]" [disabled]="changeImageDataForm.invalid">
-                                <i class="bi bi-check-square-fill"></i>
-                                {{ 'ADMINPANEL.CHANGEIMAGEDATATEXT.CHANGEBUTTON' | translate }}
-                            </button>
+                        <div class="row g-2 mb-2 w-100">
+                            <div class="col row">
+                                <label [for]="'inputChangePhotographyType_' + i" class="col-sm-5 col-form-label">
+                                    {{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPE' | translate }}
+                                </label>
+                                <div class="col-sm-7" formArrayName="newImagePhotographyType">
+                                    <select class="form-control form-select form-control-lg" [id]="'inputChangePhotographyType_' + i" [formControlName]="i"
+                                        (change)="changeImageFormControlChange('newImagePhotographyType', i)"
+                                    >
+                                        <option value="individual">{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</option>
+                                        <option value="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</option>
+                                        <option value="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</option>
+                                        <option value="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col row">
+                                <label [for]="'inputChangeDisplayType_' + i" class="col-sm-5 col-form-label">
+                                    {{ 'ADMINPANEL.TABLECOLTITLES.DISPLAYTYPE' | translate }}
+                                </label>
+                                <div class="col-sm-7" formArrayName="newImageDisplayType">
+                                    <select class="form-control form-select form-control-lg" [id]="'inputChangeDisplayType_' + i" [formControlName]="i"
+                                        (change)="changeImageFormControlChange('newImageDisplayType', i)"
+                                    >
+                                        <option value="horizontal">{{ 'IMAGEDISPLAYTYPES.HORIZONTAL' | translate }}</option>
+                                        <option value="vertical">{{ 'IMAGEDISPLAYTYPES.VERTICAL' | translate }}</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                        <div class="row g-2 mb-2 w-100">
+                            <div class="col row">
+                                <label [for]="'inputChangeImageDescription_' + i" class="col-sm-4 col-form-label">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPEDESCRIPTION' | translate }}</label>
+                                <div class="col-sm-8" formArrayName="newImageDescription">
+                                    <textarea class="form-control form-control-lg text-center" [id]="'inputChangeImageDescription_' + i" [formControlName]="i" [placeholder]="'ADMINPANEL.CHANGEIMAGEDATATEXT.PLACEHOLDERTEXT' | translate"
+                                        (change)="changeImageFormControlChange('newImageDescription', i)"
+                                    >
+                                    </textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-2 w-100">
+                            <div class="col row">
+                                <label [for]="'staticUploadDate_' + i" class="col-sm-7 col-form-label">{{ 'ADMINPANEL.TABLECOLTITLES.UPLOADAT' | translate }}</label>
+                                <div class="col-sm-5">
+                                    <input type="text" readonly class="form-control-plaintext form-control-lg" [id]="'staticUploadDate_' + i" [value]="compressedImage.uploadDate | date:'d.M.yy, H:mm'">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-2 w-100">
+                            <div class="col row">
+                                <label [for]="'staticDisplayedOnHomePage_' + i" class="col-sm-8 col-form-label">{{ 'ADMINPANEL.TABLECOLTITLES.ONHOMEPAGE' | translate }}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" readonly class="form-control-plaintext form-control-lg" [id]="'staticDisplayedOnHomePage_' + i" [value]="compressedImage.displayedOnHomePage | boolean" [ngClass]="{
+                                        'text-success': compressedImage.displayedOnHomePage === true, 
+                                        'text-danger': compressedImage.displayedOnHomePage === false
+                                    }">
+                                </div>
+                            </div>
+                            <div class="col row">
+                                <label [for]="'staticDisplayedOnGalleryPage_' + i" class="col-sm-8 col-form-label">{{ 'ADMINPANEL.TABLECOLTITLES.ONGALLERYPAGE' | translate }}</label>
+                                <div class="col-sm-4">
+                                    <input type="text" readonly class="form-control-plaintext form-control-lg" [id]="'staticDisplayedOnGalleryPage_' + i" [value]="compressedImage.displayedOnGalleryPage | boolean" [ngClass]="{
+                                        'text-success': compressedImage.displayedOnGalleryPage === true, 
+                                        'text-danger': compressedImage.displayedOnGalleryPage === false
+                                    }">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pb-2 w-100 text-end">
+                        <span class="fw-bold">
+                            №{{ i + 1 }}
+                        </span>
+                    </div>
+                </div>
+            </ng-template>
+        </div>
     </form>
-    <div *ngIf="additionalImagesIsExists" class="w-100 text-center">
+    <div *ngIf="additionalImagesIsExists" class="w-100 text-center" [hidden]="compressedImageButtonsIsHidden">
         <button class="btn btn-outline-info w-50 my-3 shadow" type="button" (click)="getFullCompressedImagesData(false, { dateFrom: currentDateFrom, dateUntil: currentDateUntil, photographyTypes: currentPhotographyTypes }, true)" #additionalImagesButton>
             {{ 'ADMINPANEL.ADDITIONALCOMPRESSEDIMAGESBUTTONTEXT' | translate }}
         </button>
     </div>
-    <ng-template #noContentBlock>  
-        <div class="noContentBlock text-center text-danger fs-4 p-4">
-            <span class="fw-bold">{{ 'ADMINPANEL.NOIMAGESMESSAGE' | translate }}</span>
-        </div>
-    </ng-template>
 </div>
+<ng-template #noContentBlock>  
+    <div class="noContentBlock text-center text-danger fs-4 p-4">
+        <span class="fw-bold">{{ 'ADMINPANEL.NOIMAGESMESSAGE' | translate }}</span>
+    </div>
+</ng-template>
 <div class="col-8 col-sm-8 col-md-8 col-lg-6 col-xl-6 col-xxl-5 position-fixed z-3 d-flex flex-column"
     [ngClass]="{ 'invisible' : !imageThumbnailContainerIsVisible }"
     [@image-thumbnail-container-animation]="imageThumbnailContainerAnimationState"
@@ -265,7 +309,7 @@
         <img [src]="imageThumbnailUrl" class="img-fluid img-thumbnail" alt="">
     </div>
 </div>
-<div ngbAccordion class="align-self-center my-4 w-50" id="uploadImageAccordion" 
+<div ngbAccordion class="align-self-center my-4 w-50" id="uploadImageAccordion" [hidden]="compressedImageButtonsIsHidden"
     (hide)="uploadImageAccordionHide()" 
     (show)="uploadImageAccordionShow()"
     (hidden)="uploadImageAccordionHidden()"

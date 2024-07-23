@@ -202,7 +202,7 @@
 			"ORIGINALNAME": "Original name",
 			"ORIGINALSIZE": "Original image size",
 			"IMAGEPHOTOGRAPHYTYPE": "Photography type",
-			"DISPLAYTYPE": "View size type",
+			"DISPLAYTYPE": "Display type",
 			"UPLOADAT": "Upload at",
 			"ONHOMEPAGE": "Displayed on Home page",
 			"ONGALLERYPAGE": "Displayed on Gallery page",
@@ -240,14 +240,15 @@
 			}
 		},
 		"CHANGEIMAGEDATATEXT": {
+			"SHOWDATABUTTONTOOLTIP": "Hide / Show data",
 			"PLACEHOLDERTEXT": "No text",
 			"CHANGEBUTTON": "Confirm changes"
 		},
 		"UPLOADIMAGETEXT": {
 			"PHOTOGRAPHYTYPE": "Photography type *",
-			"DISPLAYTYPE": "View size type *",
+			"DISPLAYTYPE": "Display type *",
 			"INVALIDPHOTOGRAPHYTYPE": "Photography type not selected",
-			"INVALIDDISPLAYTYPE": "View size not selected",
+			"INVALIDDISPLAYTYPE": "Display type not selected",
 			"INVALIDSELECTIMAGE": "No image selected",
 			"DESCRIPTION": "Individual image description",
 			"BUTTON": "Upload new image"

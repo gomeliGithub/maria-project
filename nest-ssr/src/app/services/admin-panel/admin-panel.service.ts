@@ -54,8 +54,8 @@ export class AdminPanelService {
         return this._http.get<IFullCompressedImageData>('/api/admin-panel/getFullCompressedImagesList', { params, headers: this._appService.createAuthHeaders() ?? { }, withCredentials: true });
     }
 
-    public loadAndShowImageThumbnail (componentThis: AdminPanelComponent, imageButton: HTMLButtonElement): Observable<Blob> | null {
-        const originalImageName: string | null = imageButton.getAttribute('originalImageName');
+    public loadAndShowImageThumbnail (componentThis: AdminPanelComponent, imageButton: HTMLButtonElement | null, originalName?: string): Observable<Blob> | null {
+        const originalImageName: string | null = !originalName ? ( imageButton as HTMLButtonElement ).getAttribute('originalImageName') : originalName;
 
         if ( originalImageName !== null ) {
             componentThis.currentLoadedImageThumbnailOriginalName = originalImageName;

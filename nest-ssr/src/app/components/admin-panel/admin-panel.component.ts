@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnInit, PLATFORM_ID, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnInit, PLATFORM_ID, QueryList, ViewChildren } from '@angular/core';
 import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -30,14 +30,30 @@ import { IGetFullCompressedImagesDataOptions } from 'types/options';
     templateUrl: './admin-panel.component.html',
     styleUrls: ['./admin-panel.component.css'],
     animations: [
-        trigger('images-table-rows-animation', [
-            transition(':enter', [
-                style({ opacity: 0, transform: 'translateX(-100%)' }),
-                animate('2s ease-out', style({ opacity: 1, transform: 'translateX(0)' }))
+        trigger('compressed-image-containers-animation', [
+            state('leave', style({ opacity: 0, transform: 'rotate(90deg)' })),
+            state('enter', style({ opacity: 1, transform: 'rotate(0deg)' })),
+            transition('leave => enter', [
+                animate('1s ease-in-out', style({ opacity: 1, transform: 'rotate(0deg)' }))
             ]),
+            transition('enter => leave', [
+                animate('1s ease-in-out', style({ opacity: 0, transform: 'rotate(90deg)' }))
+            ])
+        ]),
+        trigger('compressed-image-containers-delete-animation', [
             transition(':leave', [
-                style({ opacity: 1, transform: 'translateX(0)' }),
-                animate('1s ease', style({ opacity: 0, transform: 'translateX(-100%)' }))
+                style({ opacity: 1, transform: 'translate3d(0, 0, 0)' }),
+                animate('400ms ease-in-out', style({ opacity: 0, transform: 'translate3d(-120%, -120%, 0) rotate(-90deg)' })),
+            ])
+        ]),
+        trigger('compressed-image-data-containers-animation', [
+            state('static', style({ opacity: 0 })),
+            state('showed', style({ opacity: 1 })),
+            transition('static => showed', [
+                animate('0.5s ease-in-out', style({ opacity: 1 }))
+            ]),
+            transition('showed => static', [
+                animate('0.5s ease-in-out', style({ opacity: 0 }))
             ])
         ]),
         trigger('image-thumbnail-container-animation', [
@@ -61,7 +77,7 @@ import { IGetFullCompressedImagesDataOptions } from 'types/options';
     ],
     host: { ngSkipHydration: 'true' }
 })
-export class AdminPanelComponent implements OnInit {
+export class AdminPanelComponent implements OnInit, AfterViewChecked {
     public isPlatformBrowser: boolean;
     public isPlatformServer: boolean;
 
@@ -79,6 +95,8 @@ export class AdminPanelComponent implements OnInit {
         newImageDescription: FormArray<FormControl<string | null>>;
     }>;
 
+    public changeImageDataFormElementPEIsNone: boolean = true;
+
     public changeImageDataFormPreviousValues: { [controlName: string]: ( string | null )[] } = {
         newImagePhotographyType: [],
         newImageDisplayType: [],
@@ -95,6 +113,14 @@ export class AdminPanelComponent implements OnInit {
 
     public imagePhotographyTypes: Image_photography_type[] = [];
     public imageDisplayTypes: Image_display_type[] = [];
+
+    public compressedImageContainersAnimationCurrentStates: string[] = [];
+    public compressedImageDataContainersAnimationCurrentStates: string[] = [];
+    public compressedImagesContainerAnimationIsDone: boolean = false;
+
+    public compressedImageButtonsIsHidden: boolean = true;
+
+    public compressedImageThumbnailUrls: string[] = [];
 
     public imageThumbnailUrl: string | null;
     public imageThumbnailContainerAnimationState: boolean = false;
@@ -161,9 +187,6 @@ export class AdminPanelComponent implements OnInit {
         });
     }
 
-    @ViewChild('changeImageDataContainer', { static: false }) private readonly changeImageDataContainerViewRef: ElementRef<HTMLDivElement>;
-    @ViewChild('additionalImagesButton', { static: false }) private readonly additionalImagesButtonViewRef: ElementRef<HTMLDivElement>;
-
     @HostBinding('className') public get componentClassValue (): string {
         return this._webSocketService.componentClass;
     }
@@ -195,6 +218,14 @@ export class AdminPanelComponent implements OnInit {
             this._adminPanelService.spinnerHiddenStatusChange.subscribe(value => {
                 this.spinnerHidden = value;
             });
+        }
+    }
+
+    ngAfterViewChecked (): void {
+        if ( !this.compressedImagesContainerAnimationIsDone && this.compressedImageThumbnailUrls && this.fullCompressedImagesList && this.compressedImageThumbnailUrls.length === this.fullCompressedImagesList.length ) {
+            this.compressedImageContainersAnimationCurrentStates.forEach(( data, index, arr ) => data === 'leave' ? arr[index] = 'enter' : null);
+
+            this.compressedImagesContainerAnimationIsDone = true;
         }
     }
 
@@ -244,6 +275,15 @@ export class AdminPanelComponent implements OnInit {
                 if ( ( isSearch && !this.previousPhotographyTypesNotChange ) || !this.additionalImagesIsExists ) {
                     this.fullCompressedImagesList = imageData.imagesList;
 
+                    if ( this.fullCompressedImagesList.length > 0 ) {
+                        this.compressedImageThumbnailUrls = [];
+                        this.compressedImageContainersAnimationCurrentStates = [];
+
+                        this.loadAndShowImageThumbnailRecursive(this.fullCompressedImagesList, 0);
+                    }
+
+                    this.fullCompressedImagesList.forEach(() => this.compressedImageContainersAnimationCurrentStates.push('leave'));
+
                     this.changeImageDataForm = new FormGroup({
                         'newImagePhotographyType': new FormArray(this.fullCompressedImagesList.map(data => {
                             this.changeImageDataFormPreviousValues['newImagePhotographyType'].push(data.photographyType);
@@ -262,10 +302,22 @@ export class AdminPanelComponent implements OnInit {
                         }))
                     });
 
-                    this.fullCompressedImagesList.forEach(() => this.changeImageDataFormSubmitButtonsHiddenStatus.push(true));
-                }
-                else {
+                    this.fullCompressedImagesList.forEach(() => {
+                        this.changeImageDataFormSubmitButtonsHiddenStatus.push(true);
+                        this.compressedImageDataContainersAnimationCurrentStates.push('static');
+                    });
+                } else {
+                    this.compressedImageButtonsIsHidden = true;
+
                     this.fullCompressedImagesList.push(...imageData.imagesList);
+
+                    const newFullCompressedImagesList: ICompressedImageWithoutRelationFields[] = this.fullCompressedImagesList.slice(imagesExistsCount);
+
+                    newFullCompressedImagesList.forEach(() => this.compressedImageContainersAnimationCurrentStates.push('leave'));
+
+                    this.compressedImagesContainerAnimationIsDone = false;
+
+                    this.loadAndShowImageThumbnailRecursive(newFullCompressedImagesList, 0);
 
                     imageData.imagesList.forEach(data => {
                         this.changeImageDataFormPreviousValues['newImagePhotographyType'].push(data.photographyType);
@@ -278,7 +330,10 @@ export class AdminPanelComponent implements OnInit {
                         this.changeImageDataForm.controls.newImageDescription.push(new FormControl(data.description));
                     });
 
-                    imageData.imagesList.forEach(() => this.changeImageDataFormSubmitButtonsHiddenStatus.push(true));
+                    imageData.imagesList.forEach(() => {
+                        this.changeImageDataFormSubmitButtonsHiddenStatus.push(true);
+                        this.compressedImageDataContainersAnimationCurrentStates.push('static');
+                    });
                 }
 
                 this.fullCompressedImagesListCount = imageData.count;
@@ -377,10 +432,36 @@ export class AdminPanelComponent implements OnInit {
                 error: () => {
                     this.spinnerHidden = true;
 
-                    this._appService.createErrorModal()
+                    this._appService.createErrorModal();
                 }
             });
         }
+    }
+
+    public loadAndShowImageThumbnailRecursive (compressedImagesList: ICompressedImageWithoutRelationFields[], currentIndex: number): void {
+        ( this._adminPanelService.loadAndShowImageThumbnail(this, null, compressedImagesList[currentIndex].originalName) as Observable<Blob> ).subscribe({
+            next: imageThumbnailBlob => {
+                const reader = new FileReader();
+
+                reader.readAsDataURL(imageThumbnailBlob);
+
+                reader.onload = event => {
+                    this.spinnerHidden = true;
+
+                    this.compressedImageThumbnailUrls.push(( event.target as FileReader ).result as string);
+
+                    currentIndex += 1;
+
+                    if ( currentIndex === compressedImagesList.length ) return;
+                    else this.loadAndShowImageThumbnailRecursive(compressedImagesList, currentIndex);
+                };
+            },
+            error: () => {
+                this.spinnerHidden = true;
+
+                this._appService.createErrorModal();
+            }
+        });
     }
 
     public imageThumbnailContainerAnimationStart (event: AnimationEvent): void {
@@ -442,8 +523,8 @@ export class AdminPanelComponent implements OnInit {
         } else this._appService.createErrorModal();
     }
 
-    public deleteImage (event: MouseEvent) {
-        const deleteImageButton: HTMLButtonElement = !(event.target instanceof HTMLButtonElement) ? (event.target as HTMLButtonElement).parentElement as HTMLButtonElement : event.target as HTMLButtonElement;
+    public deleteImage (event: MouseEvent, compressedImageIndex: number) {
+        const deleteImageButton: HTMLButtonElement = !( event.target instanceof HTMLButtonElement ) ? ( event.target as HTMLElement ).parentElement?.parentElement as HTMLButtonElement : event.target as HTMLButtonElement;
 
         if ( deleteImageButton ) {
             const originalImageName: string | null = deleteImageButton.getAttribute('originalImageName');
@@ -462,6 +543,11 @@ export class AdminPanelComponent implements OnInit {
                         this.fullCompressedImagesList.splice(imageIndexNumber, 1);
                         
                         Object.keys(this.changeImageDataFormPreviousValues).forEach(controlName => this.changeImageDataFormPreviousValues[controlName].splice(imageIndexNumber, 1));
+
+                        this.compressedImageThumbnailUrls.splice(compressedImageIndex, 1);
+                        this.compressedImageContainersAnimationCurrentStates.splice(compressedImageIndex, 1);
+                        this.changeImageDataFormSubmitButtonsHiddenStatus.splice(compressedImageIndex, 1);
+                        this.compressedImageDataContainersAnimationCurrentStates.splice(compressedImageIndex, 1);
                     },
                     error: () => {
                         this.spinnerHidden = true;
@@ -474,7 +560,7 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public changeImageDisplayTarget (event: MouseEvent) {
-        const imageButton: HTMLButtonElement = !(event.target instanceof HTMLButtonElement) ? (event.target as HTMLButtonElement).parentElement as HTMLButtonElement : event.target as HTMLButtonElement;
+        const imageButton: HTMLButtonElement = !( event.target instanceof HTMLButtonElement ) ? ( event.target as HTMLElement ).parentElement?.parentElement as HTMLButtonElement : event.target as HTMLButtonElement;
 
         if ( imageButton ) {
             const originalImageName: string | null = imageButton.getAttribute('originalImageName');
@@ -583,7 +669,7 @@ export class AdminPanelComponent implements OnInit {
     }
 
     public setPhotographyTypeImage (event: MouseEvent): void {
-        const imageButton: HTMLButtonElement = !(event.target instanceof HTMLButtonElement) ? (event.target as HTMLButtonElement).parentElement as HTMLButtonElement : event.target as HTMLButtonElement;
+        const imageButton: HTMLButtonElement = !( event.target instanceof HTMLButtonElement ) ? ( event.target as HTMLElement ).parentElement?.parentElement as HTMLButtonElement : event.target as HTMLButtonElement;
 
         if ( imageButton ) {
             const originalImageName: string | null = imageButton.getAttribute('originalImageName');
@@ -652,26 +738,54 @@ export class AdminPanelComponent implements OnInit {
             }
         }
     }
+    
+    public compressedImageContainersAnimationStarted (event: AnimationEvent): void {
+        if ( event.toState === 'leave' && this.additionalImagesIsExists ) this.changeImageDataFormElementPEIsNone = true;
 
-    public imagesTableRowsAnimationStarted (event: AnimationEvent): void { 
-        const target: HTMLTableRowElement = event.element;
-
-        target.classList.add('pe-none');
-
-        if ( this.additionalImagesButtonViewRef ) this.additionalImagesButtonViewRef.nativeElement.hidden = true;
+        if ( event.toState === 'enter' ) this.compressedImageButtonsIsHidden = true;
     }
 
-    public imagesTableRowsAnimationDone (event: AnimationEvent): void {
-        const target: HTMLTableRowElement = event.element;
-
-        target.classList.remove('pe-none');
+    public compressedImageContainersAnimationDone (event: AnimationEvent): void {
+        if ( event.toState === 'enter' ) this.changeImageDataFormElementPEIsNone = false;
 
         if ( this.deleteImageIsCompleted ) {
             this.deleteImageIsCompleted = false;
             this._appService.createSuccessModal();
         }
 
-        if ( this.additionalImagesButtonViewRef ) this.additionalImagesButtonViewRef.nativeElement.hidden = false;
+        if ( event.toState === 'enter' ) this.compressedImageButtonsIsHidden = false;
+    }
+
+    public compressedImageContainersDeleteAnimationStarted (index: number): void {
+        this.compressedImageDataContainerClick(index);
+    }
+
+    public compressedImageDataContainerClick (index: number): void {
+        const currentState: string = this.compressedImageDataContainersAnimationCurrentStates[index];
+
+        this.compressedImageDataContainersAnimationCurrentStates[index] = currentState === 'showed' ? 'static' : 'showed';
+    }
+
+    public compressedImageDataContainersAnimationStarted (event: AnimationEvent): void {
+        const target: HTMLDivElement = event.element;
+
+        this.changeImageDataFormElementPEIsNone = true;
+
+        if ( event.toState === 'showed' ) {
+            target.classList.remove('invisible');
+            target.classList.add('visible');
+        }
+    }
+
+    public compressedImageDataContainersAnimationDone (event: AnimationEvent): void {
+        const target: HTMLDivElement = event.element;
+
+        this.changeImageDataFormElementPEIsNone = false;
+
+        if ( event.toState === 'static' ) {
+            target.classList.remove('visible');
+            target.classList.add('invisible');
+        }
     }
 
     public searchImages (): void { 

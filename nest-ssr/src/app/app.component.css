@@ -22,8 +22,12 @@
 }
 
 @media screen and (max-width: 768px) {
-    #navbarNavDropdown {
+    #navbarNavDropdown, #navbarNavDropdown ul {
         font-size: calc(1.3rem + .6vw) !important;
+    }
+
+    #navbarNavDropdown > ul:first-child {
+        padding-top: .5rem !important;
     }
 
     .homeScrollSnapChild {
