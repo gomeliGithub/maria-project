@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
 import { PrismaModule } from './prisma.module';
 
@@ -12,7 +13,7 @@ import { ClientController } from '../controllers/client/client.controller';
 
 @Module({
     imports: [ PrismaModule ],
-    providers: [ AppService, ClientService, JwtControlService, MailService ],
+    providers: [ JwtService, AppService, ClientService, JwtControlService, MailService ],
     controllers: [ClientController],
     exports: [ClientService]
 })

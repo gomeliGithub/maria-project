@@ -17,7 +17,7 @@ import { CommonService } from '../common/common.service';
 
 import { ICompressImageData, IRequest } from 'types/global';
 import { ICreateImageDirsOptions, ICompressedImageGetOptions, IClientGetOptions, IClientGetCompressedImagesOptions } from 'types/options';
-import { IAdmin, ICompressedImageWithoutRelationFields } from 'types/models';
+import { IAdmin, IAdminWithCompressedImagesCount, ICompressedImageWithoutRelationFields } from 'types/models';
 import { IJWTPayload } from 'types/sign';
 
 @Injectable()
@@ -46,7 +46,6 @@ export class ImageControlService {
         if ( options && options.find ) { 
             if ( options.find.imageTitles ) ( clientGetOptions.compressedImages as IClientGetCompressedImagesOptions ).whereNameArr = options.find.imageTitles;
             if ( options.find.selectFields ) ( clientGetOptions.compressedImages as IClientGetCompressedImagesOptions ).selectFields = options.find.selectFields;
-            // if ( options.find.imageDisplayType ) ( clientGetOptions.compressedImages as IClientGetCompressedImagesOptions ).whereDisplayType = options.find.imageDisplayType;
             if ( options.find.photographyTypes ) ( clientGetOptions.compressedImages as IClientGetCompressedImagesOptions ).wherePhotographyTypes = options.find.photographyTypes;
             if ( options.find.displayTypes ) ( clientGetOptions.compressedImages as IClientGetCompressedImagesOptions ).whereDisplayTypes = options.find.displayTypes;
         }
@@ -60,7 +59,6 @@ export class ImageControlService {
             select: options && options.find && options.find.selectFields ? options.find.selectFields : undefined,
             where: {
                 name: options && options.find && options.find.imageTitles ? { in: options.find.imageTitles } : undefined,
-                // displayType: options && options.find && options.find.imageDisplayType ? options.find.imageDisplayType : undefined,
                 photographyType: options && options.find && options.find.photographyTypes ? {
                     in: options.find.photographyTypes
                 } : undefined,
@@ -90,12 +88,10 @@ export class ImageControlService {
         const inputImageDirPath: string = path.dirname(compressImageData.inputImagePath);
         const inputImageName: string = path.basename(compressImageData.inputImagePath);
 
-        const outputImageName: string = `${path.basename(compressImageData.inputImagePath, path.extname(compressImageData.inputImagePath))}_thumb.jpeg`;
+        const outputImageName: string = `${ path.basename(compressImageData.inputImagePath, path.extname(compressImageData.inputImagePath)) }_thumb.jpeg`;
         const outputImagePath: string = path.join(compressImageData.outputDirPath, outputImageName);
 
         const outputTempFilePath: string = this.getTempFileName(outputImagePath);
-
-        let updatedClient: IAdmin | null = null;
 
         try {
             const { width, height } = await sharp(compressImageData.inputImagePath).metadata();
@@ -108,7 +104,7 @@ export class ImageControlService {
             await fsPromises.writeFile(outputTempFilePath, semiTransparentRedBuffer);
             await fsPromises.rename(outputTempFilePath, outputImagePath);
 
-            updatedClient = await this._prisma.admin.update({
+            await this._prisma.admin.update({
                 data: { 
                     compressedImages: { 
                         create: {
@@ -123,8 +119,15 @@ export class ImageControlService {
                         }
                     }
                 },
-                where: { id: ( request.activeClientData as IJWTPayload ).id as number },
-                include: { compressedImages: true }
+                where: { 
+                    id: ( request.activeClientData as IJWTPayload ).id as number,
+                },
+                include: { 
+                    compressedImages: {
+                        take: 4,
+                        skip: 0
+                    } 
+                }
             });
 
             return true;
@@ -138,22 +141,20 @@ export class ImageControlService {
 
             let imagePath: string = '';
 
+            const compressedImageIsExists: boolean = await this.findSameAdminCompressedImage(( request.activeClientData as IJWTPayload ).id as number, 4, 0, outputImageName);
+
+            if ( compressedImageIsExists ) {
+                await this._prisma.admin.update({
+                    data: { compressedImages: { delete: { name: outputImageName } } },
+                    where: { id: ( request.activeClientData as IJWTPayload ).id as number }
+                });
+            }
+
             for ( const result of accessImagesErrorResults ) {
                 if ( accessResults.indexOf(result) === 0 ) imagePath = compressImageData.inputImagePath;
                 else if ( accessResults.indexOf(result) === 1 ) imagePath = outputImagePath;
 
                 await fsPromises.unlink(imagePath);
-
-                let existingCompressedImage: ICompressedImageWithoutRelationFields | undefined = undefined;
-
-                if ( updatedClient ) existingCompressedImage = updatedClient.compressedImages.find(data => data.name === outputImageName);
-
-                if ( existingCompressedImage ) {
-                    await this._prisma.admin.update({
-                        data: { compressedImages: { delete: { name: existingCompressedImage.name } } },
-                        where: { id: ( request.activeClientData as IJWTPayload ).id as number }
-                    });
-                }
             }
 
             return false;
@@ -200,21 +201,60 @@ export class ImageControlService {
         }
     }
 
-    public async deleteImage (commonServiceRef: CommonService, request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
+    public async findSameAdminCompressedImage (adminId: number, take: number, skip: number, imageName: string | null, originalImageName?: string): Promise<boolean> {
+        const adminData: IAdminWithCompressedImagesCount = ( await this._prisma.admin.findUnique({
+            where: {
+                id: adminId
+            },
+            include: {
+                compressedImages: {
+                    take,
+                    skip,
+                    select: {
+                        originalName: true,
+                        name: true,
+                        originalSize: false,
+                        photographyType: false,
+                        displayType: false,
+                        description: false,
+                        uploadDate: false,
+                        displayedOnHomePage: false,
+                        displayedOnGalleryPage: false,
+                        dirPath: false,
+                        originalDirPath: false,
+                        admin: false,
+                        adminId: false
+                    }
+                },
+                _count: {
+                    select: {
+                        compressedImages: true
+                    }
+                }
+            }
+        }) as IAdminWithCompressedImagesCount );
+
+        if ( adminData._count.compressedImages === skip ) return false;
+
+        const existingCompressedImage: ICompressedImageWithoutRelationFields | undefined = adminData.compressedImages.find(data => imageName !== null ? data.name === imageName : data.originalName === originalImageName as string);
+
+        if ( !existingCompressedImage ) {
+            return await this.findSameAdminCompressedImage(adminId, take, 
+                skip + take <= adminData._count.compressedImages ? skip + take : skip + ( adminData._count.compressedImages - skip ),
+                imageName, originalImageName
+            );
+        }
+
+        return true;
+    }
+
+    public async deleteImage (request: IRequest, imagePath: string): Promise<boolean> {
         const compressedImageData: ICompressedImageWithoutRelationFields | null = await this._prisma.compressedImage.findFirst({ where: { originalName: path.basename(imagePath) } });
 
         if ( compressedImageData === null ) return false;
 
         try {
-            const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', compressedImageData.name);
-            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', compressedImageData.photographyType, compressedImageData.name);
-            const compressedImageOriginalPath: string = path.join(this._appService.clientCompressedImagesDir, clientLogin, compressedImageData.name);
-
-            const currentCompressedImagePath: string = await commonServiceRef.getFulfilledAccessPath([
-                staticFilesHomeImagePath, 
-                staticFilesGalleryImagePath, 
-                compressedImageOriginalPath
-            ]);
+            const currentCompressedImagePath: string = path.join(compressedImageData.dirPath, compressedImageData.name);
 
             await this._prisma.admin.update({ data: { compressedImages: { delete: { name: compressedImageData.name } } }, where: { id: ( request.activeClientData as IJWTPayload ).id as number } });
 

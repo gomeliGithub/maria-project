@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 import { Response } from 'express';
 
@@ -23,6 +24,7 @@ export class SignService {
     constructor (
         private readonly _prisma: PrismaService,
         private readonly _jwtService: JwtService,
+        private readonly _configService: ConfigService,
 
         private readonly _appService: AppService,
         private readonly _jwtControlService: JwtControlService
@@ -106,7 +108,9 @@ export class SignService {
         await commonServiceRef.registerClientLastLoginTime(request.activeClientData as IJWTPayload);
         await commonServiceRef.registerClientLastActivityTime(request.activeClientData as IJWTPayload);
 
-        const access_token: string = this._jwtService.sign(payload);
+        const access_token: string = await this._jwtService.signAsync(payload, {
+            secret: this._configService.get<string>('JWT_SECRETCODE') as string
+        });
 
         await this._jwtControlService.saveToken(access_token);
 
@@ -170,7 +174,7 @@ export class SignService {
     private async _clientSignDataValidate (commonServiceRef: CommonService, request: IRequest, clientLogin: string, clientPassword: string): Promise<IAdminWithoutRelationFields | IMemberWithoutRelationFields> {
         const existingClientData: IAdminWithoutRelationFields | IMemberWithoutRelationFields | null = await commonServiceRef.checkAnyClientDataExists(clientLogin);
 
-        console.log(await bcrypt.hash('12345Admin', parseInt(process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS as string, 10)));
+        // console.log(await bcrypt.hash('12345Admin', parseInt(process.env.CLIENT_PASSWORD_BCRYPT_SALTROUNDS as string, 10)));
 
         if ( existingClientData === null ) throw new UnauthorizedException(`${ request.url } "_clientSignDataValidate - client instance does not exists"`);
 

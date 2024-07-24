@@ -1,6 +1,7 @@
 import { Prisma, Admin, Member, CompressedImage, ImagePhotographyType, ClientOrder, Discount, JWT } from "@prisma/client";
 
 export interface IAdmin extends Admin, Prisma.AdminGetPayload<{ include: { compressedImages: true } }> { }
+export interface IAdminWithCompressedImagesCount extends Admin, Prisma.AdminGetPayload<{ include: { compressedImages: true, _count: { select: { compressedImages: true } } } }> { }
 export interface IAdminWithoutRelationFields extends Admin { }
 
 export interface IMember extends Member, Prisma.MemberGetPayload<{ include: { clientOrders: true } }> { }

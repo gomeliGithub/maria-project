@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AngularUniversalModule } from '@nestjs/ng-universal';
 import { ScheduleModule } from '@nestjs/schedule';
-import { JwtModule, JwtSecretRequestType } from '@nestjs/jwt';
-import { Algorithm } from 'jsonwebtoken';
 import { ConfigModule } from '@nestjs/config';
 
 import Importer from 'mysql-import';
@@ -14,6 +12,7 @@ import { Image_photography_type } from '@prisma/client';
 import fsPromises from 'fs/promises';
 import path from 'path';
 
+import ms from 'ms';
 import * as bcrypt from 'bcrypt';
 
 import { PrismaModule } from './modules/prisma.module';
@@ -41,30 +40,15 @@ import { IAdminWithoutRelationFields, IImagePhotographyType } from 'types/models
             bootstrap: bootstrap,
             viewsPath: path.join(process.cwd(), 'dist/nest-ssr/browser'),
             inlineCriticalCss: false,
-            cache: false
+            cache: {
+                expiresIn: ms('3h')
+            }
         }),
         ConfigModule.forRoot({
             envFilePath: [ 'server/config/.env.development', 'server/config/.env.production' ],
             isGlobal: true
         }),
         ScheduleModule.forRoot(),
-        JwtModule.register({
-            global: true,
-            secret: process.env.JWT_SECRETCODE as string,
-            signOptions: { 
-                algorithm: process.env.JWT_SIGNVERIFAY_SIGNATURE_ALGORITHM as Algorithm,
-                expiresIn: process.env.JWT_EXPIRESIN_TIME as string
-            },
-            verifyOptions: {
-                algorithms: [ process.env.JWT_SIGNVERIFAY_SIGNATURE_ALGORITHM as Algorithm ]
-            },
-            secretOrKeyProvider: (requestType: JwtSecretRequestType) => {
-                switch ( requestType ) {
-                    case JwtSecretRequestType.SIGN: return process.env.JWT_SECRETCODE as string;
-                    case JwtSecretRequestType.VERIFY: return process.env.JWT_SECRETCODE as string;
-                }
-            }
-        }), 
         PrismaModule,
         SignModule,
         ClientModule,
@@ -72,7 +56,7 @@ import { IAdminWithoutRelationFields, IImagePhotographyType } from 'types/models
         AdminPanelModule,
         CommonModule
     ],
-    controllers: [AppController],
+    controllers: [ AppController ],
     providers: [ PrismaService, AppService, WebSocketService, MailService, ValidateClientRequestsService ],
     exports: [ AppService, MailService, ValidateClientRequestsService ]
 })

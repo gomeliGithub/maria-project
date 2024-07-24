@@ -26,7 +26,7 @@ import { IJWTPayload } from 'types/sign';
 export class CommonService {
     public webSocketClients: IWebSocketClient[] = [];
     public promisesCache: { [ x: string ]: { pendingPromises: Promise<any>[], count: number } } = { };
-    public adminPanelImageOperationKeys: string[] = [ 'deleteImage', 'changeImageDisplayTargetRename', 'changeImageData', 'setPhotographyTypeImageUnlink', 'setPhotographyTypeImageCopy' ];
+    public adminPanelImageOperationKeys: string[] = [ 'deleteImage', 'resizeImageThumbnail', 'changeImageDisplayTargetRename', 'changeImageData', 'setPhotographyTypeImageUnlink', 'setPhotographyTypeImageCopy' ];
 
     constructor (
         private readonly _appService: AppService
@@ -139,6 +139,14 @@ export class CommonService {
         return imageControlServiceRef.getCompressedImages(options);
     }
 
+    public async findSameAdminCompressedImage (adminId: number, take: number, skip: number, imageName: string | null, originalImageName?: string): Promise<boolean> {
+        const imageControlServiceRef: ImageControlService = await this._appService.getServiceRef(ImageControlModule, ImageControlService);
+
+        const result: boolean = await imageControlServiceRef.findSameAdminCompressedImage(adminId, take, skip, imageName, originalImageName);
+
+        return result;
+    }
+
     public async checkFileExists (filePath: string): Promise<boolean> {
         const imageControlServiceRef: ImageControlService = await this._appService.getServiceRef(ImageControlModule, ImageControlService);
 
@@ -151,10 +159,10 @@ export class CommonService {
         return adminPanelServiceRef.getFulfilledAccessPath(paths);
     }
 
-    public async deleteImage (commonServiceRef: CommonService, request: IRequest, imagePath: string, clientLogin: string): Promise<boolean> {
+    public async deleteImage (request: IRequest, imagePath: string): Promise<boolean> {
         const imageControlServiceRef = await this._appService.getServiceRef(ImageControlModule, ImageControlService);
 
-        return imageControlServiceRef.deleteImage(commonServiceRef, request, imagePath, clientLogin);
+        return imageControlServiceRef.deleteImage(request, imagePath);
     }
 
     public async getImagePhotographyTypesData (targetPage: 'home', includeDescription: boolean): Promise<IImagePhotographyType[][]>

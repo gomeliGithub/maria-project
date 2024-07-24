@@ -47,7 +47,7 @@ export class ClientService {
         const imagesList: string[] = await commonServiceRef.managePromisesCache('getCompressedImagesData', fsPromises.readdir(imagesPath));
         const imagesLimit: number = 8;
 
-        const compressedImagesData: ICompressedImageWithoutRelationFields[] = await commonServiceRef.getCompressedImages({
+        const compressedImagesData: ICompressedImageWithoutRelationFields[] = await commonServiceRef.getCompressedImages({ ///////////////////////////////////////////////////////////////////////////////////
             find: {
                 imageTitles: imagesList,
                 selectFields: { 
@@ -72,21 +72,10 @@ export class ClientService {
         });
 
         if ( imagesType !== 'home' ) {
-            // const reducedCompressedImagesRaw: IClientCompressedImage[][] = [];
-
-            /* 
-            
-            for ( let i = 0; i < compressedImagesRaw.length; i += 5 ) {
-                reducedCompressedImagesRaw.push(compressedImagesRaw.slice(i, i + 5));
-            }
-            
-            */
-
             const commonCompressedImagesCount: number = await this._prisma.compressedImage.count({ where: { name: { in: imagesList }, displayType: imageDisplayType } });
 
-
             return {
-                compressedImagesDataList: compressedImagesData, // reducedCompressedImagesRaw, 
+                compressedImagesDataList: compressedImagesData,
                 photographyTypeDescription: ( await this.getImagePhotographyTypesData('gallery', false, imagesType) ).description as string,
                 additionalImagesExists: commonCompressedImagesCount > ( imagesExistsCount as number ) + compressedImagesData.length && commonCompressedImagesCount > imagesLimit
             }
@@ -175,8 +164,11 @@ export class ClientService {
         const cookieSerializeOptions: ICookieSerializeOptions = this._appService.cookieSerializeOptions;
 
         if ( request.activeClientData ) {
-            if ( tokenIsValid ) { 
+            if ( tokenIsValid ) {
+                // const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
+
                 decodedToken = this._jwtService.decode(token as string) as IJWTPayload;
+                // decodedToken = await commonServiceRef.jwtDecode(token as string);
 
                 const dateNow: Date = new Date(Date.now());
 
@@ -188,7 +180,9 @@ export class ClientService {
                 delete decodedToken.iat;
                 delete decodedToken.exp;
 
-                updatedAccess_token = this._jwtService.sign(decodedToken, { expiresIn: tokenExpiresIn });
+                updatedAccess_token = await this._jwtService.signAsync(decodedToken, { secret: process.env.JWT_SECRETCODE as string, expiresIn: tokenExpiresIn }); 
+                // updatedAccess_token = await commonServiceRef.jwtSign(decodedToken, { expiresIn: tokenExpiresIn }); 
+
                 cookieSerializeOptions.maxAge = request.activeClientData ? ms(`${ tokenExpiresIn as number }s`) : cookieSerializeOptions.maxAge;
             } else throw new BadRequestException(`${ request.url } "ChangeLocale - token is invalid"`);
         }

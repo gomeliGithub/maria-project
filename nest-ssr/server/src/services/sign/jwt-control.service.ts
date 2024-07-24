@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 import * as crypto from 'crypto';
 import ms from 'ms';
@@ -14,7 +15,8 @@ import { IJWT } from 'types/models';
 export class JwtControlService {
     constructor (
         private readonly _prisma: PrismaService,
-        private readonly _jwtService: JwtService
+        private readonly _jwtService: JwtService,
+        private readonly _configService: ConfigService
     ) { }
 
     public extractTokenFromHeader (request: IRequest, throwError = true): string | undefined {
@@ -32,7 +34,9 @@ export class JwtControlService {
         let validatedClientPayload: IJWTPayload | null = null;
 
         try {
-            validatedClientPayload = await this._jwtService.verifyAsync<IJWTPayload>(token);
+            validatedClientPayload = await this._jwtService.verifyAsync<IJWTPayload>(token, { 
+                secret: this._configService.get<string>('JWT_SECRETCODE') as string 
+            });
         } catch {
             if ( throwError ) throw new UnauthorizedException(`${ request.url } "TokenValidate - access token is invalid, token - ${ token }"`);
             else return null;

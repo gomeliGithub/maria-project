@@ -102,7 +102,12 @@ export class AdminPanelService {
         }
 
         const validateRequestResult: 'PENDING' | 'FILEEXISTS' | 'MAXCOUNT' | 'MAXSIZE' | 'MAXNAMELENGTH' | null = await this._validateUploadImageRequest(
-            activeUploadsClientNumber, commonServiceRef, request.activeClientData as IJWTPayload, newOriginalImagePath, originalImagesDirClientPath, imageMeta as IImageMeta
+            activeUploadsClientNumber, 
+            commonServiceRef, 
+            request.activeClientData as IJWTPayload, 
+            newOriginalImagePath, 
+            originalImagesDirClientPath, 
+            imageMeta as IImageMeta
         );
 
         if ( validateRequestResult !== null ) return validateRequestResult;
@@ -220,12 +225,9 @@ export class AdminPanelService {
     ): Promise<'PENDING' | 'FILEEXISTS' | 'MAXCOUNT' | 'MAXSIZE' | 'MAXNAMELENGTH' | null> {
         if ( activeUploadsClientNumber > 3 ) return 'PENDING';
 
-        const compressedImagesData: ICompressedImageWithoutRelationFields[] = await commonServiceRef.getCompressedImages({ clientData: activeClientData });
-        const existingCompressedImageData: ICompressedImageWithoutRelationFields | undefined = compressedImagesData.find(image => image.originalName === path.basename(newOriginalImagePath));
+        const compressedImageIsExists: boolean = await commonServiceRef.findSameAdminCompressedImage(activeClientData.id as number, 4, 0, null, path.basename(newOriginalImagePath));
 
-        if ( existingCompressedImageData ) return 'FILEEXISTS';
-
-        if ( await commonServiceRef.checkFileExists(newOriginalImagePath) ) return 'FILEEXISTS';
+        if ( compressedImageIsExists || await commonServiceRef.checkFileExists(newOriginalImagePath) ) return 'FILEEXISTS';
     
         const uploadedFilesCount: number = ( await fsPromises.readdir(originalImagesDirClientPath) ).length;
 
@@ -544,35 +546,15 @@ export class AdminPanelService {
         const originalImageName: string = requestBody.adminPanel?.originalImageName as string;
         const originalImagePath: string = path.join(this._appService.clientOriginalImagesDir, activeAdminLogin, originalImageName);
 
-        const compressedImagesData: ICompressedImageWithoutRelationFields[] = await commonServiceRef.getCompressedImages({
-            clientData: request.activeClientData,
-            find: {
-                selectFields: {
-                    originalName: true,
-                    originalSize: false,
-                    name: false,
-                    photographyType: false,
-                    displayType: false,
-                    description: false,
-                    uploadDate: false,
-                    displayedOnHomePage: false,
-                    displayedOnGalleryPage: false,
-                    dirPath: false,
-                    originalDirPath: false,
-                    admin: false,
-                    adminId: false
-                }
-            }
-        })
+        const compressedImageIsExists: boolean = await commonServiceRef.findSameAdminCompressedImage(request.activeClientData?.id as number, 4, 0, null, originalImageName);
 
-        const existingCompressedImageData: ICompressedImageWithoutRelationFields | undefined = compressedImagesData.find(compressedImage => compressedImage.originalName === originalImageName);
         const imageIsExists: boolean = await commonServiceRef.checkFileExists(path.join(this._appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
 
-        if ( !existingCompressedImageData || !imageIsExists ) {
-            throw new BadRequestException(`${ request.url } "DeleteImage - ${ !existingCompressedImageData ? 'compressed image does not exists' : 'original image does not exists'}"`);
+        if ( !compressedImageIsExists || !imageIsExists ) {
+            throw new BadRequestException(`${ request.url } "DeleteImage - ${ !compressedImageIsExists ? 'compressed image does not exists' : 'original image does not exists' }"`);
         }
 
-        const deleteImageResult: boolean = await commonServiceRef.managePromisesCache('deleteImage', commonServiceRef.deleteImage(commonServiceRef, request, originalImagePath, activeAdminLogin));
+        const deleteImageResult: boolean = await commonServiceRef.managePromisesCache('deleteImage', commonServiceRef.deleteImage(request, originalImagePath));
 
         if ( deleteImageResult ) return 'SUCCESS';
         else throw new InternalServerErrorException(`${ request.url } "DeleteImage - delete error"`);
@@ -618,30 +600,32 @@ export class AdminPanelService {
             else if ( existingCompressedImageData.displayedOnGalleryPage ) compressedImageUpdateArgs.data.displayedOnGalleryPage = false;
         }
 
-        const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', existingCompressedImageData.name);
-        const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', existingCompressedImageData.photographyType, existingCompressedImageData.name);
-        const compressedImageOriginalPath: string = path.join(this._appService.clientCompressedImagesDir, activeAdminLogin, existingCompressedImageData.name);
+        const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home');
+        const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', existingCompressedImageData.photographyType);
+        const compressedImageOriginalPath: string = path.join(this._appService.clientCompressedImagesDir, activeAdminLogin);
 
-        let newPath: string = '';
-
-        const oldPath: string = await this.getFulfilledAccessPath([
-            compressedImageOriginalPath, 
-            staticFilesHomeImagePath, 
-            staticFilesGalleryImagePath
-        ]);
+        let newImagePath: string = '';
+        let newDirPath: string = '';
 
         if ( displayTargetPage === 'home' ) {
             if ( existingCompressedImageData.displayType !== 'horizontal' ) return 'WRONGDISPLAYTYPE';
     
-            newPath = staticFilesHomeImagePath;
+            newImagePath = path.join(staticFilesHomeImagePath, existingCompressedImageData.name);
+            newDirPath = staticFilesHomeImagePath;
         }
         else if ( displayTargetPage === 'gallery' ) {
             if ( existingCompressedImageData.displayType !== 'vertical' ) return 'WRONGDISPLAYTYPE';
     
-            newPath = staticFilesGalleryImagePath;
-        } else if ( displayTargetPage === 'original' ) newPath = compressedImageOriginalPath;
+            newImagePath = path.join(staticFilesGalleryImagePath, existingCompressedImageData.name);
+            newDirPath = staticFilesGalleryImagePath;
+        } else if ( displayTargetPage === 'original' ) {
+            newImagePath = path.join(compressedImageOriginalPath, existingCompressedImageData.name);
+            newDirPath = compressedImageOriginalPath;
+        }
+
+        compressedImageUpdateArgs.data.dirPath = newDirPath;
     
-        await commonServiceRef.managePromisesCache('changeImageDisplayTargetRename', fsPromises.rename(oldPath, newPath));
+        await commonServiceRef.managePromisesCache('changeImageDisplayTargetRename', fsPromises.rename(existingCompressedImageData.dirPath, newImagePath));
         await this._prisma.compressedImage.update(compressedImageUpdateArgs);
 
         return 'SUCCESS';
@@ -669,11 +653,7 @@ export class AdminPanelService {
                 const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', existingCompressedImageData.photographyType, existingCompressedImageData.name);
                 const compressedImageOriginalPath: string = path.join(this._appService.clientCompressedImagesDir, activeAdminLogin, existingCompressedImageData.name);
 
-                const currentPath: string = await this.getFulfilledAccessPath([
-                    staticFilesHomeImagePath, 
-                    staticFilesGalleryImagePath, 
-                    compressedImageOriginalPath
-                ]);
+                const currentPath: string = path.join(existingCompressedImageData.dirPath, existingCompressedImageData.name);
 
                 if ( currentPath !== staticFilesHomeImagePath && currentPath !== compressedImageOriginalPath ) {
                     const staticFilesGalleryImageNewPath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', newImagePhotographyType, existingCompressedImageData.name);
@@ -694,32 +674,22 @@ export class AdminPanelService {
     public async setPhotographyTypeImage (request: IRequest, requestBody: IRequestBody, response: Response, clientLocale: string): Promise<string> {
         const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
 
-        const { originalImagePath, activeAdminLogin } = await this._getOriginalImagePathWithActiveAdminLogin(commonServiceRef, request, requestBody, response, clientLocale);
+        const { originalImagePath } = await this._getOriginalImagePathWithActiveAdminLogin(commonServiceRef, request, requestBody, response, clientLocale);
 
         const existingCompressedImageData: ICompressedImageWithoutRelationFields | null = await this._prisma.compressedImage.findFirst({ where: { originalName: path.basename(originalImagePath) } });
 
         if ( existingCompressedImageData === null ) throw new BadRequestException(`${ request.url } "SetPhotographyTypeImage - 'compressed image does not exists'"`);
-
         if ( existingCompressedImageData.displayType !== 'horizontal' ) return 'WRONGDISPLAYTYPE';
 
         const imagePhotographyType: string = requestBody.adminPanel?.imagePhotographyType as Image_photography_type;
 
-        const staticFilesHomeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', existingCompressedImageData.name);
-        const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', existingCompressedImageData.photographyType, existingCompressedImageData.name);
-        const compressedImageOriginalPath: string = path.join(this._appService.clientCompressedImagesDir, activeAdminLogin, existingCompressedImageData.name);
-
         const newPath: string = path.join(this.staticCompressedImagesDirPath, 'home', 'imagePhotographyTypes', existingCompressedImageData.name);
-
-        const currentPath = await this.getFulfilledAccessPath([
-            compressedImageOriginalPath, 
-            staticFilesHomeImagePath, 
-            staticFilesGalleryImagePath
-        ]);
+        const currentPath: string = path.join(existingCompressedImageData.dirPath, existingCompressedImageData.name);
 
         const currentPhotographyType: IImagePhotographyType = ( await this._prisma.imagePhotographyType.findUnique({ where: { name: imagePhotographyType } }) as IImagePhotographyType );
 
-        if ( currentPhotographyType && currentPhotographyType.compressedImageOriginalName && path.extname(currentPhotographyType.compressedImageOriginalName) !== '' ) {
-            const deletePhotographyTypeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', 'imagePhotographyTypes', currentPhotographyType.compressedImageOriginalName);
+        if ( currentPhotographyType && currentPhotographyType.compressedImageOriginalName && currentPhotographyType.compressedImageName && path.extname(currentPhotographyType.compressedImageOriginalName) !== '' ) {
+            const deletePhotographyTypeImagePath: string = path.join(this.staticCompressedImagesDirPath, 'home', 'imagePhotographyTypes', currentPhotographyType.compressedImageName);
 
             if ( await commonServiceRef.checkFileExists(deletePhotographyTypeImagePath) ) {
                 await commonServiceRef.managePromisesCache('setPhotographyTypeImageUnlink', fsPromises.unlink(deletePhotographyTypeImagePath));
@@ -755,51 +725,22 @@ export class AdminPanelService {
         const originalImageName: string = requestBody.adminPanel?.originalImageName as string;
         const originalImagePath: string = path.join(this._appService.clientOriginalImagesDir, activeAdminLogin, originalImageName);
 
-        const compressedImagesData: ICompressedImageWithoutRelationFields[] = await commonServiceRef.getCompressedImages({
-            clientData: request.activeClientData,
-            find: {
-                selectFields: {
-                    name: true,
-                    originalName: true,
-                    photographyType: true,
-                    displayedOnGalleryPage: true,
-                    originalSize: false,
-                    displayType: false,
-                    description: false,
-                    uploadDate: false,
-                    displayedOnHomePage: false,
-                    dirPath: false,
-                    originalDirPath: false,
-                    admin: false,
-                    adminId: false
-                }
-            }
-        });
+        const compressedImageIsExists: boolean = await commonServiceRef.findSameAdminCompressedImage(request.activeClientData?.id as number, 4, 0, null, originalImageName);
 
-        const existingCompressedImageData: ICompressedImageWithoutRelationFields | undefined = compressedImagesData.find(data => data.originalName === originalImageName);
         const imageIsExists: boolean = await commonServiceRef.checkFileExists(path.join(this._appService.clientOriginalImagesDir, activeAdminLogin, originalImageName));
 
-        const compressedImageIsExists: boolean = !existingCompressedImageData;
-        const originalImageRawIsExists: boolean = !imageIsExists;
-
-        if ( compressedImageIsExists || originalImageRawIsExists ) {
+        if ( !compressedImageIsExists || !imageIsExists ) {
             throw new BadRequestException(`${ request.url } "ValidateImageControlRequests - ${ !compressedImageIsExists ? 'compressed image does not exists' : 'original image does not exists' }"`);
         }
 
-        if ( ( existingCompressedImageData as ICompressedImageWithoutRelationFields ).displayedOnGalleryPage && ( [ 'home', 'gallery', 'original' ].includes(requestBody.adminPanel?.displayTargetPage as string)
+        const existingCompressedImageData: ICompressedImageWithoutRelationFields = ( await this._prisma.compressedImage.findFirst({ where: { originalName: originalImageName } }) as ICompressedImageWithoutRelationFields );
+
+        if ( existingCompressedImageData.displayedOnGalleryPage && ( [ 'home', 'gallery', 'original' ].includes(requestBody.adminPanel?.displayTargetPage as string)
             || ( requestBody.adminPanel?.newImagePhotographyType as string ) in Image_photography_type
-        ) ) { 
-            const galleryImagePaths: string[] = [ path.join(this.staticCompressedImagesDirPath, 'home') ];
+        ) ) {
+            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', existingCompressedImageData.photographyType, existingCompressedImageData.name);
 
-            for ( const data in Image_photography_type ) {
-                galleryImagePaths.push(path.join(this.staticCompressedImagesDirPath, 'gallery', data, ( existingCompressedImageData as ICompressedImageWithoutRelationFields ).name));
-            }
-
-            const existingPath: string = await this.getFulfilledAccessPath(galleryImagePaths);
-            const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', ( existingCompressedImageData as ICompressedImageWithoutRelationFields ).photographyType, 
-            ( existingCompressedImageData as ICompressedImageWithoutRelationFields ).name);
-
-            if ( existingPath !== staticFilesGalleryImagePath ) {
+            if ( existingCompressedImageData.dirPath !== staticFilesGalleryImagePath ) {
                 throw new InternalServerErrorException(`${ request.url } "ValidateImageControlRequests - compressed image '${ ( existingCompressedImageData as ICompressedImageWithoutRelationFields ).name }' does not exists in directory"`);
             }
         }

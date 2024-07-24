@@ -13,14 +13,14 @@ import { CacheInterceptor } from './interceptors/cache/cache.interceptor';
 import { BigIntInterceptor } from './interceptors/big-int/big-int.interceptor';
 
 async function bootstrap() {
+    process.env.JWT_SECRETCODE = generateJWT_SecretCode();
+    process.env.COOKIE_SECRET = generateCookieSecret();
+    
     const app = await NestFactory.create(AppModule, {
         logger: ['error', 'warn', 'log']
     });
 
     app.enableShutdownHooks();
-
-    process.env.JWT_SECRETCODE = generateJWT_SecretCode();
-    process.env.COOKIE_SECRET = generateCookieSecret();
 
     app.enableCors({
         origin: process.env.CORS_ORIGIN, 
