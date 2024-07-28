@@ -81,6 +81,7 @@
             (@compressed-image-containers-animation.done)="compressedImageContainersAnimationDone($event)"
             @compressed-image-containers-delete-animation
             (compressed-image-containers-delete-animation.start)="compressedImageContainersDeleteAnimationStarted(i)"
+            #compressedImageContainer
         >
             <ng-template [ngIf]="compressedImageThumbnailUrls[i]">
                 <div class="position-absolute bottom-0 start-0 w-100 z-1">
@@ -100,7 +101,7 @@
                     (@compressed-image-data-containers-animation.done)="compressedImageDataContainersAnimationDone($event)"
                 >
                     <div class="pb-3 w-100 d-flex flex-column">
-                        <ul class="w-100 list-group list-group-horizontal justify-content-between overflow-x-auto" id="imageControlButtonList">
+                        <ul class="w-100 list-group list-group-horizontal justify-content-between overflow-x-auto" [id]="'imageControlButtonList_' + i">
                             <li class="list-group-item text-bg-success" [hidden]="changeImageDataFormSubmitButtonsHiddenStatus[i]">
                                 <button class="btn" type="submit" [attr.originalImageName]="compressedImage.originalName" [disabled]="changeImageDataForm.invalid"
                                     placement="auto"
@@ -184,25 +185,37 @@
                     <div class="w-100 my-2 fw-semibold overflow-x-hidden overflow-y-auto">
                         <div class="row g-2 mb-2 w-100">
                             <div class="col row">
-                                <label [for]="'staticOriginalName_' + i" class="col-sm-7 col-form-label">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALNAME' | translate }}</label>
+                                <label [for]="'staticOriginalName_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-7 col-form-label">
+                                    {{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALNAME' | translate }}
+                                </label>
                                 <div class="col-sm-5">
-                                    <input type="text" readonly class="form-control-plaintext form-control-lg" [id]="'staticOriginalName_' + i" [value]="compressedImage.originalName">
+                                    <input type="text" readonly class="form-control-plaintext form-control-lg" 
+                                        [id]="'staticOriginalName_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" 
+                                        [value]="compressedImage.originalName"
+                                    >
                                 </div>
                             </div>
                             <div class="col row">
-                                <label [for]="'staticOriginalSize_' + i" class="col-sm-8 col-form-label">{{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALSIZE' | translate }}</label>
+                                <label [for]="'staticOriginalSize_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-8 col-form-label">
+                                    {{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALSIZE' | translate }}
+                                </label>
                                 <div class="col-sm-4">
-                                    <input type="text" readonly class="form-control-plaintext form-control-lg" [id]="'staticOriginalSize_' + i" [value]="compressedImage.originalSize | imageSize">
+                                    <input type="text" readonly class="form-control-plaintext form-control-lg" 
+                                        [id]="'staticOriginalSize_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" 
+                                        [value]="compressedImage.originalSize | imageSize"
+                                    >
                                 </div>
                             </div>
                         </div>
                         <div class="row g-2 mb-2 w-100">
                             <div class="col row">
-                                <label [for]="'inputChangePhotographyType_' + i" class="col-sm-5 col-form-label">
+                                <label [for]="'inputChangePhotographyType_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-5 col-form-label">
                                     {{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPE' | translate }}
                                 </label>
                                 <div class="col-sm-7" formArrayName="newImagePhotographyType">
-                                    <select class="form-control form-select form-control-lg" [id]="'inputChangePhotographyType_' + i" [formControlName]="i"
+                                    <select class="form-control form-select form-control-lg" 
+                                        [id]="'inputChangePhotographyType_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" 
+                                        [formControlName]="i"
                                         (change)="changeImageFormControlChange('newImagePhotographyType', i)"
                                     >
                                         <option value="individual">{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</option>
@@ -213,11 +226,13 @@
                                 </div>
                             </div>
                             <div class="col row">
-                                <label [for]="'inputChangeDisplayType_' + i" class="col-sm-5 col-form-label">
+                                <label [for]="'inputChangeDisplayType_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-5 col-form-label">
                                     {{ 'ADMINPANEL.TABLECOLTITLES.DISPLAYTYPE' | translate }}
                                 </label>
                                 <div class="col-sm-7" formArrayName="newImageDisplayType">
-                                    <select class="form-control form-select form-control-lg" [id]="'inputChangeDisplayType_' + i" [formControlName]="i"
+                                    <select class="form-control form-select form-control-lg" 
+                                        [id]="'inputChangeDisplayType_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" 
+                                        [formControlName]="i"
                                         (change)="changeImageFormControlChange('newImageDisplayType', i)"
                                     >
                                         <option value="horizontal">{{ 'IMAGEDISPLAYTYPES.HORIZONTAL' | translate }}</option>
@@ -228,9 +243,14 @@
                         </div>
                         <div class="row g-2 mb-2 w-100">
                             <div class="col row">
-                                <label [for]="'inputChangeImageDescription_' + i" class="col-sm-4 col-form-label">{{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPEDESCRIPTION' | translate }}</label>
+                                <label [for]="'inputChangeImageDescription_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-4 col-form-label">
+                                    {{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPEDESCRIPTION' | translate }}
+                                </label>
                                 <div class="col-sm-8" formArrayName="newImageDescription">
-                                    <textarea class="form-control form-control-lg text-center" [id]="'inputChangeImageDescription_' + i" [formControlName]="i" [placeholder]="'ADMINPANEL.CHANGEIMAGEDATATEXT.PLACEHOLDERTEXT' | translate"
+                                    <textarea class="form-control form-control-lg text-center" 
+                                        [id]="'inputChangeImageDescription_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" 
+                                        [formControlName]="i" 
+                                        [placeholder]="'ADMINPANEL.CHANGEIMAGEDATATEXT.PLACEHOLDERTEXT' | translate"
                                         (change)="changeImageFormControlChange('newImageDescription', i)"
                                     >
                                     </textarea>
@@ -239,29 +259,44 @@
                         </div>
                         <div class="row g-2 mb-2 w-100">
                             <div class="col row">
-                                <label [for]="'staticUploadDate_' + i" class="col-sm-7 col-form-label">{{ 'ADMINPANEL.TABLECOLTITLES.UPLOADAT' | translate }}</label>
+                                <label [for]="'staticUploadDate_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-7 col-form-label">
+                                    {{ 'ADMINPANEL.TABLECOLTITLES.UPLOADAT' | translate }}
+                                </label>
                                 <div class="col-sm-5">
-                                    <input type="text" readonly class="form-control-plaintext form-control-lg" [id]="'staticUploadDate_' + i" [value]="compressedImage.uploadDate | date:'d.M.yy, H:mm'">
+                                    <input type="text" readonly class="form-control-plaintext form-control-lg" 
+                                        [id]="'staticUploadDate_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" 
+                                        [value]="compressedImage.uploadDate | date:'d.M.yy, H:mm'"
+                                    >
                                 </div>
                             </div>
                         </div>
                         <div class="row g-2 mb-2 w-100">
                             <div class="col row">
-                                <label [for]="'staticDisplayedOnHomePage_' + i" class="col-sm-8 col-form-label">{{ 'ADMINPANEL.TABLECOLTITLES.ONHOMEPAGE' | translate }}</label>
+                                <label [for]="'staticDisplayedOnHomePage_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-8 col-form-label">
+                                    {{ 'ADMINPANEL.TABLECOLTITLES.ONHOMEPAGE' | translate }}
+                                </label>
                                 <div class="col-sm-4">
-                                    <input type="text" readonly class="form-control-plaintext form-control-lg" [id]="'staticDisplayedOnHomePage_' + i" [value]="compressedImage.displayedOnHomePage | boolean" [ngClass]="{
-                                        'text-success': compressedImage.displayedOnHomePage === true, 
-                                        'text-danger': compressedImage.displayedOnHomePage === false
-                                    }">
+                                    <input type="text" readonly class="form-control-plaintext form-control-lg" 
+                                        [id]="'staticDisplayedOnHomePage_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" 
+                                        [value]="compressedImage.displayedOnHomePage | boolean" [ngClass]="{
+                                            'text-success': compressedImage.displayedOnHomePage === true, 
+                                            'text-danger': compressedImage.displayedOnHomePage === false
+                                        }"
+                                    >
                                 </div>
                             </div>
                             <div class="col row">
-                                <label [for]="'staticDisplayedOnGalleryPage_' + i" class="col-sm-8 col-form-label">{{ 'ADMINPANEL.TABLECOLTITLES.ONGALLERYPAGE' | translate }}</label>
+                                <label [for]="'staticDisplayedOnGalleryPage_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-8 col-form-label">
+                                    {{ 'ADMINPANEL.TABLECOLTITLES.ONGALLERYPAGE' | translate }}
+                                </label>
                                 <div class="col-sm-4">
-                                    <input type="text" readonly class="form-control-plaintext form-control-lg" [id]="'staticDisplayedOnGalleryPage_' + i" [value]="compressedImage.displayedOnGalleryPage | boolean" [ngClass]="{
-                                        'text-success': compressedImage.displayedOnGalleryPage === true, 
-                                        'text-danger': compressedImage.displayedOnGalleryPage === false
-                                    }">
+                                    <input type="text" readonly class="form-control-plaintext form-control-lg" 
+                                        [id]="'staticDisplayedOnGalleryPage_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" 
+                                        [value]="compressedImage.displayedOnGalleryPage | boolean" [ngClass]="{
+                                            'text-success': compressedImage.displayedOnGalleryPage === true, 
+                                            'text-danger': compressedImage.displayedOnGalleryPage === false
+                                        }"
+                                    >
                                 </div>
                             </div>
                         </div>

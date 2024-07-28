@@ -117,6 +117,7 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
     public compressedImageContainersAnimationCurrentStates: string[] = [];
     public compressedImageDataContainersAnimationCurrentStates: string[] = [];
     public compressedImagesContainerAnimationIsDone: boolean = false;
+    public compressedImageContainersDeleteStatus: boolean[] = [];
 
     public compressedImageButtonsIsHidden: boolean = true;
 
@@ -191,7 +192,7 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
         return this._webSocketService.componentClass;
     }
 
-    @ViewChildren('imagePhotographyTypeDescription', { read: ElementRef<HTMLInputElement> }) 
+    @ViewChildren('imagePhotographyTypeDescription', { read: ElementRef<HTMLInputElement> })
     private readonly imagePhotographyTypeDescriptionViewRefs: QueryList<ElementRef<HTMLInputElement>>;
 
     ngOnInit (): void {
@@ -278,11 +279,15 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
                     if ( this.fullCompressedImagesList.length > 0 ) {
                         this.compressedImageThumbnailUrls = [];
                         this.compressedImageContainersAnimationCurrentStates = [];
+                        this.compressedImageContainersDeleteStatus = [];
 
                         this.loadAndShowImageThumbnailRecursive(this.fullCompressedImagesList, 0);
                     }
 
-                    this.fullCompressedImagesList.forEach(() => this.compressedImageContainersAnimationCurrentStates.push('leave'));
+                    this.fullCompressedImagesList.forEach(() => {
+                        this.compressedImageContainersAnimationCurrentStates.push('leave');
+                        this.compressedImageContainersDeleteStatus.push(false);
+                    });
 
                     this.changeImageDataForm = new FormGroup({
                         'newImagePhotographyType': new FormArray(this.fullCompressedImagesList.map(data => {
@@ -313,7 +318,10 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
 
                     const newFullCompressedImagesList: ICompressedImageWithoutRelationFields[] = this.fullCompressedImagesList.slice(imagesExistsCount);
 
-                    newFullCompressedImagesList.forEach(() => this.compressedImageContainersAnimationCurrentStates.push('leave'));
+                    newFullCompressedImagesList.forEach(() => {
+                        this.compressedImageContainersAnimationCurrentStates.push('leave');
+                        this.compressedImageContainersDeleteStatus.push(false);
+                    });
 
                     this.compressedImagesContainerAnimationIsDone = false;
 
@@ -540,6 +548,9 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
                         this._adminPanelService.switchImageControlResponses(responseText, 'delete');
                         this.deleteImageIsCompleted = true;
 
+                        this.compressedImageContainersDeleteStatus[imageIndexNumber] = true;
+                        this._changeDetectorRef.detectChanges();
+
                         this.fullCompressedImagesList.splice(imageIndexNumber, 1);
                         
                         Object.keys(this.changeImageDataFormPreviousValues).forEach(controlName => this.changeImageDataFormPreviousValues[controlName].splice(imageIndexNumber, 1));
@@ -548,6 +559,7 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
                         this.compressedImageContainersAnimationCurrentStates.splice(compressedImageIndex, 1);
                         this.changeImageDataFormSubmitButtonsHiddenStatus.splice(compressedImageIndex, 1);
                         this.compressedImageDataContainersAnimationCurrentStates.splice(compressedImageIndex, 1);
+                        this.compressedImageContainersDeleteStatus.splice(compressedImageIndex, 1);
                     },
                     error: () => {
                         this.spinnerHidden = true;
