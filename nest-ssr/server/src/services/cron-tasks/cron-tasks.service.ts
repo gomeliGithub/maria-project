@@ -54,9 +54,9 @@ export class CronTasksService {
             const dumpContents: string = await fsPromises.readFile(`./databaseDumps/dump_${ dateNow }.sql`, { encoding: 'utf8', flag: 'r+'});
             await fsPromises.writeFile(`./databaseDumps/dump_${ dateNow }.sql`, dumpContents.replace('/*!40101 SET NAMES utf8 */;', ''));
 
-            this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] 'Database dump success - DumpFile dump_${ dateNow }.sql`, false, 'internal');
+            this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] 'Database dump success - DumpFile dump_${ dateNow }.sql`, false, 'server');
         } catch ( err: any ) {
-            this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ 'Database dump error - DumpFile dump_' + dateNow + '.sql' + err }.`, true, 'internal');
+            this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ 'Database dump error - DumpFile dump_' + dateNow + '.sql' + err }.`, true, 'server');
         }
     }
 

@@ -1,16 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 
+import { NextFunction, Response } from 'express';
+import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
 import { AppService } from './app.service';
 
-import { generateCookieSecret, generateJWT_SecretCode } from './services/sign/sign.generateKeys';
+import { generateCookieSecret, generateJWT_SecretCode, generateCspNonce } from './services/sign/sign.generateKeys';
 
 import { HttpExceptionFilter } from './filters/http-exception/http-exception.filter';
 
 import { CacheInterceptor } from './interceptors/cache/cache.interceptor';
 import { BigIntInterceptor } from './interceptors/big-int/big-int.interceptor';
+
+import { IRequest } from 'types/global';
 
 async function bootstrap() {
     process.env.JWT_SECRETCODE = generateJWT_SecretCode();
@@ -20,6 +24,8 @@ async function bootstrap() {
         logger: ['error', 'warn', 'log']
     });
 
+    const serverDomain: string = process.env.SERVER_DOMAIN as string;
+
     app.enableShutdownHooks();
 
     app.enableCors({
@@ -27,6 +33,27 @@ async function bootstrap() {
         methods: [ 'GET', 'PUT', 'POST', 'DELETE' ], 
         credentials: true
     });
+
+    app.use(( _:IRequest, res: Response, next: NextFunction ) => {
+        res.locals.cspNonce = generateCspNonce();
+
+        next();
+    });
+    
+    if ( serverDomain === 'http://localhost' ) {
+        app.use(helmet({
+            contentSecurityPolicy: {
+                directives: {
+                    scriptSrc: [ `'self'`, `'unsafe-inline'`, `'unsafe-eval'` ], // ( req, res ) => `'nonce-${ ( res as Response ).locals.cspNonce }'`
+                    styleSrc: [ `'self'`, `https://fonts.googleapis.com`, `'unsafe-inline'` ],
+                    fontSrc: [ `'self'`, `https://fonts.gstatic.com` ],
+                    imgSrc: [ `'self'`, `data: w3.org/svg/2000` ],
+                    manifestSrc: [ `'self'` ],
+                    frameSrc: [ `'self'` ]
+                },
+            }
+        }));
+    }
 
     app.use(cookieParser(process.env.COOKIE_SECRET));
 

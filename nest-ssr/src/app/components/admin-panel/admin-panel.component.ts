@@ -1,6 +1,6 @@
 import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, OnInit, PLATFORM_ID, QueryList, ViewChildren } from '@angular/core';
 import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
@@ -225,6 +225,8 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
     ngAfterViewChecked (): void {
         if ( !this.compressedImagesContainerAnimationIsDone && this.compressedImageThumbnailUrls && this.fullCompressedImagesList && this.compressedImageThumbnailUrls.length === this.fullCompressedImagesList.length ) {
             this.compressedImageContainersAnimationCurrentStates.forEach(( data, index, arr ) => data === 'leave' ? arr[index] = 'enter' : null);
+
+            this._changeDetectorRef.detectChanges();
 
             this.compressedImagesContainerAnimationIsDone = true;
         }
@@ -515,7 +517,7 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
                     imageDisplayType,
                     imageDescription
                 }
-            }, { headers: this._appService.createAuthHeaders() as HttpHeaders, responseType: 'text', withCredentials: true }).subscribe({
+            }, { headers: this._appService.createAuthHeaders() || { }, responseType: 'text', withCredentials: true }).subscribe({
                 next: result => {
                     switch ( result ) {
                         case 'START': { this._adminPanelService.uploadImage(this._imageFile as File, this.uploadImageForm, newClientId); break; }
@@ -543,7 +545,7 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
 
                 this._http.post('/api/admin-panel/deleteImage', {
                     adminPanel: { originalImageName }
-                }, { headers: this._appService.createAuthHeaders() as HttpHeaders, responseType: 'text', withCredentials: true }).subscribe({
+                }, { headers: this._appService.createAuthHeaders() || { }, responseType: 'text', withCredentials: true }).subscribe({
                     next: responseText => {
                         this._adminPanelService.switchImageControlResponses(responseText, 'delete');
                         this.deleteImageIsCompleted = true;
@@ -584,7 +586,7 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
 
                 this._http.post('/api/admin-panel/changeImageDisplayTarget', {
                     adminPanel: { originalImageName, displayTargetPage }
-                }, { headers: this._appService.createAuthHeaders() as HttpHeaders, responseType: 'text', withCredentials: true }).subscribe({
+                }, { headers: this._appService.createAuthHeaders() || { }, responseType: 'text', withCredentials: true }).subscribe({
                     next: responseText => {
                         this._adminPanelService.switchImageControlResponses(responseText, 'changeDisplayTarget');
 
@@ -634,7 +636,7 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
 
             this._http.put('/api/admin-panel/changeImageData', {
                 adminPanel: { originalImageName, newImagePhotographyType, newImageDescription, newImageDisplayType }
-            }, { responseType: 'text', headers: this._appService.createAuthHeaders() as HttpHeaders, withCredentials: true }).subscribe({
+            }, { responseType: 'text', headers: this._appService.createAuthHeaders() || { }, withCredentials: true }).subscribe({
                 next: responseText => {
                     this.spinnerHidden = true;
 
@@ -692,7 +694,7 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
 
                 this._http.post('/api/admin-panel/setPhotographyTypeImage', {
                     adminPanel: { originalImageName, imagePhotographyType }
-                }, { responseType: 'text', headers: this._appService.createAuthHeaders() as HttpHeaders, withCredentials: true }).subscribe({
+                }, { responseType: 'text', headers: this._appService.createAuthHeaders() || { }, withCredentials: true }).subscribe({
                     next: responseText => {
                         this.spinnerHidden = true;
     
@@ -729,7 +731,7 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
 
                     this._http.post<void>('/api/admin-panel/changePhotographyTypeDescription', {
                         adminPanel: { photographyTypeName, photographyTypeNewDescription }
-                    }, { headers: this._appService.createAuthHeaders() as HttpHeaders, withCredentials: true }).subscribe({
+                    }, { headers: this._appService.createAuthHeaders() || { }, withCredentials: true }).subscribe({
                         next: () => {
                             this.spinnerHidden = true;
 

@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostBinding, Inject, OnInit, PLATFORM_ID, QueryList, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Inject, OnInit, PLATFORM_ID, QueryList, ViewChild } from '@angular/core';
 import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HttpResponse } from '@angular/common/http';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -22,6 +22,7 @@ import { AnimationEvent } from 'types/global';
 import { ICompressedImageWithoutRelationFields } from 'types/models';
 
 @Component({
+    changeDetection: ChangeDetectionStrategy.OnPush,
     selector: 'app-gallery',
     standalone: true,
     imports: [ CommonModule, ReactiveFormsModule, NgbModule, CarouselModule, TranslateModule ],

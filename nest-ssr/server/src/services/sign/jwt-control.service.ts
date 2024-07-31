@@ -23,7 +23,7 @@ export class JwtControlService {
         const [ type, token ] = request.headers.authorization?.split(' ') ?? [];
 
         if ( !( request.url in [ '/api/sign/up', '/api/sign/in', '/api/sign/getActiveClient', '/api/sign/out' ] ) && !token ) {
-            if ( throwError ) throw new UnauthorizedException(`${ request.url } "ExtractTokenFromHeader - access token does not exists"`);
+            if ( throwError && ( request.hasOwnProperty('validatedRequest') && request.validatedRequest === false ) ) throw new UnauthorizedException(`${ request.url } "ExtractTokenFromHeader - access token does not exists"`);
             else return undefined;
         }
         

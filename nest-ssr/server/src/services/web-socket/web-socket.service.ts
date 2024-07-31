@@ -59,7 +59,7 @@ export class WebSocketService {
             connection.on('error', async () => this.connectionOnErrorHandler(currentWebSocketClient));
         });
 
-        this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } Socket server running on port ${ this.webSocketServerPort }`, false, 'http');
+        this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } Socket server running on port ${ this.webSocketServerPort }`, false, 'server');
     }
 
     public async connectionOnMessageHandler (currentWebSocketClient: IWebSocketClient, webSocketClientId: number, data: any, isBinary: boolean) {

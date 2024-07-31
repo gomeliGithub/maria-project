@@ -18,6 +18,7 @@ export interface ICookieSerializeOptions {
 export interface IRequest extends Request {
     session: null;
     activeClientData?: IJWTPayload;
+    validatedRequest?: boolean;
 }
 
 export interface IRequestBody {

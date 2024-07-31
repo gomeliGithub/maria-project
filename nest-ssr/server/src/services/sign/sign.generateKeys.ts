@@ -32,7 +32,7 @@ export function generateJWT_SecretCode (): string {
 
 export function generate__secure_fgp (): __secure_fgpData {
     const __secure_fgp: string = crypto.randomBytes(50).toString("hex");
-    const __secure_fgpHash: string = (crypto.createHmac("SHA256", __secure_fgp)).digest('hex');
+    const __secure_fgpHash: string = crypto.createHmac("SHA256", __secure_fgp).digest('hex');
 
     return {
         __secure_fgp: __secure_fgp,
@@ -44,4 +44,12 @@ export function generateCookieSecret (): string {
     const cookieSecret: string = crypto.randomBytes(50).toString("hex");
 
     return cookieSecret;
+}
+
+export function generateCspNonce () {
+    // const cspNonce = crypto.createHmac('sha512', crypto.randomBytes(512)).digest('base64');
+
+    const cspNonce = crypto.randomBytes(16).toString('base64');
+
+    return cspNonce;
 }

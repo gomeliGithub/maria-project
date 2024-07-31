@@ -109,9 +109,9 @@ export class AppModule {
                         size: number;
                     }[] = importer.getImported();
 
-                    this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ 'Database import success - ' + files_imported.length } SQL file(s) imported. DumpFile dump_${ lastDumpDate.getTime() }.sql`, false, 'internal');
+                    this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ 'Database import success - ' + files_imported.length } SQL file(s) imported. DumpFile dump_${ lastDumpDate.getTime() }.sql`, false, 'server');
                 }).catch(err => {
-                    this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ 'Database import error - ' + err }. DumpFile dump_${ lastDumpDate.getTime() }.sql`, true, 'internal');
+                    this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ 'Database import error - ' + err }. DumpFile dump_${ lastDumpDate.getTime() }.sql`, true, 'server');
                 });
             } else await this._createOrUpdateMainAdmin();
         } else await this._createOrUpdateMainAdmin();

@@ -1,9 +1,17 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { HttpArgumentsHost } from '@nestjs/common/interfaces';
+import { Request } from 'express';
+
 import { Observable, map } from 'rxjs';
 
 @Injectable()
 export class BigIntInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+        const ctx: HttpArgumentsHost = context.switchToHttp();
+        const request: Request = ctx.getRequest<Request>();
+
+        if ( request.url.startsWith('/api/client/downloadOriginalImage') ) return next.handle();
+        
         return next.handle().pipe(map((data) => this._convertBigIntToString(data)));
     }
 

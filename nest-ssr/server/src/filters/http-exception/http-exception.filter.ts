@@ -1,6 +1,6 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 import { 
     PrismaClientInitializationError, 
@@ -12,6 +12,8 @@ import {
 
 import { AppService } from '../../app.service';
 
+import { IRequest } from 'types/global';
+
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
     constructor (private readonly _appService: AppService) { }
@@ -19,7 +21,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     catch (exception: HttpException, host: ArgumentsHost) {
         const ctx: HttpArgumentsHost = host.switchToHttp();
         const response: Response = ctx.getResponse<Response>();
-        const request: Request = ctx.getRequest<Request>();
+        const request: IRequest = ctx.getRequest<IRequest>();
         const status: number = exception.getStatus();
 
         let errorMessage: unknown;
@@ -50,7 +52,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             ];
         }
 
-        this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ status } ${ errorMessage }`, true, 'http');
+        if ( request.hasOwnProperty('validatedRequest') && request.validatedRequest === false ) this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ status } ${ errorMessage }`, true, 'http');
 
         response.status(status).json({
             statusCode: httpStatus,

@@ -69,6 +69,8 @@ export class ClientController {
             'Content-Disposition': `attachment; filename=${ encodeURIComponent(downloadingOriginalImageData.name) }`,
         });
 
+        if ( !request.hasOwnProperty('validatedRequest') ) request.validatedRequest = true;
+
         return new StreamableFile(imageReadStream);
     }
 

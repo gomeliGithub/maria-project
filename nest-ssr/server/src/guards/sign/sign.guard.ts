@@ -24,7 +24,9 @@ export class SignGuard implements CanActivate {
         if ( !requestBody ) throw new BadRequestException(`${ request.url } "SignGuard - requestBody does not exists"`);
 
         if ( !clientTypes ) return true;
-        if ( request.url !== '/api/sign/in' && !request.cookies['__secure_fgp'] ) throw new UnauthorizedException(`${ request.url } "SignGuard - cookie __secure_fgp does not exists"`);
+        if ( ( request.hasOwnProperty('validatedRequest') && request.validatedRequest === false ) && request.url !== '/api/sign/in' && !request.cookies['__secure_fgp'] ) {
+            throw new UnauthorizedException(`${ request.url } "SignGuard - cookie __secure_fgp does not exists"`);
+        }
 
         return this._signService.validateClient(request, clientTypes);
     }

@@ -1,7 +1,10 @@
-import { Component, ElementRef, HostBinding, HostListener, Inject, OnInit, PLATFORM_ID, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, HostBinding, HostListener, Inject, OnInit, Optional, PLATFORM_ID, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule, DOCUMENT, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
+
+import { Response } from 'express';
+import { RESPONSE } from '@nestjs/ng-universal/dist/tokens';
 
 import { Subscription } from 'rxjs';
 import { NgbDropdown, NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -133,6 +136,7 @@ export class AppComponent implements OnInit {
 
     constructor (
         @Inject(PLATFORM_ID) private readonly platformId: string,
+        @Optional() @Inject(RESPONSE) private readonly response: Response,
         @Inject(DOCUMENT) private readonly document: Document,
         
         private readonly _appService: AppService,
@@ -144,6 +148,18 @@ export class AppComponent implements OnInit {
     ) { 
         this.isPlatformBrowser = isPlatformBrowser(this.platformId);
         this.isPlatformServer = isPlatformServer(this.platformId);
+
+        /* if ( this.isPlatformServer ) {
+            const cspNonce: string = this.response.locals['cspNonce'];
+
+            console.log(cspNonce);
+
+            const scriptStyleElements: NodeListOf<HTMLScriptElement | HTMLStyleElement> = this.document.querySelectorAll('script, style');
+
+            console.log(scriptStyleElements.length);
+
+            scriptStyleElements.forEach(data => data.setAttribute('nonce', cspNonce));
+        } */
     }
 
     ngOnInit (): void {
@@ -240,6 +256,11 @@ export class AppComponent implements OnInit {
                 component.compressedImagesList = compressedImagesList;
                 component.additionalImagesExists = additionalImagesExists;
                 component.photographyTypeDescription = photographyTypeDescription ? photographyTypeDescription : null;
+
+                ( component.compressedImagesList as ICompressedImageWithoutRelationFields[]).forEach(() => {
+                    component.linkContainerAnimationStates.push('leave');
+                    component.linkContainerAnimationDisplayValues.push('none');
+                });
             }
         } else {
             this.componentClass = true;

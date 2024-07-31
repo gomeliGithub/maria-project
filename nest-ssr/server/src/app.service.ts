@@ -33,12 +33,12 @@ export class AppService {
     public __filename: string = fileURLToPath(import.meta.url);
     public __dirname: string = dirname(__filename);
 
-    public logFilePath: string = join(process.cwd(), 'server', 'logs', '_server.log');
+    public serverLogFilePath: string = join(process.cwd(), 'server', 'logs', '_server.log');
+    public serverErrorFilePath: string = join(process.cwd(), 'server', 'logs', '_serverError.log');
+    public httpLogFilePath: string = join(process.cwd(), 'server', 'logs', '_httpServer.log');
     public httpErrorLogFilePath: string = join(process.cwd(), 'server', 'logs', '_httpErrorServer.log');
     public webSocketLogFilePath: string = join(process.cwd(), 'server', 'logs', '_webSocketServer.log');
     public webSocketErrorLogFilePath: string = join(process.cwd(), 'server', 'logs', '_webSocketErrorServer.log');
-    public internalLogFilePath: string = join(process.cwd(), 'server', 'logs', '_internalServer.log');
-    public internalErrorLogFilePath: string = join(process.cwd(), 'server', 'logs', '_internalErrorServer.log');
 
     public cookieSerializeOptions: ICookieSerializeOptions = {
         httpOnly: true,
@@ -66,7 +66,7 @@ export class AppService {
         return serviceRef;
     }
 
-    public logLineAsync (logLine: string, error: boolean, logType: 'http' | 'webSocket' | 'internal'): Promise<void> {
+    public logLineAsync (logLine: string, error: boolean, logType: 'server' | 'http' | 'webSocket'): Promise<void> {
         return new Promise<void>( (resolve, reject) => {
             const logDT = new Date();
 
@@ -75,12 +75,10 @@ export class AppService {
 
             let logFilePath: string | null = null;
 
-            if ( logType === 'http' ) {
-                logFilePath = !error ? this.logFilePath : this.httpErrorLogFilePath;
-            } else if ( logType === 'webSocket' ) {
-                logFilePath = !error ? this.webSocketLogFilePath : this.webSocketErrorLogFilePath;
-            } else if ( logType === 'internal' ) {
-                logFilePath = !error ? this.internalLogFilePath : this.internalErrorLogFilePath;
+            switch ( logType ) {
+                case 'server': { logFilePath = !error ? this.serverLogFilePath : this.serverErrorFilePath; break; }
+                case 'http': { logFilePath = !error ? this.httpLogFilePath : this.httpErrorLogFilePath; break; }
+                case 'webSocket': { logFilePath = !error ? this.webSocketLogFilePath : this.webSocketErrorLogFilePath; break; }
             }
         
             if ( !error ) console.info(fullLogLine);
