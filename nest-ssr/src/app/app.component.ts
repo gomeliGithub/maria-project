@@ -209,7 +209,9 @@ export class AppComponent implements OnInit {
 
             // this.footerAnimationState = 'show';
 
+            this.navbarElementRef.nativeElement.classList.remove('fixed-top');
             this.footerElementRef.nativeElement.classList.remove('bottom-0', 'position-absolute');
+            this.navbarElementRef.nativeElement.classList.add('sticky-top');
             this.footerElementRef.nativeElement.classList.add('position-relative');
 
             this.isHomePage = false;
@@ -268,7 +270,9 @@ export class AppComponent implements OnInit {
 
             this._homeService.setActiveScrollSnapSection(0);
 
+            this.navbarElementRef.nativeElement.classList.remove('sticky-top');
             this.footerElementRef.nativeElement.classList.remove('position-relative');
+            this.navbarElementRef.nativeElement.classList.add('fixed-top');
             this.footerElementRef.nativeElement.classList.add('bottom-0', 'position-absolute');
         }
     }
@@ -306,6 +310,8 @@ export class AppComponent implements OnInit {
 
                 this.prevNavbarAnimationState = null;
             }
+        } else if ( this.prevNavbarAnimationState === 'scrolled' ) {
+            if ( !this.navbarIsCollapsed ) this.navbarAnimationState = 'scrolled';
         }
     }
 

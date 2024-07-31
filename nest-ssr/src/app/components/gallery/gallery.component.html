@@ -1,50 +1,7 @@
 <div class="mt-5 p-3 font-family-dancing-script-bold">
     <h1 class="display-4 user-select-none">{{ 'GALLERYPAGE.HEADERTITLE' | translate }}</h1>
 </div>
-<div *ngIf="compressedImagesList; else noContentBlock" class="col-12 py-3 shadow-lg">
-    <!-- <ngb-carousel class="carousel"
-        [interval]="3000"
-        [showNavigationArrows]="compressedImagesList.length > 1"
-        [showNavigationIndicators]="false"
-        (slide)="onCarouselSlide($event)"
-    >
-        <ng-template ngbSlide [id]="'ngb-slide-' + i" *ngFor="let imageDataArr of compressedImagesList; let i = index"> 
-            <div class="row justify-content-center align-items-center py-3 shadow-lg">
-                <div *ngFor="let imageData of imageDataArr; let j = index" class="col-5 col-lg-3 position-relative"
-                    (mouseenter)="startLinkContainerAnimation(
-                        setCurrentLinkContainerAnimationStateIndex(imageData.name)
-                    )"
-                    (mouseleave)="startLinkContainerAnimation(
-                        setCurrentLinkContainerAnimationStateIndex(imageData.name)
-                    )"
-                >
-                    <img src="/assets/images_thumbnail/gallery/{{ photographyType }}/{{ imageData.name }}" class="img-fluid object-fit-cover h-100 rounded" alt="">
-                    <div *ngIf="activeClientType === 'admin'" class="position-absolute top-100 start-50 d-flex flex-row justify-content-center z-1 downloadOriginalImageLinkContainer"
-                        [@link-container-animation]="linkContainerAnimationStates[setCurrentLinkContainerAnimationStateIndex(imageData.name)]"
-                        (@link-container-animation.start)="linkContainerAnimationStarted($event, setCurrentLinkContainerAnimationStateIndex(
-                            imageData.name)
-                        )"
-                        (@link-container-animation.done)="linkContainerAnimationDone($event, setCurrentLinkContainerAnimationStateIndex(
-                            imageData.name)
-                        )"
-                        [ngStyle]="{ 
-                            'display': linkContainerAnimationDisplayValues[setCurrentLinkContainerAnimationStateIndex(imageData.name)]
-                        }"
-                    >
-                        <div class="input-group justify-content-center flex-nowrap w-70">
-                            <button class="btn btn-success btn-sm" type="button" (click)="downloadOriginalImage(imageData.name)">
-                                <i class="bi bi-download"></i>
-                            </button>
-                            <span class="input-group-text text-wrap text-bg-light fw-medium p-0 px-1 border-0 user-select-none">
-                                {{ 'GALLERYPAGE.DOWNLOADORIGINALIMAGEBUTTONTEXT' | translate }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </ng-template>
-    </ngb-carousel> -->
-
+<div *ngIf="compressedImagesList && compressedImagesList.length !== 0; else noContentBlock" class="col-12 py-3 shadow-lg">
     <owl-carousel-o id="galleryImagesCarousel" [options]="galleryImagesCarouselOptions" (translated)="changeActiveCarouselItems($event)">
         <ng-container *ngFor="let imageData of compressedImagesList">
             <ng-template carouselSlide> <!-- [id]="slide.id" -->
@@ -301,7 +258,7 @@
         </ng-template>
     </div>
 </div>
-<div class="d-flex flex-column w-50 position-absolute visible overflow-y-auto pe-auto" [@send-order-form-animation]="sendOrderFormAnimationState"
+<div class="d-flex flex-column w-50 my-2 position-absolute visible overflow-y-auto pe-auto" [@send-order-form-animation]="sendOrderFormAnimationState"
     (@send-order-form-animation.start)="sendOrderFormAnimationStarted($event)"
     (@send-order-form-animation.done)="sendOrderFormAnimationDone($event)"
     #sendOrderFormContainer

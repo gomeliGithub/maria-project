@@ -49,7 +49,7 @@ export function generateCookieSecret (): string {
 export function generateCspNonce () {
     // const cspNonce = crypto.createHmac('sha512', crypto.randomBytes(512)).digest('base64');
 
-    const cspNonce = crypto.randomBytes(16).toString('base64');
+    const cspNonce = crypto.randomBytes(32).toString('base64');
 
     return cspNonce;
 }

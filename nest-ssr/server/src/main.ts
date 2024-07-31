@@ -34,24 +34,51 @@ async function bootstrap() {
         credentials: true
     });
 
-    app.use(( _:IRequest, res: Response, next: NextFunction ) => {
-        res.locals.cspNonce = generateCspNonce();
-
-        next();
-    });
-    
     if ( serverDomain === 'http://localhost' ) {
+        app.use(( _:IRequest, res: Response, next: NextFunction ) => {
+            res.locals.cspNonce = generateCspNonce();
+    
+            next();
+        });
+        
         app.use(helmet({
             contentSecurityPolicy: {
                 directives: {
-                    scriptSrc: [ `'self'`, `'unsafe-inline'`, `'unsafe-eval'` ], // ( req, res ) => `'nonce-${ ( res as Response ).locals.cspNonce }'`
+                    scriptSrc: [ `'self'`, `'unsafe-inline'`, `'unsafe-eval'`,  ], // ( _, res ) => `'nonce-${ ( res as Response ).locals.cspNonce }'` // `'unsafe-inline'`,
                     styleSrc: [ `'self'`, `https://fonts.googleapis.com`, `'unsafe-inline'` ],
+                    connectSrc: [ `'self'` ],
                     fontSrc: [ `'self'`, `https://fonts.gstatic.com` ],
                     imgSrc: [ `'self'`, `data: w3.org/svg/2000` ],
+                    objectSrc: [ `'self'` ],
+                    baseUri: [ `'self'` ],
+                    frameSrc: [ `'self'` ],
                     manifestSrc: [ `'self'` ],
-                    frameSrc: [ `'self'` ]
-                },
-            }
+                    mediaSrc: [ `'self'` ],
+                    workerSrc: [ `'self'` ],
+                    frameAncestors: [ `'self'` ]
+                }
+            },
+            crossOriginEmbedderPolicy: false,
+            crossOriginOpenerPolicy: { policy: 'same-origin' },
+            crossOriginResourcePolicy: { policy: 'same-origin' },
+            originAgentCluster: true,
+            referrerPolicy: {
+                policy: 'no-referrer',
+            },
+            strictTransportSecurity: {
+                maxAge: 15552000,
+                includeSubDomains: true,
+                preload: true,
+            },
+            xContentTypeOptions: false,
+            xDnsPrefetchControl: { allow: true },
+            xDownloadOptions: false,
+            xFrameOptions: { action: 'sameorigin' },
+            xPermittedCrossDomainPolicies: {
+                permittedPolicies: 'none'
+            },
+            xPoweredBy: false,
+            xXssProtection: true
         }));
     }
 
