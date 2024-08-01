@@ -18,8 +18,8 @@ export class WebSocketService {
     private _socketServer = new WebSocketServer({ port: this.webSocketServerPort });
 
     constructor (
-        private readonly appService: AppService,
-        private readonly adminPanelService: AdminPanelService
+        private readonly _appService: AppService,
+        private readonly _adminPanelService: AdminPanelService
     ) {
         this._socketServer.on('connection', async ( connection, request ) => {
             const splittedURL: string[] = ( request.url as string ).split('/');
@@ -31,7 +31,7 @@ export class WebSocketService {
                 return;
             }
 
-            const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
+            const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
             const currentWebSocketClient: IWebSocketClient | undefined = commonServiceRef.webSocketClients.find(client => client._id === webSocketClientId);
 
             if ( !currentWebSocketClient ) {
@@ -44,41 +44,58 @@ export class WebSocketService {
 
             currentWebSocketClient.connection = connection;
 
-            const timeoutInterval = this.setIntervalStart();
+            let timer: number = 0;
 
-            this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] New connection established. WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentWebSocketClient.login }`, false, 'webSocket');
+            const timeoutInterval = setInterval(() => {
+                timer++;
+            
+                try {
+                    if ( ( Date.now() - currentWebSocketClient.lastkeepalive ) > 12000 ) {
+                        this._connectionOnCloseErrorHandler(commonServiceRef, currentWebSocketClient, true);
+
+                        clearInterval(timeoutInterval);
+                    } else if ( currentWebSocketClient.connection ) {
+                        const message: IWSMessage = this._adminPanelService.createMessage('timer', 'timer= ' + timer);
                 
-            connection.on('message', async ( data, isBinary ) => this.connectionOnMessageHandler(currentWebSocketClient, webSocketClientId, data, isBinary));
+                        currentWebSocketClient.connection.send(JSON.stringify(message));
+                    }
+                    commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter(client => client.connection);
+                } catch {
+                    this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] WebSocket error`, true, 'webSocket');
+                }
+            }, 3000);
+
+            this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] New connection established. WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentWebSocketClient.login }`, false, 'webSocket');
+                
+            connection.on('message', async ( data, isBinary ) => await this._connectionOnMessageHandler(commonServiceRef, currentWebSocketClient, webSocketClientId, data, isBinary));
 
             connection.on('close', async () => {
-                this.connectionOnCloseHandler(currentWebSocketClient);
+                await this._connectionOnCloseErrorHandler(commonServiceRef, currentWebSocketClient, false);
                 
-                clearInterval(await timeoutInterval);
+                clearInterval(timeoutInterval);
             });
 
-            connection.on('error', async () => this.connectionOnErrorHandler(currentWebSocketClient));
+            connection.on('error', async () => await this._connectionOnCloseErrorHandler(commonServiceRef, currentWebSocketClient, true));
         });
 
-        this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } Socket server running on port ${ this.webSocketServerPort }`, false, 'server');
+        this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } Socket server running on port ${ this.webSocketServerPort }`, false, 'server');
     }
 
-    public async connectionOnMessageHandler (currentWebSocketClient: IWebSocketClient, webSocketClientId: number, data: any, isBinary: boolean) {
-        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
-
+    private async _connectionOnMessageHandler (commonServiceRef: CommonService, currentWebSocketClient: IWebSocketClient, webSocketClientId: number, data: any, isBinary: boolean) {
         if ( data.toString() === "KEEP_ME_ALIVE" ) commonServiceRef.webSocketClients.forEach(client => client._id === webSocketClientId ? client.lastkeepalive = Date.now() : null);
         else {
             if ( isBinary ) {
                 const fileData: string | Buffer = data;
 
-                if ( currentWebSocketClient.uploadedSize === 0 ) await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] WebSocketClientId --- ${ webSocketClientId }, 
+                if ( currentWebSocketClient.uploadedSize === 0 ) await this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] WebSocketClientId --- ${ webSocketClientId }, 
                 login --- ${ currentWebSocketClient.login }. Upload file ${ currentWebSocketClient.imageMetaName }, size --- ${ currentWebSocketClient.imageMetaSize } is started`, false, 'webSocket');
 
                 currentWebSocketClient.uploadedSize += fileData.length;
 
                 currentWebSocketClient.activeWriteStream.write(fileData, async () => {
-                    const message = this.adminPanelService.createMessage('uploadImage', 'SUCCESS', { uploadedSize: currentWebSocketClient.uploadedSize, imageMetaSize: currentWebSocketClient.imageMetaSize });
+                    const message = this._adminPanelService.createMessage('uploadImage', 'SUCCESS', { uploadedSize: currentWebSocketClient.uploadedSize, imageMetaSize: currentWebSocketClient.imageMetaSize });
 
-                    await this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] WebSocketClientId --- ${ webSocketClientId }, 
+                    await this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] WebSocketClientId --- ${ webSocketClientId }, 
                     login --- ${ currentWebSocketClient.login }. Chunk ${ currentWebSocketClient.currentChunkNumber } writed, size --> ${ fileData.length }`, false, 'webSocket');
 
                     currentWebSocketClient.currentChunkNumber += 1;
@@ -90,51 +107,23 @@ export class WebSocketService {
         }
     }
 
-    public async connectionOnCloseHandler (currentWebSocketClient: IWebSocketClient): Promise<void> {
-        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
+    private async _connectionOnCloseErrorHandler (commonServiceRef: CommonService, currentWebSocketClient: IWebSocketClient, error: boolean): Promise<void> {
+        currentWebSocketClient.connection?.terminate();
+        currentWebSocketClient.connection = null;
 
-        if ( currentWebSocketClient.uploadedSize !== currentWebSocketClient.imageMetaSize ) {
+        if ( error || currentWebSocketClient.uploadedSize !== currentWebSocketClient.imageMetaSize ) {
+            currentWebSocketClient.activeWriteStream.destroy();
+
             await fsPromises.unlink(currentWebSocketClient.imagePath);
             
-            commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter(client => client._id !== currentWebSocketClient._id);
+            await this._appService.logLineAsync(
+                `${ process.env.SERVER_DOMAIN } [${ process.env.WEBSOCKETSERVER_PORT }] WebSocket error. WebSocketClientId --- ${ currentWebSocketClient._id }, login --- ${ currentWebSocketClient.login }`,
+                true, 'webSocket'
+            );
         }
-    }
-
-    public async connectionOnErrorHandler (currentWebSocketClient: IWebSocketClient): Promise<void> {
-        const commonServiceRef: CommonService = await this.appService.getServiceRef(CommonModule, CommonService);
-
-        await fsPromises.unlink(currentWebSocketClient.imagePath);
 
         commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter(client => client._id !== currentWebSocketClient._id);
-    }
 
-    public async setIntervalStart (): Promise<NodeJS.Timeout> {
-        let timer: number = 0;
-
-        return setInterval(() => {
-            timer++;
-        
-            try {
-                this.appService.getServiceRef(CommonModule, CommonService).then(commonServiceRef => {
-                    commonServiceRef.webSocketClients.forEach(client => {
-                        if ( ( Date.now() - client.lastkeepalive ) > 12000 ) {
-                            ( client.connection as WebSocket ).terminate();
-            
-                            client.connection = null;
-                
-                            this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] Websocket client ${ client.login } disconnected`, false, 'webSocket');
-                        } else if ( client.connection ) {
-                            const message: IWSMessage = this.adminPanelService.createMessage('timer', 'timer= ' + timer);
-            
-                            client.connection.send(JSON.stringify(message));
-                        }
-                    });
-            
-                    commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter(client => client.connection);
-                });
-            } catch {
-                this.appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] WebSocketServer error`, true, 'webSocket');
-            }
-        }, 3000);
+        await this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ this.webSocketServerPort }] Connection disconnected. WebSocketClientId --- ${ currentWebSocketClient._id }, login --- ${ currentWebSocketClient.login }`, false, 'webSocket');
     }
 }

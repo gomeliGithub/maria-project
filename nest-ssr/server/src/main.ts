@@ -46,7 +46,7 @@ async function bootstrap() {
                 directives: {
                     scriptSrc: [ `'self'`, `'unsafe-inline'`, `'unsafe-eval'`,  ], // ( _, res ) => `'nonce-${ ( res as Response ).locals.cspNonce }'` // `'unsafe-inline'`,
                     styleSrc: [ `'self'`, `https://fonts.googleapis.com`, `'unsafe-inline'` ],
-                    connectSrc: [ `'self'` ],
+                    connectSrc: [ `'self'`, `ws://localhost:82` ],
                     fontSrc: [ `'self'`, `https://fonts.gstatic.com` ],
                     imgSrc: [ `'self'`, `data: w3.org/svg/2000` ],
                     objectSrc: [ `'self'` ],

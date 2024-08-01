@@ -121,14 +121,7 @@ export class AdminPanelService {
             const currentUploadImageStats: fs.Stats = await fsPromises.stat(newOriginalImagePath);
 
             if ( currentUploadImageStats.size === 0 ) {
-                const currentClient: IWebSocketClient = await this.throwWebSocketError(commonServiceRef, newOriginalImagePath, webSocketClientId, imageMeta?.size as number);
-
-                if ( currentClient.connection ) {
-                    currentClient.connection.terminate();
-                    currentClient.connection = null;
-        
-                    commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter((client => client.connection));
-                }
+                await this.throwWebSocketError(commonServiceRef, newOriginalImagePath, webSocketClientId, imageMeta?.size as number);
 
                 clearTimeout(uploadImageTimeout);
             }
@@ -137,7 +130,9 @@ export class AdminPanelService {
         writeStream.on('error', async () => {
             const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
 
-            this.throwWebSocketError(commonServiceRef, newOriginalImagePath, webSocketClientId, imageMeta?.size as number);
+            await this.throwWebSocketError(commonServiceRef, newOriginalImagePath, webSocketClientId, imageMeta?.size as number);
+
+            clearTimeout(uploadImageTimeout);
         });
     
         writeStream.on('finish', async () => {
@@ -240,13 +235,13 @@ export class AdminPanelService {
         return null;
     }
 
-    public async throwWebSocketError (commonServiceRef: CommonService, newOriginalImagePath: string, webSocketClientId: number, imageMetaSize: number): Promise<IWebSocketClient> {
+    public async throwWebSocketError (commonServiceRef: CommonService, newOriginalImagePath: string, webSocketClientId: number, imageMetaSize: number): Promise<void> {
         await fsPromises.unlink(newOriginalImagePath);
 
         const currentClient: IWebSocketClient = commonServiceRef.webSocketClients.find(client => client._id === webSocketClientId) as IWebSocketClient;
 
         await this._appService.logLineAsync(
-            `${ process.env.SERVER_DOMAIN } [${ process.env.WEBSOCKETSERVER_PORT }] WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentClient.login }. Stream error`,
+            `${ process.env.SERVER_DOMAIN } [${ process.env.WEBSOCKETSERVER_PORT }] WebSocketClientId --- ${ webSocketClientId }, login --- ${ currentClient.login }. ${ imageMetaSize === 0 ? 'Websocket error' : 'Stream error' }`,
             true, 'webSocket'
         );
 
@@ -254,7 +249,12 @@ export class AdminPanelService {
 
         if ( currentClient.connection ) currentClient.connection.send(JSON.stringify(message));
 
-        return currentClient;
+        if ( currentClient.connection ) {
+            currentClient.connection.terminate();
+            currentClient.connection = null;
+
+            commonServiceRef.webSocketClients = commonServiceRef.webSocketClients.filter((client => client.connection));
+        }
     }
 
     public createMessage (eventType: string, eventText: string, percentUploadedOptions?: IPercentUploadedOptions) {

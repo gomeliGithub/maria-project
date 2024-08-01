@@ -81,7 +81,11 @@ export class ImageControlService {
     public async compressImage (request: IRequest, compressImageData: ICompressImageData, options?: sharp.SharpOptions): Promise<boolean> {
         const { ext } = ( await fileTypeFromFile(compressImageData.inputImagePath) as FileTypeResult );
 
-        if ( !this._appService.supportedImageFileTypes.map(imageFileType => imageFileType.replace('image/', '')).includes(ext) ) return false;
+        if ( !this._appService.supportedImageFileTypes.map(imageFileType => imageFileType.replace('image/', '')).includes(ext) ) {
+            await fsPromises.unlink(compressImageData.inputImagePath);
+
+            return false;
+        }
 
         if ( !options ) options = { };
 
