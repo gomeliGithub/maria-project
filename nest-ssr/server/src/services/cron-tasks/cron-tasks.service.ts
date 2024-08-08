@@ -74,8 +74,19 @@ export class CronTasksService {
             } else if ( fileName.endsWith('component.html') ) {
                 const routesInfo = this.routes.filter(routeInfo => routeInfo.componentFileName === fileName);
 
-                if ( routesInfo.length === 1) components.push({ url: routesInfo[0].url, changeTime: fileStat.ctime });
-                else routesInfo.forEach(routeInfo => components.push({ url: routeInfo.url, changeTime: fileStat.ctime }));
+                if ( routesInfo.length === 1) components.push({ url: routesInfo[0].url, changeTime: fileStat.ctime, priority: 1 });
+                else routesInfo.forEach(routeInfo => {
+                    let priority: number = 0;
+
+                    switch ( true ) {
+                        case routeInfo.url === '/home': { priority = 1; break; }
+                        case routeInfo.url.startsWith('/gallery'): { priority = 0.9; break; }
+                        case routeInfo.url.startsWith('/sign'): { priority = 0.5; break; }
+                        case routeInfo.url.startsWith('/adminPanel'): { priority = 0.2; break; }
+                    }
+
+                    components.push({ url: routeInfo.url, changeTime: fileStat.ctime, priority });
+                });
             }
         }
 
@@ -91,7 +102,7 @@ const sitemap=`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns
     <url>
         <loc>${ process.env.SERVER_DOMAIN }${ componentsInfo.url }</loc>
         <changefreq>weekly</changefreq>
-        <priority>1</priority>
+        <priority>${ componentsInfo.priority }</priority>
         <lastmod>${ componentsInfo.changeTime.toISOString() }</lastmod>
     </url>    
 `).join("")

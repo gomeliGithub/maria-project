@@ -3,8 +3,8 @@ import { CommonModule, DOCUMENT, isPlatformBrowser, isPlatformServer } from '@an
 import { RouterModule } from '@angular/router';
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
 
-import { Response } from 'express';
-import { RESPONSE } from '@nestjs/ng-universal/dist/tokens';
+import { Request, Response } from 'express';
+import { REQUEST, RESPONSE } from '@nestjs/ng-universal/dist/tokens';
 
 import { Subscription } from 'rxjs';
 import { NgbDropdown, NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -97,6 +97,8 @@ import { ICompressedImageWithoutRelationFields } from 'types/models';
     ]
 })
 export class AppComponent implements OnInit {
+    public domainURL: string = environment.domainURL;
+
     public isPlatformBrowser: boolean;
     public isPlatformServer: boolean;
 
@@ -136,8 +138,9 @@ export class AppComponent implements OnInit {
 
     constructor (
         @Inject(PLATFORM_ID) private readonly platformId: string,
+        @Optional() @Inject(REQUEST) private readonly _request: Request,
         @Optional() @Inject(RESPONSE) private readonly response: Response,
-        @Inject(DOCUMENT) private readonly document: Document,
+        @Inject(DOCUMENT) private readonly _document: Document,
         
         private readonly _appService: AppService,
         private readonly _clientService: ClientService,
@@ -177,7 +180,7 @@ export class AppComponent implements OnInit {
                         this.activeClientLocale = environment.defaultLocale;
                     }
 
-                    this.document.documentElement.lang = this.activeClientLocale ?? environment.defaultLocale;
+                    this._document.documentElement.lang = this.activeClientLocale ?? environment.defaultLocale;
                 },
                 error: () => this._appService.createErrorModal()
             });
@@ -268,6 +271,12 @@ export class AppComponent implements OnInit {
             this.componentClass = true;
             this.isHomePage = true;
 
+            if ( this.isPlatformServer ) {
+                if ( this._request.url === '/' ) {
+                    this.updateCanonicalLink('home');
+                }
+            }
+
             this._homeService.setActiveScrollSnapSection(0);
 
             this.navbarElementRef.nativeElement.classList.remove('sticky-top');
@@ -295,6 +304,22 @@ export class AppComponent implements OnInit {
         if ( !this.navbarElementRef.nativeElement.contains(event.target as HTMLElement) ) {
             if ( !this.navbarIsCollapsed ) this.navbarTogglerClick(true);
         }
+    }
+
+    public updateCanonicalLink (newCanonicalUrl: string): void {
+        const canonicalUrl: string = this.domainURL + '/' + newCanonicalUrl;
+        const head: HTMLHeadElement = this._document.getElementsByTagName('head')[0];
+
+        let element: HTMLLinkElement | undefined = this._document.querySelector(`link[rel='canonical']`) as HTMLLinkElement || undefined;
+
+        if ( !element ) {
+            element = this._document.createElement('link') as HTMLLinkElement;
+            
+            head.appendChild(element);
+        }
+
+        element.setAttribute('rel', 'canonical');
+        element.setAttribute('href', canonicalUrl);
     }
 
     public navbarTogglerClick (animationStart = false): void {
@@ -369,7 +394,7 @@ export class AppComponent implements OnInit {
 
         this._clientService.changeClientLocale(newLocale).subscribe({
             next: data => {
-                this.document.documentElement.lang = newLocale;
+                this._document.documentElement.lang = newLocale;
 
                 if ( data[0] ) localStorage.setItem('access_token', data[0]);
 

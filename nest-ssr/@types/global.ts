@@ -130,6 +130,7 @@ export interface IClientOrdersData {
 export interface IComponentInfo {
     url: string;
     changeTime: Date;
+    priority: number;
 }
 
 export interface AnimationEvent {

@@ -66,7 +66,7 @@ async function bootstrap() {
                 policy: 'no-referrer',
             },
             strictTransportSecurity: {
-                maxAge: 15552000,
+                maxAge: 31536000,
                 includeSubDomains: true,
                 preload: true,
             },

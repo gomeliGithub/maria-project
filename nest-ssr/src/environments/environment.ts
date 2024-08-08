@@ -4,6 +4,7 @@ import { IClientLocale } from "types/global";
 
 export const environment = {
     production: true,
+    domainURL: 'https://burtseva.by',
     webSocketServerURL: 'wss://burtseva.by/websocket',
     locales: [
         { code: 'ru', title: 'Русский' }, 
