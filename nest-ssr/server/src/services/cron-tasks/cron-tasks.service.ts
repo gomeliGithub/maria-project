@@ -19,7 +19,7 @@ export class CronTasksService {
         { url: '/gallery/children', componentFileName: 'gallery.component.html' },
         { url: '/gallery/wedding', componentFileName: 'gallery.component.html' },
         { url: '/gallery/family', componentFileName: 'gallery.component.html' },
-        { url: '/adminPanel', componentFileName: 'admin-panel.component.html' },
+        // { url: '/adminPanel', componentFileName: 'admin-panel.component.html' },
         { url: '/adminPanel/imagesControl', componentFileName: 'admin-panel.component.html' },
         { url: '/adminPanel/ordersControl', componentFileName: 'admin-panel-orders-control.component.html' },
         { url: '/adminPanel/discountsControl', componentFileName: 'admin-panel-discounts-control.component.html' },
@@ -74,16 +74,13 @@ export class CronTasksService {
             } else if ( fileName.endsWith('component.html') ) {
                 const routesInfo = this.routes.filter(routeInfo => routeInfo.componentFileName === fileName);
 
-                if ( routesInfo.length === 1) components.push({ url: routesInfo[0].url, changeTime: fileStat.ctime, priority: 1 });
-                else routesInfo.forEach(routeInfo => {
-                    let priority: number = 0;
+                if ( routesInfo.length === 1) {
+                    const priority: number = this._setURLPriority(routesInfo[0].url);
 
-                    switch ( true ) {
-                        case routeInfo.url === '/home': { priority = 1; break; }
-                        case routeInfo.url.startsWith('/gallery'): { priority = 0.9; break; }
-                        case routeInfo.url.startsWith('/sign'): { priority = 0.5; break; }
-                        case routeInfo.url.startsWith('/adminPanel'): { priority = 0.2; break; }
-                    }
+                    components.push({ url: routesInfo[0].url, changeTime: fileStat.ctime, priority });
+                }
+                else routesInfo.forEach(routeInfo => {
+                    const priority: number = this._setURLPriority(routeInfo.url);
 
                     components.push({ url: routeInfo.url, changeTime: fileStat.ctime, priority });
                 });
@@ -111,5 +108,18 @@ const sitemap=`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns
 
         await fsPromises.writeFile(path.resolve(path.join(process.cwd(), 'dist/nest-ssr/browser'), 'sitemap.xml'), sitemap);
         await fsPromises.writeFile(path.resolve(path.join(process.cwd(), 'src'), 'sitemap.xml'), sitemap);
+    }
+
+    private _setURLPriority (url: string): number {
+        let priority: number = 0;
+
+        switch ( true ) {
+            case url === '/home': { priority = 1; break; }
+            case url.startsWith('/gallery'): { priority = 0.9; break; }
+            case url.startsWith('/sign'): { priority = 0.5; break; }
+            case url.startsWith('/adminPanel'): { priority = 0.2; break; }
+        }
+
+        return priority;
     }
 }
