@@ -139,7 +139,7 @@ export class AppComponent implements OnInit {
     constructor (
         @Inject(PLATFORM_ID) private readonly platformId: string,
         @Optional() @Inject(REQUEST) private readonly _request: Request,
-        @Optional() @Inject(RESPONSE) private readonly response: Response,
+        @Optional() @Inject(RESPONSE) private readonly _response: Response,
         @Inject(DOCUMENT) private readonly _document: Document,
         
         private readonly _appService: AppService,
@@ -206,6 +206,10 @@ export class AppComponent implements OnInit {
         if ( !this.navbarIsCollapsed ) this.navbarTogglerClick(true);
 
         if ( this.navbarAnimationState !== 'static' ) this._clientService.setNavbarAnimationState('static');
+
+        if ( this.isPlatformServer && !environment.production ) {
+            this._response.setHeader('Content-Language', environment.locales.map(data => data.code).join(', '));
+        }
 
         if ( !( component instanceof HomeComponent ) ) {
             this.componentClass = false;

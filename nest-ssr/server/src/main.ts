@@ -11,8 +11,8 @@ import { generateCookieSecret, generateJWT_SecretCode, generateCspNonce } from '
 
 import { HttpExceptionFilter } from './filters/http-exception/http-exception.filter';
 
-import { CacheInterceptor } from './interceptors/cache/cache.interceptor';
 import { BigIntInterceptor } from './interceptors/big-int/big-int.interceptor';
+import { CacheInterceptor } from './interceptors/cache/cache.interceptor';
 
 import { IRequest } from 'types/global';
 
@@ -89,15 +89,15 @@ async function bootstrap() {
     const appService = app.get(AppService);
 
     app.useGlobalFilters(new HttpExceptionFilter(appService));
-    app.useGlobalInterceptors(new CacheInterceptor(), new BigIntInterceptor());
+    app.useGlobalInterceptors(new BigIntInterceptor(), new CacheInterceptor());
 
     await app.listen(process.env.PORT as string); // process.env.SERVER_API_PORT ?? process.env.PORT as string
 }
 
 declare const __non_webpack_require__: NodeRequire;
 const mainModule = __non_webpack_require__.main;
-const moduleFilename = (mainModule && mainModule.filename) || '';
+const moduleFilename = ( mainModule && mainModule.filename ) || '';
 
-if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
+if ( moduleFilename === __filename || moduleFilename.includes('iisnode') ) {
     bootstrap().catch(err => console.error(err));
 }

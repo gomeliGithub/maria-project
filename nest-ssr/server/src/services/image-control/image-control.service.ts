@@ -257,20 +257,59 @@ export class ImageControlService {
 
         if ( compressedImageData === null ) return false;
 
-        try {
-            const currentCompressedImagePath: string = path.join(compressedImageData.dirPath, compressedImageData.name);
+        const currentCompressedImagePath: string = path.join(compressedImageData.dirPath, compressedImageData.name);
 
-            await this._prisma.admin.update({ data: { compressedImages: { delete: { name: compressedImageData.name } } }, where: { id: ( request.activeClientData as IJWTPayload ).id as number } });
+        const originalImageTempName: string = this.getTempFileName(imagePath);
+        const compressedImageTempName: string = this.getTempFileName(currentCompressedImagePath);
+
+        const activeClientId: number = request.activeClientData?.id as number;
+
+        try {
+            await this._prisma.admin.update({ data: { compressedImages: { delete: { name: compressedImageData.name } } }, where: { id: activeClientId } });
 
             const existingImagePhotographyType: ImagePhotographyType | null = await this._prisma.imagePhotographyType.findFirst({ where: { compressedImageName: compressedImageData.name } });
 
-            if ( existingImagePhotographyType !== null )await this._prisma.imagePhotographyType.update({ data: { compressedImageOriginalName: null, compressedImageName: null }, where: { compressedImageName: compressedImageData.name } });
+            if ( existingImagePhotographyType !== null ) await this._prisma.imagePhotographyType.update({ data: { compressedImageOriginalName: null, compressedImageName: null }, where: { compressedImageName: compressedImageData.name } });
+
+            await fsPromises.copyFile(imagePath, originalImageTempName);
+            await fsPromises.copyFile(currentCompressedImagePath, compressedImageTempName);
 
             await fsPromises.unlink(imagePath);
             await fsPromises.unlink(currentCompressedImagePath);
 
+            await fsPromises.unlink(originalImageTempName);
+            await fsPromises.unlink(compressedImageTempName);
+
             return true;
         } catch {
+            const compressedImageIsExists: boolean = await this.findSameAdminCompressedImage(activeClientId, 4, 0, compressedImageData.name);
+
+            if ( !compressedImageIsExists ) {
+                await this._prisma.admin.update({ data: {
+                    compressedImages: {
+                        create: {
+                            name: compressedImageData.name,
+                            dirPath: compressedImageData.dirPath,
+                            originalName: compressedImageData.originalName,
+                            originalDirPath: compressedImageData.originalDirPath,
+                            originalSize: compressedImageData.originalSize,
+                            photographyType: compressedImageData.photographyType,
+                            displayType: compressedImageData.displayType,
+                            description: compressedImageData.description,
+                            uploadDate: compressedImageData.uploadDate,
+                            displayedOnHomePage: compressedImageData.displayedOnHomePage,
+                            displayedOnGalleryPage: compressedImageData.displayedOnGalleryPage
+                        } 
+                    } 
+                }, where: { id: activeClientId } });
+            }
+
+            if ( !( await this.checkFileExists(imagePath) ) ) await fsPromises.rename(originalImageTempName, imagePath);
+            if ( !( await this.checkFileExists(currentCompressedImagePath) ) ) await fsPromises.rename(compressedImageTempName, currentCompressedImagePath);
+
+            if ( await this.checkFileExists(originalImageTempName) ) await fsPromises.unlink(originalImageTempName);
+            if ( await this.checkFileExists(compressedImageTempName) ) await fsPromises.unlink(compressedImageTempName);
+
             return false;
         }
     }

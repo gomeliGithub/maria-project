@@ -142,7 +142,7 @@ export class SignService {
         if ( validatedClientPayload === null || !token || token === '' ) {
             if ( response && ( !clientLocale || clientLocale === '' ) ) response.cookie('locale', process.env.CLIENT_DEFAULT_LOCALE, this._appService.cookieSerializeOptions);
 
-            if ( response ) validatedClientPayload = {
+            validatedClientPayload = {
                 id: null,
                 login: null,
                 type: null,
@@ -162,8 +162,6 @@ export class SignService {
 
             if ( existingClientData === null ) throw new UnauthorizedException(`${ request.url } "GetActiveClient - client instance does not exists"`);
         }
-
-        validatedClientPayload.id = null;
         
         delete validatedClientPayload.exp;
         delete validatedClientPayload.iat;

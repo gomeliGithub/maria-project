@@ -7,8 +7,6 @@ import Importer from 'mysql-import';
 
 import bootstrap from 'src/main.server';
 
-import { Image_photography_type } from '@prisma/client';
-
 import fsPromises from 'fs/promises';
 import path from 'path';
 
@@ -27,12 +25,11 @@ import { ImageControlModule } from './modules/image-control.module';
 import { AdminPanelModule } from './modules/admin-panel.module';
 import { CommonModule } from './modules/common.module';
 
-// import { CommonService } from './services/common/common.service';
 import { WebSocketService } from './services/web-socket/web-socket.service';
 import { MailService } from './services/mail/mail.service';
 import { ValidateClientRequestsService } from './services/validate-client-requests/validate-client-requests.service';
 
-import { IAdminWithoutRelationFields, IImagePhotographyType } from 'types/models';
+import { IAdminWithoutRelationFields } from 'types/models';
 
 @Module({
     imports: [
@@ -67,8 +64,6 @@ export class AppModule {
         private readonly _appService: AppService
     ) {
         this._importDatabaseFromDump();
-        // setTimeout(() => this._createDefaultImagePhotographyTypes(), 1000);
-        // setTimeout(() => this._createExistingCompressedImages(), 1500);
     }
 
     private async _importDatabaseFromDump (): Promise<void> {
@@ -88,7 +83,7 @@ export class AppModule {
             const jWTsCount: number = await this._prisma.jWT.count();
 
             if ( membersCount === 0 && compressedImagesCount === 0 && imagePhotographyTypesCount === 0 && clientOrdersCount === 0 && discountsCount === 0 && jWTsCount === 0 ) {
-                console.log(`Starting importing data from the dump - ${ dumpFilePath }`);
+                this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] Starting importing data from the dump - ${ dumpFilePath }`, false, 'server');
 
                 const importer = new Importer({ 
                     host: process.env.DATABASE_HOST as string, 
@@ -100,7 +95,7 @@ export class AppModule {
                 importer.onProgress(progress => {
                     const percent: number = Math.floor(progress.bytes_processed / progress.total_bytes * 10000) / 100;
 
-                    console.log(`${ percent }% Completed`);
+                    this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ percent }% Completed`, false, 'server');
                 });
                 
                 importer.import(dumpFilePath).then(() => {
@@ -115,8 +110,6 @@ export class AppModule {
                 });
             } else await this._createOrUpdateMainAdmin();
         } else await this._createOrUpdateMainAdmin();
-
-        await this._createDefaultImagePhotographyTypes();
     }
 
     private async _createOrUpdateMainAdmin (): Promise<void> {
@@ -137,144 +130,4 @@ export class AppModule {
             password: newPasswordHash
         }});
     }
-
-    private async _createDefaultImagePhotographyTypes (): Promise<void> {
-        const originalImagesDirPath: string = path.join(this._appService.clientOriginalImagesDir, 'mainAdmin');
-        // const staticFilesHomePTImagesDirPath: string = path.join(this._appService.staticFilesDirPath, 'images_thumbnail', 'home', 'imagePhotographyTypes');
-        const staticFilesHomeImagesDirPath: string = path.join(this._appService.staticFilesDirPath, 'images_thumbnail', 'home');
-
-        const photographyTypesDataData: IImagePhotographyType[] = await this._prisma.imagePhotographyType.findMany();
-
-        let directoryIsExists: boolean = true;
-
-        try {   
-            await fsPromises.access(staticFilesHomeImagesDirPath, fsPromises.constants.F_OK);
-        } catch { 
-            directoryIsExists = false;
-        }
-
-        if ( directoryIsExists ) {
-            const originalImageList: string[] = await fsPromises.readdir(originalImagesDirPath, { encoding: 'utf-8' });
-            // const imagePhotographyTypesTitle: string[] = await fsPromises.readdir(staticFilesHomePTImagesDirPath, { encoding: 'utf-8' });
-
-            // let index: number = 0;
-
-            if ( photographyTypesDataData.length === 0 && originalImageList.length >= 4 ) { // imagePhotographyTypesTitle.length === 4
-                // const commonServiceRef: CommonService = await this._appService.getServiceRef(CommonModule, CommonService);
-                
-                for ( const photographyType in Image_photography_type ) {
-                    /* const currentCompressedImageDirPath: string = await commonServiceRef.getFulfilledAccessPath([ 
-                        staticFilesHomeImagesDirPath,
-                        path.join(staticFilesHomeImagesDirPath, 'gallery', 'children'),
-                        path.join(staticFilesHomeImagesDirPath, 'gallery', 'family'),
-                        path.join(staticFilesHomeImagesDirPath, 'gallery', 'individual'),
-                        path.join(staticFilesHomeImagesDirPath, 'gallery', 'wedding')
-                    ]); */
-
-                    /* const originalImagePath: string = await commonServiceRef.getFulfilledAccessPath([ 
-                        path.join(originalImagesDirPath, imagePhotographyTypesTitle[index].replace('_thumb.jpeg', '.jpg')),
-                        path.join(originalImagesDirPath, imagePhotographyTypesTitle[index].replace('_thumb.jpeg', '.jpeg')),
-                        path.join(originalImagesDirPath, imagePhotographyTypesTitle[index].replace('_thumb.jpeg', '.png'))
-                    ]); */
-                    // const originalImageExt: string = path.extname(originalImagePath);
-
-                    // const currentOriginalImageSize: number = ( await fsPromises.stat(originalImagePath) ).size;
-                    // const currentCompressedImagePhotographyType: RegExpMatchArray | null = currentCompressedImageDirPath.match(/children|family|individual|wedding/);
-
-                    /* await this._prisma.admin.update({
-                        data: {
-                            compressedImages: {
-                                create: {
-                                    name: imagePhotographyTypesTitle[index],
-                                    dirPath: currentCompressedImageDirPath,
-                                    originalName: imagePhotographyTypesTitle[index].replace('_thumb.jpeg', originalImageExt),
-                                    originalDirPath: originalImagesDirPath,
-                                    originalSize: currentOriginalImageSize,
-                                    photographyType: currentCompressedImagePhotographyType !== null ? currentCompressedImagePhotographyType[0] as Image_photography_type : 'individual',
-                                    displayType: 'horizontal',
-                                    description: null
-                                }
-                            }
-                        },
-                        where: { login: 'mainAdmin' }
-                    }); */
-
-                    await this._prisma.imagePhotographyType.create({
-                        data: { 
-                            name: photographyType,
-                            // compressedImageOriginalName: imagePhotographyTypesTitle[index].replace('_thumb.jpeg', originalImageExt),
-                            // compressedImageName: imagePhotographyTypesTitle[index] 
-                        }
-                    });
-
-                    // index++;
-                }
-            }
-        }
-    }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
-    private async _createExistingCompressedImages (): Promise<void> {
-        const originalImagesDirPath: string = path.join(this._appService.clientOriginalImagesDir, 'TESTADMIN');
-
-        const staticFilesHomeImagesDirPath: string = path.join(this._appService.staticFilesDirPath, 'images_thumbnail', 'home');
-        const staticFilesGalleryImagesDirPath: string = path.join(this._appService.staticFilesDirPath, 'images_thumbnail', 'gallery');
-
-        const homeCompressedImagesList: string[] = await fsPromises.readdir(staticFilesHomeImagesDirPath, { encoding: 'utf-8' });
-        const galleryCompressedImagesList: string[] = await fsPromises.readdir(staticFilesGalleryImagesDirPath, { encoding: 'utf-8' });
-
-        for ( const data of homeCompressedImagesList ) {
-            const isDirectory: boolean = ( await fsPromises.stat(path.join(staticFilesHomeImagesDirPath, data)) ).isDirectory();
-
-            if ( !isDirectory ) {
-                const currentHomeImagesDirPath: string = path.join(staticFilesHomeImagesDirPath, data);
-                const currentOriginalImageName: string = data.replace('_thumb', '');
-                const currentOriginalImageSize: number = ( await fsPromises.stat(path.join(originalImagesDirPath, currentOriginalImageName)) ).size;
-
-                await this._prisma.admin.update({ 
-                    data: { 
-                        compressedImages: {
-                            create: {
-                                name: data,
-                                dirPath: currentHomeImagesDirPath,
-                                originalName: currentOriginalImageName,
-                                originalDirPath: originalImagesDirPath,
-                                originalSize: currentOriginalImageSize,
-                                photographyType: 'individual',
-                                displayType: 'vertical',
-                            }
-                        }
-                    }, 
-                    where: { id: 1 } 
-                });
-            }
-        }
-
-        for ( const dirName of galleryCompressedImagesList ) {
-            const currentGalleryImagesDirPath: string = path.join(staticFilesGalleryImagesDirPath, dirName);
-            const currentImagesList: string[] = await fsPromises.readdir(path.join(staticFilesGalleryImagesDirPath, currentGalleryImagesDirPath), { encoding: 'utf-8' });
-
-            for ( const data of currentImagesList ) {
-                const currentOriginalImageName: string = data.replace('_thumb', '');
-                const currentOriginalImageSize: number = ( await fsPromises.stat(path.join(originalImagesDirPath, currentOriginalImageName)) ).size;
-
-                await this._prisma.admin.update({ 
-                    data: { 
-                        compressedImages: {
-                            create: {
-                                name: data,
-                                dirPath: currentGalleryImagesDirPath,
-                                originalName: currentOriginalImageName,
-                                originalDirPath: originalImagesDirPath,
-                                originalSize: currentOriginalImageSize,
-                                photographyType: dirName as Image_photography_type,
-                                displayType: 'vertical',
-                            }
-                        }
-                    }, 
-                    where: { id: 1 } 
-                });
-            }
-        }
-    }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////   
 }

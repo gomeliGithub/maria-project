@@ -1,12 +1,5 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
     <url>
-        <loc>http://localhost/adminPanel</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-        <lastmod>2024-07-27T23:02:09.607Z</lastmod>
-    </url>    
-
-    <url>
         <loc>http://localhost/adminPanel/imagesControl</loc>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -16,14 +9,14 @@
     <url>
         <loc>http://localhost/adminPanel/discountsControl</loc>
         <changefreq>weekly</changefreq>
-        <priority>1</priority>
+        <priority>0.2</priority>
         <lastmod>2023-11-22T14:09:20.333Z</lastmod>
     </url>    
 
     <url>
         <loc>http://localhost/adminPanel/ordersControl</loc>
         <changefreq>weekly</changefreq>
-        <priority>1</priority>
+        <priority>0.2</priority>
         <lastmod>2023-11-06T15:50:38.940Z</lastmod>
     </url>    
 
