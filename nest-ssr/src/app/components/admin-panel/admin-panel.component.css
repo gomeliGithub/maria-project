@@ -76,56 +76,48 @@ and (-webkit-device-pixel-ratio: 2) {
 @media (max-width: 1199px) {
     .compressedImageData {
         flex-direction: column !important;
-        align-content: normal !important;
         flex-wrap: nowrap !important;
-    }
-}
-
-@media (min-width: 576px) {
-    #compressedImagesDataContainer img {
-        max-height: 680px;
     }
 }
 
 @media (min-width: 768px) {
     #compressedImagesDataContainer img {
-        max-height: 350px;
+        max-height: 670px; /* max-height: 350px; */
     }
 }
 
 @media (min-width: 992px) { 
     #compressedImagesDataContainer img {
-        max-height: 450px;
+        max-height: 455px; /* max-height: 450px; */
     }
 }
 
 @media (min-width: 1200px) { 
     #compressedImagesDataContainer img {
-        max-height: 550px;
+        max-height: 559px; /* max-height: 550px; */
     }
 
     .compressedImageData {
         flex-direction: row !important;
         flex-wrap: wrap !important;
-        align-content: space-between !important;
     }
 }
 
 @media (min-width: 1400px) { 
     #compressedImagesDataContainer img {
-        max-height: 670px;
+        max-height: 434px; /* max-height: 670px; */
     }
 }
 
 @media (min-width: 1800px) { 
     #compressedImagesDataContainer img {
-        max-height: 850px;
+        max-height: 569px; /* max-height: 850px; */
     }
 }
 
 @media (min-width: 2100px) { 
     #compressedImagesDataContainer img {
-        max-height: 950px;
+        max-height: 500px; /* max-height: 950px; */
     }
 }
 

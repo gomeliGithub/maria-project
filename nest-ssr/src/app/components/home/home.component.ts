@@ -1,4 +1,4 @@
-import { AfterContentChecked, AfterRenderPhase, AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID, QueryList, ViewChildren, afterRender} from '@angular/core';
+import { AfterContentChecked, AfterRenderPhase, AfterViewChecked, ChangeDetectorRef, Component, ElementRef, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID, QueryList, TransferState, ViewChildren, afterRender, makeStateKey} from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
@@ -14,6 +14,10 @@ import { HomeService } from '../../services/home/home.service';
 import { AnimationEvent } from 'types/global';
 import { ICompressedImageWithoutRelationFields, IDiscount, IImagePhotographyType } from 'types/models';
 import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
+
+const compressedImagesListDataStateKey = makeStateKey<ICompressedImageWithoutRelationFields[] | null>('compressedImagesList');
+const discountsDataStateKey = makeStateKey<IDiscount[] | null>('discountsData');
+const imagePhotographyTypesStateKey = makeStateKey<IImagePhotographyType[][] | null>('imagePhotographyTypes');
 
 @Component({
     selector: 'app-home',
@@ -97,6 +101,7 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
 
         private readonly _router: Router,
         private readonly _changeDetector: ChangeDetectorRef,
+        private readonly _transferState: TransferState,
         
         private readonly _deviceService: DeviceDetectorService,
 
@@ -129,10 +134,75 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
             }
         });
 
+        if ( this.isPlatformServer ) {
+            this._clientService.getCompressedImagesData('home', 'horizontal').subscribe({
+                next: imagesData => {
+                    this.compressedImagesList = imagesData.length !== 0 ? imagesData : null;
+
+                    this._transferState.set(compressedImagesListDataStateKey, imagesData);
+                },
+                error: () => this._appService.createErrorModal()
+            });
+
+            this._clientService.getDiscountsData().subscribe({
+                next: discountsData => {
+                    this.discountsData = discountsData.length !== 0 ? discountsData : null;
+
+                    this._transferState.set(discountsDataStateKey, discountsData);
+    
+                    if ( this.discountsData ) this._homeService.setDiscountsDataIsExists(true);
+                },
+                error: () => this._appService.createErrorModal()
+            });
+
+            this._clientService.getImagePhotographyTypesData('home').subscribe({
+                next: imagePhotographyTypesData => {
+                    this.imagePhotographyTypes = imagePhotographyTypesData.length !== 0 ? imagePhotographyTypesData: null;
+
+                    this._transferState.set(imagePhotographyTypesStateKey, imagePhotographyTypesData);
+
+                    this.setAnimationsStates();
+    
+                    /* if ( this.imagePhotographyTypes !== null ) {
+                        this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
+                        this.flatImagePhotographyTypes.forEach(() => {
+                            this.currentMouseTriggerStates.push('leave');
+                            this.currentLinkButtonContainerAnimationStates.push('leave');
+                        });
+            
+                        ( this.imagePhotographyTypes as IImagePhotographyType[][] ).forEach(() => this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false }));
+            
+                        this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false });
+                    } */
+                },
+                error: () => this._appService.createErrorModal()
+            });
+        } else if ( this.isPlatformBrowser ) {
+            this.compressedImagesList = this._transferState.get<ICompressedImageWithoutRelationFields[] | null>(compressedImagesListDataStateKey, null);
+
+            this.discountsData = this._transferState.get<IDiscount[] | null>(discountsDataStateKey, null);
+
+            if ( this.discountsData ) this._homeService.setDiscountsDataIsExists(true);
+
+            this.imagePhotographyTypes = this._transferState.get<IImagePhotographyType[][] | null>(imagePhotographyTypesStateKey, null);
+
+            this.setAnimationsStates();
+        }
+
+        /*
+
         this._clientService.getCompressedImagesData('home', 'horizontal').subscribe({
-            next: imagesData => this.compressedImagesList = imagesData.length !== 0 ? imagesData : null,
+            next: imagesData => {
+                this.compressedImagesList = imagesData.length !== 0 ? imagesData : null;
+
+                this._transferState.set(compressedImagesListDataKey, imagesData);
+            },
             error: () => this._appService.createErrorModal()
         });
+
+        */
+
+        /*
 
         this._clientService.getDiscountsData().subscribe({
             next: discountsData => {
@@ -142,6 +212,10 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
             },
             error: () => this._appService.createErrorModal()
         });
+
+        */
+
+        /*
 
         this._clientService.getImagePhotographyTypesData('home').subscribe({
             next: imagePhotographyTypesData => {
@@ -161,6 +235,8 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
             },
             error: () => this._appService.createErrorModal()
         });
+
+        */
 
         this._homeService.activeScrollSnapSectionChange.subscribe(value => {
             this.getScrollSnapSectionsPosition();
@@ -208,6 +284,22 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
             this.getCurrentScrollSnapVisiableAnimationSection($event.srcElement);
 
             this.getActiveScrollSnapSection($event.srcElement);
+        }
+    }
+
+    public setAnimationsStates (): void {
+        if ( this.imagePhotographyTypes !== null ) {
+            this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
+            this.flatImagePhotographyTypes.forEach(() => {
+                this.currentMouseTriggerStates.push('leave');
+                this.currentLinkButtonContainerAnimationStates.push('leave');
+            });
+
+            ( this.imagePhotographyTypes as IImagePhotographyType[][] ).forEach(() => this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false }));
+
+            this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false });
+
+            this._changeDetector.detectChanges();
         }
     }
 

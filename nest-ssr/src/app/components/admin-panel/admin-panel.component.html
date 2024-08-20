@@ -84,15 +84,28 @@
             #compressedImageContainer
         >
             <ng-template [ngIf]="compressedImageThumbnailUrls[i]">
-                <div class="position-absolute bottom-0 start-0 w-100 z-1">
-                    <button type="button" class="btn btn-lg text-info"
+                <div class="position-absolute bottom-0 start-0 pb-2 w-100 z-1">
+                    <button type="button" class="btn btn-lg pe-2 pb-0 text-info pe-none">
+                        <ng-template [ngIf]="compressedImage.displayType === 'horizontal'" [ngIfElse]="verticalTemplateI">
+                            <i class="bi bi-image-fill"></i>
+                        </ng-template>
+                        <ng-template #verticalTemplateI>
+                            <i class="bi bi-file-image-fill"></i>
+                        </ng-template>
+                    </button>
+                    <button type="button" class="btn btn-lg ps-2 pb-0 text-info"
                         placement="auto"
                         [ngbTooltip]="'ADMINPANEL.CHANGEIMAGEDATATEXT.SHOWDATABUTTONTOOLTIP' | translate"
                         container="body"
                         (click)="compressedImageDataContainerClick(i)"
                     >
                         <i class="bi bi-pencil-square"></i>
-                </button>
+                    </button>
+                    <button type="button" class="btn btn-lg pb-0 float-end pe-none">
+                        <span class="fw-bold">
+                            №{{ i + 1 }}
+                        </span>
+                    </button>
                 </div>
                 <img [src]="compressedImageThumbnailUrls[i]" class="img-fluid" alt="" [ngClass]="{ 'opacity-25': compressedImageDataContainersAnimationCurrentStates[i] === 'showed' }">
                 <div class="position-absolute top-50 start-50 translate-middle d-flex px-3 pt-2 h-100 w-100 compressedImageData invisible"
@@ -100,7 +113,7 @@
                     (@compressed-image-data-containers-animation.start)="compressedImageDataContainersAnimationStarted($event)"
                     (@compressed-image-data-containers-animation.done)="compressedImageDataContainersAnimationDone($event)"
                 >
-                    <div class="pb-3 w-100 d-flex flex-column">
+                    <div class="w-100 d-flex flex-column">
                         <ul class="w-100 list-group list-group-horizontal justify-content-between overflow-x-auto" [id]="'imageControlButtonList_' + i">
                             <li class="list-group-item text-bg-success" [hidden]="changeImageDataFormSubmitButtonsHiddenStatus[i]">
                                 <button class="btn" type="submit" [attr.originalImageName]="compressedImage.originalName" [disabled]="changeImageDataForm.invalid"
@@ -182,8 +195,8 @@
                             </ng-template>
                         </ul>
                     </div>
-                    <div class="w-100 my-2 fw-semibold overflow-x-hidden overflow-y-auto">
-                        <div class="row g-2 mb-2 w-100">
+                    <div class="h-75 w-100 align-self-center mt-1 mb-5 fw-semibold overflow-x-hidden overflow-y-auto">
+                        <div class="row gx-0 mb-2 w-100">
                             <div class="col row">
                                 <label [for]="'staticOriginalName_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-7 col-form-label">
                                     {{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALNAME' | translate }}
@@ -195,6 +208,8 @@
                                     >
                                 </div>
                             </div>
+                        </div>
+                        <div class="row gx-0 mb-2 w-100">
                             <div class="col row">
                                 <label [for]="'staticOriginalSize_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-8 col-form-label">
                                     {{ 'ADMINPANEL.TABLECOLTITLES.ORIGINALSIZE' | translate }}
@@ -207,12 +222,12 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row g-2 mb-2 w-100">
+                        <div class="row gx-0 mb-2 w-100">
                             <div class="col row">
-                                <label [for]="'inputChangePhotographyType_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-5 col-form-label">
+                                <label [for]="'inputChangePhotographyType_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-6 col-form-label">
                                     {{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPE' | translate }}
                                 </label>
-                                <div class="col-sm-7" formArrayName="newImagePhotographyType">
+                                <div class="col-sm-6" formArrayName="newImagePhotographyType">
                                     <select class="form-control form-select form-control-lg" 
                                         [id]="'inputChangePhotographyType_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" 
                                         [formControlName]="i"
@@ -225,11 +240,13 @@
                                     </select>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row gx-0 mb-2 w-100">
                             <div class="col row">
-                                <label [for]="'inputChangeDisplayType_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-5 col-form-label">
+                                <label [for]="'inputChangeDisplayType_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-6 col-form-label">
                                     {{ 'ADMINPANEL.TABLECOLTITLES.DISPLAYTYPE' | translate }}
                                 </label>
-                                <div class="col-sm-7" formArrayName="newImageDisplayType">
+                                <div class="col-sm-6" formArrayName="newImageDisplayType">
                                     <select class="form-control form-select form-control-lg" 
                                         [id]="'inputChangeDisplayType_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" 
                                         [formControlName]="i"
@@ -241,7 +258,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row g-2 mb-2 w-100">
+                        <div class="row gx-0 mb-2 w-100">
                             <div class="col row">
                                 <label [for]="'inputChangeImageDescription_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-4 col-form-label">
                                     {{ 'ADMINPANEL.TABLECOLTITLES.IMAGEPHOTOGRAPHYTYPEDESCRIPTION' | translate }}
@@ -257,7 +274,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row g-2 mb-2 w-100">
+                        <div class="row gx-0 mb-2 w-100">
                             <div class="col row">
                                 <label [for]="'staticUploadDate_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-7 col-form-label">
                                     {{ 'ADMINPANEL.TABLECOLTITLES.UPLOADAT' | translate }}
@@ -270,7 +287,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row g-2 mb-2 w-100">
+                        <div class="row gx-0 mb-2 w-100">
                             <div class="col row">
                                 <label [for]="'staticDisplayedOnHomePage_' + i + ( !compressedImageContainersDeleteStatus[i] ? '' : '_delete' )" class="col-sm-8 col-form-label">
                                     {{ 'ADMINPANEL.TABLECOLTITLES.ONHOMEPAGE' | translate }}
@@ -300,11 +317,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="pb-2 w-100 text-end">
-                        <span class="fw-bold">
-                            №{{ i + 1 }}
-                        </span>
                     </div>
                 </div>
             </ng-template>
