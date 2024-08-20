@@ -18,7 +18,7 @@ import { IRequest } from 'types/global';
 export class HttpExceptionFilter implements ExceptionFilter {
     constructor (private readonly _appService: AppService) { }
 
-    catch (exception: HttpException, host: ArgumentsHost) {
+    async catch (exception: HttpException, host: ArgumentsHost) {
         const ctx: HttpArgumentsHost = host.switchToHttp();
         const response: Response = ctx.getResponse<Response>();
         const request: IRequest = ctx.getRequest<IRequest>();
@@ -52,7 +52,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             ];
         }
 
-        if ( request.hasOwnProperty('validatedRequest') && request.validatedRequest === false ) this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ status } ${ errorMessage }`, true, 'http');
+        if ( ( request.hasOwnProperty('validatedRequest') && request.validatedRequest === false ) || !request.hasOwnProperty('validatedRequest') ) await this._appService.logLineAsync(`${ process.env.SERVER_DOMAIN } [${ process.env.SERVER_API_PORT }] ${ status } ${ errorMessage }`, true, 'http');
 
         response.status(status).json({
             statusCode: httpStatus,
