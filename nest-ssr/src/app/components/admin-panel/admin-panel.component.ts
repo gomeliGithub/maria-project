@@ -222,7 +222,13 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
         }
     }
 
-    ngAfterViewChecked (): void {
+    ngAfterViewChecked (): void { 
+        console.log(this.compressedImagesContainerAnimationIsDone); 
+        console.log(this.fullCompressedImagesList.length); 
+        console.log(this.compressedImageThumbnailUrls.length);
+
+
+
         if ( !this.compressedImagesContainerAnimationIsDone && this.compressedImageThumbnailUrls && this.fullCompressedImagesList && this.compressedImageThumbnailUrls.length === this.fullCompressedImagesList.length ) {
             this.compressedImageContainersAnimationCurrentStates.forEach(( data, index, arr ) => data === 'leave' ? arr[index] = 'enter' : null);
 
@@ -290,6 +296,8 @@ export class AdminPanelComponent implements OnInit, AfterViewChecked {
                         this.compressedImageContainersAnimationCurrentStates.push('leave');
                         this.compressedImageContainersDeleteStatus.push(false);
                     });
+
+                    this.compressedImagesContainerAnimationIsDone = false;
 
                     this.changeImageDataForm = new FormGroup({
                         'newImagePhotographyType': new FormArray(this.fullCompressedImagesList.map(data => {
