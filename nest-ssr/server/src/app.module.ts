@@ -10,7 +10,6 @@ import bootstrap from 'src/main.server';
 import fsPromises from 'fs/promises';
 import path from 'path';
 
-import ms from 'ms';
 import * as bcrypt from 'bcrypt';
 
 import { PrismaModule } from './modules/prisma.module';
@@ -37,9 +36,7 @@ import { IAdminWithoutRelationFields } from 'types/models';
             bootstrap: bootstrap,
             viewsPath: path.join(process.cwd(), 'dist/nest-ssr/browser'),
             inlineCriticalCss: false,
-            cache: {
-                expiresIn: ms('3h')
-            }
+            cache: false
         }),
         ConfigModule.forRoot({
             envFilePath: [ 'server/config/.env.development', 'server/config/.env.production' ],
