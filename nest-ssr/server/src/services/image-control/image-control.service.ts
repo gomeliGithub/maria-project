@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { Image_photography_type, ImagePhotographyType } from '@prisma/client';
+import { Image_photography_type, ImagePhotographyType, Prisma } from '@prisma/client';
 
 import { Buffer } from 'node:buffer';
 import fsPromises from 'fs/promises';
@@ -16,7 +16,7 @@ import { AppService } from '../../app.service';
 import { CommonService } from '../common/common.service';
 
 import { ICompressImageData, IRequest } from 'types/global';
-import { ICreateImageDirsOptions, ICompressedImageGetOptions, IClientGetOptions, IClientGetCompressedImagesOptions } from 'types/options';
+import { ICreateImageDirsOptions, ICompressedImageGetOptions, IClientGetOptions, IClientGetCompressedImagesOptions, SortBy_Types } from 'types/options';
 import { IAdmin, IAdminWithCompressedImagesCount, ICompressedImageWithoutRelationFields } from 'types/models';
 import { IJWTPayload } from 'types/sign';
 
@@ -50,30 +50,44 @@ export class ImageControlService {
             if ( options.find.displayTypes ) ( clientGetOptions.compressedImages as IClientGetCompressedImagesOptions ).whereDisplayTypes = options.find.displayTypes;
         }
 
+        const orderBy: Prisma.CompressedImageOrderByWithRelationInput = { };
+
+        switch ( options.sortBy as SortBy_Types ) {
+            case 'originalName': { orderBy.originalName = 'desc'; break; }
+            case 'originalSize': { orderBy.originalSize = 'desc'; break; }
+            case 'photographyType': { orderBy.photographyType = 'desc'; break; }
+            case 'displayType': { orderBy.displayType = 'desc'; break; }
+            case 'uploadDate': { orderBy.uploadDate = 'desc'; break; }
+            case 'displayedOnHomePage': { orderBy.displayedOnHomePage = 'desc'; break; }
+            case 'displayedOnGalleryPage': { orderBy.displayedOnGalleryPage = 'desc'; break; }
+        }
+
+        ( clientGetOptions.compressedImages as IClientGetCompressedImagesOptions ).orderBy = orderBy;
+
         let compressedImagesData: ICompressedImageWithoutRelationFields[] | null = null;
 
         if ( options.clientData ) compressedImagesData = ( await commonServiceRef.getClientsData('admin', options.clientData.login as string, clientGetOptions) as IAdmin ).compressedImages as ICompressedImageWithoutRelationFields[];
-        else compressedImagesData = await this._prisma.compressedImage.findMany({ 
-            skip: options && options.imagesExistsCount,
-            take: options && options.imagesLimit,
-            select: options && options.find && options.find.selectFields ? options.find.selectFields : undefined,
-            where: {
-                name: options && options.find && options.find.imageTitles ? { in: options.find.imageTitles } : undefined,
-                photographyType: options && options.find && options.find.photographyTypes ? {
-                    in: options.find.photographyTypes
-                } : undefined,
-                displayType: options && options.find && options.find.displayTypes ? {
-                    in: options.find.displayTypes
-                } : undefined,
-                uploadDate: options && options.dateFrom && options.dateUntil ? {
-                    gte: options.dateFrom,
-                    lte: options.dateUntil
-                } : undefined
-            },
-            orderBy: {
-                uploadDate: 'desc'
-            }
-        });
+        else {
+            compressedImagesData = await this._prisma.compressedImage.findMany({ 
+                skip: options && options.imagesExistsCount,
+                take: options && options.imagesLimit,
+                select: options && options.find && options.find.selectFields ? options.find.selectFields : undefined,
+                where: {
+                    name: options && options.find && options.find.imageTitles ? { in: options.find.imageTitles } : undefined,
+                    photographyType: options && options.find && options.find.photographyTypes ? {
+                        in: options.find.photographyTypes
+                    } : undefined,
+                    displayType: options && options.find && options.find.displayTypes ? {
+                        in: options.find.displayTypes
+                    } : undefined,
+                    uploadDate: options && options.dateFrom && options.dateUntil ? {
+                        gte: options.dateFrom,
+                        lte: options.dateUntil
+                    } : undefined
+                },
+                orderBy
+            });
+        }
 
         return compressedImagesData as ICompressedImageWithoutRelationFields[];
     }
@@ -252,7 +266,7 @@ export class ImageControlService {
         return true;
     }
 
-    public async deleteImage (request: IRequest, imagePath: string): Promise<boolean> {
+    public async deleteImage (request: IRequest, imagePath: string): Promise<boolean> { //////////////////////////////////////////////////////////////////////////////////
         const compressedImageData: ICompressedImageWithoutRelationFields | null = await this._prisma.compressedImage.findFirst({ where: { originalName: path.basename(imagePath) } });
 
         if ( compressedImageData === null ) return false;

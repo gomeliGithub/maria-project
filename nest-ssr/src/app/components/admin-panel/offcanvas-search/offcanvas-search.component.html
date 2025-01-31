@@ -1,0 +1,92 @@
+<ng-template #content let-offcanvas>
+	<div class="offcanvas-header">
+		<h4 class="offcanvas-title">
+			{{ 'ADMINPANEL.SEARCHIMAGESFORM.ACCORDIONTITLETEXT' | translate }}
+		</h4>
+		<button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
+	</div>
+	<div class="offcanvas-body">
+		<div class="">
+			<form [formGroup]="searchImagesForm" class="" id="searchImagesForm" novalidate (submit)="searchImages()">
+				<div class="row g-3">
+					<div class="form-text text-center">
+						{{ 'ADMINPANEL.SEARCHIMAGESFORM.INPUTSDATETEXT' | translate }}
+					</div>
+					<div class="col gy-0">
+						<label for="inputDateFrom" class="form-label w-100 text-center">
+							{{ 'ADMINPANEL.SEARCHIMAGESFORM.INPUTDATEFROMLABELTEXT' | translate }}
+						</label>
+						<input type="date" id="inputDateFrom" class="form-control" formControlName="dateFrom">
+					</div>
+					<div class="col gy-0">
+						<label for="inputDateUntil" class="form-label w-100 text-center">
+							{{ 'ADMINPANEL.SEARCHIMAGESFORM.INPUTDATEUNTILLABELTEXT' | translate }}
+						</label>
+						<input type="date" id="inputDateUntil" class="form-control" formControlName="dateUntil">
+					</div>
+				</div>
+				<div class="row g-3 mt-2">
+					<div class="col" formArrayName="photographyTypes">
+						<div class="form-text">
+							{{ 'ADMINPANEL.SEARCHIMAGESFORM.INPUTPHOTOGRAPHYTYPETEXT' | translate }}
+						</div>
+						<div *ngFor="let data of imagePhotographyTypes; let i = index" class="form-check">
+							<input type="checkbox" class="form-check-input" [id]="'inputPhotographyType_' + i" [formControlName]="i">
+							<label class="form-check-label" [for]="'inputPhotographyType_' + i" [ngSwitch]="data">
+								<ng-template ngSwitchCase="individual">{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</ng-template>
+								<ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</ng-template>
+								<ng-template ngSwitchCase="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</ng-template>
+								<ng-template ngSwitchCase="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</ng-template>
+							</label>
+						</div>
+					</div>
+					<div class="col" formArrayName="displayTypes">
+						<div class="form-text">
+							{{ 'ADMINPANEL.SEARCHIMAGESFORM.INPUTDISPLAYTYPETEXT' | translate }}
+						</div>
+						<div *ngFor="let data of imageDisplayTypes; let i = index" class="form-check">
+							<input type="checkbox" class="form-check-input" [id]="'inputDisplayType_' + i" [formControlName]="i">
+							<label class="form-check-label" [for]="'inputDisplayType_' + i" [ngSwitch]="data">
+								<ng-template ngSwitchCase="horizontal">{{ 'IMAGEDISPLAYTYPES.HORIZONTAL' | translate }}</ng-template>
+								<ng-template ngSwitchCase="vertical">{{ 'IMAGEDISPLAYTYPES.VERTICAL' | translate }}</ng-template>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="row g-3 my-3">
+					<label for="inputSortBy" class="form-label w-100 text-center">
+						{{ 'ADMINPANEL.SEARCHIMAGESFORM.INPUTSORTBYLABELTEXT' | translate }}
+					</label>
+					<select id="inputSortBy" class="form-select" formControlName="sortBy">
+						<option *ngFor="let data of sortBy_TypesArr" [ngValue]="data" [ngSwitch]="data">
+							<ng-template ngSwitchCase="originalName">{{ 'ADMINPANEL.SEARCHIMAGESFORM.SORTBYTEXT.ORIGINALNAME' | translate }}</ng-template>
+							<ng-template ngSwitchCase="originalSize">{{ 'ADMINPANEL.SEARCHIMAGESFORM.SORTBYTEXT.ORIGINALSIZE' | translate }}</ng-template>
+							<ng-template ngSwitchCase="photographyType">{{ 'ADMINPANEL.SEARCHIMAGESFORM.SORTBYTEXT.PHOTOGRAPHYTYPE' | translate }}</ng-template>
+							<ng-template ngSwitchCase="displayType">{{ 'ADMINPANEL.SEARCHIMAGESFORM.SORTBYTEXT.DISPLAYTYPE' | translate }}</ng-template>
+							<ng-template ngSwitchCase="uploadDate">{{ 'ADMINPANEL.SEARCHIMAGESFORM.SORTBYTEXT.UPLOADDATE' | translate }}</ng-template>
+							<ng-template ngSwitchCase="displayedOnHomePage">{{ 'ADMINPANEL.SEARCHIMAGESFORM.SORTBYTEXT.DISPLAYEDONHOMEPAGE' | translate }}</ng-template>
+							<ng-template ngSwitchCase="displayedOnGalleryPage">{{ 'ADMINPANEL.SEARCHIMAGESFORM.SORTBYTEXT.DISPLAYEDONGALLERYPAGE' | translate }}</ng-template>
+						</option>
+					</select>
+				</div>
+				<div class="text-center">
+					<button class="btn btn-secondary me-2" [disabled]="searchImagesForm.invalid" (click)="offcanvas.dismiss('Cross click')">
+						{{ 'ADMINPANEL.SEARCHIMAGESFORM.SUBMITBUTTONTEXT' | translate }}
+					</button>
+					<button type="button" class="btn btn-warning" (click)="searchImagesFormReset()">
+						{{ 'ADMINPANEL.SEARCHIMAGESFORM.RESETBUTTONTEXT' | translate }}
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</ng-template>
+<button class="btn btn-lg btn-outline-primary position-absolute top-50 text-nowrap"
+    [ngStyle]="{
+        'transform-origin': '20% 100%',
+        'transform': 'rotate(-90deg)'
+    }" 
+    (click)="openNoBackdrop(content)"
+>
+    {{ 'ADMINPANEL.SEARCHIMAGESFORM.ACCORDIONTITLETEXT' | translate }}
+</button>

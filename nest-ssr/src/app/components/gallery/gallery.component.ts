@@ -3,7 +3,7 @@ import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/comm
 import { HttpResponse } from '@angular/common/http';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Image_display_type, Image_photography_type } from '@prisma/client';
 
@@ -76,8 +76,6 @@ export class GalleryComponent implements OnInit {
     }>;
 
     public imageContainerViewRefs: QueryList<ElementRef<HTMLDivElement>>;
-
-    // public firstGetCompressedImagesDataRequest;
 
     public compressedImagesList: ICompressedImageWithoutRelationFields[] | null = null; // public compressedImagesList: IClientCompressedImage[][] = null;
 
@@ -159,13 +157,6 @@ export class GalleryComponent implements OnInit {
     @ViewChild('sendOrderFormContainer', { static: false }) private readonly sendOrderFormContainerViewRef: ElementRef<HTMLDivElement>;
 
     ngOnInit (): void {
-        this._router.events.subscribe(evt => {
-            if ( !( evt instanceof NavigationEnd ) ) return;
-            else this.url = evt.url;
-            
-            if ( this.url.startsWith('/gallery') ) window.location.reload();
-        });
-
         this._appService.getTranslations([ 'PAGETITLES.GALLERY', `IMAGEPHOTOGRAPHYTYPESFULLTEXT.${ this.photographyType.toUpperCase() }`], true).subscribe(translation => {
             this._appService.setTitle(`${ translation[0] } - ${ translation[1] }`);
 

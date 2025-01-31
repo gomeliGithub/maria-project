@@ -350,7 +350,7 @@ export class ClientService {
                                     lte: options.compressedImages.dateUntil
                                 } : undefined
                             },
-                            orderBy: { uploadDate: 'desc' },
+                            orderBy: options.compressedImages.orderBy,
                             skip: options.compressedImages.skip,
                             take: options.compressedImages.take
                         };

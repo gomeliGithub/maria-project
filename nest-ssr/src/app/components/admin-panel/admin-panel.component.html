@@ -1,76 +1,15 @@
-<div ngbAccordion class="w-75 mx-auto" [closeOthers]="true">
-	<div ngbAccordionItem [collapsed]="true" (hidden)="searchImagesFormReset()">
-		<h2 ngbAccordionHeader>
-			<button ngbAccordionButton>
-                {{ 'ADMINPANEL.SEARCHIMAGESFORM.ACCORDIONTITLETEXT' | translate }}
-            </button>
-		</h2>
-		<div ngbAccordionCollapse>
-			<div ngbAccordionBody>
-				<ng-template>
-                    <div class="">
-                        <form [formGroup]="searchImagesForm" class="" id="searchImagesForm" novalidate (submit)="searchImages()">
-                            <div class="row g-3">
-                                <div class="form-text">
-                                    {{ 'ADMINPANEL.SEARCHIMAGESFORM.INPUTSDATETEXT' | translate }}
-                                </div>
-                                <div class="col gy-0">
-                                    <label for="inputDateFrom" class="form-label w-100 text-center">
-                                        {{ 'ADMINPANEL.SEARCHIMAGESFORM.INPUTDATEFROMLABELTEXT' | translate }}
-                                    </label>
-                                    <input type="date" id="inputDateFrom" class="form-control" formControlName="dateFrom">
-                                </div>
-                                <div class="col gy-0">
-                                    <label for="inputDateUntil" class="form-label w-100 text-center">
-                                        {{ 'ADMINPANEL.SEARCHIMAGESFORM.INPUTDATEUNTILLABELTEXT' | translate }}
-                                    </label>
-                                    <input type="date" id="inputDateUntil" class="form-control" formControlName="dateUntil">
-                                </div>
-                            </div>
-                            <div class="row g-3 mt-2 mb-3">
-                                <div class="col" formArrayName="photographyTypes">
-                                    <div class="form-text">
-                                        {{ 'ADMINPANEL.SEARCHIMAGESFORM.INPUTPHOTOGRAPHYTYPETEXT' | translate }}
-                                    </div>
-                                    <div *ngFor="let data of imagePhotographyTypes; let i = index" class="form-check">
-                                        <input type="checkbox" class="form-check-input" [id]="'inputPhotographyType_' + i" [formControlName]="i">
-                                        <label class="form-check-label" [for]="'inputPhotographyType_' + i" [ngSwitch]="data">
-                                            <ng-template ngSwitchCase="individual">{{ 'IMAGEPHOTOGRAPHYTYPES.INDIVIDUAL' | translate }}</ng-template>
-                                            <ng-template ngSwitchCase="children">{{ 'IMAGEPHOTOGRAPHYTYPES.CHILDREN' | translate }}</ng-template>
-                                            <ng-template ngSwitchCase="wedding">{{ 'IMAGEPHOTOGRAPHYTYPES.WEDDING' | translate }}</ng-template>
-                                            <ng-template ngSwitchCase="family">{{ 'IMAGEPHOTOGRAPHYTYPES.FAMILY' | translate }}</ng-template>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col" formArrayName="displayTypes">
-                                    <div class="form-text">
-                                        {{ 'ADMINPANEL.SEARCHIMAGESFORM.INPUTDISPLAYTYPETEXT' | translate }}
-                                    </div>
-                                    <div *ngFor="let data of imageDisplayTypes; let i = index" class="form-check">
-                                        <input type="checkbox" class="form-check-input" [id]="'inputDisplayType_' + i" [formControlName]="i">
-                                        <label class="form-check-label" [for]="'inputDisplayType_' + i" [ngSwitch]="data">
-                                            <ng-template ngSwitchCase="horizontal">{{ 'IMAGEDISPLAYTYPES.HORIZONTAL' | translate }}</ng-template>
-                                            <ng-template ngSwitchCase="vertical">{{ 'IMAGEDISPLAYTYPES.VERTICAL' | translate }}</ng-template>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <button class="btn btn-secondary me-2" [disabled]="searchImagesForm.invalid">
-                                    {{ 'ADMINPANEL.SEARCHIMAGESFORM.SUBMITBUTTONTEXT' | translate }}
-                                </button>
-                                <button type="button" class="btn btn-warning" (click)="searchImagesFormReset()">
-                                    {{ 'ADMINPANEL.SEARCHIMAGESFORM.RESETBUTTONTEXT' | translate }}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-				</ng-template>
-			</div>
-		</div>
-	</div>
-</div>
-<div *ngIf="fullCompressedImagesListCount !== 0; else noContentBlock" class="w-100 mt-3" id="compressedImagesDataContainer">
+<app-offcanvas-search class="position-fixed h-50 z-2 top-0 start-0 d-flex flex-row justify-content-start align-items-center"
+    [ngStyle]="{
+        'width': '5%'
+    }"
+    [searchImagesForm]="searchImagesForm"
+    [imagePhotographyTypes]="imagePhotographyTypes"
+    [sortBy_TypesArr]="sortBy_TypesArr"
+    [imageDisplayTypes]="imageDisplayTypes"
+    [searchImagesMethod]="getSearchImagesMethod()"
+    [searchImagesFormResetMethod]="getSearchImagesFormResetMethod()"
+></app-offcanvas-search>
+<div *ngIf="fullCompressedImagesListCount !== 0; else noContentBlock" class="w-100" id="compressedImagesDataContainer">
     <form [formGroup]="changeImageDataForm" *ngIf="compressedImagesDataIsLoaded" class="w-100 d-flex flex-row flex-wrap justify-content-center" novalidate
         [ngClass]="{ 'pe-none': changeImageDataFormElementPEIsNone }"
         (submit)="changeImageData($event)"
@@ -323,7 +262,9 @@
         </div>
     </form>
     <div *ngIf="additionalImagesIsExists" class="w-100 text-center" [hidden]="compressedImageButtonsIsHidden">
-        <button class="btn btn-outline-info w-50 my-3 shadow" type="button" (click)="getFullCompressedImagesData(false, { dateFrom: currentDateFrom, dateUntil: currentDateUntil, photographyTypes: currentPhotographyTypes }, true)" #additionalImagesButton>
+        <button class="btn btn-outline-info w-50 my-3 shadow" type="button" (click)="getFullCompressedImagesData(false, { 
+            dateFrom: currentDateFrom, dateUntil: currentDateUntil, photographyTypes: currentPhotographyTypes, displayTypes: currentDisplayTypes, sortBy: searchImagesForm.controls['sortBy'].value
+        }, true)" #additionalImagesButton>
             {{ 'ADMINPANEL.ADDITIONALCOMPRESSEDIMAGESBUTTONTEXT' | translate }}
         </button>
     </div>
@@ -336,7 +277,6 @@
 <div class="col-8 col-sm-8 col-md-8 col-lg-6 col-xl-6 col-xxl-5 position-fixed z-3 d-flex flex-column"
     [ngClass]="{ 'invisible' : !imageThumbnailContainerIsVisible }"
     [@image-thumbnail-container-animation]="imageThumbnailContainerAnimationState"
-    (@image-thumbnail-container-animation.start)="imageThumbnailContainerAnimationStart($event)"
     (@image-thumbnail-container-animation.done)="imageThumbnailContainerAnimationDone($event)"
 >
     <div class="d-flex flex-row align-items-center text-bg-secondary text-center rounded-top">

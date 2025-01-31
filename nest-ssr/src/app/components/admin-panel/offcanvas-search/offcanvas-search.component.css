@@ -1,0 +1,5 @@
+.searchImagesOffcanvas {
+    height: fit-content !important;
+    top: 10% !important;
+    z-index: 3 !important;
+}

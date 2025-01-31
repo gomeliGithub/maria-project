@@ -26,6 +26,7 @@ export interface IClientGetCompressedImagesOptions {
     take?: number;
     dateFrom?: Date;
     dateUntil?: Date;
+    orderBy?: Prisma.CompressedImageOrderByWithRelationInput;
 }
 
 export interface IDownloadOriginalImageOptions {
@@ -45,6 +46,7 @@ export interface ICompressedImageGetOptions {
     imagesExistsCount?: number;
     dateFrom?: Date;
     dateUntil?: Date;
+    sortBy?: SortBy_Types;
 }
 
 export interface IModalCreateOptions {
@@ -89,4 +91,15 @@ export interface IGetFullCompressedImagesDataOptions {
     dateUntil?: Date;
     photographyTypes?: string[];
     displayTypes?: string[];
+    sortBy: SortBy_Types;
+}
+
+export enum SortBy_Types {
+    originalName = 'originalName',
+    originalSize = 'originalSize',
+    photographyType = 'photographyType',
+    displayType = 'displayType',
+    uploadDate = 'uploadDate',
+    displayedOnHomePage = 'displayedOnHomePage',
+    displayedOnGalleryPage = 'displayedOnGalleryPage'
 }

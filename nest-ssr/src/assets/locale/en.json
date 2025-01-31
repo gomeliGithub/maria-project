@@ -194,6 +194,16 @@
 			"INPUTDATEUNTILLABELTEXT": "Until",
 			"INPUTPHOTOGRAPHYTYPETEXT": "Photography types",
 			"INPUTDISPLAYTYPETEXT": "Display types",
+			"INPUTSORTBYLABELTEXT": "Sort by",
+			"SORTBYTEXT": {
+				"ORIGINALNAME": "Original name",
+				"ORIGINALSIZE": "Original image size",
+				"PHOTOGRAPHYTYPE": "Photography type",
+				"DISPLAYTYPE": "Display type",
+				"UPLOADDATE": "Upload date",
+				"DISPLAYEDONHOMEPAGE": "Displayed on home page",
+				"DISPLAYEDONGALLERYPAGE": "Displayed on gallery page"
+			},
 			"ACCORDIONTITLETEXT": "Search images",
 			"SUBMITBUTTONTEXT": "Search",
 			"RESETBUTTONTEXT": "Clear definition criteria"

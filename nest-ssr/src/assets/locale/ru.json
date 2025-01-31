@@ -194,6 +194,16 @@
 			"INPUTDATEUNTILLABELTEXT": "До",
 			"INPUTPHOTOGRAPHYTYPETEXT": "Типы съёмок",
 			"INPUTDISPLAYTYPETEXT": "Типы отображения",
+			"INPUTSORTBYLABELTEXT": "Сортировка по",
+			"SORTBYTEXT": {
+				"ORIGINALNAME": "Оригинальному имени",
+				"ORIGINALSIZE": "Размеру оригинального изображения",
+				"PHOTOGRAPHYTYPE": "Типу съёмки",
+				"DISPLAYTYPE": "Типу отображения",
+				"UPLOADDATE": "Дате загрузки",
+				"DISPLAYEDONHOMEPAGE": "Видимости на главной странице",
+				"DISPLAYEDONGALLERYPAGE": "Видимости на странице галереи"
+			},
 			"ACCORDIONTITLETEXT": "Поиск изображений",
 			"SUBMITBUTTONTEXT": "Найти",
 			"RESETBUTTONTEXT": "Очистить критерии поиска"

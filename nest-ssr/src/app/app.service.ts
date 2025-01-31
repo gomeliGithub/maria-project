@@ -7,9 +7,14 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, map } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 
+import { AppComponent } from './app.component';
+import { GalleryComponent } from './components/gallery/gallery.component';
 import { ModalComponent } from './components/modal/modal.component';
 
+import { ClientService } from './services/client/client.service';
+
 import { IModalCreateOptions } from 'types/options';
+import { ICompressedImageWithoutRelationFields } from 'types/models';
 
 @Injectable({
     providedIn: 'root'
@@ -122,5 +127,117 @@ export class AppService {
     public getTranslations (keys: string | string[], async = false): Observable<string | string[]> | string | string[] {
         if ( async ) return this.translateService.get(keys).pipe(map(translations => typeof translations === 'object' ? Object.entries(translations).map(keyValueArr => keyValueArr[1]) : translations)) as Observable<string | string[]>;
         else return this.translateService.instant(keys);
+    }
+
+    public onRouterOutletGalleryComponent (appComponentThis: AppComponent, galleryComponent: GalleryComponent): void {
+        let compressedImagesList: ICompressedImageWithoutRelationFields[] | null = null;
+        let additionalImagesExists: boolean = false;
+        let photographyTypeDescription: string | null = null;
+
+        switch ( galleryComponent.photographyType ) {
+            case 'individual': {
+                if ( appComponentThis.galleryIndividualCompressedImagesData ) {
+                    compressedImagesList = appComponentThis.galleryIndividualCompressedImagesData.compressedImagesDataList;
+                    additionalImagesExists = appComponentThis.galleryIndividualCompressedImagesData.additionalImagesExists;
+                    photographyTypeDescription = appComponentThis.galleryIndividualCompressedImagesData.photographyTypeDescription ? appComponentThis.galleryIndividualCompressedImagesData.photographyTypeDescription : null;
+                }
+
+                break;
+            }
+
+            case 'children': {
+                if ( appComponentThis.galleryChildrenCompressedImagesData ) {
+                    compressedImagesList = appComponentThis.galleryChildrenCompressedImagesData.compressedImagesDataList;
+                    additionalImagesExists = appComponentThis.galleryChildrenCompressedImagesData.additionalImagesExists;
+                    photographyTypeDescription = appComponentThis.galleryChildrenCompressedImagesData.photographyTypeDescription ? appComponentThis.galleryChildrenCompressedImagesData.photographyTypeDescription : null;
+                }
+                
+                break;
+            }
+
+            case 'wedding': {
+                if ( appComponentThis.galleryWeddingCompressedImagesData ) {
+                    compressedImagesList = appComponentThis.galleryWeddingCompressedImagesData.compressedImagesDataList;
+                    additionalImagesExists = appComponentThis.galleryWeddingCompressedImagesData.additionalImagesExists;
+                    photographyTypeDescription = appComponentThis.galleryWeddingCompressedImagesData.photographyTypeDescription ? appComponentThis.galleryWeddingCompressedImagesData.photographyTypeDescription : null;
+                }
+
+                break;
+            }
+
+            case 'family': {
+                if ( appComponentThis.galleryFamilyCompressedImagesData ) {
+                    compressedImagesList = appComponentThis.galleryFamilyCompressedImagesData.compressedImagesDataList;
+                    additionalImagesExists = appComponentThis.galleryFamilyCompressedImagesData.additionalImagesExists;
+                    photographyTypeDescription = appComponentThis.galleryFamilyCompressedImagesData.photographyTypeDescription ? appComponentThis.galleryFamilyCompressedImagesData.photographyTypeDescription : null;
+                }
+
+                break;
+            }
+        }
+
+        galleryComponent.compressedImagesList = compressedImagesList;
+        galleryComponent.additionalImagesExists = additionalImagesExists;
+        galleryComponent.photographyTypeDescription = photographyTypeDescription ? photographyTypeDescription : null;
+
+        if ( galleryComponent.compressedImagesList ) {
+            ( galleryComponent.compressedImagesList as ICompressedImageWithoutRelationFields[]).forEach(() => {
+                galleryComponent.linkContainerAnimationStates.push('leave');
+                galleryComponent.linkContainerAnimationDisplayValues.push('none');
+            });
+        }
+    }
+
+    public updateCanonicalLink (documentDOM: Document, domainURL: string, newCanonicalUrl: string): void {
+        const canonicalUrl: string = domainURL + '/' + newCanonicalUrl;
+        const head: HTMLHeadElement = documentDOM.getElementsByTagName('head')[0];
+
+        let element: HTMLLinkElement | undefined = documentDOM.querySelector(`link[rel='canonical']`) as HTMLLinkElement || undefined;
+
+        if ( !element ) {
+            element = documentDOM.createElement('link') as HTMLLinkElement;
+            
+            head.appendChild(element);
+        }
+
+        element.setAttribute('rel', 'canonical');
+        element.setAttribute('href', canonicalUrl);
+    }
+
+    public navbarTogglerClick (componentThis: AppComponent, animationStart: boolean): void {
+        if ( animationStart ) componentThis.changeNavbarTogglerIconTriggerState();
+
+        componentThis.navbarIsCollapsed = !componentThis.navbarIsCollapsed;
+        if ( !componentThis.prevNavbarAnimationState ) componentThis.prevNavbarAnimationState = componentThis.navbarAnimationState;
+
+        if ( componentThis.prevNavbarAnimationState === 'static' ) {
+            if ( !componentThis.navbarIsCollapsed ) componentThis.navbarAnimationState = 'scrolled';
+            else {
+                componentThis.navbarAnimationState = 'static';
+
+                componentThis.prevNavbarAnimationState = null;
+            }
+        } else if ( componentThis.prevNavbarAnimationState === 'scrolled' ) {
+            if ( !componentThis.navbarIsCollapsed ) componentThis.navbarAnimationState = 'scrolled';
+        }
+    }
+
+    public changeClientLocale (componentThis: AppComponent, clientService: ClientService, event: MouseEvent, documentDOM: Document): void {
+        const localeButton: HTMLAnchorElement = event.target as HTMLAnchorElement;
+
+        const newLocale: string = localeButton.id;
+
+        clientService.changeClientLocale(newLocale).subscribe({
+            next: data => {
+                documentDOM.documentElement.lang = newLocale;
+
+                if ( data[0] ) localStorage.setItem('access_token', data[0]);
+
+                componentThis.activeClientLocale = newLocale;
+
+                this.createSuccessModal(this.getTranslations('CHANGECLIENTLOCALESUCCESSMESSAGE'));
+            },
+            error: () => this.createErrorModal()
+        });
     }
 }

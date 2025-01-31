@@ -52,7 +52,7 @@ export class AdminPanelService {
 
         if ( !commonServiceRef.checkFileExists(originalImagePath) ) throw new BadRequestException(`${ request.url } "GetImageThumbnail - original image does not exists"`);
         else {
-            const originalImageThumbnail: Buffer = await commonServiceRef.managePromisesCache('resizeImageThumbnail', sharp(originalImagePath).resize(1500, 1500).toBuffer());
+            const originalImageThumbnail: Buffer = await commonServiceRef.managePromisesCache('resizeImageThumbnail', sharp(originalImagePath).resize(1500, 1500, { fit: 'inside' }).toBuffer());
 
             return originalImageThumbnail;
         }
@@ -293,12 +293,13 @@ export class AdminPanelService {
                     adminId: false
                 },
                 photographyTypes: options.photographyTypes && options.photographyTypes.length !== 0 ? options.photographyTypes as Image_photography_type[] : undefined,
-                displayTypes: options.displayTypes && options.displayTypes.length !== 0 ? options.displayTypes as Image_display_type[] : undefined
+                displayTypes: options.displayTypes && options.displayTypes.length !== 0 ? options.displayTypes as Image_display_type[] : undefined,
             },
             imagesLimit: options.imagesLimit,
             imagesExistsCount: options.imagesExistsCount,
             dateFrom: options.dateUntil,
             dateUntil: options.dateUntil,
+            sortBy: options.sortBy
         });
 
         const commonCompressedImagesCount: number = await this._prisma.compressedImage.count({
@@ -624,8 +625,8 @@ export class AdminPanelService {
         }
 
         compressedImageUpdateArgs.data.dirPath = newDirPath;
-    
-        await commonServiceRef.managePromisesCache('changeImageDisplayTargetRename', fsPromises.rename(existingCompressedImageData.dirPath, newImagePath));
+        
+        await commonServiceRef.managePromisesCache('changeImageDisplayTargetRename', fsPromises.rename(path.join(existingCompressedImageData.dirPath, existingCompressedImageData.name), newImagePath));
         await this._prisma.compressedImage.update(compressedImageUpdateArgs);
 
         return 'SUCCESS';
@@ -740,7 +741,7 @@ export class AdminPanelService {
         ) ) {
             const staticFilesGalleryImagePath: string = path.join(this.staticCompressedImagesDirPath, 'gallery', existingCompressedImageData.photographyType, existingCompressedImageData.name);
 
-            if ( existingCompressedImageData.dirPath !== staticFilesGalleryImagePath ) {
+            if ( path.join(existingCompressedImageData.dirPath, existingCompressedImageData.name) !== staticFilesGalleryImagePath ) {
                 throw new InternalServerErrorException(`${ request.url } "ValidateImageControlRequests - compressed image '${ ( existingCompressedImageData as ICompressedImageWithoutRelationFields ).name }' does not exists in directory"`);
             }
         }

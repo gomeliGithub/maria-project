@@ -26,7 +26,6 @@ import { HomeService } from './services/home/home.service';
 import { environment } from '../environments/environment';
 
 import { IClientLocale, IGalleryCompressedImagesData } from 'types/global';
-import { ICompressedImageWithoutRelationFields } from 'types/models';
 
 @Component({
     selector: 'app-root',
@@ -131,10 +130,10 @@ export class AppComponent implements OnInit {
     public activeClientLocale: string | null;
     public activeClientFullName: string | null;
     
-    private _galleryIndividualCompressedImagesData: IGalleryCompressedImagesData;
-    private _galleryChildrenCompressedImagesData: IGalleryCompressedImagesData;
-    private _galleryWeddingCompressedImagesData: IGalleryCompressedImagesData;
-    private _galleryFamilyCompressedImagesData: IGalleryCompressedImagesData;
+    public galleryIndividualCompressedImagesData: IGalleryCompressedImagesData;
+    public galleryChildrenCompressedImagesData: IGalleryCompressedImagesData;
+    public galleryWeddingCompressedImagesData: IGalleryCompressedImagesData;
+    public galleryFamilyCompressedImagesData: IGalleryCompressedImagesData;
 
     constructor (
         @Inject(PLATFORM_ID) private readonly platformId: string,
@@ -151,18 +150,6 @@ export class AppComponent implements OnInit {
     ) { 
         this.isPlatformBrowser = isPlatformBrowser(this.platformId);
         this.isPlatformServer = isPlatformServer(this.platformId);
-
-        /* if ( this.isPlatformServer ) {
-            const cspNonce: string = this.response.locals['cspNonce'];
-
-            console.log(cspNonce);
-
-            const scriptStyleElements: NodeListOf<HTMLScriptElement | HTMLStyleElement> = this.document.querySelectorAll('script, style');
-
-            console.log(scriptStyleElements.length);
-
-            scriptStyleElements.forEach(data => data.setAttribute('nonce', cspNonce));
-        } */
     }
 
     ngOnInit (): void {
@@ -194,10 +181,10 @@ export class AppComponent implements OnInit {
             this._homeService.discountsDataIsExistsChange.subscribe(value => this.discountsDataIsExists = value);
         }
 
-        this._clientService.getCompressedImagesData('individual', 'vertical', 0).subscribe(data => this._galleryIndividualCompressedImagesData = data);
-        this._clientService.getCompressedImagesData('children', 'vertical', 0).subscribe(data => this._galleryChildrenCompressedImagesData = data);
-        this._clientService.getCompressedImagesData('wedding', 'vertical', 0).subscribe(data => this._galleryWeddingCompressedImagesData = data);
-        this._clientService.getCompressedImagesData('family', 'vertical', 0).subscribe(data => this._galleryFamilyCompressedImagesData = data);
+        this._clientService.getCompressedImagesData('individual', 'vertical', 0).subscribe(data => this.galleryIndividualCompressedImagesData = data);
+        this._clientService.getCompressedImagesData('children', 'vertical', 0).subscribe(data => this.galleryChildrenCompressedImagesData = data);
+        this._clientService.getCompressedImagesData('wedding', 'vertical', 0).subscribe(data => this.galleryWeddingCompressedImagesData = data);
+        this._clientService.getCompressedImagesData('family', 'vertical', 0).subscribe(data => this.galleryFamilyCompressedImagesData = data);
     }
 
     public onRouterOutlet (component: HomeComponent | GalleryComponent | ClientComponent | AdminPanelComponent | AdminPanelOrdersControlComponent 
@@ -223,61 +210,14 @@ export class AppComponent implements OnInit {
 
             this.isHomePage = false;
 
-            if ( component instanceof GalleryComponent ) {
-                let compressedImagesList: ICompressedImageWithoutRelationFields[] | null = null;
-                let additionalImagesExists: boolean = false;
-                let photographyTypeDescription: string | null = null;
-
-                switch ( component.photographyType ) {
-                    case 'individual': {
-                        compressedImagesList = this._galleryIndividualCompressedImagesData.compressedImagesDataList;
-                        additionalImagesExists = this._galleryIndividualCompressedImagesData.additionalImagesExists;
-                        photographyTypeDescription = this._galleryIndividualCompressedImagesData.photographyTypeDescription ? this._galleryIndividualCompressedImagesData.photographyTypeDescription : null;
-
-                        break; 
-                    }
-
-                    case 'children': {
-                        compressedImagesList = this._galleryChildrenCompressedImagesData.compressedImagesDataList;
-                        additionalImagesExists = this._galleryChildrenCompressedImagesData.additionalImagesExists;
-                        photographyTypeDescription = this._galleryChildrenCompressedImagesData.photographyTypeDescription ? this._galleryChildrenCompressedImagesData.photographyTypeDescription : null;
-                        
-                        break; 
-                    }
-
-                    case 'wedding': {
-                        compressedImagesList = this._galleryWeddingCompressedImagesData.compressedImagesDataList;
-                        additionalImagesExists = this._galleryWeddingCompressedImagesData.additionalImagesExists;
-                        photographyTypeDescription = this._galleryWeddingCompressedImagesData.photographyTypeDescription ? this._galleryWeddingCompressedImagesData.photographyTypeDescription : null;
-
-                        break; 
-                    }
-
-                    case 'family': {
-                        compressedImagesList = this._galleryFamilyCompressedImagesData.compressedImagesDataList;
-                        additionalImagesExists = this._galleryFamilyCompressedImagesData.additionalImagesExists;
-                        photographyTypeDescription = this._galleryFamilyCompressedImagesData.photographyTypeDescription ? this._galleryFamilyCompressedImagesData.photographyTypeDescription : null;
-
-                        break; 
-                    }
-                }
-
-                component.compressedImagesList = compressedImagesList;
-                component.additionalImagesExists = additionalImagesExists;
-                component.photographyTypeDescription = photographyTypeDescription ? photographyTypeDescription : null;
-
-                ( component.compressedImagesList as ICompressedImageWithoutRelationFields[]).forEach(() => {
-                    component.linkContainerAnimationStates.push('leave');
-                    component.linkContainerAnimationDisplayValues.push('none');
-                });
-            }
+            if ( component instanceof GalleryComponent ) this._appService.onRouterOutletGalleryComponent(this, component);
         } else {
             this.componentClass = true;
             this.isHomePage = true;
 
             if ( this.isPlatformServer ) {
                 if ( this._request.url === '/' ) {
-                    this.updateCanonicalLink('home');
+                    this._appService.updateCanonicalLink(this._document, this.domainURL, 'home');
                 }
             }
 
@@ -307,40 +247,6 @@ export class AppComponent implements OnInit {
     public onGlobalClick (event: MouseEvent): void {
         if ( !this.navbarElementRef.nativeElement.contains(event.target as HTMLElement) ) {
             if ( !this.navbarIsCollapsed ) this.navbarTogglerClick(true);
-        }
-    }
-
-    public updateCanonicalLink (newCanonicalUrl: string): void {
-        const canonicalUrl: string = this.domainURL + '/' + newCanonicalUrl;
-        const head: HTMLHeadElement = this._document.getElementsByTagName('head')[0];
-
-        let element: HTMLLinkElement | undefined = this._document.querySelector(`link[rel='canonical']`) as HTMLLinkElement || undefined;
-
-        if ( !element ) {
-            element = this._document.createElement('link') as HTMLLinkElement;
-            
-            head.appendChild(element);
-        }
-
-        element.setAttribute('rel', 'canonical');
-        element.setAttribute('href', canonicalUrl);
-    }
-
-    public navbarTogglerClick (animationStart = false): void {
-        if ( animationStart ) this.changeNavbarTogglerIconTriggerState();
-
-        this.navbarIsCollapsed = !this.navbarIsCollapsed;
-        if ( !this.prevNavbarAnimationState ) this.prevNavbarAnimationState = this.navbarAnimationState;
-
-        if ( this.prevNavbarAnimationState === 'static' ) {
-            if ( !this.navbarIsCollapsed ) this.navbarAnimationState = 'scrolled';
-            else {
-                this.navbarAnimationState = 'static';
-
-                this.prevNavbarAnimationState = null;
-            }
-        } else if ( this.prevNavbarAnimationState === 'scrolled' ) {
-            if ( !this.navbarIsCollapsed ) this.navbarAnimationState = 'scrolled';
         }
     }
 
@@ -384,6 +290,10 @@ export class AppComponent implements OnInit {
         }
     }
 
+    public navbarTogglerClick (animationStart = false): void {
+        this._appService.navbarTogglerClick(this, animationStart);
+    }
+
     public signOut (): Subscription {
         return this._clientService.signOut().subscribe({
             next: () => this._appService.reloadComponent(false, '/'),
@@ -392,21 +302,6 @@ export class AppComponent implements OnInit {
     }
 
     public changeClientLocale (event: MouseEvent): void {
-        const localeButton: HTMLAnchorElement = event.target as HTMLAnchorElement;
-
-        const newLocale: string = localeButton.id;
-
-        this._clientService.changeClientLocale(newLocale).subscribe({
-            next: data => {
-                this._document.documentElement.lang = newLocale;
-
-                if ( data[0] ) localStorage.setItem('access_token', data[0]);
-
-                this.activeClientLocale = newLocale;
-
-                this._appService.createSuccessModal(this._appService.getTranslations('CHANGECLIENTLOCALESUCCESSMESSAGE'));
-            },
-            error: () => this._appService.createErrorModal()
-        });
+        this._appService.changeClientLocale(this, this._clientService, event, this._document);
     }
 }

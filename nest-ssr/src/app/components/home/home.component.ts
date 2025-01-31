@@ -135,108 +135,25 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
         });
 
         if ( this.isPlatformServer ) {
-            this._clientService.getCompressedImagesData('home', 'horizontal').subscribe({
-                next: imagesData => {
-                    this.compressedImagesList = imagesData.length !== 0 ? imagesData : null;
-
-                    this._transferState.set(compressedImagesListDataStateKey, imagesData);
-                },
-                error: () => this._appService.createErrorModal()
-            });
-
-            this._clientService.getDiscountsData().subscribe({
-                next: discountsData => {
-                    this.discountsData = discountsData.length !== 0 ? discountsData : null;
-
-                    this._transferState.set(discountsDataStateKey, discountsData);
-    
-                    if ( this.discountsData ) this._homeService.setDiscountsDataIsExists(true);
-                },
-                error: () => this._appService.createErrorModal()
-            });
-
-            this._clientService.getImagePhotographyTypesData('home').subscribe({
-                next: imagePhotographyTypesData => {
-                    this.imagePhotographyTypes = imagePhotographyTypesData.length !== 0 ? imagePhotographyTypesData: null;
-
-                    this._transferState.set(imagePhotographyTypesStateKey, imagePhotographyTypesData);
-
-                    this.setAnimationsStates();
-    
-                    /* if ( this.imagePhotographyTypes !== null ) {
-                        this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
-                        this.flatImagePhotographyTypes.forEach(() => {
-                            this.currentMouseTriggerStates.push('leave');
-                            this.currentLinkButtonContainerAnimationStates.push('leave');
-                        });
-            
-                        ( this.imagePhotographyTypes as IImagePhotographyType[][] ).forEach(() => this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false }));
-            
-                        this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false });
-                    } */
-                },
-                error: () => this._appService.createErrorModal()
-            });
+            this._homeService.getCompressedImagesData(this, compressedImagesListDataStateKey);
+            this._homeService.getDiscountsData(this, discountsDataStateKey);
+            this._homeService.getImagePhotographyTypesData(this, imagePhotographyTypesStateKey);
         } else if ( this.isPlatformBrowser ) {
             this.compressedImagesList = this._transferState.get<ICompressedImageWithoutRelationFields[] | null>(compressedImagesListDataStateKey, null);
 
+            if ( this.compressedImagesList === null ) this._homeService.getCompressedImagesData(this, compressedImagesListDataStateKey);
+
             this.discountsData = this._transferState.get<IDiscount[] | null>(discountsDataStateKey, null);
 
-            if ( this.discountsData ) this._homeService.setDiscountsDataIsExists(true);
+            if ( this.discountsData !== null && this.discountsData.length !== 0 ) this._homeService.setDiscountsDataIsExists(true);
+            if ( this.discountsData === null ) this._homeService.getDiscountsData(this, discountsDataStateKey);
 
             this.imagePhotographyTypes = this._transferState.get<IImagePhotographyType[][] | null>(imagePhotographyTypesStateKey, null);
 
+            if ( this.imagePhotographyTypes === null ) this._homeService.getImagePhotographyTypesData(this, imagePhotographyTypesStateKey);
+
             this.setAnimationsStates();
         }
-
-        /*
-
-        this._clientService.getCompressedImagesData('home', 'horizontal').subscribe({
-            next: imagesData => {
-                this.compressedImagesList = imagesData.length !== 0 ? imagesData : null;
-
-                this._transferState.set(compressedImagesListDataKey, imagesData);
-            },
-            error: () => this._appService.createErrorModal()
-        });
-
-        */
-
-        /*
-
-        this._clientService.getDiscountsData().subscribe({
-            next: discountsData => {
-                this.discountsData = discountsData.length !== 0 ? discountsData : null;
-
-                if ( this.discountsData ) this._homeService.setDiscountsDataIsExists(true);
-            },
-            error: () => this._appService.createErrorModal()
-        });
-
-        */
-
-        /*
-
-        this._clientService.getImagePhotographyTypesData('home').subscribe({
-            next: imagePhotographyTypesData => {
-                this.imagePhotographyTypes = imagePhotographyTypesData.length !== 0 ? imagePhotographyTypesData: null;
-
-                if ( this.imagePhotographyTypes !== null ) {
-                    this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();
-                    this.flatImagePhotographyTypes.forEach(() => {
-                        this.currentMouseTriggerStates.push('leave');
-                        this.currentLinkButtonContainerAnimationStates.push('leave');
-                    });
-        
-                    ( this.imagePhotographyTypes as IImagePhotographyType[][] ).forEach(() => this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false }));
-        
-                    this.currentScrollSnapSectionVisiableAnimationStates.push({ state: 'unvisiable', finished: false });
-                }
-            },
-            error: () => this._appService.createErrorModal()
-        });
-
-        */
 
         this._homeService.activeScrollSnapSectionChange.subscribe(value => {
             this.getScrollSnapSectionsPosition();
@@ -286,7 +203,7 @@ export class HomeComponent implements OnInit, AfterContentChecked, AfterViewChec
             this.getActiveScrollSnapSection($event.srcElement);
         }
     }
-
+    
     public setAnimationsStates (): void {
         if ( this.imagePhotographyTypes !== null ) {
             this.flatImagePhotographyTypes = this.imagePhotographyTypes.flat();

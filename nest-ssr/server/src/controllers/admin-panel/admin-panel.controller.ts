@@ -12,6 +12,7 @@ import { Cookies } from '../../decorators/cookies.decorator';
 
 import { IClientOrdersData, IClientOrdersInfoData, IFullCompressedImageData, IRequest, IRequestBody } from 'types/global';
 import { IDiscount } from 'types/models';
+import { SortBy_Types } from 'types/options';
 
 @Controller('/admin-panel')
 export class AdminPanelController {
@@ -56,6 +57,7 @@ export class AdminPanelController {
         const imagesLimit: number | undefined = options['imagesLimit'] ? parseInt(options['imagesLimit'], 10) : undefined;
         const dateFrom: Date | string | undefined = options['dateFrom'] ? new Date(options['dateFrom']) : undefined;
         const dateUntil: Date | string | undefined = options['dateUntil'] ? new Date(options['dateUntil']) : undefined;
+        const sortBy: string = options['sortBy'];
 
         let photographyTypes: string[] | undefined = options['photographyTypes'] ? options['photographyTypes'] : undefined;
         let displayTypes: string[] | undefined = options['displayTypes'] ? options['displayTypes'] : undefined;
@@ -76,7 +78,8 @@ export class AdminPanelController {
             }
         }
 
-        if ( imagesExistsCount && Number.isNaN(imagesExistsCount)
+        if ( !sortBy || !( sortBy in SortBy_Types)
+            || imagesExistsCount && Number.isNaN(imagesExistsCount)
             || imagesLimit && ( Number.isNaN(imagesLimit) || imagesLimit > 15 )
             || dateFrom && ( ( typeof dateFrom === 'string' && dateFrom === 'Invalid Date' ) )
             || dateUntil && ( ( typeof dateUntil === 'string' && dateUntil === 'Invalid Date' ) )
@@ -84,7 +87,7 @@ export class AdminPanelController {
             || displayTypes && ( !Array.isArray(displayTypes) || displayTypes.length === 0 || !( displayTypes.every(data => data in Image_display_type) ) )
         ) throw new BadRequestException(`${ request.url } "GetFullCompressedImagesList - invalid query data"`);
 
-        return this._adminPanelService.getFullCompressedImagesList(request, { imagesLimit, imagesExistsCount, photographyTypes, displayTypes });
+        return this._adminPanelService.getFullCompressedImagesList(request, { imagesLimit, imagesExistsCount, photographyTypes, displayTypes, sortBy: sortBy as SortBy_Types });
     }
 
     @Get('/getClientOrders')
